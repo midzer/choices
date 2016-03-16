@@ -12,13 +12,25 @@
 
     'use strict';
 
+    let wrap = function (element, wrapper) {
+        wrapper = wrapper || document.createElement('div');
+        if (element.nextSibling) {
+            element.parentNode.insertBefore(wrapper, element.nextSibling);
+        } else {
+            element.parentNode.appendChild(wrapper);
+        }
+        return wrapper.appendChild(element);
+    };
+
     class Choices {
         constructor() {
+            const fakeEl = document.createElement("fakeelement");
             const DEFAULT_OPTIONS = {
                 element: '[data-choice]',
                 disabled: false,
                 maxItems: 0,
                 debug: false,
+                placeholder: false,
                 callbackOnInit: function(){},
                 callbackOnRender: function(){},
                 callbackOnKeyUp: function(){},
@@ -29,6 +41,8 @@
 
             // Merge options with user options
             this.options = DEFAULT_OPTIONS;
+            this.initialised = false;
+            this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
 
             // Retrieve elements
             this.elements = document.querySelectorAll(this.options.element);
@@ -39,10 +53,6 @@
             this.onChange = this.onChange.bind(this);
             this.onFocus = this.onFocus.bind(this);
             this.onBlur = this.onChange.bind(this);
-
-            // Init
-            this.addEventListeners();
-            this.render();
         }
 
         /* State */
@@ -61,38 +71,42 @@
 
         /* Event handling */
 
-        onKeyDown() {
-            console.log('Key down');
+        onKeyDown(e) {
+            console.log('Key down')
+            console.log(e.target);
         }
 
-        onFocus() {
-            console.log('Focus');
+        onFocus(e) {
+            console.log('Focus')
+            console.log(e.target);
         }
 
-        onClick() {
-            console.log('Click');
+        onClick(e) {
+            console.log('Click')
+            console.log(e.target);
         }
 
-        onChange() {
-            console.log('Change');
+        onChange(e) {
+            console.log('Change')
+            console.log(e.target);
         }
 
         /* Event listeners */
 
-        addEventListeners() {
-            document.addEventListener('click', this.onClick);
-            document.addEventListener('keydown', this.onKeyDown);
-            document.addEventListener('change', this.onChange);
-            document.addEventListener('focus', this.onFocus);
-            document.addEventListener('blur', this.onBlur);
+        addEventListeners(el) {
+            el.addEventListener('click', this.onClick);
+            el.addEventListener('keydown', this.onKeyDown);
+            el.addEventListener('change', this.onChange);
+            el.addEventListener('focus', this.onFocus);
+            el.addEventListener('blur', this.onBlur);
         }
 
-        removeEventListeners() {
-            document.removeEventListener('click', this.onClick);
-            document.removeEventListener('keydown', this.onKeyDown);
-            document.removeEventListener('change', this.onChange);
-            document.removeEventListener('focus', this.onFocus);
-            document.removeEventListener('blur', this.onBlur);
+        removeEventListeners(el) {
+            el.removeEventListener('click', this.onClick);
+            el.removeEventListener('keydown', this.onKeyDown);
+            el.removeEventListener('change', this.onChange);
+            el.removeEventListener('focus', this.onFocus);
+            el.removeEventListener('blur', this.onBlur);
         }
 
         /* Methods */
@@ -133,14 +147,52 @@
 
         }
 
-        render() {
+        init() {
+            if(!this.supports) console.error('Your browser doesn\'nt support shit');
+            this.initialised = true;
+
+            let els = this.elements;
+            for (let i = els.length - 1; i >= 0; i--) {
+                let el = els[i];    
+                this.render(el);
+            }
+        }
+
+        render(el) {
             console.log('Render');
+
+            let wrapper = document.createElement('div');
+            wrapper.classList.add('choice', 'choice--active')
+
+            el.classList.add('choice__input', 'choice__input--original');
+            el.tabIndex = '-1';
+            el.setAttribute('style', 'display:none;');
+
+            wrap(el, wrapper);
+
+            let input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('choice__input', 'choice__input--cloned');
+            wrapper.appendChild(input);
+
+            this.addEventListeners(el);
         }
 
         destroy() {
+            this.options = null;
+            this.elements = null;
 
+            let els = this.elements;
+
+            for (let i = els.length - 1; i >= 0; i--) {
+                let el = els[i];
+
+                this.removeEventListeners(el);
+            }
         }
     };
 
-    new Choices();
+    var choices = new Choices();
+    choices.init();
+    console.log(choices);
 });
