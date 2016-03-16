@@ -14,7 +14,7 @@
 
     class Choices {
         constructor() {
-            const DEFAULT_CONFIG = {
+            const DEFAULT_OPTIONS = {
                 element: '[data-choice]',
                 disabled: false,
                 maxItems: 0,
@@ -27,12 +27,21 @@
                 callbackOnRemove: function(){}
             };
 
+            // Merge options with user options
+            this.options = DEFAULT_OPTIONS;
+
+            // Retrieve elements
+            this.elements = document.querySelectorAll(this.options.element);
+
+            // Bind methods
             this.onClick = this.onClick.bind(this);
             this.onKeyDown = this.onKeyDown.bind(this);
             this.onChange = this.onChange.bind(this);
             this.onFocus = this.onFocus.bind(this);
             this.onBlur = this.onChange.bind(this);
 
+            // Init
+            this.addEventListeners();
             this.render();
         }
 
