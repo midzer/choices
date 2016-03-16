@@ -1,4 +1,4 @@
-import { wrap, getSiblings } from './lib/utils.js';
+import { wrap, getSiblings, isType } from './lib/utils.js';
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -20,8 +20,8 @@ import { wrap, getSiblings } from './lib/utils.js';
             const DEFAULT_OPTIONS = {
                 element: '[data-choice]',
                 disabled: false,
-                maxItems: 0,
-                debug: false,
+                maxItems: 5,
+                debug: true,
                 placeholder: false,
                 callbackOnInit: function(){},
                 callbackOnRender: function(){},
@@ -61,28 +61,45 @@ import { wrap, getSiblings } from './lib/utils.js';
 
         }
 
+        clearInput(el) {
+            if(el.value) el.value = '';
+        }
+
         /* Event handling */
 
         onKeyDown(e) {
-            // let input = 
-            console.log('Key down')
-
+            // Handle enter key
             if(e.keyCode === 13 && e.target.value) {
-                this.addItem(e.target, e.target.value);
-                e.target.value = '';
+                let el = e.target;
+                let value = el.value;
+                let list = e.target.parentNode.querySelector('.choice__list');
+
+                let handleEnterKey = () => {
+                    this.addItem(el, value, list);
+                    this.updateInputValue(el, value);
+                    this.clearInput(el);
+                };
+
+                if(this.options.maxItems) {
+                    if(this.options.maxItems > list.children.length) {
+                        handleEnterKey();
+                    }
+                } else {
+                    handleEnterKey();
+                }                
             }
         }
 
         onFocus(e) {
-            console.log('Focus')
+
         }
 
         onClick(e) {
-            console.log('Click')
+
         }
 
         onChange(e) {
-            console.log('Change')
+
         }
 
         /* Event listeners */
@@ -125,30 +142,28 @@ import { wrap, getSiblings } from './lib/utils.js';
 
         }
 
-        addItem(el, value) {
-            console.log('Add item');
-            let wrapper = el.parentNode;
-            let valueInput = wrapper.querySelector('.choice__input--original');
-            
-            let list = wrapper.querySelector('.choice__list');
-            
+        updateInputValue(el, value) {
+            if(this.options.debug) console.debug('Update input value');
+            // Find hidden element
+            let hiddenInput = el.parentNode.querySelector('.choice__input--hidden');
+            // If input already has values, parse the array, otherwise create a blank array
+            let valueArray = hiddenInput.value !== '' && isType('Array', JSON.parse(hiddenInput.value)) ? JSON.parse(hiddenInput.value) : [];
+            // Push new value to array
+            valueArray.push(value); 
+            // Caste array to string and set it as the hidden inputs value
+            hiddenInput.value = JSON.stringify(valueArray);
+        }
+
+        addItem(el, value, list) {
+            if(this.options.debug) console.debug('Add item');
+        
+            // Create new list element
             let item = document.createElement('li');
             item.classList.add('choice__item');
             item.textContent = value;
 
-            if(valueInput.value === '') {
-                valueInput.value = JSON.stringify([]);
-            }
-
-            let valueInputArray = JSON.parse(valueInput.value);
-
-            valueInputArray.push(value); 
-
-            valueInput.value = JSON.stringify(valueInputArray);
-
-            console.log(valueInput.value);
-
-            wrapper.appendChild(item);
+            // Append it to list
+            list.appendChild(item);
         }
 
         removeItem() {
@@ -175,7 +190,7 @@ import { wrap, getSiblings } from './lib/utils.js';
         }
 
         render(el) {
-            console.log('Render');
+            if(this.options.debug) console.debug('Render');
 
             let wrapper = document.createElement('div');
             let input = document.createElement('input');
@@ -183,7 +198,7 @@ import { wrap, getSiblings } from './lib/utils.js';
 
             wrapper.classList.add('choice', 'choice--active');
 
-            el.classList.add('choice__input', 'choice__input--original');
+            el.classList.add('choice__input', 'choice__input--hidden');
             el.tabIndex = '-1';
             el.setAttribute('style', 'display:none;');
             el.setAttribute('aria-hidden', 'true');
@@ -191,6 +206,13 @@ import { wrap, getSiblings } from './lib/utils.js';
             wrap(el, wrapper);
 
             list.classList.add('choice__list');
+
+            if(el.value !== '') {
+                let valueArray = JSON.parse(el.value);
+                valueArray.map((v) => {
+                    this.addItem(el, v, list);
+                });
+            }
 
             input.type = 'text';
             input.classList.add('choice__input', 'choice__input--cloned');
@@ -217,5 +239,4 @@ import { wrap, getSiblings } from './lib/utils.js';
 
     var choices = new Choices();
     choices.init();
-    console.log(choices);
 });
