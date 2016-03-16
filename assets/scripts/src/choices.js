@@ -128,11 +128,25 @@ import { wrap, getSiblings } from './lib/utils.js';
         addItem(el, value) {
             console.log('Add item');
             let wrapper = el.parentNode;
+            let valueInput = wrapper.querySelector('.choice__input--original');
+            
             let list = wrapper.querySelector('.choice__list');
             
             let item = document.createElement('li');
             item.classList.add('choice__item');
             item.textContent = value;
+
+            if(valueInput.value === '') {
+                valueInput.value = JSON.stringify([]);
+            }
+
+            let valueInputArray = JSON.parse(valueInput.value);
+
+            valueInputArray.push(value); 
+
+            valueInput.value = JSON.stringify(valueInputArray);
+
+            console.log(valueInput.value);
 
             wrapper.appendChild(item);
         }
@@ -172,6 +186,7 @@ import { wrap, getSiblings } from './lib/utils.js';
             el.classList.add('choice__input', 'choice__input--original');
             el.tabIndex = '-1';
             el.setAttribute('style', 'display:none;');
+            el.setAttribute('aria-hidden', 'true');
 
             wrap(el, wrapper);
 
