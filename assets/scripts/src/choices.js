@@ -1,3 +1,5 @@
+import { wrap, getSiblings } from './lib/utils.js';
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(function() {
@@ -11,16 +13,6 @@
 })(this, function (root) {
 
     'use strict';
-
-    let wrap = function (element, wrapper) {
-        wrapper = wrapper || document.createElement('div');
-        if (element.nextSibling) {
-            element.parentNode.insertBefore(wrapper, element.nextSibling);
-        } else {
-            element.parentNode.appendChild(wrapper);
-        }
-        return wrapper.appendChild(element);
-    };
 
     class Choices {
         constructor() {
@@ -72,23 +64,25 @@
         /* Event handling */
 
         onKeyDown(e) {
+            // let input = 
             console.log('Key down')
-            console.log(e.target);
+
+            if(e.keyCode === 13 && e.target.value) {
+                this.addItem(e.target, e.target.value);
+                e.target.value = '';
+            }
         }
 
         onFocus(e) {
             console.log('Focus')
-            console.log(e.target);
         }
 
         onClick(e) {
             console.log('Click')
-            console.log(e.target);
         }
 
         onChange(e) {
             console.log('Change')
-            console.log(e.target);
         }
 
         /* Event listeners */
@@ -131,8 +125,16 @@
 
         }
 
-        addItem() {
+        addItem(el, value) {
+            console.log('Add item');
+            let wrapper = el.parentNode;
+            let list = wrapper.querySelector('.choice__list');
+            
+            let item = document.createElement('li');
+            item.classList.add('choice__item');
+            item.textContent = value;
 
+            wrapper.appendChild(item);
         }
 
         removeItem() {
@@ -162,7 +164,10 @@
             console.log('Render');
 
             let wrapper = document.createElement('div');
-            wrapper.classList.add('choice', 'choice--active')
+            let input = document.createElement('input');
+            let list = document.createElement('ul');
+
+            wrapper.classList.add('choice', 'choice--active');
 
             el.classList.add('choice__input', 'choice__input--original');
             el.tabIndex = '-1';
@@ -170,12 +175,15 @@
 
             wrap(el, wrapper);
 
-            let input = document.createElement('input');
+            list.classList.add('choice__list');
+
             input.type = 'text';
             input.classList.add('choice__input', 'choice__input--cloned');
+            
+            wrapper.appendChild(list);
             wrapper.appendChild(input);
 
-            this.addEventListeners(el);
+            this.addEventListeners(input);
         }
 
         destroy() {
