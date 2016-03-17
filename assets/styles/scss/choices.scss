@@ -1,0 +1,72 @@
+*, *:before, *:after {
+    box-sizing: border-box
+}
+
+html {
+    font-size: 62.5%;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    widows: 100%;
+}
+
+body {
+    background-color: #FAFAFA;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: 1.6rem;
+    color: #222222;
+    padding: 2.4rem;
+}
+
+
+.choices {
+    margin-bottom: 2.4rem;
+    position: relative;
+}
+
+.choices__inner {
+    background-color: #FFFFFF;
+    padding: .75rem .75rem .375rem;
+    border: 1px solid #DDDDDD;
+    border-radius: .25rem;
+    font-size: 1.4rem;
+    &:focus { 
+        outline: 1px solid #00BCD4;
+        outline-offset: -1px;
+    }
+}
+
+.choices__list {
+    margin: 0;
+    padding-left: 0;
+    list-style-type: none;
+    display: inline;
+}
+
+.choices__input {
+    font-size: 1.4rem;
+    padding: 0;
+    margin-bottom: .5rem;
+    display: inline-block;
+    vertical-align: baseline;
+    border: 0;
+    border-radius: 0;
+    max-width: 100%;
+    &:focus { outline: 0; }
+}
+
+.choices__item {
+    display: inline-block;
+    border-radius: .4rem;
+    padding: .4rem .8rem;
+    font-size: 1.4rem;
+    margin-right: .375rem;
+    margin-bottom: .375rem;
+    background-color: #00BCD4;
+    text-shadow: 0px 1px 0px darken(#00BCD4, 10%);
+    border: 1px solid darken(#00BCD4, 5%);
+    color: #FFFFFF;
+    &.is-selected { background-color: darken(#00BCD4, 5%); }
+}

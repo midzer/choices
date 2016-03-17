@@ -1,3 +1,7 @@
+export let hasClass = (elem, className) => {
+    return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
+}
+
 /**
  * Capitalises the first letter of each word in a string 
  * @param  {String} str String to capitalise
