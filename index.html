@@ -6,8 +6,24 @@
     <link rel="stylesheet" href="assets/styles/css/choices.css">
 </head>
 <body>
-<input id="1" type="text" data-choice value='["preset-1", "preset-2"]' placeholder="This is a placeholder" class="custom class">
-<input id="2" type="text" data-choice >
-<script src="assets/scripts/dist/bundle.js"></script>
+    <label for="1">Text input with no values and a limit of 5 items</label>
+    <input id="1" type="text" data-choice>
+
+    <label for="2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
+    <input id="2" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+
+    <label for="3">Select input with two options</label>
+    <select id="3" name="3" data-choice>
+        <option value="Value 1">Value 1</option>
+        <option value="Value 2">Value 2</option>
+    </select>
+
+<!--     <label for="4">Multiple select input with two options</label>
+    <select id="4" name="4" data-choice multiple>
+        <option value="Value 1">Value 1</option>
+        <option value="Value 2">Value 2</option>
+    </select>
+ -->
+    <script src="assets/scripts/dist/bundle.js"></script>
 </body>
 </html>

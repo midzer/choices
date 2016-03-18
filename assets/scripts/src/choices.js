@@ -2,6 +2,14 @@
 
 import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
 
+/**
+
+    TODO:
+    - Handle select input
+    - Handle multiple select input ?
+
+ */
+
 class Choices {
     constructor(options) {
         const fakeEl = document.createElement("fakeelement");
@@ -10,8 +18,9 @@ class Choices {
             element: document.querySelector('[data-choice]'),
             disabled: false,
             create: true,
-            maxItems: 10,
-            allowDuplicates: false,
+            maxItems: false,
+            delimiter: ',',
+            allowDuplicates: true,
             debug: false,
             placeholder: false,
             callbackOnInit: function(){},
@@ -30,7 +39,9 @@ class Choices {
         // Retrieve elements
         this.element = this.options.element;
         // If input already has values, parse the array, otherwise create a blank array
-        this.valueArray = this.element.value !== '' && isType('Array', JSON.parse(this.element.value)) ? JSON.parse(this.element.value) : [];
+        this.valueArray = this.element.value !== '' ? this.element.value.replace(/\s/g, '').split(',') : [];
+
+        console.log(this.valueArray);
 
         // Bind methods
         this.onClick = this.onClick.bind(this);
@@ -127,9 +138,7 @@ class Choices {
                 // If no duplicates are allowed, and the value already exists
                 // in the array, don't update
                 if(this.options.allowDuplicates === false && this.element.value) {
-                    let currentValues = JSON.parse(this.element.value);
-
-                    if(currentValues.indexOf(value) > -1) {
+                    if(this.valueArray.indexOf(value) > -1) {
                         canUpdate = false;
                     }
                 }
@@ -228,8 +237,9 @@ class Choices {
 
         // Push new value to array
         this.valueArray.push(value); 
+
         // Caste array to string and set it as the hidden inputs value
-        this.element.value = JSON.stringify(this.valueArray);
+        this.element.value = this.valueArray.toString();
     }
 
     removeInputValue(value) {
@@ -238,13 +248,13 @@ class Choices {
         let index = this.valueArray.indexOf(value);
         this.valueArray.splice(index, 1);
 
-        this.element.value = JSON.stringify(this.valueArray);
+        this.element.value = this.valueArray.toString();
     }
 
     addItem(value) {
         if(this.options.debug) console.debug('Add item');
     
-        // Create new list element
+        // // Create new list element
         let item = document.createElement('li');
         item.classList.add('choices__item');
         item.textContent = value;
@@ -263,17 +273,12 @@ class Choices {
         this.render(this.element);
     }
 
-    render() {
-        if(this.options.debug) console.debug('Render');
-
-        // Create DOM elements
+    renderTextInput() {
         let containerOuter = document.createElement('div');
-        let containerInner = document.createElement('div');
-        let input = document.createElement('input');
-        let list = document.createElement('ul');
+            containerOuter.className = 'choices choices--active';
 
-        containerOuter.className = 'choices choices--active';
-        containerInner.className = 'choices__inner';
+        let containerInner = document.createElement('div');
+            containerInner.className = 'choices__inner';
 
         // Hide passed input
         this.element.classList.add('choices__input', 'choices__input--hidden');
@@ -283,15 +288,21 @@ class Choices {
 
         // Wrap input in container preserving DOM ordering
         wrap(this.element, containerInner);
-
+        
+        // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        list.className = 'choices__list';
+        let list = document.createElement('ul');
+            list.className = 'choices__list';
 
-        input.type = 'text';
-        input.placeholder = this.element.placeholder;
-        input.className = 'choices__input choices__input--cloned';
-        
+        let input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'choices__input choices__input--cloned';
+
+        if(input.placeholder) {
+            input.placeholder = this.element.placeholder;    
+        }
+            
         containerInner.appendChild(list);
         containerInner.appendChild(input);
         containerOuter.appendChild(containerInner);
@@ -302,13 +313,38 @@ class Choices {
         this.list = list;
 
         if(this.element.value !== '') {
-            let initialValues = JSON.parse(this.element.value);
-            initialValues.forEach((value) => {
+            // Add any preset values
+            this.valueArray.forEach((value) => {
                 this.addItem(value);
             });
         }
 
+        // Trigger event listeners 
         this.addEventListeners(this.input);
+    }
+
+    renderSelectInput() {
+
+    }
+
+    render() {
+        if(this.options.debug) console.debug('Render');
+
+        switch(this.element.type) {
+            case "text":
+                this.renderTextInput();
+                break;
+            case "select-one":
+                this.renderSelectInput();
+                break;
+            case "select-multiple":
+                console.warn('Choices does not support multiple select boxes');
+                break;
+            default:
+                rthis.renderTextInput();
+                break;
+        }
+
     }
 
     destroy() {
@@ -321,16 +357,27 @@ class Choices {
 
 window.addEventListener('load', function() {
 
-    let choiceInputs = document.querySelectorAll('[data-choice]');
+    let input1 = document.getElementById(1);
+    let input2 = document.getElementById(2);
+    let input3 = document.getElementById(3);
 
-    for (let i = choiceInputs.length - 1; i >= 0; i--) {
+    let choices1 = new Choices({
+        element : input1,
+        delimiter: ' ',
+        maxItems: 5,
+    });
 
-        let input = choiceInputs[i];
+    let choices2 = new Choices({
+        element : input2,
+        allowDuplicates: false
+    });
 
-        var choices = new Choices({
-            element : input
-        });
+    let choices3 = new Choices({
+        element : input3
+    });
 
-        choices.init();
-    };
+    choices1.init();
+    choices2.init();
+    choices3.init();
+
 });
