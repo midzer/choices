@@ -62,6 +62,8 @@ label {
   background-color: #00BCD4;
   text-shadow: 0px 1px 0px #008fa1;
   border: 1px solid #00a5bb;
-  color: #FFFFFF; }
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
+  color: #FFFFFF;
+  cursor: pointer; }
   .choices__item.is-selected {
     background-color: #00a5bb; }

@@ -71,6 +71,8 @@ label {
     background-color: #00BCD4;
     text-shadow: 0px 1px 0px darken(#00BCD4, 10%);
     border: 1px solid darken(#00BCD4, 5%);
+    box-shadow: 0px 1px 1px rgba(#000000, 0.2);
     color: #FFFFFF;
+    cursor: pointer;
     &.is-selected { background-color: darken(#00BCD4, 5%); }
 }
