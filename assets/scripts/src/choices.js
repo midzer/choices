@@ -39,9 +39,7 @@ class Choices {
         // Retrieve elements
         this.element = this.options.element;
         // If input already has values, parse the array, otherwise create a blank array
-        this.valueArray = this.element.value !== '' ? this.element.value.replace(/\s/g, '').split(',') : [];
-
-        console.log(this.valueArray);
+        this.valueArray = this.element.value !== '' ? this.cleanInputValue(this.element.value) : [];
 
         // Bind methods
         this.onClick = this.onClick.bind(this);
@@ -49,6 +47,10 @@ class Choices {
         this.onChange = this.onChange.bind(this);
         this.onFocus = this.onFocus.bind(this);
         this.onBlur = this.onChange.bind(this);
+    }
+
+    cleanInputValue(value) {
+        return value.replace(/\s/g, '').split(this.options.delimiter);
     }
 
     /**
@@ -239,7 +241,9 @@ class Choices {
         this.valueArray.push(value); 
 
         // Caste array to string and set it as the hidden inputs value
-        this.element.value = this.valueArray.toString();
+        this.element.value = this.valueArray.join(this.options.delimiter);
+
+        console.log(this.element.value);
     }
 
     removeInputValue(value) {
@@ -248,7 +252,7 @@ class Choices {
         let index = this.valueArray.indexOf(value);
         this.valueArray.splice(index, 1);
 
-        this.element.value = this.valueArray.toString();
+        this.element.value = this.valueArray.join(this.options.delimiter);
     }
 
     addItem(value) {
