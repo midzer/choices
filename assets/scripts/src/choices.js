@@ -123,10 +123,12 @@ export class Choices {
 
         // Handle select all 
         if (ctrlDown && e.keyCode === 65) {
-            for (let i = 0; i < this.list.children.length; i++) {
-                let listItem = this.list.children[i];
+            if(this.list && this.list.children) {
+                for (let i = 0; i < this.list.children.length; i++) {
+                    let listItem = this.list.children[i];
 
-                listItem.classList.add('is-selected');
+                    listItem.classList.add('is-selected');
+                }
             }
         }
 
@@ -224,26 +226,13 @@ export class Choices {
     }
 
     /* Methods */
+    setValue() {}
 
-    setPlaceholder() {
+    getValue() {}
 
-    }
+    getValues() {}
 
-    setValue() {
-
-    }
-
-    getValue() {
-
-    }
-
-    getPlaceholder() {
-
-    }
-
-    search() {
-
-    }
+    getPlaceholder() {}
 
     updateInputValue(value) {
         if (this.options.debug) console.debug('Update input value');
@@ -298,6 +287,16 @@ export class Choices {
     }
 
     renderTextInput() {
+        // Template:
+        // 
+        // <div class="choices choices--active">
+        //     <div class="choices__inner">
+        //         <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
+        //         <ul class="choices__list choices__list--items"></ul>
+        //         <input type="text" class="choices__input choices__input--cloned">
+        //     </div>
+        // </div>
+
         let containerOuter = document.createElement('div');
         containerOuter.className = 'choices choices--active';
 
@@ -383,18 +382,30 @@ export class Choices {
         this.list = null;
         this.options = options;
 
-        let initialOptions = this.element.options;
+        let initialOptions = this.element.children;
 
         if (initialOptions) {
-            // Add any preset values
             for (let i = 0; i < initialOptions.length; i++) {
-                let option = initialOptions[i];
-                this.addItem(this.options, option.innerHTML);
+                let parentOption = initialOptions[i];
+        
+                if(parentOption.tagName === 'OPTGROUP') {
+                    this.addItem(this.options, parentOption.label);
+                    for (let j = 0; j < parentOption.children.length; j++) {
+                        let childOption = parentOption.children[j];
+                        this.addItem(this.options, childOption.innerHTML);
+                    }
+                } else if(parentOption.tagName === 'OPTION') {
+                    this.addItem(this.options, parentOption.innerHTML);
+                }
             }
         }
 
         // Trigger event listeners 
         this.addEventListeners(this.input);
+    }
+
+    renderMultipleSelectInput() {
+
     }
 
     render() {
@@ -408,7 +419,7 @@ export class Choices {
                 this.renderSelectInput();
                 break;
             case "select-multiple":
-                console.warn('Choices does not support multiple select boxes');
+                this.renderMultipleSelectInput();
                 break;
             default:
                 rthis.renderTextInput();
@@ -429,6 +440,7 @@ export class Choices {
     let input1 = document.getElementById(1);
     let input2 = document.getElementById(2);
     let input3 = document.getElementById(3);
+    let input4 = document.getElementById(4);
 
     let choices1 = new Choices({
         element : input1,
@@ -444,5 +456,10 @@ export class Choices {
 
     let choices3 = new Choices({
         element : input3
+    });
+
+
+    let choices4 = new Choices({
+        element : input4
     });
 })();
