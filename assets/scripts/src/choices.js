@@ -18,6 +18,7 @@ export class Choices {
             element: document.querySelector('[data-choice]'),
             disabled: false,
             create: true,
+            editItems: false,
             maxItems: false,
             delimiter: ',',
             allowDuplicates: true,
@@ -169,14 +170,12 @@ export class Choices {
 
                 lastItem.classList.add('is-selected');
 
-                for (let i = 0; i < currentListItems.length; i++) {
-                    let listItem = currentListItems[i];
-
-                    if (listItem.classList.contains('is-selected')) {
-                        this.removeItem(listItem);
-                        this.removeInputValue(listItem.textContent);
-                    }
-                };
+                if(this.options.editItems) {
+                    this.input.value = lastItem.innerHTML;
+                    this.removeItem(lastItem);
+                } else {
+                    this.removeAll(currentListItems);
+                }
             };
 
             handleBackspaceKey();
@@ -247,8 +246,6 @@ export class Choices {
 
         // Caste array to string and set it as the hidden inputs value
         this.element.value = this.valueArray.join(this.options.delimiter);
-
-        console.log(this.element.value);
     }
 
     removeInputValue(value) {
@@ -270,6 +267,17 @@ export class Choices {
 
         // Append it to list
         this.list.appendChild(item);
+    }
+
+    removeAll(items) {
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+
+            if (item.classList.contains('is-selected')) {
+                this.removeItem(item);
+                this.removeInputValue(item.textContent);
+            }
+        };
     }
 
     removeItem(item) {
@@ -377,7 +385,8 @@ export class Choices {
 
     let choices2 = new Choices({
         element : input2,
-        allowDuplicates: false
+        allowDuplicates: false,
+        editItems: true
     });
 
     let choices3 = new Choices({
