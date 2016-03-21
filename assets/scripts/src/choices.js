@@ -5,6 +5,7 @@ import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
 /**
 
     TODO:
+    - Dynamically set input width to contents
     - Handle select input
     - Handle multiple select input ?
 
@@ -115,7 +116,6 @@ export class Choices {
     /* Event handling */
 
     onKeyUp(e) {
-        // console.log('Keyup');
     }
 
     onKeyDown(e) {
@@ -153,9 +153,14 @@ export class Choices {
 
                 // All is good, update
                 if (canUpdate) {
-                    this.addItem(value);
-                    this.updateInputValue(value);
-                    this.clearInput(this.element);
+                    if(this.element.type === 'text') {
+                        this.addItem(this.list, value);
+                        this.updateInputValue(value);
+                        this.clearInput(this.element);
+                    } else {
+                        
+                    }
+                    
                 }
             };
 
@@ -168,9 +173,11 @@ export class Choices {
                 let currentListItems = this.list.querySelectorAll('.choices__item');
                 let lastItem = currentListItems[currentListItems.length - 1];
 
-                lastItem.classList.add('is-selected');
+                if(lastItem) {
+                    lastItem.classList.add('is-selected');  
+                } 
 
-                if(this.options.editItems) {
+                if(this.options.editItems && lastItem) {
                     this.input.value = lastItem.innerHTML;
                     this.removeItem(lastItem);
                 } else {
@@ -257,7 +264,7 @@ export class Choices {
         this.element.value = this.valueArray.join(this.options.delimiter);
     }
 
-    addItem(value) {
+    addItem(parent, value) {
         if (this.options.debug) console.debug('Add item');
 
         // // Create new list element
@@ -266,7 +273,7 @@ export class Choices {
         item.textContent = value;
 
         // Append it to list
-        this.list.appendChild(item);
+        parent.appendChild(item);
     }
 
     removeAll(items) {
@@ -310,7 +317,7 @@ export class Choices {
         wrap(containerInner, containerOuter);
 
         let list = document.createElement('ul');
-        list.className = 'choices__list';
+        list.className = 'choices__list choices__list--items';
 
         let input = document.createElement('input');
         input.type = 'text';
@@ -332,7 +339,7 @@ export class Choices {
         if (this.element.value !== '') {
             // Add any preset values
             this.valueArray.forEach((value) => {
-                this.addItem(value);
+                this.addItem(this.list, value);
             });
         }
 
@@ -341,7 +348,53 @@ export class Choices {
     }
 
     renderSelectInput() {
+        let containerOuter = document.createElement('div');
+        containerOuter.className = 'choices choices--active';
 
+        let containerInner = document.createElement('div');
+        containerInner.className = 'choices__inner';
+
+        // Hide passed input
+        this.element.classList.add('choices__input', 'choices__input--hidden');
+        this.element.tabIndex = '-1';
+        this.element.setAttribute('style', 'display:none;');
+        this.element.setAttribute('aria-hidden', 'true');
+
+        // Wrap input in container preserving DOM ordering
+        wrap(this.element, containerInner);
+
+        // Wrapper inner container with outer container
+        wrap(containerInner, containerOuter);
+
+        let options = document.createElement('ul');
+        options.className = 'choices__list choices__list--options';
+
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'choices__input choices__input--cloned';
+
+        containerInner.appendChild(input);
+        containerInner.appendChild(options);
+        containerOuter.appendChild(containerInner);
+
+        this.containerOuter = containerOuter;
+        this.containerInner = containerInner;
+        this.input = input;
+        this.list = null;
+        this.options = options;
+
+        let initialOptions = this.element.options;
+
+        if (initialOptions) {
+            // Add any preset values
+            for (let i = 0; i < initialOptions.length; i++) {
+                let option = initialOptions[i];
+                this.addItem(this.options, option.innerHTML);
+            }
+        }
+
+        // Trigger event listeners 
+        this.addEventListeners(this.input);
     }
 
     render() {

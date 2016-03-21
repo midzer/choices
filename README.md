@@ -1,4 +1,4 @@
-# Choices
+# Choices (in development)
 A vanilla JS customisable select box plugin 
 
 ## To do
