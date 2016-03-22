@@ -19,6 +19,7 @@ export class Choices {
             element: document.querySelector('[data-choice]'),
             disabled: false,
             create: true,
+            removeItems: true,
             editItems: false,
             maxItems: false,
             delimiter: ',',
@@ -121,23 +122,25 @@ export class Choices {
     onKeyDown(e) {
         let ctrlDown = e.ctrlKey || e.metaKey;
 
-        // Handle select all 
-        if (ctrlDown && e.keyCode === 65) {
-            if(this.list && this.list.children) {
-                for (let i = 0; i < this.list.children.length; i++) {
-                    let listItem = this.list.children[i];
+        // If CTRL + A or CMD + A have been pressed and there are items to select
+        if (ctrlDown && e.keyCode === 65 && this.list && this.list.children) {
+            let handleSelectAll = () => {
+                if(this.options.removeItems) {
+                    for (let i = 0; i < this.list.children.length; i++) {
+                        let listItem = this.list.children[i];
 
-                    if(listItem.classList.contains('is-selected')) {
-                        listItem.classList.remove('is-selected');
-                    } else {
-                        listItem.classList.add('is-selected');
+                        // Select any items that have not already been selected
+                        if(!listItem.classList.contains('is-selected')) {
+                            listItem.classList.add('is-selected');
+                        }
                     }
-                    
                 }
-            }
+            };
+
+            handleSelectAll();
         }
 
-        // Handle enter key
+        // If enter key is pressed and the input has a value
         if (e.keyCode === 13 && e.target.value) {
             let value = this.input.value;
 
@@ -175,21 +178,28 @@ export class Choices {
             handleEnterKey();
         }
 
+        // If backspace or delete key is pressed and the input has no value
         if ((e.keyCode === 8 || e.keyCode === 46) && !e.target.value) {
 
             let handleBackspaceKey = () => {
-                let currentListItems = this.list.querySelectorAll('.choices__item');
-                let lastItem = currentListItems[currentListItems.length - 1];
+                if(this.options.removeItems) {
+                    let currentListItems = this.list.querySelectorAll('.choices__item');
+                    let selectedItems = this.list.querySelectorAll('.is-selected');
+                    let lastItem = currentListItems[currentListItems.length - 1];
 
-                if(lastItem) {
-                    lastItem.classList.add('is-selected');  
-                } 
+                    if(lastItem) {
+                        lastItem.classList.add('is-selected');  
+                    }
 
-                if(this.options.editItems && lastItem) {
-                    this.input.value = lastItem.innerHTML;
-                    this.removeItem(lastItem);
-                } else {
-                    this.removeAll(currentListItems);
+                    // If editing the last item is allowed and there is a last item and 
+                    // there are not other selected items (minus the last item), we can edit
+                    // the item value. Otherwise if we can remove items, remove all items
+                    if(this.options.editItems && lastItem && selectedItems.length <= 1) {
+                        this.input.value = lastItem.innerHTML;
+                        this.removeItem(lastItem);
+                    } else {
+                        this.removeAll(currentListItems);
+                    }
                 }
             };
 
