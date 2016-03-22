@@ -127,7 +127,12 @@ export class Choices {
                 for (let i = 0; i < this.list.children.length; i++) {
                     let listItem = this.list.children[i];
 
-                    listItem.classList.add('is-selected');
+                    if(listItem.classList.contains('is-selected')) {
+                        listItem.classList.remove('is-selected');
+                    } else {
+                        listItem.classList.add('is-selected');
+                    }
+                    
                 }
             }
         }
@@ -159,6 +164,7 @@ export class Choices {
                         this.addItem(this.list, value);
                         this.updateInputValue(value);
                         this.clearInput(this.element);
+                        this.unselectAll(this.list.children);
                     } else {
                         
                     }
@@ -263,6 +269,16 @@ export class Choices {
 
         // Append it to list
         parent.appendChild(item);
+    }
+
+    unselectAll(items) {
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+
+            if (item.classList.contains('is-selected')) {
+                item.classList.remove('is-selected');
+            }
+        };
     }
 
     removeAll(items) {
