@@ -120,10 +120,13 @@ export class Choices {
     }
 
     onKeyDown(e) {
-        let ctrlDown = e.ctrlKey || e.metaKey;
+        const CTRLDOWN_KEY = e.ctrlKey || e.metaKey;
+        const DELETE_KEY = 8 || 46;
+        const ENTER_KEY = 13;
+        const A_KEY = 65;
 
         // If CTRL + A or CMD + A have been pressed and there are items to select
-        if (ctrlDown && e.keyCode === 65 && this.list && this.list.children) {
+        if (CTRLDOWN_KEY && e.keyCode === A_KEY && this.list && this.list.children) {
             let handleSelectAll = () => {
                 if(this.options.removeItems) {
                     for (let i = 0; i < this.list.children.length; i++) {
@@ -141,10 +144,10 @@ export class Choices {
         }
 
         // If enter key is pressed and the input has a value
-        if (e.keyCode === 13 && e.target.value) {
+        if (e.keyCode === ENTER_KEY && e.target.value) {
             let value = this.input.value;
 
-            let handleEnterKey = () => {
+            let handleENTER_KEY = () => {
                 let canUpdate = true;
 
                 // If there is a max entry limit and we have reached that limit
@@ -175,11 +178,11 @@ export class Choices {
                 }
             };
 
-            handleEnterKey();
+            handleENTER_KEY();
         }
 
         // If backspace or delete key is pressed and the input has no value
-        if ((e.keyCode === 8 || e.keyCode === 46) && !e.target.value) {
+        if (e.keyCode === DELETE_KEY && !e.target.value) {
 
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
