@@ -28,10 +28,8 @@ export class Choices {
             placeholder: false,
             callbackOnInit: function() {},
             callbackOnRender: function() {},
-            callbackOnKeyUp: function() {},
-            callbackOnKeyDown: function() {},
-            callbackOnEntry: function() {},
-            callbackOnRemove: function() {}
+            callbackOnRemoveItem: function() {},
+            callbackOnAddItem: function() {}
         };
 
         // Merge options with user options
@@ -129,14 +127,7 @@ export class Choices {
         if (CTRLDOWN_KEY && e.keyCode === A_KEY && this.list && this.list.children) {
             let handleSelectAll = () => {
                 if(this.options.removeItems) {
-                    for (let i = 0; i < this.list.children.length; i++) {
-                        let listItem = this.list.children[i];
-
-                        // Select any items that have not already been selected
-                        if(!listItem.classList.contains('is-selected')) {
-                            listItem.classList.add('is-selected');
-                        }
-                    }
+                    this.selectAll(this.list.children);
                 }
             };
 
@@ -147,7 +138,7 @@ export class Choices {
         if (e.keyCode === ENTER_KEY && e.target.value) {
             let value = this.input.value;
 
-            let handleENTER_KEY = () => {
+            let handleEnter = () => {
                 let canUpdate = true;
 
                 // If there is a max entry limit and we have reached that limit
@@ -178,7 +169,7 @@ export class Choices {
                 }
             };
 
-            handleENTER_KEY();
+            handleEnter();
         }
 
         // If backspace or delete key is pressed and the input has no value
@@ -253,6 +244,27 @@ export class Choices {
 
     getPlaceholder() {}
 
+    selectAll(items) {
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+
+            if (!item.classList.contains('is-selected')) {
+                item.classList.add('is-selected');
+            }
+        };
+    }
+
+
+    unselectAll(items) {
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+
+            if (item.classList.contains('is-selected')) {
+                item.classList.remove('is-selected');
+            }
+        };
+    }
+
     updateInputValue(value) {
         if (this.options.debug) console.debug('Update input value');
 
@@ -282,16 +294,34 @@ export class Choices {
 
         // Append it to list
         parent.appendChild(item);
+
+        // Run callback
+        if(this.options.callbackOnAddItem){
+            if(isType('Function', this.options.callbackOnAddItem)) {
+                this.options.callbackOnAddItem(item, value);
+            } else {
+                console.error('Callback is not a function');
+            }
+        }
     }
 
-    unselectAll(items) {
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
+    removeItem(item) {
+        if(!item) {
+            console.error('removeItem: No item was passed to be removed');
+            return;
+        }
 
-            if (item.classList.contains('is-selected')) {
-                item.classList.remove('is-selected');
+        let value = item.innerHTML;
+        item.parentNode.removeChild(item);
+
+        // Run callback
+        if(this.options.callbackOnRemoveItem){
+            if(isType('Function', this.options.callbackOnRemoveItem)) {
+                this.options.callbackOnRemoveItem(value);
+            } else {
+                console.error('Callback is not a function');
             }
-        };
+        }
     }
 
     removeAll(items) {
@@ -305,9 +335,7 @@ export class Choices {
         };
     }
 
-    removeItem(item) {
-        if (item) item.parentNode.removeChild(item);
-    }
+    
 
     init() {
         if (!this.supports) console.error('Your browser doesn\'nt support shit');
@@ -475,6 +503,12 @@ export class Choices {
         element : input1,
         delimiter: ' ',
         maxItems: 5,
+        callbackOnRemoveItem: function(value) {
+            console.log(value);
+        },
+        callbackOnAddItem: function(item, value) {
+            console.log(item, value);
+        }
     });
 
     let choices2 = new Choices({
@@ -486,7 +520,6 @@ export class Choices {
     let choices3 = new Choices({
         element : input3
     });
-
 
     let choices4 = new Choices({
         element : input4
