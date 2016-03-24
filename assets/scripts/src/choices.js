@@ -18,14 +18,17 @@ export class Choices {
         const DEFAULT_OPTIONS = {
             element: document.querySelector('[data-choice]'),
             disabled: false,
-            create: true,
+            addItems: true,
             removeItems: true,
             editItems: false,
             maxItems: false,
             delimiter: ',',
             allowDuplicates: true,
+            regexFilter: false,
             debug: false,
             placeholder: false,
+            prependValue: false,
+            appendValue: false,
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -126,7 +129,7 @@ export class Choices {
         // If CTRL + A or CMD + A have been pressed and there are items to select
         if (CTRLDOWN_KEY && e.keyCode === A_KEY && this.list && this.list.children) {
             let handleSelectAll = () => {
-                if(this.options.removeItems) {
+                if(this.options.removeItems && !this.input.value) {
                     this.selectAll(this.list.children);
                 }
             };
@@ -158,10 +161,22 @@ export class Choices {
                 // All is good, update
                 if (canUpdate) {
                     if(this.element.type === 'text') {
-                        this.addItem(this.list, value);
-                        this.updateInputValue(value);
-                        this.clearInput(this.element);
-                        this.unselectAll(this.list.children);
+                        let canAddItem = true;
+
+                        // If a user has supplied a regular expression filter
+                        if(this.options.regexFilter) {
+                            // Determine whether we can update based on whether 
+                            // our regular expression passes 
+                            canAddItem = this.regexFilter(value);
+                        }
+                        
+                        // All is good, add
+                        if(canAddItem) {
+                            this.addItem(this.list, value);
+                            this.updateInputValue(value);
+                            this.clearInput(this.element);
+                            this.unselectAll(this.list.children);                            
+                        }
                     } else {
                         
                     }
@@ -242,6 +257,13 @@ export class Choices {
 
     getValues() {}
 
+    regexFilter(value) {
+        let expression = new RegExp(this.options.regexFilter, 'i');
+        let passesTest = expression.test(value);
+
+        return passesTest;
+    }
+
     getPlaceholder() {}
 
     selectAll(items) {
@@ -287,20 +309,32 @@ export class Choices {
     addItem(parent, value) {
         if (this.options.debug) console.debug('Add item');
 
-        // // Create new list element
+        let passedValue = value;
+
+        // If a prepended value has been passed, prepend it
+        if(this.options.prependValue) {
+            passedValue = this.options.prependValue + passedValue.toString();
+        }
+
+        // If an appended value has been passed, append it
+        if(this.options.appendValue) {
+            passedValue = passedValue + this.options.appendValue.toString();
+        }
+
+        // Create new list element
         let item = document.createElement('li');
         item.classList.add('choices__item');
-        item.textContent = value;
+        item.textContent = passedValue;
 
         // Append it to list
         parent.appendChild(item);
 
-        // Run callback
+        // Run callback if it is a function
         if(this.options.callbackOnAddItem){
             if(isType('Function', this.options.callbackOnAddItem)) {
                 this.options.callbackOnAddItem(item, value);
             } else {
-                console.error('Callback is not a function');
+                console.error('callbackOnAddItem: Callback is not a function');
             }
         }
     }
@@ -319,7 +353,7 @@ export class Choices {
             if(isType('Function', this.options.callbackOnRemoveItem)) {
                 this.options.callbackOnRemoveItem(value);
             } else {
-                console.error('Callback is not a function');
+                console.error('callbackOnRemoveItem: Callback is not a function');
             }
         }
     }
@@ -338,7 +372,7 @@ export class Choices {
     
 
     init() {
-        if (!this.supports) console.error('Your browser doesn\'nt support shit');
+        if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
         this.render(this.element);
     }
@@ -381,6 +415,10 @@ export class Choices {
 
         if (input.placeholder) {
             input.placeholder = this.element.placeholder;
+        }
+
+        if(!this.options.addItems) {
+            input.disabled = true;
         }
 
         containerInner.appendChild(list);
@@ -498,6 +536,7 @@ export class Choices {
     let input2 = document.getElementById(2);
     let input3 = document.getElementById(3);
     let input4 = document.getElementById(4);
+    let input5 = document.getElementById(5);
 
     let choices1 = new Choices({
         element : input1,
@@ -514,14 +553,24 @@ export class Choices {
     let choices2 = new Choices({
         element : input2,
         allowDuplicates: false,
-        editItems: true
+        editItems: true,
     });
 
     let choices3 = new Choices({
-        element : input3
+        element : input3,
+        allowDuplicates: false,
+        editItems: true,
+        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     });
 
     let choices4 = new Choices({
-        element : input4
+        element : input4,
+        addItems: false
+    });
+
+    let choices5 = new Choices({
+        element: input5,
+        prependValue: 'item-',
+        appendValue: `-${Date.now()}`
     });
 })();
