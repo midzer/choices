@@ -1,10 +1,14 @@
 'use strict';
 
+import { createStore } from 'redux';
+import choices from './reducers/index.js'
 import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
+
 
 /**
 
     TODO:
+    - State handling
     - Dynamically set input width to contents
     - Handle select input
     - Handle multiple select input ?
@@ -13,8 +17,9 @@ import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
 
 export class Choices {
     constructor(options) {
-        const FAKE_EL = document.createElement("FAKE_ELement");
+        const FAKE_EL = document.createElement("fakeel");
         const USER_OPTIONS = options || {};
+        const STORE = createStore(choices);
         const DEFAULT_OPTIONS = {
             element: document.querySelector('[data-choice]'),
             disabled: false,
@@ -37,6 +42,10 @@ export class Choices {
 
         // Merge options with user options
         this.options = this.extend(DEFAULT_OPTIONS, USER_OPTIONS || {});
+        this.store = STORE;
+
+        console.log(this.store);
+
         this.initialised = false;
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in FAKE_EL;
 
