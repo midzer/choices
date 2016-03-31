@@ -1,22 +1,20 @@
-let initialId = 0;
-export const addItem = (value, element) => {
+export const addItemToStore = (value, element, id) => {
     return {
-        id: initialId++;
         type: 'ADD_ITEM',
         value: value,
         element: element,
-        active: true
+        id: id
     }
 }
 
-export const removeItem = (element) => {
+export const removeItemFromStore = (id) => {
     return {
         type: 'REMOVE_ITEM',
-        active: false
+        id: id,
     }
 }
 
-export const updateItem = (value, element) => {
+export const updateItemInStore = (value) => {
     return {
         type: 'UPDATE_ITEM',
         value: value

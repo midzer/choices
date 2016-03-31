@@ -1,7 +1,8 @@
 'use strict';
 
 import { createStore } from 'redux';
-import choices from './reducers/index.js'
+import choices from './reducers/index.js';
+import { addItemToStore, removeItemFromStore } from './actions/index';
 import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
 
 
@@ -44,15 +45,15 @@ export class Choices {
         this.options = this.extend(DEFAULT_OPTIONS, USER_OPTIONS || {});
         this.store = STORE;
 
-        console.log(this.store);
-
         this.initialised = false;
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in FAKE_EL;
 
         // Retrieve elements
         this.element = this.options.element;
+
         // If input already has values, parse the array, otherwise create a blank array
         this.valueArray = this.element.value !== '' ? this.cleanInputValue(this.element.value) : [];
+
         // How many values in array
         this.valueCount = this.valueArray.length;
 
@@ -330,10 +331,13 @@ export class Choices {
             passedValue = passedValue + this.options.appendValue.toString();
         }
 
+        let id = this.store.getState().length + 1;
+
         // Create new list element
         let item = document.createElement('li');
         item.classList.add('choices__item');
         item.textContent = passedValue;
+        item.id = id;
 
         // Append it to list
         parent.appendChild(item);
@@ -346,6 +350,9 @@ export class Choices {
                 console.error('callbackOnAddItem: Callback is not a function');
             }
         }
+
+        this.store.dispatch(addItemToStore(passedValue, item, id));
+        console.log(this.store.getState());
     }
 
     removeItem(item) {
@@ -354,6 +361,7 @@ export class Choices {
             return;
         }
 
+        let id = item.id;
         let value = item.innerHTML;
         item.parentNode.removeChild(item);
 
@@ -365,6 +373,9 @@ export class Choices {
                 console.error('callbackOnRemoveItem: Callback is not a function');
             }
         }
+
+        this.store.dispatch(removeItemFromStore(id));
+        console.log(this.store.getState());
     }
 
     removeAll(items) {
@@ -377,8 +388,6 @@ export class Choices {
             }
         };
     }
-
-    
 
     init() {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
@@ -551,12 +560,12 @@ export class Choices {
         element : input1,
         delimiter: ' ',
         maxItems: 5,
-        callbackOnRemoveItem: function(value) {
-            console.log(value);
-        },
-        callbackOnAddItem: function(item, value) {
-            console.log(item, value);
-        }
+        // callbackOnRemoveItem: function(value) {
+        //     console.log(value);
+        // },
+        // callbackOnAddItem: function(item, value) {
+        //     console.log(item, value);
+        // }
     });
 
     let choices2 = new Choices({

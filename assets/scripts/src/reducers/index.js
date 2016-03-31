@@ -1,33 +1,23 @@
-const choice = (state = [], action) => {
-    console.log('Choice', action);
-    switch(action.type) {
-        case 'ADD_VALUE':
-            return {
+// Array of choices
+const choices = (state = [], action) => {
+    switch (action.type) {
+        case 'ADD_ITEM':
+            // Add object to items array
+            return [...state, {
+                id: parseInt(action.id),
                 value: action.value,
                 element: action.element,
                 active: true
-            };
-        case 'REMOVE_VALUE':
-            return Object.assign({}, state, {
-                active: false
-            });
-        default:
-            return state;
-    }
-}
+            }];
 
-const choices = (state = {}, action) => {
-    console.log('Choices', action);
-    switch(action.type) {
-        case 'ADD_VALUE':
-            return [
-            ...state,
-                choice(undefined, action)
-            ]
-        case 'REMOVE_VALUE':
-            return state.map(t =>
-                choice(t, action)
-              )
+        case 'REMOVE_ITEM':
+            // Remove item from items array
+            return state.filter(function(item) {
+                if(item.id !== parseInt(action.id)) {
+                    return item;
+                }
+            });
+
         default:
             return state;
     }
