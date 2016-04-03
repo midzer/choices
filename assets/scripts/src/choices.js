@@ -2,8 +2,8 @@
 
 import { createStore } from 'redux';
 import choices from './reducers/index.js';
-import { addItemToStore, removeItemFromStore } from './actions/index';
-import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
+import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
+import { hasClass, wrap, getSiblings, isType, strToEl } from './lib/utils.js';
 
 
 /**
@@ -18,10 +18,10 @@ import { hasClass, wrap, getSiblings, isType } from './lib/utils.js';
 
 export class Choices {
     constructor(options) {
-        const FAKE_EL = document.createElement("fakeel");
-        const USER_OPTIONS = options || {};
-        const STORE = createStore(choices);
-        const DEFAULT_OPTIONS = {
+        const fakeEl = document.createElement("fakeel");
+        const userOptions = options || {};
+        const store = createStore(choices);
+        const defaultOptions = {
             element: document.querySelector('[data-choice]'),
             disabled: false,
             addItems: true,
@@ -35,6 +35,7 @@ export class Choices {
             placeholder: false,
             prependValue: false,
             appendValue: false,
+            selectAll: true,
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -42,27 +43,25 @@ export class Choices {
         };
 
         // Merge options with user options
-        this.options = this.extend(DEFAULT_OPTIONS, USER_OPTIONS || {});
-        this.store = STORE;
+        this.options = this.extend(defaultOptions, userOptions || {});
+        this.store = store;
 
         this.initialised = false;
-        this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in FAKE_EL;
+        this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
 
-        // Retrieve elements
+        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.element = this.options.element;
 
         // If input already has values, parse the array, otherwise create a blank array
+        // Hmm, this should really map this.store
         this.valueArray = this.element.value !== '' ? this.cleanInputValue(this.element.value) : [];
 
         // How many values in array
         this.valueCount = this.valueArray.length;
 
         // Bind methods
-        this.onClick = this.onClick.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
-        this.onChange = this.onChange.bind(this);
-        this.onFocus = this.onFocus.bind(this);
-        this.onBlur = this.onChange.bind(this);
+        this.onClick = this.onClick.bind(this);
 
         this.init();
     }
@@ -93,7 +92,7 @@ export class Choices {
 
         // Loop through each passed argument
         for (let i = 0; i < length; i++) {
-            // Store argument at position i
+            // store argument at position i
             let obj = arguments[i];
 
             // If we are in fact dealing with an object, merge it. Otherwise throw error
@@ -131,74 +130,74 @@ export class Choices {
     }
 
     onKeyDown(e) {
-        const CTRLDOWN_KEY = e.ctrlKey || e.metaKey;
-        const DELETE_KEY = 8 || 46;
-        const ENTER_KEY = 13;
-        const A_KEY = 65;
+        const ctrlDownKey = e.ctrlKey || e.metaKey;
+        const deleteKey = 8 || 46;
+        const enterKey = 13;
+        const aKey = 65;
 
-        // If CTRL + A or CMD + A have been pressed and there are items to select
-        if (CTRLDOWN_KEY && e.keyCode === A_KEY && this.list && this.list.children) {
-            let handleSelectAll = () => {
-                if(this.options.removeItems && !this.input.value) {
-                    this.selectAll(this.list.children);
-                }
-            };
+        // If we are typing in the input
+        if(e.target === this.input) {
+            // If CTRL + A or CMD + A have been pressed and there are items to select
+            if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
+                let handleSelectAll = () => {
+                    if(this.options.removeItems && !this.input.value && this.options.selectAll) {
+                        this.selectAll(this.list.children);
+                    }
+                };
 
-            handleSelectAll();
-        }
+                handleSelectAll();
+            }
 
-        // If enter key is pressed and the input has a value
-        if (e.keyCode === ENTER_KEY && e.target.value) {
-            let value = this.input.value;
+            // If enter key is pressed and the input has a value
+            if (e.keyCode === enterKey && e.target.value) {
+                let value = this.input.value;
 
-            let handleEnter = () => {
-                let canUpdate = true;
+                let handleEnter = () => {
+                    let canUpdate = true;
 
-                // If there is a max entry limit and we have reached that limit
-                // don't update
-                if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
-                    canUpdate = false;
-                }
-
-                // If no duplicates are allowed, and the value already exists
-                // in the array, don't update
-                if (this.options.allowDuplicates === false && this.element.value) {
-                    if (this.valueArray.indexOf(value) > -1) {
+                    // If there is a max entry limit and we have reached that limit
+                    // don't update
+                    if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
                         canUpdate = false;
                     }
-                }
 
-                // All is good, update
-                if (canUpdate) {
-                    if(this.element.type === 'text') {
-                        let canAddItem = true;
+                    // If no duplicates are allowed, and the value already exists
+                    // in the array, don't update
+                    if (this.options.allowDuplicates === false && this.element.value) {
+                        if (this.valueArray.indexOf(value) > -1) {
+                            canUpdate = false;
+                        }
+                    }
 
-                        // If a user has supplied a regular expression filter
-                        if(this.options.regexFilter) {
-                            // Determine whether we can update based on whether 
-                            // our regular expression passes 
-                            canAddItem = this.regexFilter(value);
+                    // All is good, update
+                    if (canUpdate) {
+                        if(this.element.type === 'text') {
+                            let canAddItem = true;
+
+                            // If a user has supplied a regular expression filter
+                            if(this.options.regexFilter) {
+                                // Determine whether we can update based on whether 
+                                // our regular expression passes 
+                                canAddItem = this.regexFilter(value);
+                            }
+                            
+                            // All is good, add
+                            if(canAddItem) {
+                                this.addItem(this.list, value);
+                                this.updateInputValue(value);
+                                this.clearInput(this.element);
+                            }
                         }
-                        
-                        // All is good, add
-                        if(canAddItem) {
-                            this.addItem(this.list, value);
-                            this.updateInputValue(value);
-                            this.clearInput(this.element);
-                            this.unselectAll(this.list.children);                            
-                        }
-                    } else {
                         
                     }
-                    
-                }
-            };
+                };
 
-            handleEnter();
+                handleEnter();
+            } 
         }
 
         // If backspace or delete key is pressed and the input has no value
-        if (e.keyCode === DELETE_KEY && !e.target.value) {
+        if (e.keyCode === deleteKey && !e.target.value) {
 
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
@@ -206,14 +205,14 @@ export class Choices {
                     let selectedItems = this.list.querySelectorAll('.is-selected');
                     let lastItem = currentListItems[currentListItems.length - 1];
 
-                    if(lastItem) {
-                        lastItem.classList.add('is-selected');  
+                    if(lastItem && !this.options.editItems) {
+                        this.selectItem(lastItem);
                     }
 
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(this.options.editItems && lastItem && selectedItems.length <= 1) {
+                    if(this.options.editItems && lastItem && selectedItems.length === 1) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
@@ -228,36 +227,30 @@ export class Choices {
         }
     }
 
-    onFocus(e) {
-
-    }
-
     onClick(e) {
+        if(e.target.tagName === 'LI') {
+            let item = e.target;
 
-    }
+            let handleClick = (item) => { 
+                let passedId = item.getAttribute('data-choice-id');
+                let items = this.list.children;
 
-    onChange(e) {
+                // We only want to select one item with a click
+                // so we unselect any items that aren't the target
+                for (var i = 0; i < items.length; i++) {
+                    let singleItem = items[i];
+                    let id = singleItem.getAttribute('data-choice-id');;
 
-    }
-
-    /* Event listeners */
-
-    addEventListeners(el) {
-        el.addEventListener('click', this.onClick);
-        el.addEventListener('keyup', this.onKeyUp);
-        el.addEventListener('keydown', this.onKeyDown);
-        el.addEventListener('change', this.onChange);
-        el.addEventListener('focus', this.onFocus);
-        el.addEventListener('blur', this.onBlur);
-    }
-
-    removeEventListeners(el) {
-        el.removeEventListener('click', this.onClick);
-        el.removeEventListener('keyup', this.onKeyUp);
-        el.removeEventListener('keydown', this.onKeyDown);
-        el.removeEventListener('change', this.onChange);
-        el.removeEventListener('focus', this.onFocus);
-        el.removeEventListener('blur', this.onBlur);
+                    if(id === passedId && !singleItem.classList.contains('is-selected')) {
+                        this.selectItem(singleItem);
+                    } else {
+                        this.unselectItem(singleItem);
+                    }
+                }          
+            }
+            
+            handleClick(item);
+        }
     }
 
     /* Methods */
@@ -274,26 +267,24 @@ export class Choices {
         return passesTest;
     }
 
-    getPlaceholder() {}
+    selectItem(item) {
+        let id = item.getAttribute('data-choice-id');
+        item.classList.add('is-selected');
+        this.store.dispatch(selectItemFromStore(id, true));
+        console.log(this.store.getState());
+    }
+
+    unselectItem(item) {
+        let id = item.getAttribute('data-choice-id');
+        item.classList.remove('is-selected');
+        this.store.dispatch(selectItemFromStore(id, false));
+        console.log(this.store.getState());
+    }
 
     selectAll(items) {
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
-
-            if (!item.classList.contains('is-selected')) {
-                item.classList.add('is-selected');
-            }
-        };
-    }
-
-
-    unselectAll(items) {
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
-
-            if (item.classList.contains('is-selected')) {
-                item.classList.remove('is-selected');
-            }
+            this.selectItem(item);
         };
     }
 
@@ -333,11 +324,8 @@ export class Choices {
 
         let id = this.store.getState().length + 1;
 
-        // Create new list element
-        let item = document.createElement('li');
-        item.classList.add('choices__item');
-        item.textContent = passedValue;
-        item.id = id;
+        // Create new list element 
+        let item = strToEl(`<li class="choices__item" data-choice-id=${id}>${passedValue}</li>`);
 
         // Append it to list
         parent.appendChild(item);
@@ -361,7 +349,7 @@ export class Choices {
             return;
         }
 
-        let id = item.id;
+        let id = item.getAttribute('data-choice-id');
         let value = item.innerHTML;
         item.parentNode.removeChild(item);
 
@@ -396,21 +384,20 @@ export class Choices {
     }
 
     renderTextInput() {
-        // Template:
-        // 
-        // <div class="choices choices--active">
-        //     <div class="choices__inner">
-        //         <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
-        //         <ul class="choices__list choices__list--items"></ul>
-        //         <input type="text" class="choices__input choices__input--cloned">
-        //     </div>
-        // </div>
+        /* 
+            Template:
 
-        let containerOuter = document.createElement('div');
-        containerOuter.className = 'choices choices--active';
+            <div class="choices choices--active">
+                <div class="choices__inner">
+                    <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
+                    <ul class="choices__list choices__list--items"></ul>
+                    <input type="text" class="choices__input choices__input--cloned">
+                </div>
+            </div>
+        */
 
-        let containerInner = document.createElement('div');
-        containerInner.className = 'choices__inner';
+        let containerOuter = strToEl('<div class="choices choices--active"></div>');
+        let containerInner = strToEl('<div class="choices__inner"></div>');
 
         // Hide passed input
         this.element.classList.add('choices__input', 'choices__input--hidden');
@@ -424,12 +411,8 @@ export class Choices {
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = document.createElement('ul');
-        list.className = 'choices__list choices__list--items';
-
-        let input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'choices__input choices__input--cloned';
+        let list = strToEl('<ul class="choices__list choices__list--items"></ul>');
+        let input = strToEl('<input type="text" class="choices__input choices__input--cloned">');
 
         if (input.placeholder) {
             input.placeholder = this.element.placeholder;
@@ -456,70 +439,10 @@ export class Choices {
         }
 
         // Trigger event listeners 
-        this.addEventListeners(this.input);
+        document.addEventListener('keydown', this.onKeyDown);
+        this.list.addEventListener('click', this.onClick);
     }
 
-    renderSelectInput() {
-        let containerOuter = document.createElement('div');
-        containerOuter.className = 'choices choices--active';
-
-        let containerInner = document.createElement('div');
-        containerInner.className = 'choices__inner';
-
-        // Hide passed input
-        this.element.classList.add('choices__input', 'choices__input--hidden');
-        this.element.tabIndex = '-1';
-        this.element.setAttribute('style', 'display:none;');
-        this.element.setAttribute('aria-hidden', 'true');
-
-        // Wrap input in container preserving DOM ordering
-        wrap(this.element, containerInner);
-
-        // Wrapper inner container with outer container
-        wrap(containerInner, containerOuter);
-
-        let options = document.createElement('ul');
-        options.className = 'choices__list choices__list--options';
-
-        let input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'choices__input choices__input--cloned';
-
-        containerInner.appendChild(input);
-        containerInner.appendChild(options);
-        containerOuter.appendChild(containerInner);
-
-        this.containerOuter = containerOuter;
-        this.containerInner = containerInner;
-        this.input = input;
-        this.list = null;
-        this.options = options;
-
-        let initialOptions = this.element.children;
-
-        if (initialOptions) {
-            for (let i = 0; i < initialOptions.length; i++) {
-                let parentOption = initialOptions[i];
-        
-                if(parentOption.tagName === 'OPTGROUP') {
-                    this.addItem(this.options, parentOption.label);
-                    for (let j = 0; j < parentOption.children.length; j++) {
-                        let childOption = parentOption.children[j];
-                        this.addItem(this.options, childOption.innerHTML);
-                    }
-                } else if(parentOption.tagName === 'OPTION') {
-                    this.addItem(this.options, parentOption.innerHTML);
-                }
-            }
-        }
-
-        // Trigger event listeners 
-        this.addEventListeners(this.input);
-    }
-
-    renderMultipleSelectInput() {
-
-    }
 
     render() {
         if (this.options.debug) console.debug('Render');
@@ -529,13 +452,13 @@ export class Choices {
                 this.renderTextInput();
                 break;
             case "select-one":
-                this.renderSelectInput();
+                // this.renderSelectInput();
                 break;
             case "select-multiple":
-                this.renderMultipleSelectInput();
+                // this.renderMultipleSelectInput();
                 break;
             default:
-                rthis.renderTextInput();
+                this.renderTextInput();
                 break;
         }
 
@@ -558,8 +481,8 @@ export class Choices {
 
     let choices1 = new Choices({
         element : input1,
-        delimiter: ' ',
-        maxItems: 5,
+        // delimiter: ' ',
+        // maxItems: 5,
         // callbackOnRemoveItem: function(value) {
         //     console.log(value);
         // },
@@ -568,27 +491,27 @@ export class Choices {
         // }
     });
 
-    let choices2 = new Choices({
-        element : input2,
-        allowDuplicates: false,
-        editItems: true,
-    });
+    // let choices2 = new Choices({
+    //     element : input2,
+    //     allowDuplicates: false,
+    //     editItems: true,
+    // });
 
-    let choices3 = new Choices({
-        element : input3,
-        allowDuplicates: false,
-        editItems: true,
-        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    });
+    // let choices3 = new Choices({
+    //     element : input3,
+    //     allowDuplicates: false,
+    //     editItems: true,
+    //     regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    // });
 
-    let choices4 = new Choices({
-        element : input4,
-        addItems: false
-    });
+    // let choices4 = new Choices({
+    //     element : input4,
+    //     addItems: false
+    // });
 
-    let choices5 = new Choices({
-        element: input5,
-        prependValue: 'item-',
-        appendValue: `-${Date.now()}`
-    });
+    // let choices5 = new Choices({
+    //     element: input5,
+    //     prependValue: 'item-',
+    //     appendValue: `-${Date.now()}`
+    // });
 })();

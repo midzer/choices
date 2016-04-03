@@ -5,18 +5,19 @@ export const addItemToStore = (value, element, id) => {
         element: element,
         id: id
     }
-}
+};
 
 export const removeItemFromStore = (id) => {
     return {
         type: 'REMOVE_ITEM',
-        id: id,
+        id: id
     }
-}
+};
 
-export const updateItemInStore = (value) => {
+export const selectItemFromStore = (id, value) => {
     return {
-        type: 'UPDATE_ITEM',
+        type: 'SELECT_ITEM',
+        id: id,
         value: value
     }
-}
+};

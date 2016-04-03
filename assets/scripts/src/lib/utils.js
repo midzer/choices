@@ -1,4 +1,4 @@
-export let hasClass = (elem, className) => {
+export const hasClass = (elem, className) => {
     return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
 }
 
@@ -7,7 +7,7 @@ export let hasClass = (elem, className) => {
  * @param  {String} str String to capitalise
  * @return {String}     Capitalised string
  */
-export let capitalise = function(str) {
+export const capitalise = function(str) {
     return str.replace(/\w\S*/g, function(txt){
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
@@ -19,7 +19,7 @@ export let capitalise = function(str) {
  * @param  {Object}  obj  Object to be tested
  * @return {Boolean}
  */
-export let isType = function(type, obj) {
+export const isType = function(type, obj) {
     var clas = Object.prototype.toString.call(obj).slice(8, -1);
     return obj !== undefined && obj !== null && clas === type;
 };
@@ -29,7 +29,7 @@ export let isType = function(type, obj) {
  * CSS transition end event listener
  * @return
  */
-export let whichTransitionEvent = function(){
+export const whichTransitionEvent = function(){
     var t,
     el = document.createElement("fakeelement");
 
@@ -51,7 +51,7 @@ export let whichTransitionEvent = function(){
  * CSS animation end event listener
  * @return
  */
-export let whichAnimationEvent = function() {
+export const whichAnimationEvent = function() {
     var t,
         el = document.createElement('fakeelement');
 
@@ -77,7 +77,7 @@ export let whichAnimationEvent = function() {
  * @param  {String} selector Class to find
  * @return {Array}          Array of parent elements
  */
-export let getParentsUntil = function(elem, parent, selector) {
+export const getParentsUntil = function(elem, parent, selector) {
     var parents = [];
     // Get matches
     for (; elem && elem !== document; elem = elem.parentNode) {
@@ -156,7 +156,7 @@ export let getParentsUntil = function(elem, parent, selector) {
     }
 };
 
-export let wrap = function (element, wrapper) {
+export const wrap = function (element, wrapper) {
     wrapper = wrapper || document.createElement('div');
     if (element.nextSibling) {
         element.parentNode.insertBefore(wrapper, element.nextSibling);
@@ -166,7 +166,7 @@ export let wrap = function (element, wrapper) {
     return wrapper.appendChild(element);
 };
 
-export let getSiblings = function (elem) {
+export const getSiblings = function (elem) {
     var siblings = [];
     var sibling = elem.parentNode.firstChild;
     for ( ; sibling; sibling = sibling.nextSibling ) {
@@ -183,7 +183,7 @@ export let getSiblings = function (elem) {
  * @param  {[type]} cls Class of parent
  * @return {NodeElement}     Found parent element
  */
-export let findAncestor = function(el, cls) {
+export const findAncestor = function(el, cls) {
     while ((el = el.parentElement) && !el.classList.contains(cls));
     return el;
 };
@@ -195,7 +195,7 @@ export let findAncestor = function(el, cls) {
  * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing. 
  * @return {Function}           A function will be called after it stops being called for a given delay
  */
-export let debounce = function(func, wait, immediate) {
+export const debounce = function(func, wait, immediate) {
     var timeout;
     return function() {
         var context = this,
@@ -217,7 +217,7 @@ export let debounce = function(func, wait, immediate) {
  * @param  {NodeElement} el Element to test for
  * @return {Number} Elements Distance from top of page
  */
-export let getElemDistance = function(el) {
+export const getElemDistance = function(el) {
     var location = 0;
     if (el.offsetParent) {
         do {
@@ -234,7 +234,7 @@ export let getElemDistance = function(el) {
  * @param  {Node} el Element to test for
  * @return {Number}    Height of element
  */
-export let getElementOffset = function(el, offset) {
+export const getElementOffset = function(el, offset) {
     var elOffset = offset;
     if(elOffset > 1) elOffset = 1;
     if(elOffset > 0) elOffset = 0;
@@ -247,7 +247,7 @@ export let getElementOffset = function(el, offset) {
  * @private
  * @return {String} Position of scroll
  */
-export let getScrollPosition = function(position) {
+export const getScrollPosition = function(position) {
     if(position === 'bottom') {
         // Scroll position from the bottom of the viewport
         return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
@@ -263,7 +263,7 @@ export let getScrollPosition = function(position) {
  * @return {String} Position of scroll
  * @return {Boolean}
  */
-export let isInView = function(el, position, offset) {
+export const isInView = function(el, position, offset) {
     // If the user has scrolled further than the distance from the element to the top of its parent
     return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset)) ? true : false;
 };
@@ -273,7 +273,7 @@ export let isInView = function(el, position, offset) {
  * @param  {String}  Initial string/html
  * @return {String}  Sanitised string
  */
-export let stripHTML = function(html) {
+export const stripHTML = function(html) {
    let el = document.createElement("DIV");
    el.innerHTML = html;
    return el.textContent || el.innerText || "";
@@ -285,7 +285,7 @@ export let stripHTML = function(html) {
  * @param  {String} animation Animation class to add to element
  * @return
  */
-export let addAnimation = (el, animation) => {
+export const addAnimation = (el, animation) => {
     let animationEvent = whichAnimationEvent();
 
     let removeAnimation = () => {
@@ -304,6 +304,26 @@ export let addAnimation = (el, animation) => {
  * @param  {Number} max Maximum range
  * @return {Number}     Random number
  */
-export let getRandomNumber = function(min, max) {
+export const getRandomNumber = function(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
+
+/**
+ * Turn a string into a node
+ * @param  {String} String to convert
+ * @return {Node}   Converted node element
+ */
+export const strToEl = (function() {
+    var tmpEl = document.createElement('div');
+    return function(str) {
+        var r;
+        tmpEl.innerHTML = str;
+        r = tmpEl.children[0];
+
+        while (tmpEl.firstChild) {
+            tmpEl.removeChild(tmpEl.firstChild);
+        }
+
+        return r;
+    };
+}());

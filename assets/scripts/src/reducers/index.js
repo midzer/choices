@@ -1,4 +1,3 @@
-// Array of choices
 const choices = (state = [], action) => {
     switch (action.type) {
         case 'ADD_ITEM':
@@ -7,16 +6,28 @@ const choices = (state = [], action) => {
                 id: parseInt(action.id),
                 value: action.value,
                 element: action.element,
-                active: true
+                active: true,
+                selected: false
             }];
 
         case 'REMOVE_ITEM':
-            // Remove item from items array
-            return state.filter(function(item) {
-                if(item.id !== parseInt(action.id)) {
-                    return item;
+            // Set item to inactive
+            return state.map((item) => {
+                if(item.id === parseInt(action.id)) {
+                    item.active = false;
                 }
+                return item;
             });
+
+        case 'SELECT_ITEM':        
+            return state.map((item) => {
+                if(item.id === parseInt(action.id)) {
+                    item.selected = action.value;
+                }
+
+                return item;
+            });
+
 
         default:
             return state;
