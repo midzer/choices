@@ -2,7 +2,7 @@
 
 import { createStore } from 'redux';
 import choices from './reducers/index.js';
-import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
+import { addItemToStore, removeItemFromStore, selectItemFromStore, unselectAllFromStore } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl } from './lib/utils.js';
 
 
@@ -20,7 +20,6 @@ export class Choices {
     constructor(options) {
         const fakeEl = document.createElement("fakeel");
         const userOptions = options || {};
-        const store = createStore(choices);
         const defaultOptions = {
             element: document.querySelector('[data-choice]'),
             disabled: false,
@@ -44,7 +43,7 @@ export class Choices {
 
         // Merge options with user options
         this.options = this.extend(defaultOptions, userOptions || {});
-        this.store = store;
+        this.store = createStore(choices);
 
         this.initialised = false;
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
@@ -62,6 +61,7 @@ export class Choices {
         // Bind methods
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.renderItems = this.renderItems.bind(this);
 
         this.init();
     }
@@ -183,12 +183,11 @@ export class Choices {
                             
                             // All is good, add
                             if(canAddItem) {
-                                this.addItem(this.list, value);
+                                this.addItem(value);
                                 this.updateInputValue(value);
                                 this.clearInput(this.element);
                             }
                         }
-                        
                     }
                 };
 
@@ -212,7 +211,7 @@ export class Choices {
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(this.options.editItems && lastItem && selectedItems.length === 1) {
+                    if(this.options.editItems && lastItem && selectedItems.length === 0) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
@@ -269,16 +268,12 @@ export class Choices {
 
     selectItem(item) {
         let id = item.getAttribute('data-choice-id');
-        item.classList.add('is-selected');
         this.store.dispatch(selectItemFromStore(id, true));
-        console.log(this.store.getState());
     }
 
     unselectItem(item) {
         let id = item.getAttribute('data-choice-id');
-        item.classList.remove('is-selected');
         this.store.dispatch(selectItemFromStore(id, false));
-        console.log(this.store.getState());
     }
 
     selectAll(items) {
@@ -307,7 +302,7 @@ export class Choices {
         this.element.value = this.valueArray.join(this.options.delimiter);
     }
 
-    addItem(parent, value) {
+    addItem(value) {
         if (this.options.debug) console.debug('Add item');
 
         let passedValue = value;
@@ -322,25 +317,20 @@ export class Choices {
             passedValue = passedValue + this.options.appendValue.toString();
         }
 
+        // Generate unique id
         let id = this.store.getState().length + 1;
-
-        // Create new list element 
-        let item = strToEl(`<li class="choices__item" data-choice-id=${id}>${passedValue}</li>`);
-
-        // Append it to list
-        parent.appendChild(item);
 
         // Run callback if it is a function
         if(this.options.callbackOnAddItem){
             if(isType('Function', this.options.callbackOnAddItem)) {
-                this.options.callbackOnAddItem(item, value);
+                this.options.callbackOnAddItem(id, value);
             } else {
                 console.error('callbackOnAddItem: Callback is not a function');
             }
         }
 
-        this.store.dispatch(addItemToStore(passedValue, item, id));
-        console.log(this.store.getState());
+        this.store.dispatch(addItemToStore(passedValue, id));
+        this.store.dispatch(unselectAllFromStore(passedValue, id));
     }
 
     removeItem(item) {
@@ -351,7 +341,6 @@ export class Choices {
 
         let id = item.getAttribute('data-choice-id');
         let value = item.innerHTML;
-        item.parentNode.removeChild(item);
 
         // Run callback
         if(this.options.callbackOnRemoveItem){
@@ -363,7 +352,6 @@ export class Choices {
         }
 
         this.store.dispatch(removeItemFromStore(id));
-        console.log(this.store.getState());
     }
 
     removeAll(items) {
@@ -380,7 +368,7 @@ export class Choices {
     init() {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
-        this.render(this.element);
+        this.renderInput(this.element);
     }
 
     renderTextInput() {
@@ -434,7 +422,7 @@ export class Choices {
         if (this.element.value !== '') {
             // Add any preset values
             this.valueArray.forEach((value) => {
-                this.addItem(this.list, value);
+                this.addItem(value);
             });
         }
 
@@ -443,13 +431,32 @@ export class Choices {
         this.list.addEventListener('click', this.onClick);
     }
 
+    renderItems(){
+        let items = this.store.getState();
 
-    render() {
+        this.list.innerHTML = '';
+
+        items.forEach((item) => {
+            if(item.active) {
+                // Create new list element 
+                let listItem = strToEl(`<li class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${item.id}" data-choice-selected="${item.selected}">${item.value}</li>`);
+
+                // Append it to list
+                this.list.appendChild(listItem);
+            }
+        });
+
+        console.log(items);
+    }
+
+    renderInput() {
         if (this.options.debug) console.debug('Render');
 
         switch (this.element.type) {
             case "text":
                 this.renderTextInput();
+                this.store.subscribe(this.renderItems);
+                this.renderItems();
                 break;
             case "select-one":
                 // this.renderSelectInput();
@@ -461,7 +468,6 @@ export class Choices {
                 this.renderTextInput();
                 break;
         }
-
     }
 
     destroy() {
@@ -482,36 +488,37 @@ export class Choices {
     let choices1 = new Choices({
         element : input1,
         // delimiter: ' ',
-        // maxItems: 5,
-        // callbackOnRemoveItem: function(value) {
-        //     console.log(value);
-        // },
-        // callbackOnAddItem: function(item, value) {
-        //     console.log(item, value);
-        // }
+        editItems: true,
+        maxItems: 5,
+        callbackOnRemoveItem: function(value) {
+            console.log(value);
+        },
+        callbackOnAddItem: function(item, value) {
+            console.log(item, value);
+        }
     });
 
-    // let choices2 = new Choices({
-    //     element : input2,
-    //     allowDuplicates: false,
-    //     editItems: true,
-    // });
+    let choices2 = new Choices({
+        element : input2,
+        allowDuplicates: false,
+        editItems: true,
+    });
 
-    // let choices3 = new Choices({
-    //     element : input3,
-    //     allowDuplicates: false,
-    //     editItems: true,
-    //     regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    // });
+    let choices3 = new Choices({
+        element : input3,
+        allowDuplicates: false,
+        editItems: true,
+        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    });
 
-    // let choices4 = new Choices({
-    //     element : input4,
-    //     addItems: false
-    // });
+    let choices4 = new Choices({
+        element : input4,
+        addItems: false
+    });
 
-    // let choices5 = new Choices({
-    //     element: input5,
-    //     prependValue: 'item-',
-    //     appendValue: `-${Date.now()}`
-    // });
+    let choices5 = new Choices({
+        element: input5,
+        prependValue: 'item-',
+        appendValue: `-${Date.now()}`
+    });
 })();

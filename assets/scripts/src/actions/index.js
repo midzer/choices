@@ -1,11 +1,16 @@
-export const addItemToStore = (value, element, id) => {
+export const addItemToStore = (value, id) => {
     return {
         type: 'ADD_ITEM',
         value: value,
-        element: element,
         id: id
     }
 };
+
+export const unselectAllFromStore = () => {
+    return {
+        type: 'UNSELECT_ALL'
+    }
+}
 
 export const removeItemFromStore = (id) => {
     return {

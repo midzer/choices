@@ -5,10 +5,17 @@ const choices = (state = [], action) => {
             return [...state, {
                 id: parseInt(action.id),
                 value: action.value,
-                element: action.element,
                 active: true,
                 selected: false
             }];
+
+        case 'UNSELECT_ALL':
+            return state.map((item) => {
+                if(item.selected) {
+                    item.selected = false;
+                }
+                return item;
+            });
 
         case 'REMOVE_ITEM':
             // Set item to inactive
