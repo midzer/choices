@@ -24,6 +24,40 @@ export const isType = function(type, obj) {
     return obj !== undefined && obj !== null && clas === type;
 };
 
+/**
+ * Merges unspecified amount of objects into new object
+ * @private
+ * @return {Object} Merged object of arguments
+ */
+export const extend = function() {
+    let extended = {};
+    let length = arguments.length;
+
+    /**
+     * Merge one object into another
+     * @param  {Object} obj  Object to merge into extended object
+     */
+    let merge = function(obj) {
+        for (let prop in obj) {
+            extended[prop] = obj[prop];
+        }
+    };
+
+    // Loop through each passed argument
+    for (let i = 0; i < length; i++) {
+        // store argument at position i
+        let obj = arguments[i];
+
+        // If we are in fact dealing with an object, merge it. Otherwise throw error
+        if (isType('Object', obj)) {
+            merge(obj);
+        } else {
+            console.error('Custom options must be an object');
+        }
+    }
+
+    return extended;
+};
 
 /**
  * CSS transition end event listener

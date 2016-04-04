@@ -1,21 +1,22 @@
-const choices = (state = [], action) => {
+const initialState = [];
+
+const choices = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_ITEM':
             // Add object to items array
-            return [...state, {
+            let newState = [...state, {
                 id: parseInt(action.id),
                 value: action.value,
                 active: true,
                 selected: false
             }];
 
-        case 'UNSELECT_ALL':
-            return state.map((item) => {
+            return newState.map((item) => {
                 if(item.selected) {
                     item.selected = false;
                 }
                 return item;
-            });
+            });;
 
         case 'REMOVE_ITEM':
             // Set item to inactive
@@ -34,7 +35,6 @@ const choices = (state = [], action) => {
 
                 return item;
             });
-
 
         default:
             return state;

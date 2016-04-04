@@ -2,19 +2,8 @@
 
 import { createStore } from 'redux';
 import choices from './reducers/index.js';
-import { addItemToStore, removeItemFromStore, selectItemFromStore, unselectAllFromStore } from './actions/index';
-import { hasClass, wrap, getSiblings, isType, strToEl } from './lib/utils.js';
-
-
-/**
-
-    TODO:
-    - State handling
-    - Dynamically set input width to contents
-    - Handle select input
-    - Handle multiple select input ?
-
- */
+import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
+import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
 export class Choices {
     constructor(options) {
@@ -41,95 +30,57 @@ export class Choices {
             callbackOnAddItem: function() {}
         };
 
+        // Initial instance state
+        this.initialised = false;
+
         // Merge options with user options
-        this.options = this.extend(defaultOptions, userOptions || {});
+        this.options = extend(defaultOptions, userOptions || {});
+
+        // Create data store
         this.store = createStore(choices);
 
-        this.initialised = false;
+        // Cutting the mustard
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.element = this.options.element;
 
-        // If input already has values, parse the array, otherwise create a blank array
-        // Hmm, this should really map this.store
-        this.valueArray = this.element.value !== '' ? this.cleanInputValue(this.element.value) : [];
-
-        // How many values in array
-        this.valueCount = this.valueArray.length;
-
         // Bind methods
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
-        this.renderItems = this.renderItems.bind(this);
+        this.render = this.render.bind(this);
 
+        // Let's have it large
         this.init();
     }
 
-    cleanInputValue(value) {
-        // Remove spaces and split with delimiter
-        return value.replace(/\s/g, '').split(this.options.delimiter);
-    }
+    /* State tests */
 
-    /**
-     * Merges unspecified amount of objects into new object
-     * @private
-     * @return {Object} Merged object of arguments
+    /** 
+     * Whether input is disabled
+     * @return {Boolean}
      */
-    extend() {
-        let extended = {};
-        let length = arguments.length;
-
-        /**
-         * Merge one object into another
-         * @param  {Object} obj  Object to merge into extended object
-         */
-        let merge = function(obj) {
-            for (let prop in obj) {
-                extended[prop] = obj[prop];
-            }
-        };
-
-        // Loop through each passed argument
-        for (let i = 0; i < length; i++) {
-            // store argument at position i
-            let obj = arguments[i];
-
-            // If we are in fact dealing with an object, merge it. Otherwise throw error
-            if (isType('Object', obj)) {
-                merge(obj);
-            } else {
-                console.error('Custom options must be an object');
-            }
-        }
-
-        return extended;
-    };
-
-    /* State */
-
-    isOpen() {
-
-    }
-
     isDisabled() {
-
+        return (this.input.disabled) ?  true : false;
     }
 
+    /** 
+     * Whether there are no values
+     * @return {Boolean}
+     */
     isEmpty() {
-        return (this.valueCount.length === 0) ? true : false; 
-    }
-
-    clearInput() {
-        if (this.input.value) this.input.value = '';
+        return (this.store.getState().length === 0) ? true : false; 
     }
 
     /* Event handling */
 
-    onKeyUp(e) {
-    }
-
+    /** 
+     * Handle keydown event 
+     * @param  {Object} e Event
+     * @return
+     */
     onKeyDown(e) {
+        const storeValues = this.store.getState();
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
@@ -137,6 +88,7 @@ export class Choices {
 
         // If we are typing in the input
         if(e.target === this.input) {
+
             // If CTRL + A or CMD + A have been pressed and there are items to select
             if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
                 let handleSelectAll = () => {
@@ -164,9 +116,9 @@ export class Choices {
                     // If no duplicates are allowed, and the value already exists
                     // in the array, don't update
                     if (this.options.allowDuplicates === false && this.element.value) {
-                        if (this.valueArray.indexOf(value) > -1) {
-                            canUpdate = false;
-                        }
+                        canUpdate = !storeValues.some((item) => {
+                            return item.value === value;
+                        });
                     }
 
                     // All is good, update
@@ -184,7 +136,6 @@ export class Choices {
                             // All is good, add
                             if(canAddItem) {
                                 this.addItem(value);
-                                this.updateInputValue(value);
                                 this.clearInput(this.element);
                             }
                         }
@@ -226,6 +177,12 @@ export class Choices {
         }
     }
 
+
+    /** 
+     * Handle click event 
+     * @param  {Object} e Event
+     * @return
+     */
     onClick(e) {
         if(e.target.tagName === 'LI') {
             let item = e.target;
@@ -235,7 +192,7 @@ export class Choices {
                 let items = this.list.children;
 
                 // We only want to select one item with a click
-                // so we unselect any items that aren't the target
+                // so we deselect any items that aren't the target
                 for (var i = 0; i < items.length; i++) {
                     let singleItem = items[i];
                     let id = singleItem.getAttribute('data-choice-id');;
@@ -243,7 +200,7 @@ export class Choices {
                     if(id === passedId && !singleItem.classList.contains('is-selected')) {
                         this.selectItem(singleItem);
                     } else {
-                        this.unselectItem(singleItem);
+                        this.deselectItem(singleItem);
                     }
                 }          
             }
@@ -253,12 +210,20 @@ export class Choices {
     }
 
     /* Methods */
-    setValue() {}
 
-    getValue() {}
+    /** 
+     * Set value of input to blank
+     * @return
+     */
+    clearInput() {
+        if (this.input.value) this.input.value = '';
+    }
 
-    getValues() {}
-
+    /**
+     * Tests value against a regular expression
+     * @param  {string} value Value to test
+     * @return {Boolean}       Whether test passed/failed
+     */
     regexFilter(value) {
         let expression = new RegExp(this.options.regexFilter, 'i');
         let passesTest = expression.test(value);
@@ -266,16 +231,32 @@ export class Choices {
         return passesTest;
     }
 
+    /**
+     * Select item (a selected item can be deleted)
+     * @param  {Element} item Element to select
+     * @return
+     */
     selectItem(item) {
         let id = item.getAttribute('data-choice-id');
         this.store.dispatch(selectItemFromStore(id, true));
     }
 
-    unselectItem(item) {
+    /** 
+     * Deselect item
+     * @param  {Element} item Element to de-select
+     * @return
+     */
+    deselectItem(item) {
         let id = item.getAttribute('data-choice-id');
         this.store.dispatch(selectItemFromStore(id, false));
     }
 
+
+    /**
+     * Select items within array
+     * @param  {Array} items Array of items to select
+     * @return
+     */
     selectAll(items) {
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
@@ -283,25 +264,10 @@ export class Choices {
         };
     }
 
-    updateInputValue(value) {
-        if (this.options.debug) console.debug('Update input value');
-
-        // Push new value to array
-        this.valueArray.push(value);
-
-        // Caste array to string and set it as the hidden inputs value
-        this.element.value = this.valueArray.join(this.options.delimiter);
-    }
-
-    removeInputValue(value) {
-        if (this.options.debug) console.debug('Remove input value');
-
-        let index = this.valueArray.indexOf(value);
-        this.valueArray.splice(index, 1);
-
-        this.element.value = this.valueArray.join(this.options.delimiter);
-    }
-
+    /**
+     * Add item to store with correct value
+     * @param {String} value Value to add to store
+     */
     addItem(value) {
         if (this.options.debug) console.debug('Add item');
 
@@ -330,9 +296,12 @@ export class Choices {
         }
 
         this.store.dispatch(addItemToStore(passedValue, id));
-        this.store.dispatch(unselectAllFromStore(passedValue, id));
     }
 
+    /**
+     * Remove item from store
+     * @param
+     */
     removeItem(item) {
         if(!item) {
             console.error('removeItem: No item was passed to be removed');
@@ -354,23 +323,27 @@ export class Choices {
         this.store.dispatch(removeItemFromStore(id));
     }
 
+    /**
+     * Remove all items from array
+     * @param  {Array} items Items to remove from store
+     * @return
+     */
     removeAll(items) {
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
 
             if (item.classList.contains('is-selected')) {
                 this.removeItem(item);
-                this.removeInputValue(item.textContent);
             }
         };
     }
+    
+    /* Rendering */
 
-    init() {
-        if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
-        this.initialised = true;
-        this.renderInput(this.element);
-    }
-
+    /**
+     * Create DOM structure around passed text element
+     * @return
+     */
     renderTextInput() {
         /* 
             Template:
@@ -419,44 +392,66 @@ export class Choices {
         this.input = input;
         this.list = list;
 
-        if (this.element.value !== '') {
-            // Add any preset values
-            this.valueArray.forEach((value) => {
-                this.addItem(value);
-            });
-        }
+        // Add any preset values seperated by delimiter 
+        let valueArray = this.element.value !== '' ? this.element.value.split(this.options.delimiter) : [];
+        valueArray.forEach((value) => {
+            this.addItem(value);
+        });
 
         // Trigger event listeners 
         document.addEventListener('keydown', this.onKeyDown);
         this.list.addEventListener('click', this.onClick);
+
+        // Subscribe to store
+        this.store.subscribe(this.render);
+
+        // Render any items
+        this.render();
     }
 
-    renderItems(){
-        let items = this.store.getState();
+    /**
+     * Render DOM with values
+     * @return
+     */
+    render() {
+        let state = this.store.getState();
 
+        // Simplify store data to just values
+        let valueArray = state.reduce((prev, current) => {
+            prev.push(current.value);
+            return prev;
+        }, []);
+
+        // Assign hidden input array of values
+        this.element.value = valueArray.join(this.options.delimiter);
+
+        // Clear list
         this.list.innerHTML = '';
-
-        items.forEach((item) => {
+        
+        // Add each list item to list
+        state.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<li class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${item.id}" data-choice-selected="${item.selected}">${item.value}</li>`);
+                let listItem = strToEl(`<li class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
             }
         });
 
-        console.log(items);
+        console.log(state);
     }
 
-    renderInput() {
+    /**
+     * Determine how an input should be rendered
+     * @return {Element} Input to test
+     */
+    renderInput(input) {
         if (this.options.debug) console.debug('Render');
 
-        switch (this.element.type) {
+        switch (input.type) {
             case "text":
                 this.renderTextInput();
-                this.store.subscribe(this.renderItems);
-                this.renderItems();
                 break;
             case "select-one":
                 // this.renderSelectInput();
@@ -470,11 +465,24 @@ export class Choices {
         }
     }
 
+    /**
+     * Initialise Choices
+     * @return
+     */
+    init() {
+        if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
+        this.initialised = true;
+        this.renderInput(this.element);
+    }
+    
+    /**
+     * Destroy Choices and nullify values
+     * @return
+     */
     destroy() {
         this.options = null;
         this.element = null;
         this.initialised = null;
-        this.removeEventListeners(this.input);
     }
 };
 
@@ -487,15 +495,15 @@ export class Choices {
 
     let choices1 = new Choices({
         element : input1,
-        // delimiter: ' ',
+        delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        callbackOnRemoveItem: function(value) {
-            console.log(value);
-        },
-        callbackOnAddItem: function(item, value) {
-            console.log(item, value);
-        }
+        // callbackOnRemoveItem: function(value) {
+        //     console.log(value);
+        // },
+        // callbackOnAddItem: function(item, value) {
+        //     console.log(item, value);
+        // }
     });
 
     let choices2 = new Choices({

@@ -6,12 +6,6 @@ export const addItemToStore = (value, id) => {
     }
 };
 
-export const unselectAllFromStore = () => {
-    return {
-        type: 'UNSELECT_ALL'
-    }
-}
-
 export const removeItemFromStore = (id) => {
     return {
         type: 'REMOVE_ITEM',
