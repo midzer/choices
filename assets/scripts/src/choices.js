@@ -372,7 +372,7 @@ export class Choices {
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = strToEl('<ul class="choices__list choices__list--items"></ul>');
+        let list = strToEl('<div class="choices__list choices__list--items"></div>');
         let input = strToEl('<input type="text" class="choices__input choices__input--cloned">');
 
         if (input.placeholder) {
@@ -383,10 +383,10 @@ export class Choices {
             input.disabled = true;
         }
 
+        containerOuter.appendChild(containerInner);
         containerInner.appendChild(list);
         containerInner.appendChild(input);
-        containerOuter.appendChild(containerInner);
-
+        
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
         this.input = input;
@@ -398,15 +398,24 @@ export class Choices {
             this.addItem(value);
         });
 
-        // Trigger event listeners 
-        document.addEventListener('keydown', this.onKeyDown);
-        this.list.addEventListener('click', this.onClick);
-
         // Subscribe to store
         this.store.subscribe(this.render);
 
         // Render any items
         this.render();
+
+        // Trigger event listeners 
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        document.addEventListener('keydown', this.onKeyDown);
+        this.list.addEventListener('click', this.onClick);
+    }
+
+    removeEventListeners() {
+        document.removeEventListener('keydown', this.onKeyDown);
+        this.list.removeEventListener('click', this.onClick);
     }
 
     /**
@@ -432,7 +441,7 @@ export class Choices {
         state.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<li class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
+                let listItem = strToEl(`<div class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
