@@ -12,6 +12,7 @@ export class Choices {
         const defaultOptions = {
             element: document.querySelector('[data-choice]'),
             disabled: false,
+            items: [],
             addItems: true,
             removeItems: true,
             editItems: false,
@@ -45,10 +46,19 @@ export class Choices {
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.element = this.options.element;
 
+        // Set preset items
+        this.presetItems = [];
+        if(this.options.items.length) {
+            this.presetItems = this.options.items;
+        } else if(this.element.value !== '') {
+            this.presetItems = this.element.value.split(this.options.delimiter);
+        }
+
         // Bind methods
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.render = this.render.bind(this);
+        this.init = this.init.bind(this);
 
         // Let's have it large
         this.init();
@@ -392,9 +402,8 @@ export class Choices {
         this.input = input;
         this.list = list;
 
-        // Add any preset values seperated by delimiter 
-        let valueArray = this.element.value !== '' ? this.element.value.split(this.options.delimiter) : [];
-        valueArray.forEach((value) => {
+        // Add any preset values seperated by delimiter
+        this.presetItems.forEach((value) => {
             this.addItem(value);
         });
 
@@ -501,6 +510,7 @@ export class Choices {
     let input3 = document.getElementById(3);
     let input4 = document.getElementById(4);
     let input5 = document.getElementById(5);
+    let input6 = document.getElementById(6);
 
     let choices1 = new Choices({
         element : input1,
@@ -537,5 +547,10 @@ export class Choices {
         element: input5,
         prependValue: 'item-',
         appendValue: `-${Date.now()}`
+    });
+
+    let choices6 = new Choices({
+        element: input6,
+        items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk']
     });
 })();
