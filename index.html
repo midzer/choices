@@ -7,24 +7,26 @@
 </head>
 <body>
     <div class="container">
-        <label for="1">Text input with no values and a limit of 5 items</label>
-        <input id="1" type="text" data-choice value="preset-1 preset-2">
+        <div class="section">
+            <h1>Choices</h1>
+            <label for="1">Text input with no values and a limit of 5 items</label>
+            <input id="1" type="text" data-choice value="preset-1 preset-2">
 
-        <label for="2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
-        <input id="2" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+            <label for="2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
+            <input id="2" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
 
-        <label for="3">Text input that only allows email addresses</label>
-        <input id="3" type="text" data-choice placeholder="This is a placeholder">
+            <label for="3">Text input that only allows email addresses</label>
+            <input id="3" type="text" data-choice placeholder="This is a placeholder">
 
-        <label for="4">Text input that disables adding items</label>
-        <input id="4" type="text" data-choice value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
+            <label for="4">Text input that disables adding items</label>
+            <input id="4" type="text" data-choice value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
-        <label for="5">Text input that prepends and appends a value to each item</label>
-        <input id="5" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder">
+            <label for="5">Text input that prepends and appends a value to each item</label>
+            <input id="5" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder">
 
-        <label for="6">Text input with preset values passed through options</label>
-        <input id="6" type="text" data-choice placeholder="This is a placeholder">
-
+            <label for="6">Text input with preset values passed through options</label>
+            <input id="6" type="text" data-choice placeholder="This is a placeholder">
+        </div>
     </div>
     <script src="assets/scripts/dist/bundle.js"></script>
 </body>
