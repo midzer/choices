@@ -44,14 +44,14 @@ export class Choices {
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-        this.element = this.options.element;
+        this.passedInput = this.options.element;
 
         // Set preset items
         this.presetItems = [];
         if(this.options.items.length) {
             this.presetItems = this.options.items;
-        } else if(this.element.value !== '') {
-            this.presetItems = this.element.value.split(this.options.delimiter);
+        } else if(this.passedInput.value !== '') {
+            this.presetItems = this.passedInput.value.split(this.options.delimiter);
         }
 
         // Bind methods
@@ -60,6 +60,7 @@ export class Choices {
         this.destroy = this.destroy.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.onFocus = this.onFocus.bind(this);
 
         // Let's have it large
         this.init();
@@ -103,7 +104,7 @@ export class Choices {
             // If CTRL + A or CMD + A have been pressed and there are items to select
             if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
                 let handleSelectAll = () => {
-                    if(this.options.removeItems && !this.input.value && this.options.selectAll) {
+                    if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
                         this.selectAll(this.list.children);
                     }
                 };
@@ -126,7 +127,7 @@ export class Choices {
 
                     // If no duplicates are allowed, and the value already exists
                     // in the array, don't update
-                    if (this.options.allowDuplicates === false && this.element.value) {
+                    if (this.options.allowDuplicates === false && this.passedInput.value) {
                         canUpdate = !storeValues.some((item) => {
                             return item.value === value;
                         });
@@ -134,7 +135,7 @@ export class Choices {
 
                     // All is good, update
                     if (canUpdate) {
-                        if(this.element.type === 'text') {
+                        if(this.passedInput.type === 'text') {
                             let canAddItem = true;
 
                             // If a user has supplied a regular expression filter
@@ -147,7 +148,7 @@ export class Choices {
                             // All is good, add
                             if(canAddItem) {
                                 this.addItem(value);
-                                this.clearInput(this.element);
+                                this.clearInput(this.passedInput);
                             }
                         }
                     }
@@ -162,18 +163,20 @@ export class Choices {
 
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
-                    let currentListItems = this.list.querySelectorAll('.choices__item');
+                    let currentListItems = this.list.querySelectorAll('[data-choice-item]');
                     let selectedItems = this.list.querySelectorAll('.is-selected');
                     let lastItem = currentListItems[currentListItems.length - 1];
+                    let inputIsFocussed = this.input === document.activeElement;
 
-                    if(lastItem && !this.options.editItems) {
+                    if(lastItem && !this.options.editItems && inputIsFocussed) {
                         this.selectItem(lastItem);
                     }
 
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(this.options.editItems && lastItem && selectedItems.length === 0) {
+
+                    if(this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
@@ -195,7 +198,8 @@ export class Choices {
      * @return
      */
     onClick(e) {
-        if(e.target.tagName === 'LI') {
+        // I don't like the look of this
+        if(e.target.hasAttribute('data-choice-item')) {
             let item = e.target;
 
             let handleClick = (item) => { 
@@ -217,6 +221,12 @@ export class Choices {
             }
             
             handleClick(item);
+        }
+    }
+
+    onFocus(e) {
+        if(this.passedInput.type === 'select-multiple') {
+            console.log(e.target);
         }
     }
 
@@ -242,6 +252,23 @@ export class Choices {
         return passesTest;
     }
 
+    /** 
+     * Get Element based on a given value
+     * @param  {String} value Value to search for
+     * @return {Element}       First Element with given value
+     */
+    getItemByValue(value) {
+        let state = this.store.getState()
+        
+        let stateObject = state.find((item) => {
+            return item.value === value;
+        });
+
+        let item = this.list.querySelector(`[data-choice-id='${stateObject.id}']`) 
+
+        return item;
+    }
+
     /**
      * Select item (a selected item can be deleted)
      * @param  {Element} item Element to select
@@ -261,7 +288,6 @@ export class Choices {
         let id = item.getAttribute('data-choice-id');
         this.store.dispatch(selectItemFromStore(id, false));
     }
-
 
     /**
      * Select items within array
@@ -387,26 +413,26 @@ export class Choices {
             </div>
         */
 
-        let containerOuter = strToEl('<div class="choices choices--active"></div>');
-        let containerInner = strToEl('<div class="choices__inner"></div>');
+        let containerOuter = strToEl(`<div class="choices choices--active"></div>`);
+        let containerInner = strToEl(`<div class="choices__inner"></div>`);
 
         // Hide passed input
-        this.element.classList.add('choices__input', 'choices__input--hidden');
-        this.element.tabIndex = '-1';
-        this.element.setAttribute('style', 'display:none;');
-        this.element.setAttribute('aria-hidden', 'true');
+        this.passedInput.classList.add('choices__input', 'choices__input--hidden');
+        this.passedInput.tabIndex = '-1';
+        this.passedInput.setAttribute('style', 'display:none;');
+        this.passedInput.setAttribute('aria-hidden', 'true');
 
         // Wrap input in container preserving DOM ordering
-        wrap(this.element, containerInner);
+        wrap(this.passedInput, containerInner);
 
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = strToEl('<div class="choices__list choices__list--items"></div>');
-        let input = strToEl('<input type="text" class="choices__input choices__input--cloned">');
+        let list = strToEl(`<div class="choices__list choices__list--items"></div>`);
+        let input = strToEl(`<input type="text" class="choices__input choices__input--cloned">`);
 
-        if (input.placeholder) {
-            input.placeholder = this.element.placeholder;
+        if (this.passedInput.placeholder) {
+            input.placeholder = this.passedInput.placeholder;
         }
 
         if(!this.options.addItems) {
@@ -437,14 +463,86 @@ export class Choices {
         this.addEventListeners();
     }
 
+    /**
+     * Create DOM structure around passed select element
+     * @return
+     */
+    renderMultipleSelectInput() {
+        /* 
+            Template:
+
+            <div class="choices choices--active">
+                <div class="choices__inner">
+                    <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
+                    <ul class="choices__list choices__list--items"></ul>
+                    <input type="text" class="choices__input choices__input--cloned">
+                </div>
+            </div>
+        */
+
+        let containerOuter = strToEl('<div class="choices choices--active"></div>');
+        let containerInner = strToEl('<div class="choices__inner"></div>');
+
+        // Hide passed input
+        this.passedInput.classList.add('choices__input', 'choices__input--hidden');
+        this.passedInput.tabIndex = '-1';
+        this.passedInput.setAttribute('style', 'display:none;');
+        this.passedInput.setAttribute('aria-hidden', 'true');
+
+        // Wrap input in container preserving DOM ordering
+        wrap(this.passedInput, containerInner);
+
+        // Wrapper inner container with outer container
+        wrap(containerInner, containerOuter);
+
+        let list = strToEl('<div class="choices__list choices__list--items"></div>');
+        let input = strToEl('<input type="text" class="choices__input choices__input--cloned">');
+        let dropdown = strToEl('<div class="choices__list choices__list--dropdown"></div>');
+
+        if (input.placeholder) {
+            input.placeholder = this.passedInput.placeholder;
+        }
+
+        if(!this.options.addItems) {
+            input.disabled = true;
+        }
+
+        containerOuter.appendChild(containerInner);
+        containerOuter.appendChild(dropdown);
+        containerInner.appendChild(list);
+        containerInner.appendChild(input);
+        
+        this.containerOuter = containerOuter;
+        this.containerInner = containerInner;
+        this.input = input;
+        this.list = list;
+        this.dropdown = dropdown;
+
+        // Add any preset values seperated by delimiter
+        this.presetItems.forEach((value) => {
+            this.addItem(value);
+        });
+
+        // Subscribe to store
+        this.store.subscribe(this.render);
+
+        // Render any items
+        this.render();
+
+        // Trigger event listeners 
+        this.addEventListeners();
+    }
+
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
         this.list.addEventListener('click', this.onClick);
+        this.input.addEventListener('focus', this.onFocus);
     }
 
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
         this.list.removeEventListener('click', this.onClick);
+        this.input.removeEventListener('focus', this.onFocus);
     }
 
     /**
@@ -461,7 +559,7 @@ export class Choices {
         }, []);
 
         // Assign hidden input array of values
-        this.element.value = valueArray.join(this.options.delimiter);
+        this.passedInput.value = valueArray.join(this.options.delimiter);
 
         // Clear list
         this.list.innerHTML = '';
@@ -470,7 +568,7 @@ export class Choices {
         state.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<div class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
+                let listItem = strToEl(`<div class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
@@ -495,7 +593,7 @@ export class Choices {
                 // this.renderSelectInput();
                 break;
             case "select-multiple":
-                // this.renderMultipleSelectInput();
+                this.renderMultipleSelectInput();
                 break;
             default:
                 this.renderTextInput();
@@ -510,7 +608,7 @@ export class Choices {
     init() {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
-        this.renderInput(this.element);
+        this.renderInput(this.passedInput);
     }
     
     /**
@@ -519,18 +617,19 @@ export class Choices {
      */
     destroy() {
         this.options = null;
-        this.element = null;
+        this.passedInput = null;
         this.initialised = null;
     }
 };
 
-(function(){
+document.addEventListener('DOMContentLoaded', () => {
     let input1 = document.getElementById(1);
     let input2 = document.getElementById(2);
     let input3 = document.getElementById(3);
     let input4 = document.getElementById(4);
     let input5 = document.getElementById(5);
     let input6 = document.getElementById(6);
+    let input7 = document.getElementById(7);
 
     let choices1 = new Choices({
         element : input1,
@@ -574,6 +673,11 @@ export class Choices {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk']
     });
 
+    let choices7 = new Choices({
+        element: input7,
+    });
+
     choices6.addItem('josh2@joshuajohnson.co.uk');
     choices6.removeItem('josh@joshuajohnson.co.uk');
-})();
+    console.log(choices6.getItemByValue('josh2@joshuajohnson.co.uk'));
+});

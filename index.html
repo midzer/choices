@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Choices</title>
     <link rel="stylesheet" href="assets/styles/css/choices.css">
+    <script src="assets/scripts/dist/bundle.js"></script>
 </head>
 <body>
     <div class="container">
@@ -26,8 +27,33 @@
 
             <label for="6">Text input with preset values passed through options</label>
             <input id="6" type="text" data-choice placeholder="This is a placeholder">
+
+
+            <label for="7">Select box</label>
+            <select name="7" id="7" data-choice placeholder="This is a placeholder" multiple>
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2" selected>Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
+
+            
+            <div class="choices choices--active">
+                <div class="choices__inner">
+                    <input id="1" type="text" data-choice="" value="preset-1 preset-2" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
+                    <div class="choices__list choices__list--items">
+                        <div class="choices__item" data-choice-item data-choice-id="1" data-choice-selected="false">preset-1</div>
+                        <div class="choices__item" data-choice-item data-choice-id="2" data-choice-selected="false">preset-2</div>
+                    </div>
+                    <input type="text" class="choices__input choices__input--cloned">
+                </div>
+                <ul class="choices__list choices__list--dropdown">
+                    <li class="choices__item choices__item--selectable" data-choice-selectable data-choice-value="Dropdown item 1">Dropdown item 1</li>
+                    <li class="choices__item choices__item--selectable" data-choice-selectable data-choice-value="Dropdown item 2">Dropdown item 2</li>
+                    <li class="choices__item choices__item--selectable" data-choice-selectable data-choice-value="Dropdown item 3">Dropdown item 3</li>
+                </ul>
+            </div>
+
         </div>
     </div>
-    <script src="assets/scripts/dist/bundle.js"></script>
 </body>
 </html>

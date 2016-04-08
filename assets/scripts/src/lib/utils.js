@@ -366,12 +366,12 @@ export const strToEl = (function() {
  * Calculates the width of a passed input based on its value
  * @return {Number} Width of input
  */
-export const getWidthOfInput = function() {
-    var tmp = document.createElement("span");
-    tmp.className = "input-element tmp-element";
+export const getWidthOfInput = () => {
+    let tmp = document.createElement('span');
+    tmp.className = "tmp-element";
     tmp.innerHTML = inputEl.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     document.body.appendChild(tmp);
-    var theWidth = tmp.getBoundingClientRect().width;
+    let theWidth = tmp.getBoundingClientRect().width;
     document.body.removeChild(tmp);
     return theWidth;
-  }
+}

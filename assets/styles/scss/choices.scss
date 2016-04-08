@@ -70,23 +70,45 @@ h1, h2, h3, h4, h5, h6 {
     list-style-type: none;
 }
 
+.choices__item {}
+.choices__item--selectable { cursor: pointer; }
+
 .choices__list--options {}
 
 .choices__list--items {
     display: inline;
     .choices__item {
         display: inline-block;
-        border-radius: .8rem;
-        padding: .4rem .8rem;
+        border-radius: 2rem;
+        padding: .4rem 1rem;
         font-size: 1.2rem;
         margin-right: .375rem;
         margin-bottom: .375rem;
         background-color: #00BCD4;
-        border: 1px solid darken(#00BCD4, 5%);
+        border: 1px solid darken(#00BCD4, 2.5%);
         color: #FFFFFF;
         cursor: pointer;
         &.is-selected { background-color: darken(#00BCD4, 5%); }
     }
+}
+
+.choices__list--dropdown {
+    position: absolute;
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    margin-top: -1px;
+    display: none;
+    border-bottom-left-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+    .choices__item {
+        padding: 1rem;
+        font-size: 1.4rem;
+        &:hover {
+            background-color: mix(#000000, #FFFFFF, 2.5%);
+        }
+    }
+    .is-active { display: block; }
 }
 
 .choices__input {

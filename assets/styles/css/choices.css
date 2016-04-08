@@ -56,21 +56,41 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 0;
   list-style-type: none; }
 
+.choices__item--selectable {
+  cursor: pointer; }
+
 .choices__list--items {
   display: inline; }
   .choices__list--items .choices__item {
     display: inline-block;
-    border-radius: .8rem;
-    padding: .4rem .8rem;
+    border-radius: 2rem;
+    padding: .4rem 1rem;
     font-size: 1.2rem;
     margin-right: .375rem;
     margin-bottom: .375rem;
     background-color: #00BCD4;
-    border: 1px solid #00a5bb;
+    border: 1px solid #00b1c7;
     color: #FFFFFF;
     cursor: pointer; }
     .choices__list--items .choices__item.is-selected {
       background-color: #00a5bb; }
+
+.choices__list--dropdown {
+  position: absolute;
+  width: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid #DDDDDD;
+  margin-top: -1px;
+  display: none;
+  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem; }
+  .choices__list--dropdown .choices__item {
+    padding: 1rem;
+    font-size: 1.4rem; }
+    .choices__list--dropdown .choices__item:hover {
+      background-color: #f9f9f9; }
+  .choices__list--dropdown .is-active {
+    display: block; }
 
 .choices__input {
   background-color: #f9f9f9;
