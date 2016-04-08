@@ -55,10 +55,11 @@ export class Choices {
         }
 
         // Bind methods
+        this.init = this.init.bind(this);
+        this.render = this.render.bind(this);
+        this.destroy = this.destroy.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
-        this.render = this.render.bind(this);
-        this.init = this.init.bind(this);
 
         // Let's have it large
         this.init();
@@ -312,25 +313,44 @@ export class Choices {
      * Remove item from store
      * @param
      */
-    removeItem(item) {
-        if(!item) {
-            console.error('removeItem: No item was passed to be removed');
+    removeItem(itemOrValue) {
+        if(!itemOrValue) {
+            console.error('removeItem: No item or value was passed to be removed');
             return;
         }
 
-        let id = item.getAttribute('data-choice-id');
-        let value = item.innerHTML;
-
-        // Run callback
-        if(this.options.callbackOnRemoveItem){
-            if(isType('Function', this.options.callbackOnRemoveItem)) {
-                this.options.callbackOnRemoveItem(value);
-            } else {
-                console.error('callbackOnRemoveItem: Callback is not a function');
+        // We are re-assigning a variable here. Probably shouldn't be doing that...
+        let item;
+        if(itemOrValue.nodeType) {
+            item = itemOrValue;
+        } else {
+            for (var i = this.list.children.length - 1; i >= 0; i--) {
+                let listItem = this.list.children[i];
+                if(listItem.innerHTML === itemOrValue.toString()) {
+                    item = listItem;
+                    break;
+                }
             }
         }
 
-        this.store.dispatch(removeItemFromStore(id));
+        if(item) {
+            let id = item.getAttribute('data-choice-id');
+            let value = item.innerHTML;
+
+            // Run callback
+            if(this.options.callbackOnRemoveItem){
+                if(isType('Function', this.options.callbackOnRemoveItem)) {
+                    this.options.callbackOnRemoveItem(value);
+                } else {
+                    console.error('callbackOnRemoveItem: Callback is not a function');
+                }
+            }
+
+            this.store.dispatch(removeItemFromStore(id));
+        } else {
+            console.error('Item not found');        
+        }
+        
     }
 
     /**
@@ -517,12 +537,12 @@ export class Choices {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        // callbackOnRemoveItem: function(value) {
-        //     console.log(value);
-        // },
-        // callbackOnAddItem: function(item, value) {
-        //     console.log(item, value);
-        // }
+        callbackOnRemoveItem: function(value) {
+            console.log(value);
+        },
+        callbackOnAddItem: function(item, value) {
+            console.log(item, value);
+        }
     });
 
     let choices2 = new Choices({
@@ -553,4 +573,7 @@ export class Choices {
         element: input6,
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk']
     });
+
+    choices6.addItem('josh2@joshuajohnson.co.uk');
+    choices6.removeItem('josh@joshuajohnson.co.uk');
 })();
