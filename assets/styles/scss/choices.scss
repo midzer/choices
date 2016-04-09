@@ -108,7 +108,7 @@ h1, h2, h3, h4, h5, h6 {
             background-color: mix(#000000, #FFFFFF, 2.5%);
         }
     }
-    .is-active { display: block; }
+    &.is-active { display: block; }
 }
 
 .choices__input {

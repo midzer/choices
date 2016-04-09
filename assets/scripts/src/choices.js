@@ -61,6 +61,7 @@ export class Choices {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onFocus = this.onFocus.bind(this);
+        this.onBlur = this.onBlur.bind(this);
 
         // Let's have it large
         this.init();
@@ -225,8 +226,14 @@ export class Choices {
     }
 
     onFocus(e) {
-        if(this.passedInput.type === 'select-multiple') {
-            console.log(e.target);
+        if(this.dropdown) {
+            this.toggleDropdown();
+        }
+    }
+
+    onBlur(e) {
+        if(this.dropdown) {
+            this.toggleDropdown();
         }
     }
 
@@ -393,6 +400,22 @@ export class Choices {
             }
         };
     }
+
+    toggleDropdown() {
+        if(!this.dropdown) {
+            console.error('No dropdown set');
+            return;
+        }
+
+        const isActive = this.dropdown.classList.contains('is-active');
+
+        this.dropdown.classList[isActive ? 'remove' : 'add']('is-active');
+    }
+
+    addItemToDropdown(value) {
+        const dropdownItem = strToEl(`<li class="choices__item choices__item--selectable" data-choice-selectable data-choice-value="${value}">${value}</li>`);        
+        this.dropdown.appendChild(dropdownItem);
+    }
     
     /* Rendering */
 
@@ -523,6 +546,12 @@ export class Choices {
             this.addItem(value);
         });
 
+        const unselectedOptions = this.passedInput.options;
+        for (var i = 0; i < unselectedOptions.length; i++) {
+            let option = unselectedOptions[i];
+            this.addItemToDropdown(option.value);
+        }
+
         // Subscribe to store
         this.store.subscribe(this.render);
 
@@ -537,12 +566,14 @@ export class Choices {
         document.addEventListener('keydown', this.onKeyDown);
         this.list.addEventListener('click', this.onClick);
         this.input.addEventListener('focus', this.onFocus);
+        this.input.addEventListener('blur', this.onBlur);
     }
 
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
         this.list.removeEventListener('click', this.onClick);
         this.input.removeEventListener('focus', this.onFocus);
+        this.input.removeEventListener('blur', this.onBlur);
     }
 
     /**
