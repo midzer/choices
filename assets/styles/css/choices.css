@@ -56,9 +56,6 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 0;
   list-style-type: none; }
 
-.choices__item--selectable {
-  cursor: pointer; }
-
 .choices__list--items {
   display: inline; }
   .choices__list--items .choices__item {
@@ -70,8 +67,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: .375rem;
     background-color: #00BCD4;
     border: 1px solid #00b1c7;
-    color: #FFFFFF;
-    cursor: pointer; }
+    color: #FFFFFF; }
     .choices__list--items .choices__item.is-selected {
       background-color: #00a5bb; }
 
@@ -91,6 +87,12 @@ h1, h2, h3, h4, h5, h6 {
       background-color: #f9f9f9; }
   .choices__list--dropdown.is-active {
     display: block; }
+
+.choices__item {
+  cursor: default; }
+
+.choices__item--selectable {
+  cursor: pointer; }
 
 .choices__input {
   background-color: #f9f9f9;

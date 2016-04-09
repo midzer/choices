@@ -1,6 +1,4 @@
-const initialState = [];
-
-const choices = (state = initialState, action) => {
+const items = (state = [], action) => {
     switch (action.type) {
         case 'ADD_ITEM':
             // Add object to items array
@@ -16,7 +14,7 @@ const choices = (state = initialState, action) => {
                     item.selected = false;
                 }
                 return item;
-            });;
+            });
 
         case 'REMOVE_ITEM':
             // Set item to inactive
@@ -41,4 +39,25 @@ const choices = (state = initialState, action) => {
     }
 }
 
-export default choices
+const initialState = {
+    dropdownItems: [],
+    items: []
+}
+
+const choices = (state = initialState, action) => {
+    switch (action.type) {
+        case 'ADD_ITEM':
+            return state;
+
+        case 'REMOVE_ITEM':
+            return state;
+            
+        case 'SELECT_ITEM': 
+            return state;       
+            
+        default:
+            return state;
+    }
+}
+
+export default items;

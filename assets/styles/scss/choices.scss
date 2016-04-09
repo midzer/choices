@@ -70,9 +70,6 @@ h1, h2, h3, h4, h5, h6 {
     list-style-type: none;
 }
 
-.choices__item {}
-.choices__item--selectable { cursor: pointer; }
-
 .choices__list--options {}
 
 .choices__list--items {
@@ -87,7 +84,6 @@ h1, h2, h3, h4, h5, h6 {
         background-color: #00BCD4;
         border: 1px solid darken(#00BCD4, 2.5%);
         color: #FFFFFF;
-        cursor: pointer;
         &.is-selected { background-color: darken(#00BCD4, 5%); }
     }
 }
@@ -110,6 +106,9 @@ h1, h2, h3, h4, h5, h6 {
     }
     &.is-active { display: block; }
 }
+
+.choices__item { cursor: default; }
+.choices__item--selectable { cursor: pointer; }
 
 .choices__input {
     background-color: mix(#000000, #FFFFFF, 2.5%);

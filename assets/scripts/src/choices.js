@@ -1,7 +1,7 @@
 'use strict';
 
 import { createStore } from 'redux';
-import choices from './reducers/index.js';
+import items from './reducers/index.js';
 import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
@@ -11,7 +11,6 @@ export class Choices {
         const userOptions = options || {};
         const defaultOptions = {
             element: document.querySelector('[data-choice]'),
-            disabled: false,
             items: [],
             addItems: true,
             removeItems: true,
@@ -38,7 +37,7 @@ export class Choices {
         this.options = extend(defaultOptions, userOptions || {});
 
         // Create data store
-        this.store = createStore(choices);
+        this.store = createStore(items);
 
         // Cutting the mustard
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
@@ -46,7 +45,7 @@ export class Choices {
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedInput = this.options.element;
 
-        // Set preset items
+        // Set preset items - this looks out of place
         this.presetItems = [];
         if(this.options.items.length) {
             this.presetItems = this.options.items;
@@ -135,7 +134,7 @@ export class Choices {
                     }
 
                     // All is good, update
-                    if (canUpdate) {
+                    if (canUpdate && this.options.addItems) {
                         if(this.passedInput.type === 'text') {
                             let canAddItem = true;
 
@@ -169,15 +168,14 @@ export class Choices {
                     let lastItem = currentListItems[currentListItems.length - 1];
                     let inputIsFocussed = this.input === document.activeElement;
 
-                    if(lastItem && !this.options.editItems && inputIsFocussed) {
+                    if(lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
                         this.selectItem(lastItem);
                     }
 
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-
-                    if(this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
+                    if(this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
@@ -203,22 +201,24 @@ export class Choices {
         if(e.target.hasAttribute('data-choice-item')) {
             let item = e.target;
 
-            let handleClick = (item) => { 
-                let passedId = item.getAttribute('data-choice-id');
-                let items = this.list.children;
+            let handleClick = (item) => {
+                if(this.options.removeItems) {
+                    let passedId = item.getAttribute('data-choice-id');
+                    let items = this.list.children;
 
-                // We only want to select one item with a click
-                // so we deselect any items that aren't the target
-                for (var i = 0; i < items.length; i++) {
-                    let singleItem = items[i];
-                    let id = singleItem.getAttribute('data-choice-id');;
+                    // We only want to select one item with a click
+                    // so we deselect any items that aren't the target
+                    for (var i = 0; i < items.length; i++) {
+                        let singleItem = items[i];
+                        let id = singleItem.getAttribute('data-choice-id');;
 
-                    if(id === passedId && !singleItem.classList.contains('is-selected')) {
-                        this.selectItem(singleItem);
-                    } else {
-                        this.deselectItem(singleItem);
-                    }
-                }          
+                        if(id === passedId && !singleItem.classList.contains('is-selected')) {
+                            this.selectItem(singleItem);
+                        } else {
+                            this.deselectItem(singleItem);
+                        }
+                    }  
+                }
             }
             
             handleClick(item);
@@ -460,6 +460,7 @@ export class Choices {
 
         if(!this.options.addItems) {
             input.disabled = true;
+            containerOuter.classList.add('is-disabled');
         }
 
         containerOuter.appendChild(containerInner);
@@ -599,7 +600,7 @@ export class Choices {
         state.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<div class="choices__item ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
+                let listItem = strToEl(`<div class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
@@ -690,7 +691,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let choices4 = new Choices({
         element : input4,
-        addItems: false
+        addItems: false,
+        removeItems: false
     });
 
     let choices5 = new Choices({
