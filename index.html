@@ -10,27 +10,40 @@
     <div class="container">
         <div class="section">
             <h1>Choices</h1>
-            <label for="1">Text input with no values and a limit of 5 items</label>
-            <input id="1" type="text" data-choice value="preset-1 preset-2">
+            <label for="choices-1">Text input with no values and a limit of 5 items</label>
+            <input id="choices-1" type="text" value="preset-1 preset-2">
 
-            <label for="2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
-            <input id="2" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+            <label for="choices-2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
+            <input id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
 
-            <label for="3">Text input that only allows email addresses</label>
-            <input id="3" type="text" data-choice placeholder="This is a placeholder">
+            <label for="choices-3">Text input that only allows email addresses</label>
+            <input id="choices-3" type="text" placeholder="This is a placeholder">
 
-            <label for="4">Text input that disables adding items</label>
-            <input id="4" type="text" data-choice value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
+            <label for="choices-4">Text input that disables adding items</label>
+            <input id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
-            <label for="5">Text input that prepends and appends a value to each item</label>
-            <input id="5" type="text" data-choice value="preset-1, preset-2" placeholder="This is a placeholder">
+            <label for="choices-5">Text input that prepends and appends a value to each item</label>
+            <input id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
-            <label for="6">Text input with preset values passed through options</label>
-            <input id="6" type="text" data-choice placeholder="This is a placeholder">
+            <label for="choices-6">Text input with preset values passed through options</label>
+            <input id="choices-6" type="text" placeholder="This is a placeholder">
 
+            <label for="choices-7">Select box</label>
+            <select name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2" selected>Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
 
-            <label for="7">Select box</label>
-            <select name="7" id="7" data-choice placeholder="This is a placeholder" multiple>
+            <label for="choices-8">Select box</label>
+            <select id="choices-8" name="choices-8" data-choice placeholder="This is a placeholder" multiple>
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2" selected>Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
+
+            <label for="choices-9">Select box</label>
+            <select id="choices-9" name="choices-9" data-choice placeholder="This is a placeholder" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2" selected>Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
@@ -39,10 +52,10 @@
 <!--             
             <div class="choices choices--active">
                 <div class="choices__inner">
-                    <input id="1" type="text" data-choice="" value="preset-1 preset-2" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
+                    <input id="choices-1" type="text" data-choice="" value="preset-1 preset-2" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
                     <div class="choices__list choices__list--items">
-                        <div class="choices__item" data-choice-item data-choice-id="1" data-choice-selected="false">preset-1</div>
-                        <div class="choices__item" data-choice-item data-choice-id="2" data-choice-selected="false">preset-2</div>
+                        <div class="choices__item" data-choice-item data-choice-id="choices-1" data-choice-selected="false">preset-1</div>
+                        <div class="choices__item" data-choice-item data-choice-id="choices-2" data-choice-selected="false">preset-2</div>
                     </div>
                     <input type="text" class="choices__input choices__input--cloned">
                 </div>

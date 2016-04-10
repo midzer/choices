@@ -6,11 +6,23 @@ import { addItemToStore, removeItemFromStore, selectItemFromStore } from './acti
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
 export class Choices {
-    constructor(options) {
+    constructor(element = '[data-choice]', options) {
         const fakeEl = document.createElement("fakeel");
         const userOptions = options || {};
+
+        // If there are multiple elements, create a new instance 
+        // for each element besides the first one (as that already has an instance)
+        if(isType('String', element)) {
+            let elements = document.querySelectorAll(element);
+            if(elements.length > 1) {
+                for (let i = 1; i < elements.length; i++) {
+                    let el = elements[i];
+                    new Choices(el, options);
+                }
+            }
+        }
+
         const defaultOptions = {
-            element: document.querySelector('[data-choice]'),
             items: [],
             addItems: true,
             removeItems: true,
@@ -24,6 +36,7 @@ export class Choices {
             prependValue: false,
             appendValue: false,
             selectAll: true,
+            classNames: {},
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -43,14 +56,14 @@ export class Choices {
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-        this.passedInput = this.options.element;
+        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         // Set preset items - this looks out of place
         this.presetItems = [];
         if(this.options.items.length) {
             this.presetItems = this.options.items;
-        } else if(this.passedInput.value !== '') {
-            this.presetItems = this.passedInput.value.split(this.options.delimiter);
+        } else if(this.passedElement.value !== '') {
+            this.presetItems = this.passedElement.value.split(this.options.delimiter);
         }
 
         // Bind methods
@@ -127,7 +140,7 @@ export class Choices {
 
                     // If no duplicates are allowed, and the value already exists
                     // in the array, don't update
-                    if (this.options.allowDuplicates === false && this.passedInput.value) {
+                    if (this.options.allowDuplicates === false && this.passedElement.value) {
                         canUpdate = !storeValues.some((item) => {
                             return item.value === value;
                         });
@@ -135,7 +148,7 @@ export class Choices {
 
                     // All is good, update
                     if (canUpdate && this.options.addItems) {
-                        if(this.passedInput.type === 'text') {
+                        if(this.passedElement.type === 'text') {
                             let canAddItem = true;
 
                             // If a user has supplied a regular expression filter
@@ -148,7 +161,7 @@ export class Choices {
                             // All is good, add
                             if(canAddItem) {
                                 this.addItem(value);
-                                this.clearInput(this.passedInput);
+                                this.clearInput(this.passedElement);
                             }
                         }
                     }
@@ -440,13 +453,13 @@ export class Choices {
         let containerInner = strToEl(`<div class="choices__inner"></div>`);
 
         // Hide passed input
-        this.passedInput.classList.add('choices__input', 'choices__input--hidden');
-        this.passedInput.tabIndex = '-1';
-        this.passedInput.setAttribute('style', 'display:none;');
-        this.passedInput.setAttribute('aria-hidden', 'true');
+        this.passedElement.classList.add('choices__input', 'choices__input--hidden');
+        this.passedElement.tabIndex = '-1';
+        this.passedElement.setAttribute('style', 'display:none;');
+        this.passedElement.setAttribute('aria-hidden', 'true');
 
         // Wrap input in container preserving DOM ordering
-        wrap(this.passedInput, containerInner);
+        wrap(this.passedElement, containerInner);
 
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
@@ -454,8 +467,8 @@ export class Choices {
         let list = strToEl(`<div class="choices__list choices__list--items"></div>`);
         let input = strToEl(`<input type="text" class="choices__input choices__input--cloned">`);
 
-        if (this.passedInput.placeholder) {
-            input.placeholder = this.passedInput.placeholder;
+        if (this.passedElement.placeholder) {
+            input.placeholder = this.passedElement.placeholder;
         }
 
         if(!this.options.addItems) {
@@ -508,13 +521,13 @@ export class Choices {
         let containerInner = strToEl('<div class="choices__inner"></div>');
 
         // Hide passed input
-        this.passedInput.classList.add('choices__input', 'choices__input--hidden');
-        this.passedInput.tabIndex = '-1';
-        this.passedInput.setAttribute('style', 'display:none;');
-        this.passedInput.setAttribute('aria-hidden', 'true');
+        this.passedElement.classList.add('choices__input', 'choices__input--hidden');
+        this.passedElement.tabIndex = '-1';
+        this.passedElement.setAttribute('style', 'display:none;');
+        this.passedElement.setAttribute('aria-hidden', 'true');
 
         // Wrap input in container preserving DOM ordering
-        wrap(this.passedInput, containerInner);
+        wrap(this.passedElement, containerInner);
 
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
@@ -524,7 +537,7 @@ export class Choices {
         let dropdown = strToEl('<div class="choices__list choices__list--dropdown"></div>');
 
         if (input.placeholder) {
-            input.placeholder = this.passedInput.placeholder;
+            input.placeholder = this.passedElement.placeholder;
         }
 
         if(!this.options.addItems) {
@@ -547,7 +560,7 @@ export class Choices {
             this.addItem(value);
         });
 
-        const unselectedOptions = this.passedInput.options;
+        const unselectedOptions = this.passedElement.options;
         for (var i = 0; i < unselectedOptions.length; i++) {
             let option = unselectedOptions[i];
             this.addItemToDropdown(option.value);
@@ -591,7 +604,7 @@ export class Choices {
         }, []);
 
         // Assign hidden input array of values
-        this.passedInput.value = valueArray.join(this.options.delimiter);
+        this.passedElement.value = valueArray.join(this.options.delimiter);
 
         // Clear list
         this.list.innerHTML = '';
@@ -607,7 +620,7 @@ export class Choices {
             }
         });
 
-        console.log(state);
+        console.debug(state);
     }
 
     /**
@@ -640,7 +653,7 @@ export class Choices {
     init() {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
-        this.renderInput(this.passedInput);
+        this.renderInput(this.passedElement);
     }
     
     /**
@@ -649,22 +662,13 @@ export class Choices {
      */
     destroy() {
         this.options = null;
-        this.passedInput = null;
+        this.passedElement = null;
         this.initialised = null;
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    let input1 = document.getElementById(1);
-    let input2 = document.getElementById(2);
-    let input3 = document.getElementById(3);
-    let input4 = document.getElementById(4);
-    let input5 = document.getElementById(5);
-    let input6 = document.getElementById(6);
-    let input7 = document.getElementById(7);
-
-    let choices1 = new Choices({
-        element : input1,
+    let choices1 = new Choices('#choices-1', {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
@@ -676,39 +680,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let choices2 = new Choices({
-        element : input2,
+    let choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
     });
 
-    let choices3 = new Choices({
-        element : input3,
+    let choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     });
 
-    let choices4 = new Choices({
-        element : input4,
+    let choices4 = new Choices('#choices-4', {
         addItems: false,
         removeItems: false
     });
 
-    let choices5 = new Choices({
-        element: input5,
+    let choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`
     });
 
-    let choices6 = new Choices({
-        element: input6,
+    let choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk']
     });
 
-    let choices7 = new Choices({
-        element: input7,
-    });
+    let choices7 = new Choices('#choices-7');
+
+    let choicesMultiple = new Choices();
 
     choices6.addItem('josh2@joshuajohnson.co.uk');
     choices6.removeItem('josh@joshuajohnson.co.uk');
