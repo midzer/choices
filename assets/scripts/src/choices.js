@@ -36,7 +36,11 @@ export class Choices {
             prependValue: false,
             appendValue: false,
             selectAll: true,
-            classNames: {},
+            classNames: {
+                input: '',
+                container: '',
+
+            },
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -235,6 +239,12 @@ export class Choices {
             }
             
             handleClick(item);
+        }
+
+        if(e.target.hasAttribute('data-choice-selectable')) {
+            let item = e.target;
+            let value = e.target.getAttribute('data-choice-value');
+            this.addItem(value);
         }
     }
 
@@ -578,14 +588,14 @@ export class Choices {
 
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
-        this.list.addEventListener('click', this.onClick);
+        this.containerOuter.addEventListener('click', this.onClick);
         this.input.addEventListener('focus', this.onFocus);
         this.input.addEventListener('blur', this.onBlur);
     }
 
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
-        this.list.removeEventListener('click', this.onClick);
+        this.containerOuter.removeEventListener('click', this.onClick);
         this.input.removeEventListener('focus', this.onFocus);
         this.input.removeEventListener('blur', this.onBlur);
     }
