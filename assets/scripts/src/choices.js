@@ -37,9 +37,19 @@ export class Choices {
             appendValue: false,
             selectAll: true,
             classNames: {
-                input: '',
-                container: '',
-
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
+                input: 'choices__input',
+                inputCloned: 'choices__input--cloned',
+                list: 'choices__list',
+                listItems: 'choices__list--items',
+                listDropdown: 'choices__list--dropdown',
+                item: 'choices__item',
+                itemSelectable: 'choices__item--selectable',
+                activeState: 'is-active',
+                disabledState: 'is-disabled',
+                hiddenState: 'is-hidden',
+                selectedState: 'is-selected'
             },
             callbackOnInit: function() {},
             callbackOnRender: function() {},
@@ -77,7 +87,6 @@ export class Choices {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onFocus = this.onFocus.bind(this);
-        this.onBlur = this.onBlur.bind(this);
 
         // Let's have it large
         this.init();
@@ -181,7 +190,7 @@ export class Choices {
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
                     let currentListItems = this.list.querySelectorAll('[data-choice-item]');
-                    let selectedItems = this.list.querySelectorAll('.is-selected');
+                    let selectedItems = this.list.querySelectorAll(this.options.classNames.selectedState);
                     let lastItem = currentListItems[currentListItems.length - 1];
                     let inputIsFocussed = this.input === document.activeElement;
 
@@ -214,47 +223,47 @@ export class Choices {
      * @return
      */
     onClick(e) {
-        // I don't like the look of this
-        if(e.target.hasAttribute('data-choice-item')) {
-            let item = e.target;
+        // If click is affecting a child node of our element
+        if(this.containerOuter.contains(e.target)) {
+            if(e.target.hasAttribute('data-choice-item')) {
+                let item = e.target;
 
-            let handleClick = (item) => {
-                if(this.options.removeItems) {
-                    let passedId = item.getAttribute('data-choice-id');
-                    let items = this.list.children;
+                let handleClick = (item) => {
+                    if(this.options.removeItems) {
+                        let passedId = item.getAttribute('data-choice-id');
+                        let items = this.list.children;
 
-                    // We only want to select one item with a click
-                    // so we deselect any items that aren't the target
-                    for (var i = 0; i < items.length; i++) {
-                        let singleItem = items[i];
-                        let id = singleItem.getAttribute('data-choice-id');;
+                        // We only want to select one item with a click
+                        // so we deselect any items that aren't the target
+                        for (var i = 0; i < items.length; i++) {
+                            let singleItem = items[i];
+                            let id = singleItem.getAttribute('data-choice-id');;
 
-                        if(id === passedId && !singleItem.classList.contains('is-selected')) {
-                            this.selectItem(singleItem);
-                        } else {
-                            this.deselectItem(singleItem);
-                        }
-                    }  
+                            if(id === passedId && !singleItem.classList.contains(this.options.classNames.selectedState)) {
+                                this.selectItem(singleItem);
+                            } else {
+                                this.deselectItem(singleItem);
+                            }
+                        }  
+                    }
                 }
+                
+                handleClick(item);
             }
-            
-            handleClick(item);
-        }
 
-        if(e.target.hasAttribute('data-choice-selectable')) {
-            let item = e.target;
-            let value = e.target.getAttribute('data-choice-value');
-            this.addItem(value);
+
+            if(e.target.hasAttribute('data-choice-selectable')) {
+                let item = e.target;
+                let value = e.target.getAttribute('data-choice-value');
+                this.addItem(value);
+            }
+        } else if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            this.toggleDropdown();
         }
+        
     }
 
     onFocus(e) {
-        if(this.dropdown) {
-            this.toggleDropdown();
-        }
-    }
-
-    onBlur(e) {
         if(this.dropdown) {
             this.toggleDropdown();
         }
@@ -353,6 +362,11 @@ export class Choices {
         // Generate unique id
         let id = this.store.getState().length + 1;
 
+        // Close dropdown
+        if(this.dropdown && this.dropdown.classList.contains('is-active')) {
+            this.toggleDropdown();    
+        }
+
         // Run callback if it is a function
         if(this.options.callbackOnAddItem){
             if(isType('Function', this.options.callbackOnAddItem)) {
@@ -377,6 +391,7 @@ export class Choices {
 
         // We are re-assigning a variable here. Probably shouldn't be doing that...
         let item;
+
         if(itemOrValue.nodeType) {
             item = itemOrValue;
         } else {
@@ -436,7 +451,7 @@ export class Choices {
     }
 
     addItemToDropdown(value) {
-        const dropdownItem = strToEl(`<li class="choices__item choices__item--selectable" data-choice-selectable data-choice-value="${value}">${value}</li>`);        
+        const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-value="${value}">${value}</li>`);        
         this.dropdown.appendChild(dropdownItem);
     }
     
@@ -459,11 +474,11 @@ export class Choices {
             </div>
         */
 
-        let containerOuter = strToEl(`<div class="choices choices--active"></div>`);
-        let containerInner = strToEl(`<div class="choices__inner"></div>`);
+        let containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
+        let containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
         // Hide passed input
-        this.passedElement.classList.add('choices__input', 'choices__input--hidden');
+        this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
         this.passedElement.tabIndex = '-1';
         this.passedElement.setAttribute('style', 'display:none;');
         this.passedElement.setAttribute('aria-hidden', 'true');
@@ -474,8 +489,8 @@ export class Choices {
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = strToEl(`<div class="choices__list choices__list--items"></div>`);
-        let input = strToEl(`<input type="text" class="choices__input choices__input--cloned">`);
+        let list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
+        let input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
 
         if (this.passedElement.placeholder) {
             input.placeholder = this.passedElement.placeholder;
@@ -483,7 +498,7 @@ export class Choices {
 
         if(!this.options.addItems) {
             input.disabled = true;
-            containerOuter.classList.add('is-disabled');
+            containerOuter.classList.add(this.options.classNames.disabledState);
         }
 
         containerOuter.appendChild(containerInner);
@@ -527,11 +542,11 @@ export class Choices {
             </div>
         */
 
-        let containerOuter = strToEl('<div class="choices choices--active"></div>');
-        let containerInner = strToEl('<div class="choices__inner"></div>');
+        let containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
+        let containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
         // Hide passed input
-        this.passedElement.classList.add('choices__input', 'choices__input--hidden');
+        this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
         this.passedElement.tabIndex = '-1';
         this.passedElement.setAttribute('style', 'display:none;');
         this.passedElement.setAttribute('aria-hidden', 'true');
@@ -542,9 +557,9 @@ export class Choices {
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = strToEl('<div class="choices__list choices__list--items"></div>');
-        let input = strToEl('<input type="text" class="choices__input choices__input--cloned">');
-        let dropdown = strToEl('<div class="choices__list choices__list--dropdown"></div>');
+        let list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
+        let input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
+        let dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
 
         if (input.placeholder) {
             input.placeholder = this.passedElement.placeholder;
@@ -588,16 +603,14 @@ export class Choices {
 
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
-        this.containerOuter.addEventListener('click', this.onClick);
+        document.addEventListener('click', this.onClick);
         this.input.addEventListener('focus', this.onFocus);
-        this.input.addEventListener('blur', this.onBlur);
     }
 
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
-        this.containerOuter.removeEventListener('click', this.onClick);
+        document.removeEventListener('click', this.onClick);
         this.input.removeEventListener('focus', this.onFocus);
-        this.input.removeEventListener('blur', this.onBlur);
     }
 
     /**
@@ -623,7 +636,7 @@ export class Choices {
         state.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<div class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</div>`);
+                let listItem = strToEl(`<li class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
