@@ -31,15 +31,23 @@ export const isType = function(type, obj) {
  */
 export const extend = function() {
     let extended = {};
+    let deep = false;
     let length = arguments.length;
 
     /**
      * Merge one object into another
      * @param  {Object} obj  Object to merge into extended object
      */
-    let merge = function(obj) {
+    let merge = function (obj) {
         for (let prop in obj) {
-            extended[prop] = obj[prop];
+            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                // If deep merge and property is an object, merge properties
+                if (deep && isType('Object', obj[prop])) {
+                    extended[prop] = extend( true, extended[prop], obj[prop]);
+                } else {
+                    extended[prop] = obj[prop];
+                }
+            }
         }
     };
 
