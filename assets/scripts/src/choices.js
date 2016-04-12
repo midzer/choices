@@ -118,7 +118,8 @@ export class Choices {
      * @return
      */
     onKeyDown(e) {
-        const storeValues = this.store.getState();
+        const state = this.store.getState();
+        const items = state.items;
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
@@ -154,7 +155,7 @@ export class Choices {
                     // If no duplicates are allowed, and the value already exists
                     // in the array, don't update
                     if (this.options.allowDuplicates === false && this.passedElement.value) {
-                        canUpdate = !storeValues.some((item) => {
+                        canUpdate = !items.some((item) => {
                             return item.value === value;
                         });
                     }
@@ -194,18 +195,18 @@ export class Choices {
                     let lastItem = currentListItems[currentListItems.length - 1];
                     let inputIsFocussed = this.input === document.activeElement;
 
-                    if(lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
+                    if(currentListItems && lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
                         this.selectItem(lastItem);
                     }
 
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
+                    if(currentListItems && this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
-                        this.removeAllItems();
+                        this.removeAllItems(true);
                     }
                 }
             };
@@ -385,6 +386,7 @@ export class Choices {
      * @param
      */
     removeItem(itemOrValue, callback = this.options.callbackOnRemoveItem) {
+
         if(!itemOrValue) {
             console.error('removeItem: No item or value was passed to be removed');
             return;
@@ -426,21 +428,24 @@ export class Choices {
 
     /**
      * Remove all items from array
-     * @param  {Array} items Items to remove from store
+     * @param  {Boolean} selectedOnly Optionally remove only selected items
      * @return
      */
-    removeAllItems() {
-        const items = this.store.getState().items;
+    removeAllItems(selectedOnly = false) {
+        let state = this.store.getState();
+        let items = state.items;
 
-        console.log(items);
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-
-            if (item.selected) {
-                this.removeItem(item.value);
+        items.forEach((item) => {
+            if(selectedOnly) {
+                if(item.selected && item.active && item.value){
+                    this.removeItem(item.value);    
+                }
+            } else {
+                if(item.active && item.value) {
+                    this.removeItem(item.value);    
+                }
             }
-        };
+        });
     }
 
     toggleDropdown() {
@@ -731,57 +736,57 @@ document.addEventListener('DOMContentLoaded', () => {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        // callbackOnRemoveItem: function(value) {
-        //     console.log(value);
-        // },
-        // callbackOnAddItem: function(item, value) {
-        //     console.log(item, value);
-        // },
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRemoveItem: function(value) {
+            console.log(value);
+        },
+        callbackOnAddItem: function(item, value) {
+            console.log(item, value);
+        },
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices4 = new Choices('#choices-4', {
         addItems: false,
         removeItems: false,
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`,
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     choices5.removeAllItems();
 
     let choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices7 = new Choices('#choices-7', {
