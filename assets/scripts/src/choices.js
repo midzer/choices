@@ -1,7 +1,7 @@
 'use strict';
 
 import { createStore } from 'redux';
-import items from './reducers/index.js';
+import rootReducer from './reducers/index.js';
 import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
@@ -64,7 +64,7 @@ export class Choices {
         this.options = extend(defaultOptions, userOptions || {});
 
         // Create data store
-        this.store = createStore(items);
+        this.store = createStore(rootReducer);
 
         // Cutting the mustard
         this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
@@ -297,9 +297,10 @@ export class Choices {
      * @return {Element}       First Element with given value
      */
     getItemByValue(value) {
-        let state = this.store.getState()
+        let state = this.store.getState();
+        let items = state.items;
         
-        let stateObject = state.find((item) => {
+        let stateObject = items.find((item) => {
             return item.value === value;
         });
 
@@ -344,7 +345,7 @@ export class Choices {
      * Add item to store with correct value
      * @param {String} value Value to add to store
      */
-    addItem(value) {
+    addItem(value, callback = this.options.callbackOnAddItem) {
         if (this.options.debug) console.debug('Add item');
 
         let passedValue = value;
@@ -360,7 +361,7 @@ export class Choices {
         }
 
         // Generate unique id
-        let id = this.store.getState().length + 1;
+        let id = this.store.getState().items.length + 1;
 
         // Close dropdown
         if(this.dropdown && this.dropdown.classList.contains('is-active')) {
@@ -368,9 +369,9 @@ export class Choices {
         }
 
         // Run callback if it is a function
-        if(this.options.callbackOnAddItem){
-            if(isType('Function', this.options.callbackOnAddItem)) {
-                this.options.callbackOnAddItem(id, value);
+        if(callback){
+            if(isType('Function', callback)) {
+                callback(id, value);
             } else {
                 console.error('callbackOnAddItem: Callback is not a function');
             }
@@ -383,7 +384,7 @@ export class Choices {
      * Remove item from store
      * @param
      */
-    removeItem(itemOrValue) {
+    removeItem(itemOrValue, callback = this.options.callbackOnRemoveItem) {
         if(!itemOrValue) {
             console.error('removeItem: No item or value was passed to be removed');
             return;
@@ -409,9 +410,9 @@ export class Choices {
             let value = item.innerHTML;
 
             // Run callback
-            if(this.options.callbackOnRemoveItem){
-                if(isType('Function', this.options.callbackOnRemoveItem)) {
-                    this.options.callbackOnRemoveItem(value);
+            if(callback){
+                if(isType('Function', callback)) {
+                    callback(value);
                 } else {
                     console.error('callbackOnRemoveItem: Callback is not a function');
                 }
@@ -617,11 +618,12 @@ export class Choices {
      * Render DOM with values
      * @return
      */
-    render() {
+    render(callback = this.options.callbackOnRender) {
         let state = this.store.getState();
+        let items = state.items;
 
         // Simplify store data to just values
-        let valueArray = state.reduce((prev, current) => {
+        let valueArray = items.reduce((prev, current) => {
             prev.push(current.value);
             return prev;
         }, []);
@@ -633,7 +635,7 @@ export class Choices {
         this.list.innerHTML = '';
         
         // Add each list item to list
-        state.forEach((item) => {
+        items.forEach((item) => {
             if(item.active) {
                 // Create new list element 
                 let listItem = strToEl(`<li class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
@@ -643,7 +645,14 @@ export class Choices {
             }
         });
 
-        console.debug(state);
+        // Run callback if it is a function
+        if(callback){
+            if(isType('Function', callback)) {
+                callback(items);
+            } else {
+                console.error('callbackOnRender: Callback is not a function');
+            }
+        }
     }
 
     /**
@@ -673,10 +682,18 @@ export class Choices {
      * Initialise Choices
      * @return
      */
-    init() {
+    init(callback = this.options.callbackOnInit) {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
         this.renderInput(this.passedElement);
+        // Run callback if it is a function
+        if(callback){
+            if(isType('Function', callback)) {
+                callback();
+            } else {
+                console.error('callbackOnInit: Callback is not a function');
+            }
+        }
     }
     
     /**
@@ -700,39 +717,57 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         callbackOnAddItem: function(item, value) {
             console.log(item, value);
+        },
+        callbackOnRender: function(items) {
+            console.log(items);
         }
     });
 
     let choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
-        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices4 = new Choices('#choices-4', {
         addItems: false,
-        removeItems: false
+        removeItems: false,
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
-        appendValue: `-${Date.now()}`
+        appendValue: `-${Date.now()}`,
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices6 = new Choices('#choices-6', {
-        items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk']
+        items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     let choices7 = new Choices('#choices-7');
 
     let choicesMultiple = new Choices();
 
-    choices6.addItem('josh2@joshuajohnson.co.uk');
+    choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
     choices6.removeItem('josh@joshuajohnson.co.uk');
     console.log(choices6.getItemByValue('josh2@joshuajohnson.co.uk'));
 });
