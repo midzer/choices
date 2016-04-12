@@ -2,7 +2,7 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItem, removeItem, selectItem, addOption } from './actions/index';
+import { addItem, removeItem, selectItem, addOption, selectOption } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
 export class Choices {
@@ -191,12 +191,11 @@ export class Choices {
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
 
+                    let inputIsFocussed = this.input === document.activeElement;
                     let lastItem = items[items.length - 1];
                     let selectedItems = items.filter((item) => {
                         return item.selected === true;
                     });
-
-                    let inputIsFocussed = this.input === document.activeElement;
 
                     if(items && lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
                         this.selectItem(lastItem);
@@ -229,6 +228,10 @@ export class Choices {
     onClick(e) {
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
+            const state = this.store.getState();
+            const items = state.items;
+            const options = state.options;
+
             if(this.input !== document.activeElement) {
                 this.input.focus();
             }
@@ -239,20 +242,16 @@ export class Choices {
                 let handleClick = (item) => {
                     if(this.options.removeItems) {
                         let passedId = item.getAttribute('data-choice-id');
-                        let items = this.list.children;
 
                         // We only want to select one item with a click
                         // so we deselect any items that aren't the target
-                        for (var i = 0; i < items.length; i++) {
-                            let singleItem = items[i];
-                            let id = singleItem.getAttribute('data-choice-id');;
-
-                            if(id === passedId && !singleItem.classList.contains(this.options.classNames.selectedState)) {
-                                this.selectItem(singleItem);
+                        items.forEach((item) => {
+                            if(item.id === parseInt(passedId) && !item.selected) {
+                                this.selectItem(item);
                             } else {
-                                this.deselectItem(singleItem);
+                                this.deselectItem(item);
                             }
-                        }  
+                        });
                     }
                 }
                 
@@ -260,13 +259,24 @@ export class Choices {
             }
 
             if(e.target.hasAttribute('data-choice-selectable')) {
-                let item = e.target;
-                let value = e.target.getAttribute('data-choice-value');
-                this.addItem(value);
+                let id = e.target.getAttribute('data-choice-id');
+
+                let option = options.find((option) => {
+                    return option.id === parseInt(id);
+                });
+
+                if(option) {
+                    this.selectOption(id);
+                    this.addItem(option.value);                    
+                }
             }
 
-        } else if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
-            this.toggleDropdown();
+        } else {
+            // Click is outside of our element so close dropdown and de-select items
+            this.deselectAll();
+            if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                this.toggleDropdown();
+            }
         }
         
     }
@@ -328,7 +338,8 @@ export class Choices {
      * @return
      */
     selectItem(item) {
-        let id = item.getAttribute('data-choice-id');
+        if(!item) return;
+        let id = item.id;
         this.store.dispatch(selectItem(id, true));
     }
 
@@ -338,7 +349,8 @@ export class Choices {
      * @return
      */
     deselectItem(item) {
-        let id = item.getAttribute('data-choice-id');
+        if(!item) return;
+        let id = item.id;
         this.store.dispatch(selectItem(id, false));
     }
 
@@ -347,11 +359,25 @@ export class Choices {
      * @param  {Array} items Array of items to select
      * @return
      */
-    selectAll(items) {
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
+    selectAll() {
+        const state = this.store.getState();
+        const items = state.items;
+        items.forEach((item) => {
             this.selectItem(item);
-        };
+        });
+    }
+
+    deselectAll() {
+        const state = this.store.getState();
+        const items = state.items;
+        items.forEach((item) => {
+            this.deselectItem(item);
+        });
+    }
+
+    selectOption(id) {
+        if(!id) return;
+        this.store.dispatch(selectOption(id));
     }
 
     /**
@@ -632,7 +658,7 @@ export class Choices {
 
             // Add each option to dropdown
             options.forEach((option) => {
-                const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-value="${ option.value }">${ option.value }</li>`);        
+                const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">${ option.value }</li>`);        
                 this.dropdown.appendChild(dropdownItem);
             });
         }

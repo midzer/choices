@@ -10,6 +10,16 @@ const options = (state = [], action) => {
             }];
 
             return newState;
+
+        case 'SELECT_OPTION':
+            return state.map((option) => {
+                if(option.id === parseInt(action.id)) {
+                    option.selected = action.value;
+                }
+
+                return option;
+            });
+
         default:
             return state;
     }

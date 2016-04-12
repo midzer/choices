@@ -28,7 +28,7 @@ const items = (state = [], action) => {
         case 'SELECT_ITEM':        
             return state.map((item) => {
                 if(item.id === parseInt(action.id)) {
-                    item.selected = action.value;
+                    item.selected = action.selected;
                 }
 
                 return item;
