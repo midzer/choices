@@ -190,19 +190,22 @@ export class Choices {
 
             let handleBackspaceKey = () => {
                 if(this.options.removeItems) {
-                    let currentListItems = this.list.querySelectorAll('[data-choice-item]');
-                    let selectedItems = this.list.querySelectorAll(this.options.classNames.selectedState);
-                    let lastItem = currentListItems[currentListItems.length - 1];
+
+                    let lastItem = items[items.length - 1];
+                    let selectedItems = items.filter((item) => {
+                        return item.selected === true;
+                    });
+
                     let inputIsFocussed = this.input === document.activeElement;
 
-                    if(currentListItems && lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
+                    if(items && lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
                         this.selectItem(lastItem);
                     }
 
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(currentListItems && this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
+                    if(items && this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
@@ -226,6 +229,10 @@ export class Choices {
     onClick(e) {
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
+            if(this.input !== document.activeElement) {
+                this.input.focus();
+            }
+
             if(e.target.hasAttribute('data-choice-item')) {
                 let item = e.target;
 
@@ -297,15 +304,20 @@ export class Choices {
      * @param  {String} value Value to search for
      * @return {Element}       First Element with given value
      */
-    getItemByValue(value) {
+    getItemById(id) {
+        if(!id) {
+            console.error('getItemById: An id must be a number');
+            return;
+        }
+
         let state = this.store.getState();
         let items = state.items;
         
-        let stateObject = items.find((item) => {
-            return item.value === value;
+        let itemObject = items.find((item) => {
+            return item.id === parseInt(id);
         });
 
-        let item = this.list.querySelector(`[data-choice-id='${stateObject.id}']`) 
+        let item = this.list.querySelector(`[data-choice-id='${ itemObject.id }']`);
 
         return item;
     }
@@ -385,45 +397,26 @@ export class Choices {
      * Remove item from store
      * @param
      */
-    removeItem(itemOrValue, callback = this.options.callbackOnRemoveItem) {
+    removeItem(item, callback = this.options.callbackOnRemoveItem) {
 
-        if(!itemOrValue) {
+        if(!item) {
             console.error('removeItem: No item or value was passed to be removed');
             return;
         }
 
-        // We are re-assigning a variable here. Probably shouldn't be doing that...
-        let item;
+        let id = item.id;
+        let value = item.value;
 
-        if(itemOrValue.nodeType) {
-            item = itemOrValue;
-        } else {
-            for (var i = this.list.children.length - 1; i >= 0; i--) {
-                let listItem = this.list.children[i];
-                if(listItem.innerHTML === itemOrValue.toString()) {
-                    item = listItem;
-                    break;
-                }
+        // Run callback
+        if(callback){
+            if(isType('Function', callback)) {
+                callback(value);
+            } else {
+                console.error('callbackOnRemoveItem: Callback is not a function');
             }
         }
 
-        if(item) {
-            let id = item.getAttribute('data-choice-id');
-            let value = item.innerHTML;
-
-            // Run callback
-            if(callback){
-                if(isType('Function', callback)) {
-                    callback(value);
-                } else {
-                    console.error('callbackOnRemoveItem: Callback is not a function');
-                }
-            }
-
-            this.store.dispatch(removeItem(id));
-        } else {
-            console.error('Item not found');        
-        }
+        this.store.dispatch(removeItem(id));
     }
 
     /**
@@ -437,12 +430,12 @@ export class Choices {
 
         items.forEach((item) => {
             if(selectedOnly) {
-                if(item.selected && item.active && item.value){
-                    this.removeItem(item.value);    
+                if(item.selected && item.active){
+                    this.removeItem(item);    
                 }
             } else {
-                if(item.active && item.value) {
-                    this.removeItem(item.value);    
+                if(item.active) {
+                    this.removeItem(item);    
                 }
             }
         });
@@ -736,15 +729,15 @@ document.addEventListener('DOMContentLoaded', () => {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        callbackOnRemoveItem: function(value) {
-            console.log(value);
-        },
-        callbackOnAddItem: function(item, value) {
-            console.log(item, value);
-        },
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRemoveItem: function(value) {
+        //     console.log(value);
+        // },
+        // callbackOnAddItem: function(item, value) {
+        //     console.log(item, value);
+        // },
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     let choices2 = new Choices('#choices-2', {
@@ -799,5 +792,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
     choices6.removeItem('josh@joshuajohnson.co.uk');
-    console.log(choices6.getItemByValue('josh2@joshuajohnson.co.uk'));
+    console.log(choices6.getItemById(1));
 });
