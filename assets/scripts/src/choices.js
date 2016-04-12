@@ -2,7 +2,7 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItemToStore, removeItemFromStore, selectItemFromStore } from './actions/index';
+import { addItem, removeItem, selectItem, addOption } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
 export class Choices {
@@ -205,7 +205,7 @@ export class Choices {
                         this.input.value = lastItem.innerHTML;
                         this.removeItem(lastItem);
                     } else {
-                        this.removeAll(currentListItems);
+                        this.removeAllItems();
                     }
                 }
             };
@@ -251,12 +251,12 @@ export class Choices {
                 handleClick(item);
             }
 
-
             if(e.target.hasAttribute('data-choice-selectable')) {
                 let item = e.target;
                 let value = e.target.getAttribute('data-choice-value');
                 this.addItem(value);
             }
+
         } else if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
             this.toggleDropdown();
         }
@@ -316,7 +316,7 @@ export class Choices {
      */
     selectItem(item) {
         let id = item.getAttribute('data-choice-id');
-        this.store.dispatch(selectItemFromStore(id, true));
+        this.store.dispatch(selectItem(id, true));
     }
 
     /** 
@@ -326,7 +326,7 @@ export class Choices {
      */
     deselectItem(item) {
         let id = item.getAttribute('data-choice-id');
-        this.store.dispatch(selectItemFromStore(id, false));
+        this.store.dispatch(selectItem(id, false));
     }
 
     /**
@@ -377,7 +377,7 @@ export class Choices {
             }
         }
 
-        this.store.dispatch(addItemToStore(passedValue, id));
+        this.store.dispatch(addItem(passedValue, id));
     }
 
     /**
@@ -418,11 +418,10 @@ export class Choices {
                 }
             }
 
-            this.store.dispatch(removeItemFromStore(id));
+            this.store.dispatch(removeItem(id));
         } else {
             console.error('Item not found');        
         }
-        
     }
 
     /**
@@ -430,12 +429,16 @@ export class Choices {
      * @param  {Array} items Items to remove from store
      * @return
      */
-    removeAll(items) {
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
+    removeAllItems() {
+        const items = this.store.getState().items;
 
-            if (item.classList.contains('is-selected')) {
-                this.removeItem(item);
+        console.log(items);
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            if (item.selected) {
+                this.removeItem(item.value);
             }
         };
     }
@@ -451,9 +454,10 @@ export class Choices {
         this.dropdown.classList[isActive ? 'remove' : 'add']('is-active');
     }
 
-    addItemToDropdown(value) {
-        const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-value="${value}">${value}</li>`);        
-        this.dropdown.appendChild(dropdownItem);
+    addOptionToDropdown(value) {
+        // Generate unique id
+        let id = this.store.getState().items.length + 1;
+        this.store.dispatch(addOption(value, id));
     }
     
     /* Rendering */
@@ -589,7 +593,7 @@ export class Choices {
         const unselectedOptions = this.passedElement.options;
         for (var i = 0; i < unselectedOptions.length; i++) {
             let option = unselectedOptions[i];
-            this.addItemToDropdown(option.value);
+            this.addOptionToDropdown(option.value);
         }
 
         // Subscribe to store
@@ -621,7 +625,22 @@ export class Choices {
     render(callback = this.options.callbackOnRender) {
         let state = this.store.getState();
         let items = state.items;
+        let options = state.options;
 
+        // OPTIONS
+        if(this.dropdown) {
+            // Clear options
+            this.dropdown.innerHTML = '';
+
+            // Add each option to dropdown
+            options.forEach((option) => {
+                const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-value="${ option.value }">${ option.value }</li>`);        
+                this.dropdown.appendChild(dropdownItem);
+            });
+        }
+        
+
+        // ITEMS
         // Simplify store data to just values
         let valueArray = items.reduce((prev, current) => {
             prev.push(current.value);
@@ -638,7 +657,7 @@ export class Choices {
         items.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                let listItem = strToEl(`<li class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
+                const listItem = strToEl(`<li class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
@@ -648,7 +667,7 @@ export class Choices {
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
-                callback(items);
+                callback(items, options);
             } else {
                 console.error('callbackOnRender: Callback is not a function');
             }
@@ -712,58 +731,64 @@ document.addEventListener('DOMContentLoaded', () => {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        callbackOnRemoveItem: function(value) {
-            console.log(value);
-        },
-        callbackOnAddItem: function(item, value) {
-            console.log(item, value);
-        },
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRemoveItem: function(value) {
+        //     console.log(value);
+        // },
+        // callbackOnAddItem: function(item, value) {
+        //     console.log(item, value);
+        // },
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     let choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     let choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     let choices4 = new Choices('#choices-4', {
         addItems: false,
         removeItems: false,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     let choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
+
+    choices5.removeAllItems();
 
     let choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
-    let choices7 = new Choices('#choices-7');
+    let choices7 = new Choices('#choices-7', {
+        callbackOnRender: function(items, options) {
+            console.log(options);
+        }
+    });
 
     let choicesMultiple = new Choices();
 

@@ -4,7 +4,7 @@ import options from './options';
 
 const rootReducer = combineReducers({
     items,
-    // options
+    options
 })
 
 export default rootReducer;
