@@ -77,6 +77,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   background-color: #FFFFFF;
   border: 1px solid #DDDDDD;
+  top: 100%;
   margin-top: -1px;
   display: none;
   border-bottom-left-radius: .25rem;
@@ -86,14 +87,34 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.4rem; }
     .choices__list--dropdown .choices__item:hover {
       background-color: #f9f9f9; }
+    .choices__list--dropdown .choices__item.is-selected {
+      opacity: .5; }
+      .choices__list--dropdown .choices__item.is-selected:hover {
+        background-color: #FFFFFF; }
   .choices__list--dropdown.is-active {
     display: block; }
+  .choices__list--dropdown.is-flipped {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem; }
 
 .choices__item {
   cursor: default; }
 
 .choices__item--selectable {
   cursor: pointer; }
+
+.choices__item--disabled {
+  cursor: not-allowed;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
 
 .choices__input {
   background-color: #f9f9f9;

@@ -13,7 +13,7 @@ export class Choices {
         // If there are multiple elements, create a new instance 
         // for each element besides the first one (as that already has an instance)
         if(isType('String', element)) {
-            let elements = document.querySelectorAll(element);
+            const elements = document.querySelectorAll(element);
             if(elements.length > 1) {
                 for (let i = 1; i < elements.length; i++) {
                     let el = elements[i];
@@ -46,6 +46,8 @@ export class Choices {
                 listDropdown: 'choices__list--dropdown',
                 item: 'choices__item',
                 itemSelectable: 'choices__item--selectable',
+                itemDisabled: 'choices__item--disabled',
+                itemOption: 'choices__item--option',
                 activeState: 'is-active',
                 disabledState: 'is-disabled',
                 hiddenState: 'is-hidden',
@@ -86,7 +88,6 @@ export class Choices {
         this.destroy = this.destroy.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
-        this.onFocus = this.onFocus.bind(this);
 
         // Let's have it large
         this.init();
@@ -107,7 +108,7 @@ export class Choices {
      * @return {Boolean}
      */
     isEmpty() {
-        return (this.store.getState().length === 0) ? true : false; 
+        return (this.store.getState().items.length === 0) ? true : false; 
     }
 
     /* Event handling */
@@ -130,7 +131,7 @@ export class Choices {
 
             // If CTRL + A or CMD + A have been pressed and there are items to select
             if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
-                let handleSelectAll = () => {
+                const handleSelectAll = () => {
                     if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
                         this.selectAll(this.list.children);
                     }
@@ -143,7 +144,7 @@ export class Choices {
             if (e.keyCode === enterKey && e.target.value) {
                 let value = this.input.value;
 
-                let handleEnter = () => {
+                const handleEnter = () => {
                     let canUpdate = true;
 
                     // If there is a max entry limit and we have reached that limit
@@ -188,7 +189,7 @@ export class Choices {
         // If backspace or delete key is pressed and the input has no value
         if (e.keyCode === deleteKey && !e.target.value) {
 
-            let handleBackspaceKey = () => {
+            const handleBackspaceKey = () => {
                 if(this.options.removeItems) {
 
                     let inputIsFocussed = this.input === document.activeElement;
@@ -226,11 +227,17 @@ export class Choices {
      * @return
      */
     onClick(e) {
+        if(this.dropdown) {
+            this.toggleDropdown();
+        }
+
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
             const state = this.store.getState();
             const items = state.items;
             const options = state.options;
+
+            
 
             if(this.input !== document.activeElement) {
                 this.input.focus();
@@ -239,7 +246,7 @@ export class Choices {
             if(e.target.hasAttribute('data-choice-item')) {
                 let item = e.target;
 
-                let handleClick = (item) => {
+                const handleClick = (item) => {
                     if(this.options.removeItems) {
                         let passedId = item.getAttribute('data-choice-id');
 
@@ -256,17 +263,16 @@ export class Choices {
                 }
                 
                 handleClick(item);
-            }
 
-            if(e.target.hasAttribute('data-choice-selectable')) {
+            } else if(e.target.hasAttribute('data-choice-selectable')) {
                 let id = e.target.getAttribute('data-choice-id');
 
                 let option = options.find((option) => {
                     return option.id === parseInt(id);
                 });
 
-                if(option) {
-                    this.selectOption(id);
+                if(!option.selected) {
+                    this.selectOption(id, true);
                     this.addItem(option.value);                    
                 }
             }
@@ -279,12 +285,6 @@ export class Choices {
             }
         }
         
-    }
-
-    onFocus(e) {
-        if(this.dropdown) {
-            this.toggleDropdown();
-        }
     }
 
     /* Methods */
@@ -303,8 +303,8 @@ export class Choices {
      * @return {Boolean}       Whether test passed/failed
      */
     regexFilter(value) {
-        let expression = new RegExp(this.options.regexFilter, 'i');
-        let passesTest = expression.test(value);
+        const expression = new RegExp(this.options.regexFilter, 'i');
+        const passesTest = expression.test(value);
 
         return passesTest;
     }
@@ -320,14 +320,14 @@ export class Choices {
             return;
         }
 
-        let state = this.store.getState();
-        let items = state.items;
+        const state = this.store.getState();
+        const items = state.items;
         
-        let itemObject = items.find((item) => {
+        const itemObject = items.find((item) => {
             return item.id === parseInt(id);
         });
 
-        let item = this.list.querySelector(`[data-choice-id='${ itemObject.id }']`);
+        const item = this.list.querySelector(`[data-choice-id='${ itemObject.id }']`);
 
         return item;
     }
@@ -339,7 +339,7 @@ export class Choices {
      */
     selectItem(item) {
         if(!item) return;
-        let id = item.id;
+        const id = item.id;
         this.store.dispatch(selectItem(id, true));
     }
 
@@ -350,7 +350,7 @@ export class Choices {
      */
     deselectItem(item) {
         if(!item) return;
-        let id = item.id;
+        const id = item.id;
         this.store.dispatch(selectItem(id, false));
     }
 
@@ -375,9 +375,9 @@ export class Choices {
         });
     }
 
-    selectOption(id) {
+    selectOption(id, value) {
         if(!id) return;
-        this.store.dispatch(selectOption(id));
+        this.store.dispatch(selectOption(id, value));
     }
 
     /**
@@ -480,7 +480,8 @@ export class Choices {
 
     addOptionToDropdown(value) {
         // Generate unique id
-        let id = this.store.getState().items.length + 1;
+        let state = this.store.getState();
+        let id = state.options.length + 1;
         this.store.dispatch(addOption(value, id));
     }
     
@@ -559,20 +560,8 @@ export class Choices {
      * @return
      */
     renderMultipleSelectInput() {
-        /* 
-            Template:
-
-            <div class="choices choices--active">
-                <div class="choices__inner">
-                    <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
-                    <ul class="choices__list choices__list--items"></ul>
-                    <input type="text" class="choices__input choices__input--cloned">
-                </div>
-            </div>
-        */
-
-        let containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
-        let containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
+        const containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
+        const containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -586,9 +575,9 @@ export class Choices {
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
 
-        let list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
-        let input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
-        let dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
+        const list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
+        const input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
+        const dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
 
         if (input.placeholder) {
             input.placeholder = this.passedElement.placeholder;
@@ -613,12 +602,11 @@ export class Choices {
         this.presetItems.forEach((value) => {
             this.addItem(value);
         });
-
-        const unselectedOptions = this.passedElement.options;
-        for (var i = 0; i < unselectedOptions.length; i++) {
-            let option = unselectedOptions[i];
+    
+        const passedOptions = Array.prototype.slice.call(this.passedElement.options);
+        passedOptions.forEach((option) => {
             this.addOptionToDropdown(option.value);
-        }
+        });
 
         // Subscribe to store
         this.store.subscribe(this.render);
@@ -633,13 +621,11 @@ export class Choices {
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
-        this.input.addEventListener('focus', this.onFocus);
     }
 
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
-        this.input.removeEventListener('focus', this.onFocus);
     }
 
     /**
@@ -647,9 +633,10 @@ export class Choices {
      * @return
      */
     render(callback = this.options.callbackOnRender) {
-        let state = this.store.getState();
-        let items = state.items;
-        let options = state.options;
+        const classNames = this.options.classNames;
+        const state = this.store.getState();
+        const items = state.items;
+        const options = state.options;
 
         // OPTIONS
         if(this.dropdown) {
@@ -657,16 +644,22 @@ export class Choices {
             this.dropdown.innerHTML = '';
 
             // Add each option to dropdown
-            options.forEach((option) => {
-                const dropdownItem = strToEl(`<li class="${ this.options.classNames.item } ${ this.options.classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">${ option.value }</li>`);        
+            if(options) {
+                options.forEach((option) => {
+                    const dropdownItem = strToEl(`<li class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">${ option.value }</li>`);        
+                    this.dropdown.appendChild(dropdownItem);
+                });
+            } else {
+                const dropdownItem = strToEl(`<li class="${ classNames.item }">No options to select</li>`);        
                 this.dropdown.appendChild(dropdownItem);
-            });
+            }
+            
         }
         
 
         // ITEMS
         // Simplify store data to just values
-        let valueArray = items.reduce((prev, current) => {
+        const valueArray = items.reduce((prev, current) => {
             prev.push(current.value);
             return prev;
         }, []);
@@ -681,7 +674,7 @@ export class Choices {
         items.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                const listItem = strToEl(`<li class="choices__item ${ this.options.removeItems ? 'choices__item--selectable' : '' } ${ item.selected ? 'is-selected' : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
+                const listItem = strToEl(`<li class="${ classNames.item } ${ this.options.removeItems ? classNames.itemSelectable : '' } ${ item.selected ? classNames.selectedState : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
 
                 // Append it to list
                 this.list.appendChild(listItem);
@@ -751,7 +744,7 @@ export class Choices {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    let choices1 = new Choices('#choices-1', {
+    const choices1 = new Choices('#choices-1', {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
@@ -766,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
     });
 
-    let choices2 = new Choices('#choices-2', {
+    const choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
         callbackOnRender: function(items) {
@@ -774,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let choices3 = new Choices('#choices-3', {
+    const choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -783,7 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let choices4 = new Choices('#choices-4', {
+    const choices4 = new Choices('#choices-4', {
         addItems: false,
         removeItems: false,
         callbackOnRender: function(items) {
@@ -791,7 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let choices5 = new Choices('#choices-5', {
+    const choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`,
         callbackOnRender: function(items) {
@@ -801,20 +794,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     choices5.removeAllItems();
 
-    let choices6 = new Choices('#choices-6', {
+    const choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
         callbackOnRender: function(items) {
             console.log(items);
         }
     });
 
-    let choices7 = new Choices('#choices-7', {
+    const choices7 = new Choices('#choices-7', {
         callbackOnRender: function(items, options) {
-            console.log(options);
+            console.log(items);
         }
     });
 
-    let choicesMultiple = new Choices();
+    const choicesMultiple = new Choices();
 
     choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
     choices6.removeItem('josh@joshuajohnson.co.uk');

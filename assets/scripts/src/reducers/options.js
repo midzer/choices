@@ -14,7 +14,7 @@ const options = (state = [], action) => {
         case 'SELECT_OPTION':
             return state.map((option) => {
                 if(option.id === parseInt(action.id)) {
-                    option.selected = action.value;
+                    option.selected = action.selected;
                 }
 
                 return option;

@@ -94,6 +94,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     background-color: #FFFFFF;
     border: 1px solid #DDDDDD;
+    top: 100%;
     margin-top: -1px;
     display: none;
     border-bottom-left-radius: .25rem;
@@ -101,15 +102,31 @@ h1, h2, h3, h4, h5, h6 {
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
-        &:hover {
-            background-color: mix(#000000, #FFFFFF, 2.5%);
+        &:hover { background-color: mix(#000000, #FFFFFF, 2.5%); }
+        &.is-selected { 
+            opacity: .5; 
+            &:hover { background-color: #FFFFFF; }
         }
     }
     &.is-active { display: block; }
+    &.is-flipped {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: -1px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+    }
 }
 
 .choices__item { cursor: default; }
 .choices__item--selectable { cursor: pointer; }
+.choices__item--disabled { 
+    cursor: not-allowed; 
+    user-select: none;
+}
 
 .choices__input {
     background-color: mix(#000000, #FFFFFF, 2.5%);
