@@ -695,6 +695,7 @@ export class Choices {
             // Clear options
             this.dropdown.innerHTML = '';
 
+            // Create a fragment to store our list items (so we don't have to update the DOM for each item)
             const optionListFragment = document.createDocumentFragment();
 
             // Add each option to dropdown
