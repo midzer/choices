@@ -10,6 +10,7 @@ import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/util
  * Choices
  *
  * To do:
+ *    - Dispatch events
  *    - Remove item by clicking a target
  *    - Set input width based on the size of the contents
  *    - Map options to items
