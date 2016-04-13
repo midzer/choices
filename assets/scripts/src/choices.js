@@ -5,6 +5,17 @@ import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, selectOption } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
 
+
+/**
+ * Choices
+ *
+ * To do:
+ *    - Remove item by clicking a target
+ *    - Set input width based on the size of the contents
+ *    - Map options to items
+ *    - Single select input support
+ *    - Populate options by function
+ */
 export class Choices {
     constructor(element = '[data-choice]', options) {
         const fakeEl = document.createElement("fakeel");
@@ -314,7 +325,6 @@ export class Choices {
         }
 
         const items = this.getItems();
-        
         const itemObject = items.find((item) => {
             return item.id === parseInt(id);
         });
@@ -473,11 +483,21 @@ export class Choices {
         this.store.dispatch(addOption(value, id));
     }
 
+    /* Getters */
+
+    /**
+     * Get items in state
+     * @return {Array} Array of item objects
+     */
     getItems() {
         const state = this.store.getState();
         return state.items;
     }
 
+    /**
+     * Get items in state if they are active
+     * @return {Array} Array of item objects
+     */
     getItemsFilteredByActive() {
         const items = this.getItems();
 
@@ -488,7 +508,11 @@ export class Choices {
         return valueArray;
     }
 
-    getItemsFilteredByValue() {
+    /**
+     * Get items in state reduced to just their values
+     * @return {Array} Array of items 
+     */
+    getItemsReducedToValues() {
         const items = this.getItems();
 
         const valueArray = items.reduce((prev, current) => {
@@ -499,6 +523,10 @@ export class Choices {
         return valueArray;
     }
 
+    /**
+     * Get options in state 
+     * @return {Array} Array of item options
+     */
     getOptions() {
         const state = this.store.getState();
         return state.options;
@@ -510,7 +538,7 @@ export class Choices {
      * Create DOM structure around passed text element
      * @return
      */
-    renderTextInput() {
+    generateTextInput() {
         /* 
             Template:
 
@@ -578,7 +606,7 @@ export class Choices {
      * Create DOM structure around passed select element
      * @return
      */
-    renderMultipleSelectInput() {
+    generateMultipleSelectInput() {
         const containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
         const containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
@@ -637,11 +665,17 @@ export class Choices {
         this.addEventListeners();
     }
 
+    /**
+     * Trigger event listeners
+     */
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
     }
 
+    /**
+     * Destroy event listeners
+     */
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
@@ -661,27 +695,34 @@ export class Choices {
             // Clear options
             this.dropdown.innerHTML = '';
 
+            const optionListFragment = document.createDocumentFragment();
+
             // Add each option to dropdown
             if(options) {
                 options.forEach((option) => {
                     const dropdownItem = strToEl(`<li class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">${ option.value }</li>`);        
-                    this.dropdown.appendChild(dropdownItem);
+                    optionListFragment.appendChild(dropdownItem);
                 });
             } else {
                 const dropdownItem = strToEl(`<li class="${ classNames.item }">No options to select</li>`);        
-                this.dropdown.appendChild(dropdownItem);
+                optionListFragment.appendChild(dropdownItem);
             }
+
+            this.dropdown.appendChild(optionListFragment);
         }
         
         // ITEMS
         // Simplify store data to just values
-        const itemsFiltered = this.getItemsFilteredByValue();
+        const itemsFiltered = this.getItemsReducedToValues();
 
         // Assign hidden input array of values
         this.passedElement.value = itemsFiltered.join(this.options.delimiter);
 
         // Clear list
         this.list.innerHTML = '';
+
+        // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+        const itemListFragment = document.createDocumentFragment();
         
         // Add each list item to list
         items.forEach((item) => {
@@ -690,9 +731,11 @@ export class Choices {
                 const listItem = strToEl(`<li class="${ classNames.item } ${ this.options.removeItems ? classNames.itemSelectable : '' } ${ item.selected ? classNames.selectedState : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
 
                 // Append it to list
-                this.list.appendChild(listItem);
+                itemListFragment.appendChild(listItem);
             }
         });
+
+        this.list.appendChild(itemListFragment);
 
         // Run callback if it is a function
         if(callback){
@@ -713,16 +756,16 @@ export class Choices {
 
         switch (input.type) {
             case "text":
-                this.renderTextInput();
+                this.generateTextInput();
                 break;
             case "select-one":
-                // this.renderSelectInput();
+                // this.generateSelectInput();
                 break;
             case "select-multiple":
-                this.renderMultipleSelectInput();
+                this.generateMultipleSelectInput();
                 break;
             default:
-                this.renderTextInput();
+                this.generateMultipleSelectInput();
                 break;
         }
     }
@@ -757,16 +800,17 @@ export class Choices {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    const choices1 = new Choices('#choices-1', {
+    const firstElement = document.getElementById('choices-1');
+    const choices1 = new Choices(firstElement, {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        // callbackOnRemoveItem: function(value) {
-        //     console.log(value);
-        // },
-        // callbackOnAddItem: function(item, value) {
-        //     console.log(item, value);
-        // },
+        callbackOnRemoveItem: function(value) {
+            console.log(value);
+        },
+        callbackOnAddItem: function(id, value) {
+            console.log(id, value);
+        },
         callbackOnRender: function(items) {
             console.log(items);
         }
