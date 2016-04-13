@@ -119,8 +119,8 @@ export class Choices {
      * @return
      */
     onKeyDown(e) {
-        const state = this.store.getState();
-        const items = state.items;
+        const items = this.getItems();
+        const activeItems = this.getItemsFilteredByActive();
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
@@ -142,7 +142,7 @@ export class Choices {
 
             // If enter key is pressed and the input has a value
             if (e.keyCode === enterKey && e.target.value) {
-                let value = this.input.value;
+                const value = this.input.value;
 
                 const handleEnter = () => {
                     let canUpdate = true;
@@ -191,10 +191,9 @@ export class Choices {
 
             const handleBackspaceKey = () => {
                 if(this.options.removeItems) {
-
-                    let inputIsFocussed = this.input === document.activeElement;
-                    let lastItem = items[items.length - 1];
-                    let selectedItems = items.filter((item) => {
+                    const inputIsFocussed = this.input === document.activeElement;
+                    const lastItem = activeItems[activeItems.length - 1];
+                    const selectedItems = items.some((item) => {
                         return item.selected === true;
                     });
 
@@ -205,8 +204,8 @@ export class Choices {
                     // If editing the last item is allowed and there is a last item and 
                     // there are not other selected items (minus the last item), we can edit
                     // the item value. Otherwise if we can remove items, remove all items
-                    if(items && this.options.removeItems && this.options.editItems && lastItem && selectedItems.length === 0 && inputIsFocussed) {
-                        this.input.value = lastItem.innerHTML;
+                    if(items && this.options.removeItems && this.options.editItems && lastItem && !selectedItems && inputIsFocussed) {
+                        this.input.value = lastItem.value;
                         this.removeItem(lastItem);
                     } else {
                         this.removeAllItems(true);
@@ -214,9 +213,9 @@ export class Choices {
                 }
             };
 
-            handleBackspaceKey();
-
             e.preventDefault();
+
+            handleBackspaceKey();
         }
     }
 
@@ -233,22 +232,16 @@ export class Choices {
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
-            const state = this.store.getState();
-            const items = state.items;
-            const options = state.options;
-
-            
-
             if(this.input !== document.activeElement) {
                 this.input.focus();
             }
 
             if(e.target.hasAttribute('data-choice-item')) {
-                let item = e.target;
-
-                const handleClick = (item) => {
+                const items = this.getItems();
+                const target = e.target;
+                const handleClick = (target) => {
                     if(this.options.removeItems) {
-                        let passedId = item.getAttribute('data-choice-id');
+                        const passedId = target.getAttribute('data-choice-id');
 
                         // We only want to select one item with a click
                         // so we deselect any items that aren't the target
@@ -262,12 +255,12 @@ export class Choices {
                     }
                 }
                 
-                handleClick(item);
+                handleClick(target);
 
             } else if(e.target.hasAttribute('data-choice-selectable')) {
-                let id = e.target.getAttribute('data-choice-id');
-
-                let option = options.find((option) => {
+                const options = this.getOptions();
+                const id = e.target.getAttribute('data-choice-id');
+                const option = options.find((option) => {
                     return option.id === parseInt(id);
                 });
 
@@ -320,8 +313,7 @@ export class Choices {
             return;
         }
 
-        const state = this.store.getState();
-        const items = state.items;
+        const items = this.getItems();
         
         const itemObject = items.find((item) => {
             return item.id === parseInt(id);
@@ -360,16 +352,14 @@ export class Choices {
      * @return
      */
     selectAll() {
-        const state = this.store.getState();
-        const items = state.items;
+        const items = this.getItems();
         items.forEach((item) => {
             this.selectItem(item);
         });
     }
 
     deselectAll() {
-        const state = this.store.getState();
-        const items = state.items;
+        const items = this.getItems();
         items.forEach((item) => {
             this.deselectItem(item);
         });
@@ -424,7 +414,6 @@ export class Choices {
      * @param
      */
     removeItem(item, callback = this.options.callbackOnRemoveItem) {
-
         if(!item) {
             console.error('removeItem: No item or value was passed to be removed');
             return;
@@ -451,8 +440,7 @@ export class Choices {
      * @return
      */
     removeAllItems(selectedOnly = false) {
-        let state = this.store.getState();
-        let items = state.items;
+        let items = this.getItems();
 
         items.forEach((item) => {
             if(selectedOnly) {
@@ -483,6 +471,37 @@ export class Choices {
         let state = this.store.getState();
         let id = state.options.length + 1;
         this.store.dispatch(addOption(value, id));
+    }
+
+    getItems() {
+        const state = this.store.getState();
+        return state.items;
+    }
+
+    getItemsFilteredByActive() {
+        const items = this.getItems();
+
+        const valueArray = items.filter((item) => {
+            return item.active === true;
+        }, []);
+
+        return valueArray;
+    }
+
+    getItemsFilteredByValue() {
+        const items = this.getItems();
+
+        const valueArray = items.reduce((prev, current) => {
+            prev.push(current.value);
+            return prev;
+        }, []);
+
+        return valueArray;
+    }
+
+    getOptions() {
+        const state = this.store.getState();
+        return state.options;
     }
     
     /* Rendering */
@@ -634,9 +653,8 @@ export class Choices {
      */
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
-        const state = this.store.getState();
-        const items = state.items;
-        const options = state.options;
+        const items = this.getItems();
+        const options = this.getOptions();
 
         // OPTIONS
         if(this.dropdown) {
@@ -653,19 +671,14 @@ export class Choices {
                 const dropdownItem = strToEl(`<li class="${ classNames.item }">No options to select</li>`);        
                 this.dropdown.appendChild(dropdownItem);
             }
-            
         }
         
-
         // ITEMS
         // Simplify store data to just values
-        const valueArray = items.reduce((prev, current) => {
-            prev.push(current.value);
-            return prev;
-        }, []);
+        const itemsFiltered = this.getItemsFilteredByValue();
 
         // Assign hidden input array of values
-        this.passedElement.value = valueArray.join(this.options.delimiter);
+        this.passedElement.value = itemsFiltered.join(this.options.delimiter);
 
         // Clear list
         this.list.innerHTML = '';
@@ -754,51 +767,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // callbackOnAddItem: function(item, value) {
         //     console.log(item, value);
         // },
-        // callbackOnRender: function(items) {
-        //     console.log(items);
-        // }
+        callbackOnRender: function(items) {
+            console.log(items);
+        }
     });
 
     const choices2 = new Choices('#choices-2', {
         allowDuplicates: false,
         editItems: true,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
     });
 
     const choices3 = new Choices('#choices-3', {
         allowDuplicates: false,
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
     });
 
     const choices4 = new Choices('#choices-4', {
         addItems: false,
         removeItems: false,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
     });
 
     const choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`,
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
     });
 
     choices5.removeAllItems();
 
     const choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
     });
 
     const choices7 = new Choices('#choices-7', {
