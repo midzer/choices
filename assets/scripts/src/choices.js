@@ -42,6 +42,7 @@ export class Choices {
             maxItems: false,
             delimiter: ',',
             allowDuplicates: true,
+            allowPaste: true,
             regexFilter: false,
             debug: false,
             placeholder: false,
@@ -100,6 +101,7 @@ export class Choices {
         this.destroy = this.destroy.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.onPaste = this.onPaste.bind(this);
 
         // Let's have it large
         this.init();
@@ -289,7 +291,12 @@ export class Choices {
                 this.toggleDropdown();
             }
         }
-        
+    }
+
+    onPaste(e) {
+        if(!this.options.allowPaste) {
+            e.preventDefault();
+        }
     }
 
     /* Methods */
@@ -676,6 +683,7 @@ export class Choices {
     addEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
+        document.addEventListener('paste', this.onPaste);
     }
 
     /**
@@ -684,6 +692,23 @@ export class Choices {
     removeEventListeners() {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
+        document.removeEventListener('paste', this.onPaste);
+    }
+
+    observeStore(store, select, onChange) {
+        let currentState;
+
+        function handleChange() {
+            let nextState = select(store.getState());
+            if (nextState !== currentState) {
+                currentState = nextState;
+                onChange(currentState);
+            }
+        }
+
+        let unsubscribe = store.subscribe(handleChange);
+        handleChange();
+        return unsubscribe;
     }
 
     /**
@@ -823,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const choices2 = new Choices('#choices-2', {
+        allowPaste: false,
         allowDuplicates: false,
         editItems: true,
     });
