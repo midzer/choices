@@ -3,7 +3,8 @@ const items = (state = [], action) => {
         case 'ADD_ITEM':
             // Add object to items array
             let newState = [...state, {
-                id: parseInt(action.id),
+                id: action.id,
+                optionId: action.optionId,
                 value: action.value,
                 active: true,
                 selected: false
@@ -19,7 +20,7 @@ const items = (state = [], action) => {
         case 'REMOVE_ITEM':
             // Set item to inactive
             return state.map((item) => {
-                if(item.id === parseInt(action.id)) {
+                if(item.id === action.id) {
                     item.active = false;
                 }
                 return item;
@@ -27,7 +28,7 @@ const items = (state = [], action) => {
 
         case 'SELECT_ITEM':        
             return state.map((item) => {
-                if(item.id === parseInt(action.id)) {
+                if(item.id === action.id) {
                     item.selected = action.selected;
                 }
 

@@ -1,22 +1,24 @@
-export const addItem = (value, id) => {
+export const addItem = (value, id, optionId) => {
     return {
         type: 'ADD_ITEM',
         value: value,
-        id: id,
+        id: parseInt(id),
+        optionId: parseInt(optionId)
     }
 };
 
-export const removeItem = (id) => {
+export const removeItem = (id, optionId) => {
     return {
         type: 'REMOVE_ITEM',
-        id: id,
+        id: parseInt(id),
+        optionId: parseInt(optionId)
     }
 };
 
 export const selectItem = (id, selected) => {
     return {
         type: 'SELECT_ITEM',
-        id: id,
+        id: parseInt(id),
         selected: selected,
     }
 };
@@ -25,14 +27,14 @@ export const addOption = (value, id) => {
     return {
         type: 'ADD_OPTION',
         value: value,
-        id: id,
+        id: parseInt(id),
     }
 };
 
 export const selectOption = (id, selected) => {
     return {
         type: 'SELECT_OPTION',
-        id: id,
+        id: parseInt(id),
         selected: selected,
     }
 };

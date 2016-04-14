@@ -278,7 +278,7 @@ export class Choices {
 
                 if(!option.selected) {
                     this.selectOption(id, true);
-                    this.addItem(option.value);                    
+                    this.addItem(option.value, option.id);                    
                 }
             }
 
@@ -376,7 +376,7 @@ export class Choices {
         });
     }
 
-    selectOption(id, value) {
+    selectOption(id, value = true) {
         if(!id) return;
         this.store.dispatch(selectOption(id, value));
     }
@@ -385,7 +385,7 @@ export class Choices {
      * Add item to store with correct value
      * @param {String} value Value to add to store
      */
-    addItem(value, callback = this.options.callbackOnAddItem) {
+    addItem(value, optionId = -1, callback = this.options.callbackOnAddItem) {
         if (this.options.debug) console.debug('Add item');
 
         let passedValue = value;
@@ -417,7 +417,7 @@ export class Choices {
             }
         }
 
-        this.store.dispatch(addItem(passedValue, id));
+        this.store.dispatch(addItem(passedValue, id, optionId));
     }
 
     /**
@@ -432,6 +432,7 @@ export class Choices {
 
         let id = item.id;
         let value = item.value;
+        let optionId = item.optionId;
 
         // Run callback
         if(callback){
@@ -442,7 +443,7 @@ export class Choices {
             }
         }
 
-        this.store.dispatch(removeItem(id));
+        this.store.dispatch(removeItem(id, optionId));
     }
 
     /**
@@ -477,11 +478,19 @@ export class Choices {
         this.dropdown.classList[isActive ? 'remove' : 'add']('is-active');
     }
 
-    addOptionToDropdown(value) {
+    addOptionToDropdown(option) {
         // Generate unique id
-        let state = this.store.getState();
-        let id = state.options.length + 1;
+        const state = this.store.getState();
+        const id = state.options.length + 1;
+        const value = option.value;
+        const isSelected = option.selected;
+
         this.store.dispatch(addOption(value, id));
+
+        if(isSelected) {
+            this.selectOption(id);
+            this.addItem(option.value, id);
+        }
     }
 
     /* Getters */
@@ -645,15 +654,10 @@ export class Choices {
         this.input = input;
         this.list = list;
         this.dropdown = dropdown;
-
-        // Add any preset values seperated by delimiter
-        this.presetItems.forEach((value) => {
-            this.addItem(value);
-        });
     
         const passedOptions = Array.prototype.slice.call(this.passedElement.options);
         passedOptions.forEach((option) => {
-            this.addOptionToDropdown(option.value);
+            this.addOptionToDropdown(option);
         });
 
         // Subscribe to store
@@ -807,15 +811,15 @@ document.addEventListener('DOMContentLoaded', () => {
         delimiter: ' ',
         editItems: true,
         maxItems: 5,
-        callbackOnRemoveItem: function(value) {
-            console.log(value);
-        },
-        callbackOnAddItem: function(id, value) {
-            console.log(id, value);
-        },
-        callbackOnRender: function(items) {
-            console.log(items);
-        }
+        // callbackOnRemoveItem: function(value) {
+        //     console.log(value);
+        // },
+        // callbackOnAddItem: function(id, value) {
+        //     console.log(id, value);
+        // },
+        // callbackOnRender: function(items) {
+        //     console.log(items);
+        // }
     });
 
     const choices2 = new Choices('#choices-2', {
@@ -846,14 +850,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const choices7 = new Choices('#choices-7', {
-        callbackOnRender: function(items, options) {
-            console.log(items);
-        }
+        // callbackOnRender: function(items, options) {
+        //     console.log(items);
+        // },
     });
 
-    const choicesMultiple = new Choices();
+    const choicesMultiple = new Choices('[data-choice]', {
+        callbackOnRender: function(items, options) {
+            console.log(items);
+        },
+    });
 
-    choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
-    choices6.removeItem('josh@joshuajohnson.co.uk');
-    console.log(choices6.getItemById(1));
+    // choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
+    // choices6.removeItem('josh@joshuajohnson.co.uk');
+    // console.log(choices6.getItemById(1));
 });
