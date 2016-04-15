@@ -13,7 +13,6 @@ import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/util
  *    - Dispatch events
  *    - Remove item by clicking a target
  *    - Set input width based on the size of the contents
- *    - Map options to items
  *    - Single select input support
  *    - Populate options by function
  */
@@ -45,7 +44,8 @@ export class Choices {
             allowPaste: true,
             regexFilter: false,
             debug: false,
-            placeholder: false,
+            placeholder: true,
+            placeholderValue: '',
             prependValue: false,
             appendValue: false,
             selectAll: true,
@@ -586,8 +586,13 @@ export class Choices {
         let list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
         let input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
 
-        if (this.passedElement.placeholder) {
-            input.placeholder = this.passedElement.placeholder;
+        // If placeholder has been enabled
+        if (this.options.placeholder) {
+            // ...and we have a value to set
+            const placeholderValue = this.options.placeholderValue || this.passedElement.placeholder;
+            if(placeholderValue) {
+                input.placeholder = placeholderValue;    
+            }
         }
 
         if(!this.options.addItems) {
@@ -643,8 +648,9 @@ export class Choices {
         const input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
         const dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
 
-        if (input.placeholder) {
-            input.placeholder = this.passedElement.placeholder;
+        // If placeholder has been enabled and we have a value
+        if (this.options.placeholder && this.options.placeholderValue) {
+            input.placeholder = this.options.placeholderValue;    
         }
 
         if(!this.options.addItems) {
@@ -882,6 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const choicesMultiple = new Choices('[data-choice]', {
+        placeholderValue: 'This is a placeholder set in the config',
         callbackOnRender: function(items, options) {
             console.log(items);
         },
