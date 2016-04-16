@@ -2,8 +2,8 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItem, removeItem, selectItem, addOption, selectOption } from './actions/index';
-import { hasClass, wrap, getSiblings, isType, strToEl, extend } from './lib/utils.js';
+import { addItem, removeItem, selectItem, addOption, selectOption, addGroup } from './actions/index';
+import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput } from './lib/utils.js';
 
 
 /**
@@ -61,6 +61,8 @@ export class Choices {
                 itemSelectable: 'choices__item--selectable',
                 itemDisabled: 'choices__item--disabled',
                 itemOption: 'choices__item--option',
+                group: 'choices__group',
+                groupHeading : 'choices__heading',
                 activeState: 'is-active',
                 disabledState: 'is-disabled',
                 hiddenState: 'is-hidden',
@@ -125,6 +127,14 @@ export class Choices {
         return (this.store.getState().items.length === 0) ? true : false; 
     }
 
+    hasSelectedItems() {
+        const items = this.getItems();
+
+        return items.some((item) => {
+            return item.selected === true;
+        });
+    }
+
     /* Event handling */
 
     /** 
@@ -142,6 +152,8 @@ export class Choices {
 
         // If we are typing in the input
         if(e.target === this.input) {
+
+            // this.input.style.width = getWidthOfInput(this.input);
 
             // If CTRL + A or CMD + A have been pressed and there are items to select
             if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
@@ -161,22 +173,24 @@ export class Choices {
                 const handleEnter = () => {
                     let canUpdate = true;
 
-                    // If there is a max entry limit and we have reached that limit
-                    // don't update
-                    if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
+                    if(this.options.addItems) {
+                        if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
+                            // If there is a max entry limit and we have reached that limit
+                            // don't update
+                            canUpdate = false;
+                        } else if(this.options.allowDuplicates === false && this.passedElement.value) {
+                            // If no duplicates are allowed, and the value already exists
+                            // in the array, don't update
+                            canUpdate = !activeItems.some((item) => {
+                                return item.value === value;
+                            });
+                        }   
+                    } else {
                         canUpdate = false;
                     }
 
-                    // If no duplicates are allowed, and the value already exists
-                    // in the array, don't update
-                    if (this.options.allowDuplicates === false && this.passedElement.value) {
-                        canUpdate = !items.some((item) => {
-                            return item.value === value;
-                        });
-                    }
-
                     // All is good, update
-                    if (canUpdate && this.options.addItems) {
+                    if (canUpdate) {
                         if(this.passedElement.type === 'text') {
                             let canAddItem = true;
 
@@ -280,13 +294,16 @@ export class Choices {
 
                 if(!option.selected) {
                     this.selectOption(id, true);
-                    this.addItem(option.value, option.id);                    
+                    this.addItem(option.value, option.label, option.id);                    
                 }
             }
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            this.deselectAll();
+            if(this.hasSelectedItems()) {
+                this.deselectAll();
+            }
+            // If there is a dropdown and it is active
             if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
@@ -392,10 +409,11 @@ export class Choices {
      * Add item to store with correct value
      * @param {String} value Value to add to store
      */
-    addItem(value, optionId = -1, callback = this.options.callbackOnAddItem) {
+    addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
         if (this.options.debug) console.debug('Add item');
 
-        let passedValue = value;
+        let passedValue = value.trim();
+        let passedLabel = label || passedValue;
 
         // If a prepended value has been passed, prepend it
         if(this.options.prependValue) {
@@ -424,7 +442,7 @@ export class Choices {
             }
         }
 
-        this.store.dispatch(addItem(passedValue, id, optionId));
+        this.store.dispatch(addItem(passedValue, passedLabel, id, optionId));
     }
 
     /**
@@ -485,19 +503,24 @@ export class Choices {
         this.dropdown.classList[isActive ? 'remove' : 'add']('is-active');
     }
 
-    addOptionToDropdown(option) {
+    addOption(option, groupId = -1) {
         // Generate unique id
         const state = this.store.getState();
         const id = state.options.length + 1;
         const value = option.value;
+        const label = option.innerHTML;
         const isSelected = option.selected;
 
-        this.store.dispatch(addOption(value, id));
+        this.store.dispatch(addOption(value, label, id, groupId));
 
         if(isSelected) {
             this.selectOption(id);
-            this.addItem(option.value, id);
+            this.addItem(value, label, id);
         }
+    }
+
+    addGroup(value, id) {
+        this.store.dispatch(addGroup(value, id));
     }
 
     /* Getters */
@@ -548,6 +571,11 @@ export class Choices {
         const state = this.store.getState();
         return state.options;
     }
+
+    getGroups() {
+        const state = this.store.getState();
+        return state.groups;
+    }
     
     /* Rendering */
 
@@ -556,18 +584,6 @@ export class Choices {
      * @return
      */
     generateTextInput() {
-        /* 
-            Template:
-
-            <div class="choices choices--active">
-                <div class="choices__inner">
-                    <input id="1" type="text" data-choice="" class="choices__input choices__input--hidden" tabindex="-1" style="display:none;" aria-hidden="true">
-                    <ul class="choices__list choices__list--items"></ul>
-                    <input type="text" class="choices__input choices__input--cloned">
-                </div>
-            </div>
-        */
-
         let containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
         let containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
@@ -591,7 +607,8 @@ export class Choices {
             // ...and we have a value to set
             const placeholderValue = this.options.placeholderValue || this.passedElement.placeholder;
             if(placeholderValue) {
-                input.placeholder = placeholderValue;    
+                input.placeholder = placeholderValue;
+                input.style.width = getWidthOfInput(input);
             }
         }
 
@@ -650,7 +667,8 @@ export class Choices {
 
         // If placeholder has been enabled and we have a value
         if (this.options.placeholder && this.options.placeholderValue) {
-            input.placeholder = this.options.placeholderValue;    
+            input.placeholder = this.options.placeholderValue;  
+            input.style.width = getWidthOfInput(input);
         }
 
         if(!this.options.addItems) {
@@ -668,10 +686,29 @@ export class Choices {
         this.list = list;
         this.dropdown = dropdown;
     
-        const passedOptions = Array.prototype.slice.call(this.passedElement.options);
-        passedOptions.forEach((option) => {
-            this.addOptionToDropdown(option);
-        });
+        // const passedGroups;
+        const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
+
+        if(passedGroups.length) {
+            passedGroups.forEach((group, index) => {
+                const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
+                const groupId = index;
+            
+                this.addGroup(group.label, groupId);
+
+                groupOptions.forEach((option) => {
+                    this.addOption(option, groupId);
+                });
+                
+            });
+        } else {
+            const passedOptions = Array.from(this.passedElement.options);
+
+            passedOptions.forEach((option) => {
+                this.addOption(option);
+            });
+        }
+        
 
         // Subscribe to store
         this.store.subscribe(this.render);
@@ -725,6 +762,7 @@ export class Choices {
         const classNames = this.options.classNames;
         const items = this.getItems();
         const options = this.getOptions();
+        const groups = this.getGroups();
 
         // OPTIONS
         if(this.dropdown) {
@@ -734,16 +772,54 @@ export class Choices {
             // Create a fragment to store our list items (so we don't have to update the DOM for each item)
             const optionListFragment = document.createDocumentFragment();
 
-            // Add each option to dropdown
-            if(options) {
-                options.forEach((option) => {
-                    const dropdownItem = strToEl(`<li class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">${ option.value }</li>`);        
-                    optionListFragment.appendChild(dropdownItem);
+            // If we have grouped options
+            if(groups.length) {
+                groups.forEach((group) => {
+                    
+                    const dropdownGroup = strToEl(`
+                        <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
+                            <div class="${ classNames.groupHeading }">${ group.value }</div>
+                        </div>
+                    `);
+
+                    const childOptions = options.filter((option) => {
+                        return option.groupId === group.id;
+                    });
+
+                    if(childOptions) {
+                        childOptions.forEach((option) => {
+                            const dropdownItem = strToEl(`
+                                <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                                    ${ option.label }
+                                </div>
+                            `);
+
+                            dropdownGroup.appendChild(dropdownItem);
+                        });
+                    } else {
+                        const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
+                        dropdownGroup.appendChild(dropdownItem);
+                    }
+
+                    optionListFragment.appendChild(dropdownGroup);
                 });
             } else {
-                const dropdownItem = strToEl(`<li class="${ classNames.item }">No options to select</li>`);        
-                optionListFragment.appendChild(dropdownItem);
+                if(options) {
+                    options.forEach((option) => {
+                        const dropdownItem = strToEl(`
+                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                                ${ option.label }
+                            </div>
+                        `);        
+
+                        optionListFragment.appendChild(dropdownItem);
+                    });
+                } else {
+                    const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
+                    optionListFragment.appendChild(dropdownItem);
+                }
             }
+            
 
             this.dropdown.appendChild(optionListFragment);
         }
@@ -765,7 +841,11 @@ export class Choices {
         items.forEach((item) => {
             if(item.active) {
                 // Create new list element 
-                const listItem = strToEl(`<li class="${ classNames.item } ${ this.options.removeItems ? classNames.itemSelectable : '' } ${ item.selected ? classNames.selectedState : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">${ item.value }</li>`);
+                const listItem = strToEl(`
+                    <li class="${ classNames.item } ${ this.options.removeItems ? classNames.itemSelectable : '' } ${ item.selected ? classNames.selectedState : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">
+                        ${ item.label }
+                    </li>
+                `);
 
                 // Append it to list
                 itemListFragment.appendChild(listItem);
@@ -777,7 +857,7 @@ export class Choices {
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
-                callback(items, options);
+                callback(items, options, groups);
             } else {
                 console.error('callbackOnRender: Callback is not a function');
             }
@@ -889,8 +969,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const choicesMultiple = new Choices('[data-choice]', {
         placeholderValue: 'This is a placeholder set in the config',
-        callbackOnRender: function(items, options) {
-            console.log(items);
+        callbackOnRender: function(items, options, groups) {
+            console.log(options);
         },
     });
 

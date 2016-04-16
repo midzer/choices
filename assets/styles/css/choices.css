@@ -46,7 +46,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: .75rem .75rem .375rem;
   border: 1px solid #DDDDDD;
   border-radius: .25rem;
-  font-size: 1.4rem; }
+  font-size: 1.4rem;
+  cursor: text; }
   .choices__inner:focus {
     outline: 1px solid #00BCD4;
     outline-offset: -1px; }
@@ -67,7 +68,8 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: .375rem;
     background-color: #00BCD4;
     border: 1px solid #00b1c7;
-    color: #FFFFFF; }
+    color: #FFFFFF;
+    word-break: break-all; }
     .choices__list--items .choices__item.is-selected {
       background-color: #00a5bb; }
 
@@ -85,12 +87,12 @@ h1, h2, h3, h4, h5, h6 {
   .choices__list--dropdown .choices__item {
     padding: 1rem;
     font-size: 1.4rem; }
-    .choices__list--dropdown .choices__item:hover {
-      background-color: #f9f9f9; }
     .choices__list--dropdown .choices__item.is-selected {
       opacity: .5; }
       .choices__list--dropdown .choices__item.is-selected:hover {
         background-color: #FFFFFF; }
+  .choices__list--dropdown .choices__item--selectable:hover {
+    background-color: #f9f9f9; }
   .choices__list--dropdown.is-active {
     display: block; }
   .choices__list--dropdown.is-flipped {
@@ -115,6 +117,12 @@ h1, h2, h3, h4, h5, h6 {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none; }
+
+.choices__group .choices__heading {
+  font-size: 1.2rem;
+  padding: 1rem;
+  border-bottom: 1px solid #EAEAEA;
+  color: gray; }
 
 .choices__input {
   background-color: #f9f9f9;

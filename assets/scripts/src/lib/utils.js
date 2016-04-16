@@ -371,15 +371,29 @@ export const strToEl = (function() {
 }());
 
 /** 
- * Calculates the width of a passed input based on its value
+ * Sets the width of a passed input based on its value
  * @return {Number} Width of input
  */
-export const getWidthOfInput = () => {
-    let tmp = document.createElement('span');
-    tmp.className = "tmp-element";
-    tmp.innerHTML = inputEl.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    document.body.appendChild(tmp);
-    let theWidth = tmp.getBoundingClientRect().width;
-    document.body.removeChild(tmp);
-    return theWidth;
+export const getWidthOfInput = (input, initialWidth = 20) => {
+    const value = input.value || input.placeholder;
+    let width = input.offsetWidth;
+
+    if(value) {
+        const testEl = strToEl(`<span class="offscreen">${value}</span>`);
+        testEl.style.position = 'absolute';
+        testEl.style.top = '-9999px';
+        testEl.style.left = '-9999px';
+        testEl.style.padding = '0';
+        testEl.style.width = 'auto';
+
+        document.body.appendChild(testEl);
+
+        if(testEl.offsetWidth > initialWidth && testEl.offsetWidth != input.offsetWidth) {
+            width = testEl.offsetWidth + initialWidth;    
+        } 
+
+        document.body.removeChild(testEl);
+    }
+
+    return `${width}px`;    
 }

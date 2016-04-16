@@ -3,9 +3,11 @@ const options = (state = [], action) => {
         case 'ADD_OPTION':
             return [...state, {
                 id: parseInt(action.id),
+                groupId: action.groupId,
                 value: action.value,
+                label: action.label,
                 disabled: false,
-                selected: false
+                selected: false,
             }];;
 
         case 'SELECT_OPTION':

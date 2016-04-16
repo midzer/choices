@@ -6,6 +6,7 @@ const items = (state = [], action) => {
                 id: action.id,
                 optionId: action.optionId,
                 value: action.value,
+                label: action.label,
                 active: true,
                 selected: false
             }];

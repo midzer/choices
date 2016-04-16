@@ -58,6 +58,7 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #DDDDDD;
     border-radius: .25rem;
     font-size: 1.4rem;
+    cursor: text;
     &:focus { 
         outline: 1px solid #00BCD4;
         outline-offset: -1px;
@@ -84,6 +85,7 @@ h1, h2, h3, h4, h5, h6 {
         background-color: #00BCD4;
         border: 1px solid darken(#00BCD4, 2.5%);
         color: #FFFFFF;
+        word-break: break-all;
         &.is-selected { background-color: darken(#00BCD4, 5%); }
     }
 }
@@ -102,12 +104,15 @@ h1, h2, h3, h4, h5, h6 {
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
-        &:hover { background-color: mix(#000000, #FFFFFF, 2.5%); }
         &.is-selected { 
             opacity: .5; 
             &:hover { background-color: #FFFFFF; }
         }
     }
+    .choices__item--selectable {
+        &:hover { background-color: mix(#000000, #FFFFFF, 2.5%); }
+    }
+
     &.is-active { display: block; }
     &.is-flipped {
         top: auto;
@@ -126,6 +131,15 @@ h1, h2, h3, h4, h5, h6 {
 .choices__item--disabled { 
     cursor: not-allowed; 
     user-select: none;
+}
+
+.choices__group {
+    .choices__heading { 
+        font-size: 1.2rem;
+        padding: 1rem;
+        border-bottom: 1px solid #EAEAEA;
+        color: lighten(#333, 30%); 
+    }
 }
 
 .choices__input {
