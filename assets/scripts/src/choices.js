@@ -129,7 +129,6 @@ export class Choices {
 
     hasSelectedItems() {
         const items = this.getItems();
-
         return items.some((item) => {
             return item.selected === true;
         });
@@ -137,14 +136,96 @@ export class Choices {
 
     /* Event handling */
 
+    handleSelectAll() {
+        if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
+            this.selectAll(this.list.children);
+        }
+    };
+    
+    handleEnter(activeItems, value) {
+        let canUpdate = true;
+
+        if(this.options.addItems) {
+            if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
+                // If there is a max entry limit and we have reached that limit
+                // don't update
+                canUpdate = false;
+            } else if(this.options.allowDuplicates === false && this.passedElement.value) {
+                // If no duplicates are allowed, and the value already exists
+                // in the array, don't update
+                canUpdate = !activeItems.some((item) => {
+                    return item.value === value;
+                });
+            }   
+        } else {
+            canUpdate = false;
+        }
+
+        // All is good, update
+        if (canUpdate) {
+            if(this.passedElement.type === 'text') {
+                let canAddItem = true;
+
+                // If a user has supplied a regular expression filter
+                if(this.options.regexFilter) {
+                    // Determine whether we can update based on whether 
+                    // our regular expression passes 
+                    canAddItem = this.regexFilter(value);
+                }
+                
+                // All is good, add
+                if(canAddItem) {
+                    this.addItem(value);
+                    this.clearInput(this.passedElement);
+                }
+            }
+        }
+    };
+
+    handleBackspaceKey(activeItems) {
+        if(this.options.removeItems && activeItems) {
+            const lastItem = activeItems[activeItems.length - 1];
+            const hasSelectedItems = activeItems.some((item) => {
+                return item.selected === true;
+            });
+
+            // If editing the last item is allowed and there are not other selected items, 
+            // we can edit the item value. Otherwise if we can remove items, remove all selected items
+            if(this.options.editItems && !hasSelectedItems) {
+                this.input.value = lastItem.value;
+                this.removeItem(lastItem);
+            } else {
+                this.removeAllSelectedItems();
+            }
+        }
+    };
+
+    handleClick(activeItems, target) {
+        if(this.options.removeItems && target) {
+            const passedId = target.getAttribute('data-choice-id');
+
+            // We only want to select one item with a click
+            // so we deselect any items that aren't the target
+            activeItems.forEach((item) => {
+                if(item.id === parseInt(passedId) && !item.selected) {
+                    this.selectItem(item);
+                } else {
+                    this.deselectItem(item);
+                }
+            });
+        }
+    }
+
+
     /** 
      * Handle keydown event 
      * @param  {Object} e Event
      * @return
      */
     onKeyDown(e) {
-        const items = this.getItems();
         const activeItems = this.getItemsFilteredByActive();
+        const inputIsFocussed = this.input === document.activeElement;
+        const items = this.getItems();
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
@@ -152,98 +233,26 @@ export class Choices {
 
         // If we are typing in the input
         if(e.target === this.input) {
-
             // this.input.style.width = getWidthOfInput(this.input);
 
             // If CTRL + A or CMD + A have been pressed and there are items to select
             if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
-                const handleSelectAll = () => {
-                    if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
-                        this.selectAll(this.list.children);
-                    }
-                };
-
-                handleSelectAll();
+                this.handleSelectAll();
             }
 
             // If enter key is pressed and the input has a value
             if (e.keyCode === enterKey && e.target.value) {
                 const value = this.input.value;
-
-                const handleEnter = () => {
-                    let canUpdate = true;
-
-                    if(this.options.addItems) {
-                        if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
-                            // If there is a max entry limit and we have reached that limit
-                            // don't update
-                            canUpdate = false;
-                        } else if(this.options.allowDuplicates === false && this.passedElement.value) {
-                            // If no duplicates are allowed, and the value already exists
-                            // in the array, don't update
-                            canUpdate = !activeItems.some((item) => {
-                                return item.value === value;
-                            });
-                        }   
-                    } else {
-                        canUpdate = false;
-                    }
-
-                    // All is good, update
-                    if (canUpdate) {
-                        if(this.passedElement.type === 'text') {
-                            let canAddItem = true;
-
-                            // If a user has supplied a regular expression filter
-                            if(this.options.regexFilter) {
-                                // Determine whether we can update based on whether 
-                                // our regular expression passes 
-                                canAddItem = this.regexFilter(value);
-                            }
-                            
-                            // All is good, add
-                            if(canAddItem) {
-                                this.addItem(value);
-                                this.clearInput(this.passedElement);
-                            }
-                        }
-                    }
-                };
-
-                handleEnter();
+                this.handleEnter(activeItems, value);
             } 
         }
 
-        // If backspace or delete key is pressed and the input has no value
-        if (e.keyCode === deleteKey && !e.target.value) {
-
-            const handleBackspaceKey = () => {
-                if(this.options.removeItems) {
-                    const inputIsFocussed = this.input === document.activeElement;
-                    const lastItem = activeItems[activeItems.length - 1];
-                    const selectedItems = items.some((item) => {
-                        return item.selected === true;
-                    });
-
-                    if(items && lastItem && !this.options.editItems && inputIsFocussed && this.options.removeItems) {
-                        this.selectItem(lastItem);
-                    }
-
-                    // If editing the last item is allowed and there is a last item and 
-                    // there are not other selected items (minus the last item), we can edit
-                    // the item value. Otherwise if we can remove items, remove all items
-                    if(items && this.options.removeItems && this.options.editItems && lastItem && !selectedItems && inputIsFocussed) {
-                        this.input.value = lastItem.value;
-                        this.removeItem(lastItem);
-                    } else {
-                        this.removeAllItems(true);
-                    }
-                }
-            };
-
-            e.preventDefault();
-
-            handleBackspaceKey();
+        if(inputIsFocussed) {
+            // If backspace or delete key is pressed and the input has no value
+            if (e.keyCode === deleteKey && !e.target.value) {
+                this.handleBackspaceKey(activeItems);
+                e.preventDefault();
+            }
         }
     }
 
@@ -265,25 +274,10 @@ export class Choices {
             }
 
             if(e.target.hasAttribute('data-choice-item')) {
-                const items = this.getItems();
+                const activeItems = this.getItemsFilteredByActive();
                 const target = e.target;
-                const handleClick = (target) => {
-                    if(this.options.removeItems) {
-                        const passedId = target.getAttribute('data-choice-id');
-
-                        // We only want to select one item with a click
-                        // so we deselect any items that aren't the target
-                        items.forEach((item) => {
-                            if(item.id === parseInt(passedId) && !item.selected) {
-                                this.selectItem(item);
-                            } else {
-                                this.deselectItem(item);
-                            }
-                        });
-                    }
-                }
                 
-                handleClick(target);
+                this.handleClick(activeItems, target);
 
             } else if(e.target.hasAttribute('data-choice-selectable')) {
                 const options = this.getOptions();
@@ -344,8 +338,8 @@ export class Choices {
      * @return {Element}       First Element with given value
      */
     getItemById(id) {
-        if(!id) {
-            console.error('getItemById: An id must be a number');
+        if(!id || !isType('Number', id)) {
+            console.error('getItemById: An id was not given or was not a number');
             return;
         }
 
@@ -476,18 +470,22 @@ export class Choices {
      * @param  {Boolean} selectedOnly Optionally remove only selected items
      * @return
      */
-    removeAllItems(selectedOnly = false) {
-        let items = this.getItems();
+    removeAllItems() {
+        const items = this.getItems();
 
         items.forEach((item) => {
-            if(selectedOnly) {
-                if(item.selected && item.active){
-                    this.removeItem(item);    
-                }
-            } else {
-                if(item.active) {
-                    this.removeItem(item);    
-                }
+            if(item.active) {
+                this.removeItem(item);    
+            }
+        });
+    }
+
+    removeAllSelectedItems() {
+        const items = this.getItems();
+
+        items.forEach((item) => {
+            if(item.selected && item.active) {
+                this.removeItem(item);
             }
         });
     }
@@ -959,6 +957,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
+        // callbackOnRender: function(items, options, groups) {
+        //     console.log(items);
+        // },
     });
 
     const choices7 = new Choices('#choices-7', {
@@ -969,9 +970,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const choicesMultiple = new Choices('[data-choice]', {
         placeholderValue: 'This is a placeholder set in the config',
-        callbackOnRender: function(items, options, groups) {
-            console.log(options);
-        },
+        // callbackOnRender: function(items, options, groups) {
+        //     console.log(options);
+        // },
     });
 
     // choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
