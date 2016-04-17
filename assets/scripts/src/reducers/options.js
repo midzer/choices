@@ -2,7 +2,7 @@ const options = (state = [], action) => {
     switch (action.type) {
         case 'ADD_OPTION':
             return [...state, {
-                id: parseInt(action.id),
+                id: action.id,
                 groupId: action.groupId,
                 value: action.value,
                 label: action.label,

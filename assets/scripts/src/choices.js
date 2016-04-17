@@ -408,6 +408,7 @@ export class Choices {
 
         let passedValue = value.trim();
         let passedLabel = label || passedValue;
+        let passedOptionId = optionId || -1;
 
         // If a prepended value has been passed, prepend it
         if(this.options.prependValue) {
@@ -420,7 +421,7 @@ export class Choices {
         }
 
         // Generate unique id
-        let id = this.store.getState().items.length + 1;
+        const id = this.store.getState().items.length + 1;
 
         // Close dropdown
         if(this.dropdown && this.dropdown.classList.contains('is-active')) {
@@ -436,7 +437,7 @@ export class Choices {
             }
         }
 
-        this.store.dispatch(addItem(passedValue, passedLabel, id, optionId));
+        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
     }
 
     /**
@@ -444,14 +445,14 @@ export class Choices {
      * @param
      */
     removeItem(item, callback = this.options.callbackOnRemoveItem) {
-        if(!item) {
-            console.error('removeItem: No item or value was passed to be removed');
+        if(!item || !isType('Object', item)) {
+            console.error('removeItem: No item object was passed to be removed');
             return;
         }
 
-        let id = item.id;
-        let value = item.value;
-        let optionId = item.optionId;
+        const id = item.id;
+        const value = item.value;
+        const optionId = item.optionId;
 
         // Run callback
         if(callback){
@@ -465,13 +466,27 @@ export class Choices {
         this.store.dispatch(removeItem(id, optionId));
     }
 
+    removeItemsByValue(value) {
+        if(!value || !isType('String', value)) {
+            console.error('removeItemsByValue: No value was passed to be removed');
+        }
+
+        const items = this.getItemsFilteredByActive();
+
+        items.forEach((item) => {
+            if(item.value === value) {
+                this.removeItem(item);
+            }
+        });
+    }
+
     /**
      * Remove all items from array
      * @param  {Boolean} selectedOnly Optionally remove only selected items
      * @return
      */
     removeAllItems() {
-        const items = this.getItems();
+        const items = this.getItemsFilteredByActive();
 
         items.forEach((item) => {
             if(item.active) {
@@ -481,7 +496,7 @@ export class Choices {
     }
 
     removeAllSelectedItems() {
-        const items = this.getItems();
+        const items = this.getItemsFilteredByActive();
 
         items.forEach((item) => {
             if(item.selected && item.active) {
@@ -628,15 +643,6 @@ export class Choices {
         this.presetItems.forEach((value) => {
             this.addItem(value);
         });
-
-        // Subscribe to store
-        this.store.subscribe(this.render);
-
-        // Render any items
-        this.render();
-
-        // Trigger event listeners 
-        this.addEventListeners();
     }
 
     /**
@@ -684,7 +690,6 @@ export class Choices {
         this.list = list;
         this.dropdown = dropdown;
     
-        // const passedGroups;
         const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
         if(passedGroups.length) {
@@ -706,16 +711,6 @@ export class Choices {
                 this.addOption(option);
             });
         }
-        
-
-        // Subscribe to store
-        this.store.subscribe(this.render);
-
-        // Render any items
-        this.render();
-
-        // Trigger event listeners 
-        this.addEventListeners();
     }
 
     /**
@@ -736,29 +731,13 @@ export class Choices {
         document.removeEventListener('paste', this.onPaste);
     }
 
-    observeStore(store, select, onChange) {
-        let currentState;
-
-        function handleChange() {
-            let nextState = select(store.getState());
-            if (nextState !== currentState) {
-                currentState = nextState;
-                onChange(currentState);
-            }
-        }
-
-        let unsubscribe = store.subscribe(handleChange);
-        handleChange();
-        return unsubscribe;
-    }
-
     /**
      * Render DOM with values
      * @return
      */
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
-        const items = this.getItems();
+        const activeItems = this.getItemsFilteredByActive();
         const options = this.getOptions();
         const groups = this.getGroups();
 
@@ -823,21 +802,21 @@ export class Choices {
         }
         
         // ITEMS
-        // Simplify store data to just values
-        const itemsFiltered = this.getItemsReducedToValues();
+        if(activeItems) {
+            // Simplify store data to just values
+            const itemsFiltered = this.getItemsReducedToValues();
 
-        // Assign hidden input array of values
-        this.passedElement.value = itemsFiltered.join(this.options.delimiter);
+            // Assign hidden input array of values
+            this.passedElement.value = itemsFiltered.join(this.options.delimiter);
 
-        // Clear list
-        this.list.innerHTML = '';
+            // Clear list
+            this.list.innerHTML = '';
 
-        // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-        const itemListFragment = document.createDocumentFragment();
-        
-        // Add each list item to list
-        items.forEach((item) => {
-            if(item.active) {
+            // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+            const itemListFragment = document.createDocumentFragment();
+            
+            // Add each list item to list
+            activeItems.forEach((item) => {
                 // Create new list element 
                 const listItem = strToEl(`
                     <li class="${ classNames.item } ${ this.options.removeItems ? classNames.itemSelectable : '' } ${ item.selected ? classNames.selectedState : '' }" data-choice-item data-choice-id="${ item.id }" data-choice-selected="${ item.selected }">
@@ -847,15 +826,15 @@ export class Choices {
 
                 // Append it to list
                 itemListFragment.appendChild(listItem);
-            }
-        });
+            });
 
-        this.list.appendChild(itemListFragment);
+            this.list.appendChild(itemListFragment);
+        }
 
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
-                callback(items, options, groups);
+                callback(activeItems, options, groups);
             } else {
                 console.error('callbackOnRender: Callback is not a function');
             }
@@ -880,7 +859,7 @@ export class Choices {
                 this.generateMultipleSelectInput();
                 break;
             default:
-                this.generateMultipleSelectInput();
+                console.error('renderInput: Input type is not supported');
                 break;
         }
     }
@@ -892,7 +871,18 @@ export class Choices {
     init(callback = this.options.callbackOnInit) {
         if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
+
+        // Render input
         this.renderInput(this.passedElement);
+
+        // Subscribe to store
+        this.store.subscribe(this.render);
+
+        // Render any items
+        this.render();
+
+        // Trigger event listeners 
+        this.addEventListeners();
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
@@ -951,15 +941,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const choices5 = new Choices('#choices-5', {
         prependValue: 'item-',
         appendValue: `-${Date.now()}`,
+        // callbackOnRender: function(items, options) {
+        //     console.log(items);
+        // },
     });
 
     choices5.removeAllItems();
 
     const choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-        // callbackOnRender: function(items, options, groups) {
-        //     console.log(items);
-        // },
+        callbackOnRender: function(items, options, groups) {
+            console.log(items);
+        },
     });
 
     const choices7 = new Choices('#choices-7', {
@@ -975,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // },
     });
 
-    // choices6.addItem('josh2@joshuajohnson.co.uk', () => { console.log('Custom add item callback')});
-    // choices6.removeItem('josh@joshuajohnson.co.uk');
-    // console.log(choices6.getItemById(1));
+    choices6.addItem('josh2@joshuajohnson.co.uk', null, null, () => { console.log('Custom add item callback')});
+    choices6.removeItemsByValue('josh@joshuajohnson.co.uk');
+    console.log(choices6.getItemById(3));
 });
