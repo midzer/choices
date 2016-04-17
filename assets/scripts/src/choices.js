@@ -18,7 +18,12 @@ import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput }
  */
 export class Choices {
     constructor(element = '[data-choice]', options) {
+        
+        // Cutting the mustard
         const fakeEl = document.createElement("fakeel");
+        const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
+        if (!cuttingTheMustard) console.error('init: Your browser doesn\'nt support Choices');
+
         const userOptions = options || {};
 
         // If there are multiple elements, create a new instance 
@@ -83,9 +88,6 @@ export class Choices {
         // Create data store
         this.store = createStore(rootReducer);
 
-        // Cutting the mustard
-        this.supports = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
-
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
@@ -135,7 +137,6 @@ export class Choices {
     }
 
     /* Event handling */
-
     handleSelectAll() {
         if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
             this.selectAll(this.list.children);
@@ -191,7 +192,7 @@ export class Choices {
 
             // If editing the last item is allowed and there are not other selected items, 
             // we can edit the item value. Otherwise if we can remove items, remove all selected items
-            if(this.options.editItems && !hasSelectedItems) {
+            if(this.options.editItems && !hasSelectedItems && lastItem) {
                 this.input.value = lastItem.value;
                 this.removeItem(lastItem);
             } else {
@@ -200,22 +201,22 @@ export class Choices {
         }
     };
 
-    handleClick(activeItems, target) {
+    handleClick(activeItems, target, shiftKey) {
         if(this.options.removeItems && target) {
             const passedId = target.getAttribute('data-choice-id');
 
             // We only want to select one item with a click
             // so we deselect any items that aren't the target
+            // unless shift is being pressed
             activeItems.forEach((item) => {
                 if(item.id === parseInt(passedId) && !item.selected) {
                     this.selectItem(item);
-                } else {
+                } else if(!shiftKey) {
                     this.deselectItem(item);
                 }
             });
         }
     }
-
 
     /** 
      * Handle keydown event 
@@ -263,6 +264,8 @@ export class Choices {
      * @return
      */
     onClick(e) {
+        const shiftKey = e.shiftKey;
+
         if(this.dropdown) {
             this.toggleDropdown();
         }
@@ -277,7 +280,7 @@ export class Choices {
                 const activeItems = this.getItemsFilteredByActive();
                 const target = e.target;
                 
-                this.handleClick(activeItems, target);
+                this.handleClick(activeItems, target, shiftKey);
 
             } else if(e.target.hasAttribute('data-choice-selectable')) {
                 const options = this.getOptions();
@@ -869,7 +872,6 @@ export class Choices {
      * @return
      */
     init(callback = this.options.callbackOnInit) {
-        if (!this.supports) console.error('init: Your browser doesn\'nt support shit');
         this.initialised = true;
 
         // Render input
