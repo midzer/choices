@@ -71,6 +71,7 @@ export class Choices {
                 activeState: 'is-active',
                 disabledState: 'is-disabled',
                 hiddenState: 'is-hidden',
+                flippedState: 'is-flipped',
                 selectedState: 'is-selected'
             },
             callbackOnInit: function() {},
@@ -103,6 +104,9 @@ export class Choices {
         this.init = this.init.bind(this);
         this.render = this.render.bind(this);
         this.destroy = this.destroy.bind(this);
+
+        this.onFocus = this.onFocus.bind(this);
+        this.onBlur = this.onBlur.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onPaste = this.onPaste.bind(this);
@@ -277,12 +281,14 @@ export class Choices {
             }
 
             if(e.target.hasAttribute('data-choice-item')) {
+                // If we are clicking on an item
                 const activeItems = this.getItemsFilteredByActive();
                 const target = e.target;
                 
                 this.handleClick(activeItems, target, shiftKey);
 
-            } else if(e.target.hasAttribute('data-choice-selectable')) {
+            } else if(e.target.hasAttribute('data-choice-option')) {
+                // If we are clicking on an option
                 const options = this.getOptions();
                 const id = e.target.getAttribute('data-choice-id');
                 const option = options.find((option) => {
@@ -308,9 +314,18 @@ export class Choices {
     }
 
     onPaste(e) {
+        // Disable pasting into the input if option has been set
         if(!this.options.allowPaste) {
             e.preventDefault();
         }
+    }
+
+    onFocus(e) {
+        this.containerOuter.classList.add('is-active');
+    }
+
+    onBlur(e) {
+        this.containerOuter.classList.remove('is-active');
     }
 
     /* Methods */
@@ -508,15 +523,36 @@ export class Choices {
         });
     }
 
-    toggleDropdown() {
-        if(!this.dropdown) {
-            console.error('No dropdown set');
-            return;
+    showDropdown() {
+        this.dropdown.classList.add('is-active');
+
+        const dimensions = this.dropdown.getBoundingClientRect();
+        if(dimensions.top + dimensions.height >= document.body.offsetHeight) {
+            this.dropdown.classList.add('is-flipped');
+        } else {
+            this.dropdown.classList.remove('is-flipped');
+        }
+    }
+
+    hideDropdown() {
+        const isFlipped = this.dropdown.classList.contains('is-flipped');
+
+        this.dropdown.classList.remove('is-active');
+        if(isFlipped) {
+            this.dropdown.classList.remove('is-flipped');
         }
 
+    }
+
+    toggleDropdown() {
+        if(!this.dropdown) return;
         const isActive = this.dropdown.classList.contains('is-active');
 
-        this.dropdown.classList[isActive ? 'remove' : 'add']('is-active');
+        if(isActive) {
+            this.hideDropdown();
+        } else {
+            this.showDropdown();
+        }
     }
 
     addOption(option, groupId = -1) {
@@ -723,6 +759,9 @@ export class Choices {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
         document.addEventListener('paste', this.onPaste);
+
+        this.input.addEventListener('focus', this.onFocus);
+        this.input.addEventListener('blur', this.onBlur);
     }
 
     /**
@@ -732,6 +771,9 @@ export class Choices {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
         document.removeEventListener('paste', this.onPaste);
+
+        this.input.removeEventListener('focus', this.onFocus);
+        this.input.removeEventListener('blur', this.onBlur);
     }
 
     /**
@@ -769,7 +811,7 @@ export class Choices {
                     if(childOptions) {
                         childOptions.forEach((option) => {
                             const dropdownItem = strToEl(`
-                                <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                                <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                     ${ option.label }
                                 </div>
                             `);
@@ -787,7 +829,7 @@ export class Choices {
                 if(options) {
                     options.forEach((option) => {
                         const dropdownItem = strToEl(`
-                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-selectable data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                 ${ option.label }
                             </div>
                         `);        
