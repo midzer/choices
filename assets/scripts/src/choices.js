@@ -47,6 +47,7 @@ export class Choices {
             delimiter: ',',
             allowDuplicates: true,
             allowPaste: true,
+            allowSearch: true, 
             regexFilter: false,
             debug: false,
             placeholder: true,
@@ -91,6 +92,9 @@ export class Choices {
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+
+        // Initial state of input type (we update this when we init)
+        this.inputType = null;
 
         // Set preset items - this looks out of place
         this.presetItems = [];
@@ -230,7 +234,6 @@ export class Choices {
     onKeyDown(e) {
         const activeItems = this.getItemsFilteredByActive();
         const inputIsFocussed = this.input === document.activeElement;
-        const items = this.getItems();
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
@@ -249,7 +252,11 @@ export class Choices {
             if (e.keyCode === enterKey && e.target.value) {
                 const value = this.input.value;
                 this.handleEnter(activeItems, value);
-            } 
+            }
+
+            if(this.inputType === 'multipleSelect' && this.options.allowSearch) {
+                // Do search 
+            }
         }
 
         if(inputIsFocussed) {
@@ -321,11 +328,11 @@ export class Choices {
     }
 
     onFocus(e) {
-        this.containerOuter.classList.add('is-active');
+        this.containerOuter.classList.add(this.options.classNames.activeState);
     }
 
     onBlur(e) {
-        this.containerOuter.classList.remove('is-active');
+        this.containerOuter.classList.remove(this.options.classNames.activeState);
     }
 
     /* Methods */
@@ -442,7 +449,7 @@ export class Choices {
         const id = this.store.getState().items.length + 1;
 
         // Close dropdown
-        if(this.dropdown && this.dropdown.classList.contains('is-active')) {
+        if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
             this.toggleDropdown();    
         }
 
@@ -524,29 +531,30 @@ export class Choices {
     }
 
     showDropdown() {
-        this.dropdown.classList.add('is-active');
+        this.dropdown.classList.add(this.options.classNames.activeState);
 
         const dimensions = this.dropdown.getBoundingClientRect();
         if(dimensions.top + dimensions.height >= document.body.offsetHeight) {
-            this.dropdown.classList.add('is-flipped');
+            this.dropdown.classList.add(this.options.classNames.flippedState);
         } else {
-            this.dropdown.classList.remove('is-flipped');
+            this.dropdown.classList.remove(this.options.classNames.flippedState);
         }
     }
 
     hideDropdown() {
-        const isFlipped = this.dropdown.classList.contains('is-flipped');
+        // A dropdown flips if it does not have space below the input
+        const isFlipped = this.dropdown.classList.contains(this.options.classNames.flippedState);
 
-        this.dropdown.classList.remove('is-active');
+        this.dropdown.classList.remove(this.options.classNames.activeState);
+
         if(isFlipped) {
-            this.dropdown.classList.remove('is-flipped');
+            this.dropdown.classList.remove(this.options.classNames.flippedState);
         }
-
     }
 
     toggleDropdown() {
         if(!this.dropdown) return;
-        const isActive = this.dropdown.classList.contains('is-active');
+        const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
 
         if(isActive) {
             this.hideDropdown();
@@ -677,6 +685,7 @@ export class Choices {
         this.containerInner = containerInner;
         this.input = input;
         this.list = list;
+        this.inputType = "text";
 
         // Add any preset values seperated by delimiter
         this.presetItems.forEach((value) => {
@@ -728,6 +737,7 @@ export class Choices {
         this.input = input;
         this.list = list;
         this.dropdown = dropdown;
+        this.inputType = "multipleSelect";
     
         const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
