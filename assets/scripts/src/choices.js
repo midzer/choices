@@ -2,9 +2,9 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItem, removeItem, selectItem, addOption, selectOption, addGroup } from './actions/index';
-import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput } from './lib/utils.js';
-
+import { addItem, removeItem, selectItem, addOption, selectOption, filterOptions, activateOptions, addGroup } from './actions/index';
+import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import Sifter from 'sifter';
 
 /**
  * Choices
@@ -111,6 +111,7 @@ export class Choices {
 
         this.onFocus = this.onFocus.bind(this);
         this.onBlur = this.onBlur.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onPaste = this.onPaste.bind(this);
@@ -204,6 +205,7 @@ export class Choices {
                 this.input.value = lastItem.value;
                 this.removeItem(lastItem);
             } else {
+                this.selectItem(lastItem);
                 this.removeAllSelectedItems();
             }
         }
@@ -253,10 +255,6 @@ export class Choices {
                 const value = this.input.value;
                 this.handleEnter(activeItems, value);
             }
-
-            if(this.inputType === 'multipleSelect' && this.options.allowSearch) {
-                // Do search 
-            }
         }
 
         if(inputIsFocussed) {
@@ -265,6 +263,32 @@ export class Choices {
                 this.handleBackspaceKey(activeItems);
                 e.preventDefault();
             }
+        }
+    }
+
+    onKeyUp(e) {
+        if(e.target === this.input) {
+            if(this.inputType === 'multipleSelect' && this.options.allowSearch) {
+                if(this.input.value) {
+                    // If we have a value, filter options based on it 
+                    const handleFilter = debounce(() => {
+                        const options = this.getOptionsFiltedBySelectable();
+                        const sifter = new Sifter(options);
+                        const results = sifter.search(this.input.value, {
+                            fields: ['label', 'value'],
+                            sort: [{field: 'value', direction: 'asc'}],
+                            limit: 10
+                        });
+                        this.store.dispatch(filterOptions(results));
+                    }, 100)
+                    
+                    handleFilter();
+                } else {
+                    // Otherwise reset options to active
+                    this.store.dispatch(activateOptions());
+                }
+            }
+            
         }
     }
 
@@ -277,7 +301,7 @@ export class Choices {
     onClick(e) {
         const shiftKey = e.shiftKey;
 
-        if(this.dropdown) {
+        if(this.inputType === 'multipleSelect') {
             this.toggleDropdown();
         }
 
@@ -296,7 +320,7 @@ export class Choices {
 
             } else if(e.target.hasAttribute('data-choice-option')) {
                 // If we are clicking on an option
-                const options = this.getOptions();
+                const options = this.getOptionsFilteredByActive();
                 const id = e.target.getAttribute('data-choice-id');
                 const option = options.find((option) => {
                     return option.id === parseInt(id);
@@ -314,7 +338,7 @@ export class Choices {
                 this.deselectAll();
             }
             // If there is a dropdown and it is active
-            if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            if(this.inputType === 'multipleSelect' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
         }
@@ -421,6 +445,7 @@ export class Choices {
 
     selectOption(id, value = true) {
         if(!id) return;
+        this.input.value = '';
         this.store.dispatch(selectOption(id, value));
     }
 
@@ -449,7 +474,7 @@ export class Choices {
         const id = this.store.getState().items.length + 1;
 
         // Close dropdown
-        if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+        if(this.inputType === 'multipleSelect' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
             this.toggleDropdown();    
         }
 
@@ -579,8 +604,8 @@ export class Choices {
         }
     }
 
-    addGroup(value, id) {
-        this.store.dispatch(addGroup(value, id));
+    addGroup(value, id, active, disabled) {
+        this.store.dispatch(addGroup(value, id, active, disabled));
     }
 
     /* Getters */
@@ -632,9 +657,38 @@ export class Choices {
         return state.options;
     }
 
+    getOptionsFilteredByActive() {
+        const options = this.getOptions();
+        const valueArray = options.filter((option) => {
+            return option.active === true;
+        },[]);
+
+        return valueArray;
+    }
+
+    getOptionsFiltedBySelectable() {
+        const options = this.getOptions();
+        const valueArray = options.filter((option) => {
+            return option.disabled === false;
+        },[]);
+
+        return valueArray;
+    }
+
     getGroups() {
         const state = this.store.getState();
         return state.groups;
+    }
+
+    getGroupsFilteredByActive() {
+        const groups = this.getGroups();
+        const valueArray = groups.filter((group) => {
+            return group.active === true;
+        },[]);
+
+        console.log(groups);
+
+        return valueArray;
     }
     
     /* Rendering */
@@ -745,13 +799,16 @@ export class Choices {
             passedGroups.forEach((group, index) => {
                 const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
                 const groupId = index;
-            
-                this.addGroup(group.label, groupId);
 
-                groupOptions.forEach((option) => {
-                    this.addOption(option, groupId);
-                });
-                
+                if(groupOptions) {
+                    this.addGroup(group.label, groupId, true, group.disabled);
+                    groupOptions.forEach((option) => {
+                        this.addOption(option, groupId);
+                    });
+                } else {
+                    this.addGroup(group.label, groupId, false, group.disabled);
+                }
+            
             });
         } else {
             const passedOptions = Array.from(this.passedElement.options);
@@ -766,6 +823,7 @@ export class Choices {
      * Trigger event listeners
      */
     addEventListeners() {
+        document.addEventListener('keyup', this.onKeyUp);
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
         document.addEventListener('paste', this.onPaste);
@@ -778,6 +836,7 @@ export class Choices {
      * Destroy event listeners
      */
     removeEventListeners() {
+        document.removeEventListener('keyup', this.onKeyUp);
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
         document.removeEventListener('paste', this.onPaste);
@@ -793,11 +852,11 @@ export class Choices {
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
         const activeItems = this.getItemsFilteredByActive();
-        const options = this.getOptions();
-        const groups = this.getGroups();
+        const activeOptions = this.getOptionsFilteredByActive();
+        const activeGroups = this.getGroupsFilteredByActive();
 
         // OPTIONS
-        if(this.dropdown) {
+        if(this.inputType === 'multipleSelect') {
             // Clear options
             this.dropdown.innerHTML = '';
 
@@ -805,21 +864,21 @@ export class Choices {
             const optionListFragment = document.createDocumentFragment();
 
             // If we have grouped options
-            if(groups.length) {
-                groups.forEach((group) => {
-                    
-                    const dropdownGroup = strToEl(`
-                        <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
-                            <div class="${ classNames.groupHeading }">${ group.value }</div>
-                        </div>
-                    `);
-
-                    const childOptions = options.filter((option) => {
+            if(activeGroups.length >= 1) {
+                activeGroups.forEach((group) => {
+                    const groupOptions = activeOptions.filter((option) => {
                         return option.groupId === group.id;
                     });
 
-                    if(childOptions) {
-                        childOptions.forEach((option) => {
+                    // IF group actually has options within it
+                    if(groupOptions.length >= 1) {
+                        const dropdownGroup = strToEl(`
+                            <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
+                                <div class="${ classNames.groupHeading }">${ group.value }</div>
+                            </div>
+                        `);
+
+                        groupOptions.forEach((option) => {
                             const dropdownItem = strToEl(`
                                 <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                     ${ option.label }
@@ -828,28 +887,23 @@ export class Choices {
 
                             dropdownGroup.appendChild(dropdownItem);
                         });
-                    } else {
-                        const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
-                        dropdownGroup.appendChild(dropdownItem);
-                    }
 
-                    optionListFragment.appendChild(dropdownGroup);
+                        optionListFragment.appendChild(dropdownGroup);
+                    } 
+                });
+            } else if(activeOptions.length >= 1) {
+                activeOptions.forEach((option) => {
+                    const dropdownItem = strToEl(`
+                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                            ${ option.label }
+                        </div>
+                    `);        
+
+                    optionListFragment.appendChild(dropdownItem);
                 });
             } else {
-                if(options) {
-                    options.forEach((option) => {
-                        const dropdownItem = strToEl(`
-                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
-                                ${ option.label }
-                            </div>
-                        `);        
-
-                        optionListFragment.appendChild(dropdownItem);
-                    });
-                } else {
-                    const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
-                    optionListFragment.appendChild(dropdownItem);
-                }
+                const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
+                optionListFragment.appendChild(dropdownItem);
             }
             
 
@@ -889,7 +943,7 @@ export class Choices {
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
-                callback(activeItems, options, groups);
+                callback(activeItems, activeOptions, activeGroups);
             } else {
                 console.error('callbackOnRender: Callback is not a function');
             }
@@ -1004,9 +1058,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const choices6 = new Choices('#choices-6', {
         items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-        callbackOnRender: function(items, options, groups) {
-            console.log(items);
-        },
+        // callbackOnRender: function(items, options, groups) {
+        //     console.log(items);
+        // },
     });
 
     const choices7 = new Choices('#choices-7', {
@@ -1022,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // },
     });
 
-    choices6.addItem('josh2@joshuajohnson.co.uk', null, null, () => { console.log('Custom add item callback')});
-    choices6.removeItemsByValue('josh@joshuajohnson.co.uk');
-    console.log(choices6.getItemById(3));
+    // choices6.addItem('josh2@joshuajohnson.co.uk', null, null, () => { console.log('Custom add item callback')});
+    // choices6.removeItemsByValue('josh@joshuajohnson.co.uk');
+    // console.log(choices6.getItemById(3));
 });

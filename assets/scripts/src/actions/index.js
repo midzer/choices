@@ -42,10 +42,26 @@ export const selectOption = (id, selected) => {
     }
 };
 
-export const addGroup = (value, id) => {
+export const filterOptions = (results) => {
+    return {
+        type: 'FILTER_OPTIONS',
+        results,
+    }
+};
+
+export const activateOptions = (active = true) => {
+    return {
+        type: 'ACTIVATE_OPTIONS',
+        active,
+    }
+};
+
+export const addGroup = (value, id, active, disabled) => {
     return {
         type: 'ADD_GROUP',
         value,
         id,
+        active,
+        disabled,
     }
 };

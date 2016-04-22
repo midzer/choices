@@ -4,7 +4,8 @@ const groups = (state = [], action) => {
             return [...state, {
                 id: action.id,
                 value: action.value,
-                disabled: false,
+                active: action.active,
+                disabled: action.disabled,
             }];
 
         default:

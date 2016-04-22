@@ -8,7 +8,8 @@ const options = (state = [], action) => {
                 label: action.label,
                 disabled: false,
                 selected: false,
-            }];;
+                active: true,
+            }];
 
         case 'SELECT_OPTION':
             return state.map((option) => {
@@ -19,19 +20,26 @@ const options = (state = [], action) => {
                 return option;
             });
 
-        case 'REMOVE_ITEM':
-            // When an item is removed and it has an associated option,
-            // we want to re-enable it so it can be chosen again
-            if(action.optionId > -1) {
-                return state.map((option) => {
-                    if(option.id === parseInt(action.optionId)) {
-                        option.selected = action.selected;
-                    }
-                    return option;
+        case 'FILTER_OPTIONS':
+            const filteredResults = action.results.items;
+            const newState = state.map((option, index) => {
+                // Set active state based on whether option is 
+                // within filtered results
+                option.active = filteredResults.some((result) => {
+                    return result.id === index;
                 });
-            } else {
-                return state;
-            }
+
+                return option;
+            });
+
+            return newState;
+
+        case 'ACTIVATE_OPTIONS':
+            return state.map((option) => {
+                option.active = action.active;
+
+                return option;
+            });
             
 
         default:

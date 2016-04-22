@@ -49,7 +49,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.4rem;
   cursor: text; }
   .is-active .choices__inner {
-    border-color: #c4c4c4; }
+    border-color: #b7b7b7; }
   .choices__inner:focus {
     outline: 1px solid #00BCD4;
     outline-offset: -1px; }
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 300px;
   overflow: auto; }
   .is-active .choices__list--dropdown {
-    border-color: #c4c4c4; }
+    border-color: #b7b7b7; }
   .choices__list--dropdown .choices__item {
     padding: 1rem;
     font-size: 1.4rem; }

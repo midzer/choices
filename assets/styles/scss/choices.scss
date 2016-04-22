@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: .25rem;
     font-size: 1.4rem;
     cursor: text;
-    .is-active & { border-color: darken(#DDDDDD, 10%); }
+    .is-active & { border-color: darken(#DDDDDD, 15%); }
     &:focus { 
         outline: 1px solid #00BCD4;
         outline-offset: -1px;
@@ -104,7 +104,7 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom-right-radius: .25rem;
     max-height: 300px;
     overflow: auto;
-    .is-active & { border-color: darken(#DDDDDD, 10%); }
+    .is-active & { border-color: darken(#DDDDDD, 15%); }
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
