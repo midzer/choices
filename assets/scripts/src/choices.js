@@ -240,6 +240,7 @@ export class Choices {
         const deleteKey = 8 || 46;
         const enterKey = 13;
         const aKey = 65;
+        const escapeKey = 27;
 
         // If we are typing in the input
         if(e.target === this.input) {
@@ -254,6 +255,10 @@ export class Choices {
             if (e.keyCode === enterKey && e.target.value) {
                 const value = this.input.value;
                 this.handleEnter(activeItems, value);
+            }
+
+            if(e.keyCode === escapeKey && this.dropdown) {
+                this.toggleDropdown();
             }
         }
 
@@ -301,7 +306,7 @@ export class Choices {
     onClick(e) {
         const shiftKey = e.shiftKey;
 
-        if(this.inputType === 'multipleSelect') {
+        if(this.dropdown) {
             this.toggleDropdown();
         }
 
@@ -682,11 +687,15 @@ export class Choices {
 
     getGroupsFilteredByActive() {
         const groups = this.getGroups();
-        const valueArray = groups.filter((group) => {
-            return group.active === true;
-        },[]);
+        const options = this.getOptions();
 
-        console.log(groups);
+        const valueArray = groups.filter((group) => {
+            const isActive = group.active === true && group.disabled === false;
+            const hasActiveOptions = options.some((option) => {
+                return option.active === true && option.disabled === false;
+            });
+            return isActive && hasActiveOptions ? true : false;
+        },[]);
 
         return valueArray;
     }
@@ -852,11 +861,16 @@ export class Choices {
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
         const activeItems = this.getItemsFilteredByActive();
-        const activeOptions = this.getOptionsFilteredByActive();
-        const activeGroups = this.getGroupsFilteredByActive();
+    
 
         // OPTIONS
         if(this.inputType === 'multipleSelect') {
+
+            const activeOptions = this.getOptionsFilteredByActive();
+            const activeGroups = this.getGroupsFilteredByActive();
+
+            console.log(activeGroups);
+
             // Clear options
             this.dropdown.innerHTML = '';
 
@@ -865,32 +879,32 @@ export class Choices {
 
             // If we have grouped options
             if(activeGroups.length >= 1) {
-                activeGroups.forEach((group) => {
+
+                activeGroups.forEach((group, index) => {
+                    // Grab options that are children of this group
                     const groupOptions = activeOptions.filter((option) => {
                         return option.groupId === group.id;
                     });
 
-                    // IF group actually has options within it
-                    if(groupOptions.length >= 1) {
-                        const dropdownGroup = strToEl(`
-                            <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
-                                <div class="${ classNames.groupHeading }">${ group.value }</div>
+                    const dropdownGroup = strToEl(`
+                        <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
+                            <div class="${ classNames.groupHeading }">${ group.value }</div>
+                        </div>
+                    `);
+
+                    groupOptions.forEach((option) => {
+                        const dropdownItem = strToEl(`
+                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                                ${ option.label }
                             </div>
                         `);
 
-                        groupOptions.forEach((option) => {
-                            const dropdownItem = strToEl(`
-                                <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
-                                    ${ option.label }
-                                </div>
-                            `);
+                        dropdownGroup.appendChild(dropdownItem);
+                    });
 
-                            dropdownGroup.appendChild(dropdownItem);
-                        });
-
-                        optionListFragment.appendChild(dropdownGroup);
-                    } 
+                    optionListFragment.appendChild(dropdownGroup);
                 });
+
             } else if(activeOptions.length >= 1) {
                 activeOptions.forEach((option) => {
                     const dropdownItem = strToEl(`
@@ -898,10 +912,10 @@ export class Choices {
                             ${ option.label }
                         </div>
                     `);        
-
                     optionListFragment.appendChild(dropdownItem);
                 });
             } else {
+                // Show 'no options' message 
                 const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
                 optionListFragment.appendChild(dropdownItem);
             }
@@ -943,7 +957,7 @@ export class Choices {
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
-                callback(activeItems, activeOptions, activeGroups);
+                callback(activeItems);
             } else {
                 console.error('callbackOnRender: Callback is not a function');
             }

@@ -20,6 +20,20 @@ const options = (state = [], action) => {
                 return option;
             });
 
+        case 'REMOVE_ITEM':
+            // When an item is removed and it has an associated option,
+            // we want to re-enable it so it can be chosen again
+            if(action.optionId > -1) {
+                return state.map((option) => {
+                    if(option.id === parseInt(action.optionId)) {
+                        option.selected = action.selected;
+                    }
+                    return option;
+                });
+            } else {
+                return state;
+            }
+
         case 'FILTER_OPTIONS':
             const filteredResults = action.results.items;
             const newState = state.map((option, index) => {
