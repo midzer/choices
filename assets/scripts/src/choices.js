@@ -2,7 +2,7 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItem, removeItem, selectItem, addOption, selectOption, filterOptions, activateOptions, addGroup } from './actions/index';
+import { addItem, removeItem, selectItem, addOption, selectOption, highlightOption, filterOptions, activateOptions, addGroup } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Sifter from 'sifter';
 
@@ -71,6 +71,7 @@ export class Choices {
                 groupHeading : 'choices__heading',
                 activeState: 'is-active',
                 disabledState: 'is-disabled',
+                highlightedState: 'is-highlighted',
                 hiddenState: 'is-hidden',
                 flippedState: 'is-flipped',
                 selectedState: 'is-selected'
@@ -235,12 +236,16 @@ export class Choices {
      */
     onKeyDown(e) {
         const activeItems = this.getItemsFilteredByActive();
+        const activeOptions = this.getOptionsFilteredByActive();
         const inputIsFocussed = this.input === document.activeElement;
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const deleteKey = 8 || 46;
         const enterKey = 13;
         const aKey = 65;
         const escapeKey = 27;
+        const upKey = 38;
+        const downKey = 40;
+        const hasActiveDropDown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
 
         // If we are typing in the input
         if(e.target === this.input) {
@@ -257,8 +262,13 @@ export class Choices {
                 this.handleEnter(activeItems, value);
             }
 
-            if(e.keyCode === escapeKey && this.dropdown) {
+            if(e.keyCode === escapeKey && hasActiveDropDown) {
                 this.toggleDropdown();
+            }
+
+            if((e.keyCode === downKey || e.keyCode === upKey) && hasActiveDropDown) {
+                let option = activeOptions[0];
+                this.highlightOption(option.id);
             }
         }
 
@@ -454,6 +464,11 @@ export class Choices {
         this.store.dispatch(selectOption(id, value));
     }
 
+    highlightOption(id) {
+        if(!id) return;
+        this.store.dispatch(highlightOption(id));
+    }
+
     /**
      * Add item to store with correct value
      * @param {String} value Value to add to store
@@ -593,7 +608,7 @@ export class Choices {
         }
     }
 
-    addOption(option, groupId = -1) {
+    addOption(option, groupId = -1, highlighted = false, disabled = false) {
         // Generate unique id
         const state = this.store.getState();
         const id = state.options.length + 1;
@@ -601,7 +616,7 @@ export class Choices {
         const label = option.innerHTML;
         const isSelected = option.selected;
 
-        this.store.dispatch(addOption(value, label, id, groupId));
+        this.store.dispatch(addOption(value, label, id, groupId, highlighted, disabled));
 
         if(isSelected) {
             this.selectOption(id);
@@ -665,7 +680,7 @@ export class Choices {
     getOptionsFilteredByActive() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
-            return option.active === true;
+            return option.active === true && option.disabled === false;
         },[]);
 
         return valueArray;
@@ -811,8 +826,16 @@ export class Choices {
 
                 if(groupOptions) {
                     this.addGroup(group.label, groupId, true, group.disabled);
-                    groupOptions.forEach((option) => {
-                        this.addOption(option, groupId);
+                    groupOptions.forEach((option, optionIndex) => {
+                        // We want to pre-highlight the first option
+                        const highlighted = index === 0 && optionIndex === 0 ? true : false;
+
+                        // If group is disabled, disable all of its children
+                        if(group.disabled) {
+                            this.addOption(option, groupId, highlighted, true);
+                        } else {
+                            this.addOption(option, groupId, highlighted);    
+                        }
                     });
                 } else {
                     this.addGroup(group.label, groupId, false, group.disabled);
@@ -869,8 +892,6 @@ export class Choices {
             const activeOptions = this.getOptionsFilteredByActive();
             const activeGroups = this.getGroupsFilteredByActive();
 
-            console.log(activeGroups);
-
             // Clear options
             this.dropdown.innerHTML = '';
 
@@ -893,8 +914,9 @@ export class Choices {
                     `);
 
                     groupOptions.forEach((option) => {
+                        console.log(option);
                         const dropdownItem = strToEl(`
-                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ option.highlighted ?  classNames.highlightedState : '' }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                 ${ option.label }
                             </div>
                         `);
@@ -908,7 +930,7 @@ export class Choices {
             } else if(activeOptions.length >= 1) {
                 activeOptions.forEach((option) => {
                     const dropdownItem = strToEl(`
-                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ option.highlighted ?  classNames.highlightedState : '' }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                             ${ option.label }
                         </div>
                     `);        
@@ -1005,6 +1027,7 @@ export class Choices {
 
         // Trigger event listeners 
         this.addEventListeners();
+
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
@@ -1020,9 +1043,12 @@ export class Choices {
      * @return
      */
     destroy() {
+        this.passedElement = null;
+        this.userOptions = null;
         this.options = null;
         this.passedElement = null;
         this.initialised = null;
+        this.store = null;
     }
 };
 

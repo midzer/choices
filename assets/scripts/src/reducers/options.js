@@ -6,10 +6,22 @@ const options = (state = [], action) => {
                 groupId: action.groupId,
                 value: action.value,
                 label: action.label,
-                disabled: false,
+                highlighted: action.highlighted,
+                disabled: action.disabled,
                 selected: false,
                 active: true,
             }];
+
+        case 'HIGHLIGHT_OPTION':
+            return state.map((option) => {
+                if(option.id === parseInt(action.id)) {
+                    option.highlighted = true;
+                } else {
+                    option.highlighted = false;
+                }
+
+                return option;
+            });
 
         case 'SELECT_OPTION':
             return state.map((option) => {

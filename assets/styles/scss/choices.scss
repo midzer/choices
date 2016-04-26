@@ -112,6 +112,7 @@ h1, h2, h3, h4, h5, h6 {
             opacity: .5; 
             &:hover { background-color: #FFFFFF; }
         }
+         &.is-highlighted { color: #00BCD4; }
     }
     .choices__item--selectable {
         &:hover { background-color: mix(#000000, #FFFFFF, 2.5%); }

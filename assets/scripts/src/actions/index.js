@@ -24,13 +24,15 @@ export const selectItem = (id, selected) => {
     }
 };
 
-export const addOption = (value, label, id, groupId) => {
+export const addOption = (value, label, id, groupId, highlighted, disabled) => {
     return {
         type: 'ADD_OPTION',
         value,
         label,
         id,
         groupId,
+        highlighted, 
+        disabled,
     }
 };
 
@@ -39,6 +41,13 @@ export const selectOption = (id, selected) => {
         type: 'SELECT_OPTION',
         id,
         selected,
+    }
+};
+
+export const highlightOption = (id) => {
+    return {
+        type: 'HIGHLIGHT_OPTION',
+        id,
     }
 };
 

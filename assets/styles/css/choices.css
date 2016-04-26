@@ -97,6 +97,8 @@ h1, h2, h3, h4, h5, h6 {
       opacity: .5; }
       .choices__list--dropdown .choices__item.is-selected:hover {
         background-color: #FFFFFF; }
+    .choices__list--dropdown .choices__item.is-highlighted {
+      color: #00BCD4; }
   .choices__list--dropdown .choices__item--selectable:hover {
     background-color: #f9f9f9; }
   .choices__list--dropdown.is-active {
