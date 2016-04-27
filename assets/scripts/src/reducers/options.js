@@ -48,12 +48,22 @@ const options = (state = [], action) => {
 
         case 'FILTER_OPTIONS':
             const filteredResults = action.results.items;
+            let firstActive = false;
             const newState = state.map((option, index) => {
                 // Set active state based on whether option is 
                 // within filtered results
                 option.active = filteredResults.some((result) => {
                     return result.id === index;
                 });
+
+                // Highlight option if it is active and is the first 
+                // active option in state
+                if(option.active && firstActive === false) {
+                    option.highlighted = true;
+                    firstActive = true;
+                } else {
+                    option.highlighted = false;
+                }
 
                 return option;
             });

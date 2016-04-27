@@ -94,9 +94,6 @@ export class Choices {
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
-        // Initial state of input type (we update this when we init)
-        this.inputType = null;
-
         // Set preset items - this looks out of place
         this.presetItems = [];
         if(this.options.items.length) {
@@ -153,23 +150,25 @@ export class Choices {
         }
     };
     
-    handleEnter(activeItems, value) {
+    handleEnter(activeItems, value = null) {
         let canUpdate = true;
 
-        if(this.options.addItems) {
-            if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
-                // If there is a max entry limit and we have reached that limit
-                // don't update
+        if(this.passedElement.type === 'text') {
+            if(this.options.addItems) {
+                if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
+                    // If there is a max entry limit and we have reached that limit
+                    // don't update
+                    canUpdate = false;
+                } else if(this.options.allowDuplicates === false && this.passedElement.value) {
+                    // If no duplicates are allowed, and the value already exists
+                    // in the array, don't update
+                    canUpdate = !activeItems.some((item) => {
+                        return item.value === value;
+                    });
+                }   
+            } else {
                 canUpdate = false;
-            } else if(this.options.allowDuplicates === false && this.passedElement.value) {
-                // If no duplicates are allowed, and the value already exists
-                // in the array, don't update
-                canUpdate = !activeItems.some((item) => {
-                    return item.value === value;
-                });
-            }   
-        } else {
-            canUpdate = false;
+            }
         }
 
         // All is good, update
@@ -189,6 +188,10 @@ export class Choices {
                     this.addItem(value);
                     this.clearInput(this.passedElement);
                 }
+            }
+
+            if(this.passedElement.type === 'select-multiple') {
+                console.log('hit');
             }
         }
     };
@@ -257,9 +260,19 @@ export class Choices {
             }
 
             // If enter key is pressed and the input has a value
-            if (e.keyCode === enterKey && e.target.value) {
-                const value = this.input.value;
-                this.handleEnter(activeItems, value);
+            if (e.keyCode === enterKey) {
+                if(e.target.value && this.passedElement.type === 'text') {
+                    const value = this.input.value;
+                    this.handleEnter(activeItems, value);                    
+                }
+
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
+                    const highlighted = this.getOptionsFilteredByHighlighted();
+                    if(highlighted) {
+                        this.addItem(highlighted.value, highlighted.label, highlighted.id);
+                        this.input.value = "";
+                    }
+                }
             }
 
             if(e.keyCode === escapeKey && hasActiveDropDown) {
@@ -283,7 +296,7 @@ export class Choices {
 
     onKeyUp(e) {
         if(e.target === this.input) {
-            if(this.inputType === 'multipleSelect' && this.options.allowSearch) {
+            if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
                 if(this.input.value) {
                     // If we have a value, filter options based on it 
                     const handleFilter = debounce(() => {
@@ -353,7 +366,7 @@ export class Choices {
                 this.deselectAll();
             }
             // If there is a dropdown and it is active
-            if(this.inputType === 'multipleSelect' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
         }
@@ -494,9 +507,9 @@ export class Choices {
         const id = this.store.getState().items.length + 1;
 
         // Close dropdown
-        if(this.inputType === 'multipleSelect' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
-            this.toggleDropdown();    
-        }
+        // if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+        //     this.toggleDropdown();    
+        // }
 
         // Run callback if it is a function
         if(callback){
@@ -686,6 +699,14 @@ export class Choices {
         return valueArray;
     }
 
+    getOptionsFilteredByHighlighted() {
+        const options = this.getOptions();
+        const value = options.find((option) => {
+            return option.highlighted === true;
+        });
+        return value;
+    }
+
     getOptionsFiltedBySelectable() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
@@ -763,7 +784,6 @@ export class Choices {
         this.containerInner = containerInner;
         this.input = input;
         this.list = list;
-        this.inputType = "text";
 
         // Add any preset values seperated by delimiter
         this.presetItems.forEach((value) => {
@@ -815,7 +835,6 @@ export class Choices {
         this.input = input;
         this.list = list;
         this.dropdown = dropdown;
-        this.inputType = "multipleSelect";
     
         const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
@@ -887,7 +906,7 @@ export class Choices {
     
 
         // OPTIONS
-        if(this.inputType === 'multipleSelect') {
+        if(this.passedElement.type === 'select-multiple') {
 
             const activeOptions = this.getOptionsFilteredByActive();
             const activeGroups = this.getGroupsFilteredByActive();
@@ -914,7 +933,6 @@ export class Choices {
                     `);
 
                     groupOptions.forEach((option) => {
-                        console.log(option);
                         const dropdownItem = strToEl(`
                             <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ option.highlighted ?  classNames.highlightedState : '' }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                 ${ option.label }
@@ -1046,7 +1064,6 @@ export class Choices {
         this.passedElement = null;
         this.userOptions = null;
         this.options = null;
-        this.passedElement = null;
         this.initialised = null;
         this.store = null;
     }
