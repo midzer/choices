@@ -269,14 +269,13 @@ export class Choices {
 
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
                     const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
-                    const value = highlighted.getAttribute('data-choice-value');
-                    const label = highlighted.innerHTML;
-                    const id = highlighted.getAttribute('data-choice-id');
-
+                
                     if(highlighted) {
+                        const value = highlighted.getAttribute('data-choice-value');
+                        const label = highlighted.innerHTML;
+                        const id = highlighted.getAttribute('data-choice-id');
                         this.addItem(value, label, id);
                         this.input.value = "";
-                        // this.highlightPosition()
                     }
                 }
             }
@@ -303,15 +302,17 @@ export class Choices {
 
                     if(canHighlight) {
                         const option = selectableOptions[this.highlightPosition];
-                        const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
-                        const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
+                        if(option) {
+                            const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                            const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
 
-                        if(previousElement) {
-                            previousElement.classList.remove(this.options.classNames.highlightedState);
-                        }
+                            if(previousElement) {
+                                previousElement.classList.remove(this.options.classNames.highlightedState);
+                            }
 
-                        if(currentElement) {
-                            currentElement.classList.add(this.options.classNames.highlightedState);                         
+                            if(currentElement) {
+                                currentElement.classList.add(this.options.classNames.highlightedState);                         
+                            }
                         }
                     }
                 }
@@ -531,10 +532,7 @@ export class Choices {
         // Generate unique id
         const id = this.store.getState().items.length + 1;
 
-        // Close dropdown
-        // if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
-        //     this.toggleDropdown();    
-        // }
+        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
 
         // Run callback if it is a function
         if(callback){
@@ -544,8 +542,6 @@ export class Choices {
                 console.error('callbackOnAddItem: Callback is not a function');
             }
         }
-
-        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
     }
 
     /**
@@ -918,7 +914,6 @@ export class Choices {
      * @return
      */
     render(callback = this.options.callbackOnRender) {
-        console.log('Rendering');
         const classNames = this.options.classNames;
         const activeItems = this.getItemsFilteredByActive();
     
@@ -936,47 +931,51 @@ export class Choices {
 
             // If we have grouped options
             if(activeGroups.length >= 1) {
-                activeGroups.forEach((group, index) => {
+                activeGroups.forEach((group, i) => {
                     // Grab options that are children of this group
                     const groupOptions = activeOptions.filter((option) => {
                         return option.groupId === group.id;
                     });
 
-                    const dropdownGroup = strToEl(`
-                        <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
-                            <div class="${ classNames.groupHeading }">${ group.value }</div>
-                        </div>
-                    `);
-
-                    groupOptions.forEach((option) => {
-                        const dropdownItem = strToEl(`
-                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
-                                ${ option.label }
+                    if(groupOptions.length >= 1) {
+                        const dropdownGroup = strToEl(`
+                            <div class="${ classNames.group } ${ group.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ group.value }" data-choice-group-id="${ group.id }">
+                                <div class="${ classNames.groupHeading }">${ group.value }</div>
                             </div>
                         `);
 
-                        dropdownGroup.appendChild(dropdownItem);
-                    });
+                        groupOptions.forEach((option, j) => {
+                            const dropdownItem = strToEl(`
+                                <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ i === 0 && j === 0 ? classNames.highlightedState : ''}" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                                    ${ option.label }
+                                </div>
+                            `);
 
-                    optionListFragment.appendChild(dropdownGroup);
+                            dropdownGroup.appendChild(dropdownItem);
+                        });
+
+                        optionListFragment.appendChild(dropdownGroup);
+                    }
                 });
-
             } else if(activeOptions.length >= 1) {
-                activeOptions.forEach((option) => {
+                activeOptions.forEach((option, i) => {
                     const dropdownItem = strToEl(`
-                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ i === 0 ? classNames.highlightedState : ''}" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                             ${ option.label }
                         </div>
                     `);        
                     optionListFragment.appendChild(dropdownItem);
                 });
-            } else {
-                // Show 'no options' message 
-                const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
-                optionListFragment.appendChild(dropdownItem);
             }
             
             this.dropdown.appendChild(optionListFragment);
+
+            // If dropdown is empty, show a no content message
+            if(this.dropdown.innerHTML === "") {
+                const dropdownItem = strToEl(`<div class="${ classNames.item }">No options to select</div>`);        
+                optionListFragment.appendChild(dropdownItem);
+                this.dropdown.appendChild(optionListFragment);
+            }
         }
         
         // ITEMS
