@@ -2,7 +2,7 @@
 
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
-import { addItem, removeItem, selectItem, addOption, selectOption, highlightOption, filterOptions, activateOptions, addGroup } from './actions/index';
+import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
 import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Sifter from 'sifter';
 
@@ -249,13 +249,14 @@ export class Choices {
         const upKey = 38;
         const downKey = 40;
         const hasActiveDropDown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
+        const hasItems = this.list && this.list.children;
 
         // If we are typing in the input
         if(e.target === this.input) {
             // this.input.style.width = getWidthOfInput(this.input);
 
             // If CTRL + A or CMD + A have been pressed and there are items to select
-            if (ctrlDownKey && e.keyCode === aKey && this.list && this.list.children) {
+            if (ctrlDownKey && e.keyCode === aKey && hasItems) {
                 this.handleSelectAll();
             }
 
@@ -267,22 +268,55 @@ export class Choices {
                 }
 
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
-                    const highlighted = this.getOptionsFilteredByHighlighted();
+                    const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                    const value = highlighted.getAttribute('data-choice-value');
+                    const label = highlighted.innerHTML;
+                    const id = highlighted.getAttribute('data-choice-id');
+
                     if(highlighted) {
-                        this.addItem(highlighted.value, highlighted.label, highlighted.id);
+                        this.addItem(value, label, id);
                         this.input.value = "";
+                        // this.highlightPosition()
                     }
                 }
             }
 
             if(e.keyCode === escapeKey && hasActiveDropDown) {
-                this.toggleDropdown();
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
+                    this.toggleDropdown();
+                }
             }
 
-            if((e.keyCode === downKey || e.keyCode === upKey) && hasActiveDropDown) {
-                let option = activeOptions[0];
-                this.highlightOption(option.id);
+            if(e.keyCode === downKey || e.keyCode === upKey) {
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
+                    const selectableOptions = activeOptions.filter((option) => {
+                        return !option.selected;
+                    });
+
+                    let canHighlight = true;
+
+                    if(e.keyCode === downKey) {
+                        this.highlightPosition < (selectableOptions.length - 1) ? this.highlightPosition++ : canHighlight = false;
+                    } else if(e.keyCode === upKey) {
+                        this.highlightPosition > 0 ? this.highlightPosition-- : canHighlight = false;
+                    }
+
+                    if(canHighlight) {
+                        const option = selectableOptions[this.highlightPosition];
+                        const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                        const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
+
+                        if(previousElement) {
+                            previousElement.classList.remove(this.options.classNames.highlightedState);
+                        }
+
+                        if(currentElement) {
+                            currentElement.classList.add(this.options.classNames.highlightedState);                         
+                        }
+                    }
+                }
             }
+
         }
 
         if(inputIsFocussed) {
@@ -297,26 +331,28 @@ export class Choices {
     onKeyUp(e) {
         if(e.target === this.input) {
             if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
-                if(this.input.value) {
-                    // If we have a value, filter options based on it 
-                    const handleFilter = debounce(() => {
-                        const options = this.getOptionsFiltedBySelectable();
-                        const sifter = new Sifter(options);
-                        const results = sifter.search(this.input.value, {
-                            fields: ['label', 'value'],
-                            sort: [{field: 'value', direction: 'asc'}],
-                            limit: 10
-                        });
-                        this.store.dispatch(filterOptions(results));
-                    }, 100)
-                    
-                    handleFilter();
-                } else {
-                    // Otherwise reset options to active
-                    this.store.dispatch(activateOptions());
+                const charStr = String.fromCharCode(e.keyCode);
+                if(this.input === document.activeElement && /[a-z0-9]/i.test(charStr)) {
+                    if(this.input.value) {
+                        // If we have a value, filter options based on it 
+                        const handleFilter = debounce(() => {
+                            const options = this.getOptionsFiltedBySelectable();
+                            const sifter = new Sifter(options);
+                            const results = sifter.search(this.input.value, {
+                                fields: ['label', 'value'],
+                                sort: [{field: 'value', direction: 'asc'}],
+                                limit: 10
+                            });
+                            this.store.dispatch(filterOptions(results));
+                        }, 100)
+                        
+                        handleFilter();
+                    } else {
+                        // Otherwise reset options to active
+                        this.store.dispatch(activateOptions());
+                    }
                 }
-            }
-            
+            } 
         }
     }
 
@@ -355,7 +391,6 @@ export class Choices {
                 });
 
                 if(!option.selected) {
-                    this.selectOption(id, true);
                     this.addItem(option.value, option.label, option.id);                    
                 }
             }
@@ -471,16 +506,6 @@ export class Choices {
         });
     }
 
-    selectOption(id, value = true) {
-        if(!id) return;
-        this.input.value = '';
-        this.store.dispatch(selectOption(id, value));
-    }
-
-    highlightOption(id) {
-        if(!id) return;
-        this.store.dispatch(highlightOption(id));
-    }
 
     /**
      * Add item to store with correct value
@@ -621,7 +646,7 @@ export class Choices {
         }
     }
 
-    addOption(option, groupId = -1, highlighted = false, disabled = false) {
+    addOption(option, groupId = -1, disabled = false) {
         // Generate unique id
         const state = this.store.getState();
         const id = state.options.length + 1;
@@ -629,10 +654,9 @@ export class Choices {
         const label = option.innerHTML;
         const isSelected = option.selected;
 
-        this.store.dispatch(addOption(value, label, id, groupId, highlighted, disabled));
+        this.store.dispatch(addOption(value, label, id, groupId, disabled));
 
         if(isSelected) {
-            this.selectOption(id);
             this.addItem(value, label, id);
         }
     }
@@ -693,18 +717,10 @@ export class Choices {
     getOptionsFilteredByActive() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
-            return option.active === true && option.disabled === false;
+            return option.active === true && option.disabled === false && option.selected !== true;
         },[]);
 
         return valueArray;
-    }
-
-    getOptionsFilteredByHighlighted() {
-        const options = this.getOptions();
-        const value = options.find((option) => {
-            return option.highlighted === true;
-        });
-        return value;
     }
 
     getOptionsFiltedBySelectable() {
@@ -835,6 +851,7 @@ export class Choices {
         this.input = input;
         this.list = list;
         this.dropdown = dropdown;
+        this.highlightPosition = 0;
     
         const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
@@ -851,9 +868,9 @@ export class Choices {
 
                         // If group is disabled, disable all of its children
                         if(group.disabled) {
-                            this.addOption(option, groupId, highlighted, true);
+                            this.addOption(option, groupId, true);
                         } else {
-                            this.addOption(option, groupId, highlighted);    
+                            this.addOption(option, groupId);    
                         }
                     });
                 } else {
@@ -901,13 +918,13 @@ export class Choices {
      * @return
      */
     render(callback = this.options.callbackOnRender) {
+        console.log('Rendering');
         const classNames = this.options.classNames;
         const activeItems = this.getItemsFilteredByActive();
     
 
         // OPTIONS
         if(this.passedElement.type === 'select-multiple') {
-
             const activeOptions = this.getOptionsFilteredByActive();
             const activeGroups = this.getGroupsFilteredByActive();
 
@@ -919,7 +936,6 @@ export class Choices {
 
             // If we have grouped options
             if(activeGroups.length >= 1) {
-
                 activeGroups.forEach((group, index) => {
                     // Grab options that are children of this group
                     const groupOptions = activeOptions.filter((option) => {
@@ -934,7 +950,7 @@ export class Choices {
 
                     groupOptions.forEach((option) => {
                         const dropdownItem = strToEl(`
-                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ option.highlighted ?  classNames.highlightedState : '' }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                            <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                                 ${ option.label }
                             </div>
                         `);
@@ -948,7 +964,7 @@ export class Choices {
             } else if(activeOptions.length >= 1) {
                 activeOptions.forEach((option) => {
                     const dropdownItem = strToEl(`
-                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable } ${ option.highlighted ?  classNames.highlightedState : '' }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
+                        <div class="${ classNames.item } ${ classNames.itemOption } ${ option.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ option.id }" data-choice-value="${ option.value }">
                             ${ option.label }
                         </div>
                     `);        
@@ -960,7 +976,6 @@ export class Choices {
                 optionListFragment.appendChild(dropdownItem);
             }
             
-
             this.dropdown.appendChild(optionListFragment);
         }
         

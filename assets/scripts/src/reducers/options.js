@@ -6,31 +6,24 @@ const options = (state = [], action) => {
                 groupId: action.groupId,
                 value: action.value,
                 label: action.label,
-                highlighted: action.highlighted,
                 disabled: action.disabled,
                 selected: false,
                 active: true,
             }];
 
-        case 'HIGHLIGHT_OPTION':
-            return state.map((option) => {
-                if(option.id === parseInt(action.id)) {
-                    option.highlighted = true;
-                } else {
-                    option.highlighted = false;
-                }
-
-                return option;
-            });
-
-        case 'SELECT_OPTION':
-            return state.map((option) => {
-                if(option.id === parseInt(action.id)) {
-                    option.selected = action.selected;
-                }
-
-                return option;
-            });
+        case 'ADD_ITEM':
+            // When an item is added and it has an associated option,
+            // we want to disable it so it can't be chosen again
+            if(action.optionId > -1) {
+                return state.map((option) => {
+                    if(option.id === parseInt(action.optionId)) {
+                        option.selected = true;
+                    }
+                    return option;
+                });
+            } else {
+                return state;
+            }
 
         case 'REMOVE_ITEM':
             // When an item is removed and it has an associated option,
@@ -38,7 +31,7 @@ const options = (state = [], action) => {
             if(action.optionId > -1) {
                 return state.map((option) => {
                     if(option.id === parseInt(action.optionId)) {
-                        option.selected = action.selected;
+                        option.selected = false;
                     }
                     return option;
                 });
@@ -55,15 +48,6 @@ const options = (state = [], action) => {
                 option.active = filteredResults.some((result) => {
                     return result.id === index;
                 });
-
-                // Highlight option if it is active and is the first 
-                // active option in state
-                if(option.active && firstActive === false) {
-                    option.highlighted = true;
-                    firstActive = true;
-                } else {
-                    option.highlighted = false;
-                }
 
                 return option;
             });
