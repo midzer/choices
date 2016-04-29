@@ -17,14 +17,12 @@ import Sifter from 'sifter';
  *    - Populate options by function
  */
 export class Choices {
-    constructor(element = '[data-choice]', options) {
+    constructor(element = '[data-choice]', userOptions = {}) {
         
         // Cutting the mustard
         const fakeEl = document.createElement("fakeel");
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
         if (!cuttingTheMustard) console.error('init: Your browser doesn\'nt support Choices');
-
-        const userOptions = options || {};
 
         // If there are multiple elements, create a new instance 
         // for each element besides the first one (as that already has an instance)
@@ -86,7 +84,7 @@ export class Choices {
         this.initialised = false;
 
         // Merge options with user options
-        this.options = extend(defaultOptions, userOptions || {});
+        this.options = extend(defaultOptions, userOptions);
 
         // Create data store
         this.store = createStore(rootReducer);
@@ -117,6 +115,24 @@ export class Choices {
         const classNames = this.options.classNames;
 
         this.templates = {
+            containerOuter: () => {
+                return strToEl(`<div class="${ classNames.containerOuter }"></div>`);
+            },
+            containerInner: () => {
+                return strToEl(`<div class="${ classNames.containerInner }"></div>`);
+            },
+            list: () => {
+                return strToEl(`<ul class="${ classNames.list } ${ classNames.listItems }"></ul>`);
+            },
+            input: () => {
+                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
+            },
+            dropdown: () => {
+                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
+            },
+            notice: (label) => {
+                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }" data-choice-notice>${ label }</div>`);
+            },
             option: (data) => {
                 return strToEl(`
                     <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ data.id }" data-choice-value="${ data.value }">
@@ -133,15 +149,8 @@ export class Choices {
             },
             item: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ data.id }" data-choice-value="${ data.value }">
+                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-choice-item data-choice-id="${ data.id }" data-choice-value="${ data.value }">
                         ${ data.label }
-                    </div>
-                `);
-            },
-            notice: (label) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption }" data-choice-notice>
-                        ${ label }
                     </div>
                 `);
             },
@@ -150,40 +159,13 @@ export class Choices {
         // Let's have it large
         this.init();
     }
-
-    /* State tests */
-
-    /** 
-     * Whether input is disabled
-     * @return {Boolean}
-     */
-    isDisabled() {
-        return (this.input.disabled) ?  true : false;
-    }
-
-    /** 
-     * Whether there are no values
-     * @return {Boolean}
-     */
-    isEmpty() {
-        return (this.store.getState().items.length === 0) ? true : false; 
-    }
-
-    hasSelectedItems() {
-        const items = this.getItems();
-        return items.some((item) => {
-            return item.selected === true;
-        });
-    }
-
-    /* Event handling */
-    handleSelectAll() {
-        if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
-            this.selectAll(this.list.children);
-        }
-    };
     
-    handleEnter(activeItems, value = null) {
+    /** 
+     * Process enter key event
+     * @param  {Array} activeItems Items that are currently active
+     * @return
+     */
+    handleEnter(activeItems, value) {
         let canUpdate = true;
 
         if(this.passedElement.type === 'text') {
@@ -202,11 +184,8 @@ export class Choices {
             } else {
                 canUpdate = false;
             }
-        }
 
-        // All is good, update
-        if (canUpdate) {
-            if(this.passedElement.type === 'text') {
+            if (canUpdate) {
                 let canAddItem = true;
 
                 // If a user has supplied a regular expression filter
@@ -222,13 +201,14 @@ export class Choices {
                     this.clearInput(this.passedElement);
                 }
             }
-
-            if(this.passedElement.type === 'select-multiple') {
-                console.log('hit');
-            }
         }
     };
 
+    /**
+     * Process back space event
+     * @param  {Array} Active items
+     * @return
+     */
     handleBackspaceKey(activeItems) {
         if(this.options.removeItems && activeItems) {
             const lastItem = activeItems[activeItems.length - 1];
@@ -248,7 +228,14 @@ export class Choices {
         }
     };
 
-    handleClick(activeItems, target, shiftKey) {
+    /** 
+     * Handle what happens on a click event
+     * @param  {Array} activeItems    Items that are active
+     * @param  {HTMLElement} target   What triggered the click
+     * @param  {Boolean} hasShiftKey  Whether shift key is active
+     * @return
+     */
+    handleClick(activeItems, target, hasShiftKey) {
         if(this.options.removeItems && target) {
             const passedId = target.getAttribute('data-choice-id');
 
@@ -258,15 +245,15 @@ export class Choices {
             activeItems.forEach((item) => {
                 if(item.id === parseInt(passedId) && !item.selected) {
                     this.selectItem(item);
-                } else if(!shiftKey) {
+                } else if(!hasShiftKey) {
                     this.deselectItem(item);
                 }
             });
         }
     }
 
-    /** 
-     * Handle keydown event 
+    /**
+     * Key down event
      * @param  {Object} e Event
      * @return
      */
@@ -292,7 +279,9 @@ export class Choices {
                 case aKey:
                     // If CTRL + A or CMD + A have been pressed and there are items to select
                     if(ctrlDownKey && hasItems) {
-                        this.handleSelectAll();
+                        if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
+                            this.selectAll(this.list.children);
+                        }
                     }
                     break;
                 case enterKey:
@@ -366,6 +355,11 @@ export class Choices {
         }
     }
 
+    /**
+     * Key up event
+     * @param  {Object} e Event
+     * @return
+     */
     onKeyUp(e) {
         if(e.target === this.input) {
             if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
@@ -395,13 +389,14 @@ export class Choices {
     }
 
 
-    /** 
-     * Handle click event 
+    /**
+     * Click event
      * @param  {Object} e Event
      * @return
      */
     onClick(e) {
-        const shiftKey = e.shiftKey;
+        const activeItems = this.getItemsFilteredByActive();
+        const hasShiftKey = e.shiftKey ? true : false;
 
         if(this.dropdown) {
             this.toggleDropdown();
@@ -415,11 +410,7 @@ export class Choices {
 
             if(e.target.hasAttribute('data-choice-item')) {
                 // If we are clicking on an item
-                const activeItems = this.getItemsFilteredByActive();
-                const target = e.target;
-                
-                this.handleClick(activeItems, target, shiftKey);
-
+                this.handleClick(activeItems, e.target, hasShiftKey);
             } else if(e.target.hasAttribute('data-choice-option')) {
                 // If we are clicking on an option
                 const options = this.getOptionsFilteredByActive();
@@ -435,9 +426,14 @@ export class Choices {
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            if(this.hasSelectedItems()) {
+            const hasSelectedItems = activeItems.some((item) => {
+                return item.selected === true;
+            });
+
+            if(hasSelectedItems) {
                 this.deselectAll();
             }
+
             // If there is a dropdown and it is active
             if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
@@ -445,6 +441,12 @@ export class Choices {
         }
     }
 
+
+    /**
+     * Paste event
+     * @param  {Object} e Event
+     * @return
+     */
     onPaste(e) {
         // Disable pasting into the input if option has been set
         if(!this.options.allowPaste) {
@@ -452,15 +454,23 @@ export class Choices {
         }
     }
 
+    /**
+     * Focus event
+     * @param  {Object} e Event
+     * @return
+     */
     onFocus(e) {
         this.containerOuter.classList.add(this.options.classNames.activeState);
     }
 
+    /**
+     * Blur event
+     * @param  {Object} e Event
+     * @return
+     */
     onBlur(e) {
         this.containerOuter.classList.remove(this.options.classNames.activeState);
     }
-
-    /* Methods */
 
     /** 
      * Set value of input to blank
@@ -607,6 +617,11 @@ export class Choices {
         }
     }
 
+    /**
+     * Remove an item from the store by its value
+     * @param  {String} value Value to search for
+     * @return
+     */
     removeItemsByValue(value) {
         if(!value || !isType('String', value)) {
             console.error('removeItemsByValue: No value was passed to be removed');
@@ -622,7 +637,8 @@ export class Choices {
     }
 
     /**
-     * Remove all items from array
+     * Remove all items from store array
+     * Note: removed items are soft deleted
      * @param  {Boolean} selectedOnly Optionally remove only selected items
      * @return
      */
@@ -636,6 +652,11 @@ export class Choices {
         });
     }
 
+    /** 
+     * Remove all selected items from store
+     * Note: removed items are soft deleted
+     * @return
+     */
     removeAllSelectedItems() {
         const items = this.getItemsFilteredByActive();
 
@@ -646,17 +667,27 @@ export class Choices {
         });
     }
 
+    /** 
+     * Show dropdown to user by adding active state class
+     * @return
+     */
     showDropdown() {
         this.dropdown.classList.add(this.options.classNames.activeState);
-
         const dimensions = this.dropdown.getBoundingClientRect();
-        if(dimensions.top + dimensions.height >= document.body.offsetHeight) {
+        const shouldFlip = dimensions.top + dimensions.height >= document.body.offsetHeight;
+
+        // Whether or not the dropdown should appear above or below input
+        if(shouldFlip) {
             this.dropdown.classList.add(this.options.classNames.flippedState);
         } else {
             this.dropdown.classList.remove(this.options.classNames.flippedState);
         }
     }
 
+    /** 
+     * Hide dropdown from user
+     * @return {[type]} [description]
+     */
     hideDropdown() {
         // A dropdown flips if it does not have space below the input
         const isFlipped = this.dropdown.classList.contains(this.options.classNames.flippedState);
@@ -668,6 +699,10 @@ export class Choices {
         }
     }
 
+    /** 
+     * Determine whether to hide or show dropdown based on its current state
+     * @return
+     */
     toggleDropdown() {
         if(!this.dropdown) return;
         const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
@@ -679,6 +714,13 @@ export class Choices {
         }
     }
 
+    /** 
+     * Add option to dropdown
+     * @param {Object}  option   Option to add
+     * @param {Number}  groupId  ID of the options group
+     * @param {Boolean} disabled Whether the option is disabled
+     * @return
+     */
     addOption(option, groupId = -1, disabled = false) {
         // Generate unique id
         const state = this.store.getState();
@@ -694,15 +736,37 @@ export class Choices {
         }
     }
 
-    addGroup(value, id, active, disabled) {
-        this.store.dispatch(addGroup(value, id, active, disabled));
+    /**
+     * Add group to dropdown
+     * @param {Object} group Group to add
+     * @param {Number} index Whether this is the first group to add
+     */
+    addGroup(group, id, isFirst) {
+        const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
+        const groupId = id;
+
+        if(groupOptions) {
+            this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
+
+            groupOptions.forEach((option, optionIndex) => {
+                // We want to pre-highlight the first option
+                const highlighted = isFirst && optionIndex === 0 ? true : false;
+
+                // If group is disabled, disable all of its children
+                if(group.disabled) {
+                    this.addOption(option, groupId, true);
+                } else {
+                    this.addOption(option, groupId);    
+                }
+            });
+        } else {
+            this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
+        }
     }
 
-    /* Getters */
-
     /**
-     * Get items in state
-     * @return {Array} Array of item objects
+     * Get items from store
+     * @return {Array} Item objects
      */
     getItems() {
         const state = this.store.getState();
@@ -710,8 +774,8 @@ export class Choices {
     }
 
     /**
-     * Get items in state if they are active
-     * @return {Array} Array of item objects
+     * Get active items from store
+     * @return {Array} Item objects
      */
     getItemsFilteredByActive() {
         const items = this.getItems();
@@ -724,8 +788,8 @@ export class Choices {
     }
 
     /**
-     * Get items in state reduced to just their values
-     * @return {Array} Array of items 
+     * Get items from store reduced to just their values
+     * @return {Array} Item objects
      */
     getItemsReducedToValues() {
         const items = this.getItems();
@@ -739,14 +803,18 @@ export class Choices {
     }
 
     /**
-     * Get options in state 
-     * @return {Array} Array of item options
+     * Get options from store 
+     * @return {Array} Option objects
      */
     getOptions() {
         const state = this.store.getState();
         return state.options;
     }
 
+    /**
+     * Get active options from store
+     * @return {Array} Option objects
+     */
     getOptionsFilteredByActive() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
@@ -756,6 +824,10 @@ export class Choices {
         return valueArray;
     }
 
+    /**
+     * Get selectable options from store
+     * @return {Array} Option objects
+     */
     getOptionsFiltedBySelectable() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
@@ -765,11 +837,19 @@ export class Choices {
         return valueArray;
     }
 
+    /**
+     * Get groups from store
+     * @return {Array} Group objects
+     */
     getGroups() {
         const state = this.store.getState();
         return state.groups;
     }
 
+    /**
+     * Get active groups from store
+     * @return {Array} Group objects
+     */
     getGroupsFilteredByActive() {
         const groups = this.getGroups();
         const options = this.getOptions();
@@ -784,16 +864,16 @@ export class Choices {
 
         return valueArray;
     }
-    
-    /* Rendering */
 
     /**
      * Create DOM structure around passed select element
      * @return
      */
     generateInput() {
-        const containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
-        const containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
+        const containerOuter = this.templates['containerOuter']();
+        const containerInner = this.templates['containerInner']();
+        const list = this.templates['list']();
+        const input = this.templates['input']();
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -806,11 +886,7 @@ export class Choices {
 
         // Wrapper inner container with outer container
         wrap(containerInner, containerOuter);
-
-        const list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
-        const input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
         
-
         // If placeholder has been enabled and we have a value
         if (this.options.placeholder && this.options.placeholderValue) {
             input.placeholder = this.options.placeholderValue;  
@@ -823,13 +899,12 @@ export class Choices {
         }
 
         containerOuter.appendChild(containerInner);
-        
         containerInner.appendChild(list);
         containerInner.appendChild(input);
 
         if(this.passedElement.type === 'select-multiple') {
             this.highlightPosition = 0;
-            const dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
+            const dropdown = this.templates['dropdown']();
             const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
             
             containerOuter.appendChild(dropdown);
@@ -838,26 +913,8 @@ export class Choices {
         
             if(passedGroups.length) {
                 passedGroups.forEach((group, index) => {
-                    const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
-                    const groupId = index;
-
-                    if(groupOptions) {
-                        this.addGroup(group.label, groupId, true, group.disabled);
-                        groupOptions.forEach((option, optionIndex) => {
-                            // We want to pre-highlight the first option
-                            const highlighted = index === 0 && optionIndex === 0 ? true : false;
-
-                            // If group is disabled, disable all of its children
-                            if(group.disabled) {
-                                this.addOption(option, groupId, true);
-                            } else {
-                                this.addOption(option, groupId);    
-                            }
-                        });
-                    } else {
-                        this.addGroup(group.label, groupId, false, group.disabled);
-                    }
-                
+                    const isFirst = index === 0 ? true : false;
+                    this.addGroup(group, index, isFirst);
                 });
             } else {
                 const passedOptions = Array.from(this.passedElement.options);
@@ -877,7 +934,6 @@ export class Choices {
         this.containerInner = containerInner;
         this.input = input;
         this.list = list;
-        
     }
 
     /**
@@ -976,6 +1032,7 @@ export class Choices {
 
     /**
      * Trigger event listeners
+     * @return
      */
     addEventListeners() {
         document.addEventListener('keyup', this.onKeyUp);
@@ -989,6 +1046,7 @@ export class Choices {
 
     /**
      * Destroy event listeners
+     * @return
      */
     removeEventListeners() {
         document.removeEventListener('keyup', this.onKeyUp);
