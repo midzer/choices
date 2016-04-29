@@ -10,7 +10,6 @@ import Sifter from 'sifter';
  * Choices
  *
  * To do:
- *    - Dispatch events
  *    - Remove item by clicking a target
  *    - Set input width based on the size of the contents
  *    - Single select input support
@@ -20,9 +19,8 @@ export class Choices {
     constructor(element = '[data-choice]', userOptions = {}) {
         
         // Cutting the mustard
-        const fakeEl = document.createElement("fakeel");
-        const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in fakeEl;
-        if (!cuttingTheMustard) console.error('init: Your browser doesn\'nt support Choices');
+        const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
+        if (!cuttingTheMustard) console.error('init: Your browser doesn\'t support Choices');
 
         // If there are multiple elements, create a new instance 
         // for each element besides the first one (as that already has an instance)
@@ -104,7 +102,8 @@ export class Choices {
         this.init = this.init.bind(this);
         this.render = this.render.bind(this);
         this.destroy = this.destroy.bind(this);
-
+        
+        // Bind event handlers
         this.onFocus = this.onFocus.bind(this);
         this.onBlur = this.onBlur.bind(this);
         this.onKeyUp = this.onKeyUp.bind(this);
@@ -113,7 +112,6 @@ export class Choices {
         this.onPaste = this.onPaste.bind(this);
 
         const classNames = this.options.classNames;
-
         this.templates = {
             containerOuter: () => {
                 return strToEl(`<div class="${ classNames.containerOuter }"></div>`);
@@ -258,9 +256,8 @@ export class Choices {
      * @return
      */
     onKeyDown(e) {
-        const activeItems = this.getItemsFilteredByActive();
-        const activeOptions = this.getOptionsFilteredByActive();
-        const inputIsFocussed = this.input === document.activeElement;
+        if(e.target !== this.input) return;
+        
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const backKey = 46;
         const deleteKey = 8;
@@ -269,89 +266,95 @@ export class Choices {
         const escapeKey = 27;
         const upKey = 38;
         const downKey = 40;
-        const hasActiveDropDown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
+
+        const activeItems = this.getItemsFilteredByActive();
+        const activeOptions = this.getOptionsFilteredByActive();
+        const hasFocussedInput = this.input === document.activeElement;
+        const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
         const hasItems = this.list && this.list.children;
+        const keyString = String.fromCharCode(event.keyCode);
 
-        // If we are typing in the input
-        if(e.target === this.input) {
-            // this.input.style.width = getWidthOfInput(this.input);
-            switch (e.keyCode) {
-                case aKey:
-                    // If CTRL + A or CMD + A have been pressed and there are items to select
-                    if(ctrlDownKey && hasItems) {
-                        if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
-                            this.selectAll(this.list.children);
-                        }
+        // If a user is typing and the dropdown is not active
+        if(/[a-zA-Z0-9-_ ]/.test(keyString) && this.dropdown && !hasActiveDropdown) {
+            this.toggleDropdown();
+        }
+
+        switch (e.keyCode) {
+            case aKey:
+                // If CTRL + A or CMD + A have been pressed and there are items to select
+                if(ctrlDownKey && hasItems) {
+                    if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
+                        this.selectAll(this.list.children);
                     }
-                    break;
-                case enterKey:
-                    // If enter key is pressed and the input has a value
-                    if(e.target.value && this.passedElement.type === 'text') {
-                        const value = this.input.value;
-                        this.handleEnter(activeItems, value);                    
+                }
+                break;
+            case enterKey:
+                // If enter key is pressed and the input has a value
+                if(e.target.value && this.passedElement.type === 'text') {
+                    const value = this.input.value;
+                    this.handleEnter(activeItems, value);                    
+                }
+
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                    const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                
+                    if(highlighted) {
+                        const value = highlighted.getAttribute('data-choice-value');
+                        const label = highlighted.innerHTML;
+                        const id = highlighted.getAttribute('data-choice-id');
+                        this.addItem(value, label, id);
+                        this.input.value = "";
+                    }
+                }
+                break;
+            case escapeKey:
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                    this.toggleDropdown();
+                }
+                break;
+            case downKey:
+            case upKey:
+                // If up or down key is pressed, traverse through options
+                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                    const selectableOptions = activeOptions.filter((option) => {
+                        return !option.selected;
+                    });
+
+                    let canHighlight = true;
+
+                    if(e.keyCode === downKey) {
+                        this.highlightPosition < (selectableOptions.length - 1) ? this.highlightPosition++ : canHighlight = false;
+                    } else if(e.keyCode === upKey) {
+                        this.highlightPosition > 0 ? this.highlightPosition-- : canHighlight = false;
                     }
 
-                    if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
-                        const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
-                    
-                        if(highlighted) {
-                            const value = highlighted.getAttribute('data-choice-value');
-                            const label = highlighted.innerHTML;
-                            const id = highlighted.getAttribute('data-choice-id');
-                            this.addItem(value, label, id);
-                            this.input.value = "";
-                        }
-                    }
-                    break;
-                case escapeKey:
-                    if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
-                        this.toggleDropdown();
-                    }
-                    break;
-                case downKey:
-                case upKey:
-                    // If up or down key is pressed, traverse through options
-                    if(this.passedElement.type === 'select-multiple' && hasActiveDropDown) {
-                        const selectableOptions = activeOptions.filter((option) => {
-                            return !option.selected;
-                        });
+                    if(canHighlight) {
+                        const option = selectableOptions[this.highlightPosition];
+                        if(option) {
+                            const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                            const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
 
-                        let canHighlight = true;
+                            if(previousElement) {
+                                previousElement.classList.remove(this.options.classNames.highlightedState);
+                            }
 
-                        if(e.keyCode === downKey) {
-                            this.highlightPosition < (selectableOptions.length - 1) ? this.highlightPosition++ : canHighlight = false;
-                        } else if(e.keyCode === upKey) {
-                            this.highlightPosition > 0 ? this.highlightPosition-- : canHighlight = false;
-                        }
-
-                        if(canHighlight) {
-                            const option = selectableOptions[this.highlightPosition];
-                            if(option) {
-                                const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
-                                const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
-
-                                if(previousElement) {
-                                    previousElement.classList.remove(this.options.classNames.highlightedState);
-                                }
-
-                                if(currentElement) {
-                                    currentElement.classList.add(this.options.classNames.highlightedState);                         
-                                }
+                            if(currentElement) {
+                                currentElement.classList.add(this.options.classNames.highlightedState);                         
                             }
                         }
                     }
-                    break
-                case backKey:
-                case deleteKey:
-                    // If backspace or delete key is pressed and the input has no value
-                    if(inputIsFocussed && !e.target.value) {
-                        this.handleBackspaceKey(activeItems);
-                        e.preventDefault();
-                    }
-                    break;
-                default:
-                    break;
-            }
+                }
+                break
+            case backKey:
+            case deleteKey:
+                // If backspace or delete key is pressed and the input has no value
+                if(hasFocussedInput && !e.target.value) {
+                    this.handleBackspaceKey(activeItems);
+                    e.preventDefault();
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -361,31 +364,35 @@ export class Choices {
      * @return
      */
     onKeyUp(e) {
-        if(e.target === this.input) {
-            if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
-                const charStr = String.fromCharCode(e.keyCode);
-                if(this.input === document.activeElement && /[a-z0-9]/i.test(charStr)) {
-                    if(this.input.value) {
-                        // If we have a value, filter options based on it 
-                        const handleFilter = debounce(() => {
-                            const options = this.getOptionsFiltedBySelectable();
-                            const sifter = new Sifter(options);
-                            const results = sifter.search(this.input.value, {
-                                fields: ['label', 'value'],
-                                sort: [{field: 'value', direction: 'asc'}],
-                                limit: 10
-                            });
-                            this.store.dispatch(filterOptions(results));
-                        }, 100)
-                        
-                        handleFilter();
-                    } else {
-                        // Otherwise reset options to active
-                        this.store.dispatch(activateOptions());
-                    }
+        if(e.target !== this.input) return;
+        
+        if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
+            const options = this.getOptions();
+            const hasUnactiveOptions = options.some((option) => {
+                return option.active !== true; 
+            });
+
+            if(this.input === document.activeElement) {
+                if(this.input.value) {
+                    // If we have a value, filter options based on it 
+                    const handleFilter = debounce(() => {
+                        const options = this.getOptionsFiltedBySelectable();
+                        const sifter = new Sifter(options);
+                        const results = sifter.search(this.input.value, {
+                            fields: ['label', 'value'],
+                            sort: [{field: 'value', direction: 'asc'}],
+                            limit: 10
+                        });
+                        this.store.dispatch(filterOptions(results));
+                    }, 100)
+                    
+                    handleFilter();
+                } else if(hasUnactiveOptions) {
+                    // Otherwise reset options to active
+                    this.store.dispatch(activateOptions());
                 }
-            } 
-        }
+            }
+        } 
     }
 
 
