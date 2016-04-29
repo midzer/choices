@@ -788,63 +788,10 @@ export class Choices {
     /* Rendering */
 
     /**
-     * Create DOM structure around passed text element
-     * @return
-     */
-    generateTextInput() {
-        let containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
-        let containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
-
-        // Hide passed input
-        this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
-        this.passedElement.tabIndex = '-1';
-        this.passedElement.setAttribute('style', 'display:none;');
-        this.passedElement.setAttribute('aria-hidden', 'true');
-
-        // Wrap input in container preserving DOM ordering
-        wrap(this.passedElement, containerInner);
-
-        // Wrapper inner container with outer container
-        wrap(containerInner, containerOuter);
-
-        let list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
-        let input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
-
-        // If placeholder has been enabled
-        if (this.options.placeholder) {
-            // ...and we have a value to set
-            const placeholderValue = this.options.placeholderValue || this.passedElement.placeholder;
-            if(placeholderValue) {
-                input.placeholder = placeholderValue;
-                input.style.width = getWidthOfInput(input);
-            }
-        }
-
-        if(!this.options.addItems) {
-            input.disabled = true;
-            containerOuter.classList.add(this.options.classNames.disabledState);
-        }
-
-        containerOuter.appendChild(containerInner);
-        containerInner.appendChild(list);
-        containerInner.appendChild(input);
-        
-        this.containerOuter = containerOuter;
-        this.containerInner = containerInner;
-        this.input = input;
-        this.list = list;
-
-        // Add any preset values seperated by delimiter
-        this.presetItems.forEach((value) => {
-            this.addItem(value);
-        });
-    }
-
-    /**
      * Create DOM structure around passed select element
      * @return
      */
-    generateMultipleSelectInput() {
+    generateInput() {
         const containerOuter = strToEl(`<div class="${ this.options.classNames.containerOuter }"></div>`);
         const containerInner = strToEl(`<div class="${ this.options.classNames.containerInner }"></div>`);
 
@@ -862,7 +809,7 @@ export class Choices {
 
         const list = strToEl(`<ul class="${ this.options.classNames.list } ${ this.options.classNames.listItems }"></ul>`);
         const input = strToEl(`<input type="text" class="${ this.options.classNames.input } ${ this.options.classNames.inputCloned }">`);
-        const dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
+        
 
         // If placeholder has been enabled and we have a value
         if (this.options.placeholder && this.options.placeholderValue) {
@@ -872,78 +819,65 @@ export class Choices {
 
         if(!this.options.addItems) {
             input.disabled = true;
+            containerOuter.classList.add(this.options.classNames.disabledState);
         }
 
         containerOuter.appendChild(containerInner);
-        containerOuter.appendChild(dropdown);
+        
         containerInner.appendChild(list);
         containerInner.appendChild(input);
+
+        if(this.passedElement.type === 'select-multiple') {
+            this.highlightPosition = 0;
+            const dropdown = strToEl(`<div class="${ this.options.classNames.list } ${ this.options.classNames.listDropdown }"></div>`);
+            const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
+            
+            containerOuter.appendChild(dropdown);
+
+            this.dropdown = dropdown;
+        
+            if(passedGroups.length) {
+                passedGroups.forEach((group, index) => {
+                    const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
+                    const groupId = index;
+
+                    if(groupOptions) {
+                        this.addGroup(group.label, groupId, true, group.disabled);
+                        groupOptions.forEach((option, optionIndex) => {
+                            // We want to pre-highlight the first option
+                            const highlighted = index === 0 && optionIndex === 0 ? true : false;
+
+                            // If group is disabled, disable all of its children
+                            if(group.disabled) {
+                                this.addOption(option, groupId, true);
+                            } else {
+                                this.addOption(option, groupId);    
+                            }
+                        });
+                    } else {
+                        this.addGroup(group.label, groupId, false, group.disabled);
+                    }
+                
+                });
+            } else {
+                const passedOptions = Array.from(this.passedElement.options);
+
+                passedOptions.forEach((option) => {
+                    this.addOption(option);
+                });
+            }
+        } else if(this.passedElement.type === 'text') {
+            // Add any preset values seperated by delimiter
+            this.presetItems.forEach((value) => {
+                this.addItem(value);
+            });
+        }
         
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
         this.input = input;
         this.list = list;
-        this.dropdown = dropdown;
-        this.highlightPosition = 0;
-    
-        const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
-
-        if(passedGroups.length) {
-            passedGroups.forEach((group, index) => {
-                const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
-                const groupId = index;
-
-                if(groupOptions) {
-                    this.addGroup(group.label, groupId, true, group.disabled);
-                    groupOptions.forEach((option, optionIndex) => {
-                        // We want to pre-highlight the first option
-                        const highlighted = index === 0 && optionIndex === 0 ? true : false;
-
-                        // If group is disabled, disable all of its children
-                        if(group.disabled) {
-                            this.addOption(option, groupId, true);
-                        } else {
-                            this.addOption(option, groupId);    
-                        }
-                    });
-                } else {
-                    this.addGroup(group.label, groupId, false, group.disabled);
-                }
-            
-            });
-        } else {
-            const passedOptions = Array.from(this.passedElement.options);
-
-            passedOptions.forEach((option) => {
-                this.addOption(option);
-            });
-        }
-    }
-
-    /**
-     * Trigger event listeners
-     */
-    addEventListeners() {
-        document.addEventListener('keyup', this.onKeyUp);
-        document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('click', this.onClick);
-        document.addEventListener('paste', this.onPaste);
-
-        this.input.addEventListener('focus', this.onFocus);
-        this.input.addEventListener('blur', this.onBlur);
-    }
-
-    /**
-     * Destroy event listeners
-     */
-    removeEventListeners() {
-        document.removeEventListener('keyup', this.onKeyUp);
-        document.removeEventListener('keydown', this.onKeyDown);
-        document.removeEventListener('click', this.onClick);
-        document.removeEventListener('paste', this.onPaste);
-
-        this.input.removeEventListener('focus', this.onFocus);
-        this.input.removeEventListener('blur', this.onBlur);
+        
     }
 
     /**
@@ -1041,26 +975,29 @@ export class Choices {
     }
 
     /**
-     * Determine how an input should be rendered
-     * @return {Element} Input to test
+     * Trigger event listeners
      */
-    renderInput(input) {
-        if (this.options.debug) console.debug('Render');
+    addEventListeners() {
+        document.addEventListener('keyup', this.onKeyUp);
+        document.addEventListener('keydown', this.onKeyDown);
+        document.addEventListener('click', this.onClick);
+        document.addEventListener('paste', this.onPaste);
 
-        switch (input.type) {
-            case "text":
-                this.generateTextInput();
-                break;
-            case "select-one":
-                // this.generateSelectInput();
-                break;
-            case "select-multiple":
-                this.generateMultipleSelectInput();
-                break;
-            default:
-                console.error('renderInput: Input type is not supported');
-                break;
-        }
+        this.input.addEventListener('focus', this.onFocus);
+        this.input.addEventListener('blur', this.onBlur);
+    }
+
+    /**
+     * Destroy event listeners
+     */
+    removeEventListeners() {
+        document.removeEventListener('keyup', this.onKeyUp);
+        document.removeEventListener('keydown', this.onKeyDown);
+        document.removeEventListener('click', this.onClick);
+        document.removeEventListener('paste', this.onPaste);
+
+        this.input.removeEventListener('focus', this.onFocus);
+        this.input.removeEventListener('blur', this.onBlur);
     }
 
     /**
@@ -1070,8 +1007,8 @@ export class Choices {
     init(callback = this.options.callbackOnInit) {
         this.initialised = true;
 
-        // Render input
-        this.renderInput(this.passedElement);
+        // Generate input markup
+        this.generateInput();
 
         // Subscribe to store
         this.store.subscribe(this.render);
