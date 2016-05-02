@@ -3,7 +3,7 @@
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
-import { getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Sifter from 'sifter';
 
 /**
@@ -45,7 +45,6 @@ export class Choices {
             allowPaste: true,
             allowSearch: true, 
             regexFilter: false,
-            debug: false,
             placeholder: true,
             placeholderValue: '',
             prependValue: false,
@@ -72,6 +71,7 @@ export class Choices {
                 flippedState: 'is-flipped',
                 selectedState: 'is-selected'
             },
+            templates: {},
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -193,7 +193,7 @@ export class Choices {
      */
     handleClick(activeItems, target, hasShiftKey) {
         if(this.options.removeItems && target) {
-            const passedId = target.getAttribute('data-choice-id');
+            const passedId = target.getAttribute('data-id');
 
             // We only want to select one item with a click
             // so we deselect any items that aren't the target
@@ -247,6 +247,7 @@ export class Choices {
                     }
                 }
                 break;
+
             case enterKey:
                 // If enter key is pressed and the input has a value
                 if(e.target.value && this.passedElement.type === 'text') {
@@ -258,19 +259,21 @@ export class Choices {
                     const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
                 
                     if(highlighted) {
-                        const value = highlighted.getAttribute('data-choice-value');
+                        const value = highlighted.getAttribute('data-value');
                         const label = highlighted.innerHTML;
-                        const id = highlighted.getAttribute('data-choice-id');
+                        const id = highlighted.getAttribute('data-id');
                         this.addItem(value, label, id);
-                        this.input.value = "";
+                        this.clearInput(this.passedElement);
                     }
                 }
                 break;
+
             case escapeKey:
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
                     this.toggleDropdown();
                 }
                 break;
+
             case downKey:
             case upKey:
                 // If up or down key is pressed, traverse through options
@@ -281,22 +284,26 @@ export class Choices {
 
                     if(currentEl) {
                         if(e.keyCode === downKey) {
-                            nextEl = getAdjacentEl(currentEl, '[data-choice-option]', 1);
+                            nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', 1);
                         } else if(e.keyCode === upKey) {
-                            nextEl = getAdjacentEl(currentEl, '[data-choice-option]', -1);
+                            nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', -1);
                         }
                     } else {
-                        nextEl = this.dropdown.querySelector('[data-choice-option]');
+                        nextEl = this.dropdown.querySelector('[data-option-selectable]');
                     }
                 
                     if(nextEl) {
                         if(currentEl) {
                             currentEl.classList.remove(this.options.classNames.highlightedState);                            
                         }
+                        if(!isScrolledIntoView(nextEl)) {
+                            nextEl.scrollIntoView();    
+                        }
                         nextEl.classList.add(this.options.classNames.highlightedState);                         
                     }
                 }
                 break
+
             case backKey:
             case deleteKey:
                 // If backspace or delete key is pressed and the input has no value
@@ -305,6 +312,7 @@ export class Choices {
                     e.preventDefault();
                 }
                 break;
+
             default:
                 break;
         }
@@ -358,7 +366,7 @@ export class Choices {
         const activeItems = this.getItemsFilteredByActive();
         const hasShiftKey = e.shiftKey ? true : false;
 
-        if(this.dropdown) {
+        if(this.passedElement.type === 'select-multiple' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
             this.toggleDropdown();
         }
 
@@ -369,18 +377,18 @@ export class Choices {
                 this.input.focus();
             }
 
-            if(e.target.hasAttribute('data-choice-item')) {
+            if(e.target.hasAttribute('data-item')) {
                 // If we are clicking on an item
                 this.handleClick(activeItems, e.target, hasShiftKey);
-            } else if(e.target.hasAttribute('data-choice-option')) {
+            } else if(e.target.hasAttribute('data-option')) {
                 // If we are clicking on an option
                 const options = this.getOptionsFilteredByActive();
-                const id = e.target.getAttribute('data-choice-id');
+                const id = e.target.getAttribute('data-id');
                 const option = options.find((option) => {
                     return option.id === parseInt(id);
                 });
 
-                if(!option.selected) {
+                if(!option.selected && !option.disabled) {
                     this.addItem(option.value, option.label, option.id);                    
                 }
             }
@@ -395,7 +403,7 @@ export class Choices {
                 this.deselectAll();
             }
 
-            // If there is a dropdown and it is active
+            // Close all other dropodowns
             if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
@@ -423,7 +431,7 @@ export class Choices {
     onMouseOver(e) {
         // If we have a dropdown and it is either the target or one of its children is the target
         if(this.dropdown && (e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
-            if(e.target.hasAttribute('data-choice-option')) {
+            if(e.target.hasAttribute('data-option')) {
                 const highlightedOptions = this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`);
                 // Remove any highlighted options 
                 Array.from(highlightedOptions).forEach((element) => {
@@ -473,27 +481,6 @@ export class Choices {
         return passesTest;
     }
 
-    /** 
-     * Get Element based on a given value
-     * @param  {String} value Value to search for
-     * @return {Element}       First Element with given value
-     */
-    getItemById(id) {
-        if(!id || !isType('Number', id)) {
-            console.error('getItemById: An id was not given or was not a number');
-            return;
-        }
-
-        const items = this.getItems();
-        const itemObject = items.find((item) => {
-            return item.id === parseInt(id);
-        });
-
-        const item = this.list.querySelector(`[data-choice-id='${ itemObject.id }']`);
-
-        return item;
-    }
-
     /**
      * Select item (a selected item can be deleted)
      * @param  {Element} item Element to select
@@ -517,8 +504,7 @@ export class Choices {
     }
 
     /**
-     * Select items within array
-     * @param  {Array} items Array of items to select
+     * Select items within store
      * @return
      */
     selectAll() {
@@ -528,6 +514,10 @@ export class Choices {
         });
     }
 
+    /**
+     * Deselect items within store
+     * @return
+     */
     deselectAll() {
         const items = this.getItems();
         items.forEach((item) => {
@@ -535,14 +525,11 @@ export class Choices {
         });
     }
 
-
     /**
      * Add item to store with correct value
      * @param {String} value Value to add to store
      */
     addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
-        if (this.options.debug) console.debug('Add item');
-
         let passedValue = value.trim();
         let passedLabel = label || passedValue;
         let passedOptionId = optionId || -1;
@@ -699,20 +686,19 @@ export class Choices {
      * Add option to dropdown
      * @param {Object}  option   Option to add
      * @param {Number}  groupId  ID of the options group
-     * @param {Boolean} disabled Whether the option is disabled
      * @return
      */
-    addOption(option, groupId = -1, disabled = false) {
+    addOption(option, groupId = -1) {
         // Generate unique id
         const state = this.store.getState();
         const id = state.options.length + 1;
         const value = option.value;
         const label = option.innerHTML;
-        const isSelected = option.selected;
+        const isDisabled = option.disabled || option.parentNode.disabled;
 
-        this.store.dispatch(addOption(value, label, id, groupId, disabled));
+        this.store.dispatch(addOption(value, label, id, groupId, isDisabled));
 
-        if(isSelected) {
+        if(option.selected && !isDisabled) {
             this.addItem(value, label, id);
         }
     }
@@ -732,13 +718,7 @@ export class Choices {
             groupOptions.forEach((option, optionIndex) => {
                 // We want to pre-highlight the first option
                 const highlighted = isFirst && optionIndex === 0 ? true : false;
-
-                // If group is disabled, disable all of its children
-                if(group.disabled) {
-                    this.addOption(option, groupId, true);
-                } else {
-                    this.addOption(option, groupId);    
-                }
+                this.addOption(option, groupId);   
             });
         } else {
             this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
@@ -799,7 +779,7 @@ export class Choices {
     getOptionsFilteredByActive() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
-            return option.active === true && option.disabled === false && option.selected !== true;
+            return option.active === true && option.selected !== true;
         },[]);
 
         return valueArray;
@@ -851,10 +831,10 @@ export class Choices {
      * @return
      */
     generateInput() {
-        const containerOuter = this.createTemplate('containerOuter');
-        const containerInner = this.createTemplate('containerInner');
-        const list = this.createTemplate('list');
-        const input = this.createTemplate('input');
+        const containerOuter = this.getTemplate('containerOuter');
+        const containerInner = this.getTemplate('containerInner');
+        const list = this.getTemplate('list');
+        const input = this.getTemplate('input');
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -885,7 +865,7 @@ export class Choices {
 
         if(this.passedElement.type === 'select-multiple') {
             this.highlightPosition = 0;
-            const dropdown = this.createTemplate('dropdown');
+            const dropdown = this.getTemplate('dropdown');
             const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
             
             containerOuter.appendChild(dropdown);
@@ -945,10 +925,10 @@ export class Choices {
                     });
 
                     if(groupOptions.length >= 1) {
-                        const dropdownGroup = this.createTemplate('optgroup', group);
+                        const dropdownGroup = this.getTemplate('optgroup', group);
 
                         groupOptions.forEach((option, j) => {
-                            const dropdownItem = this.createTemplate('option', option);
+                            const dropdownItem = this.getTemplate('option', option);
                             dropdownGroup.appendChild(dropdownItem);
                         });
 
@@ -957,23 +937,25 @@ export class Choices {
                 });
             } else if(activeOptions.length >= 1) {
                 activeOptions.forEach((option, i) => {
-                    const dropdownItem = this.createTemplate('option', option);    
+                    const dropdownItem = this.getTemplate('option', option);    
                     optionListFragment.appendChild(dropdownItem);
                 });
             }
             
             this.dropdown.appendChild(optionListFragment);
 
-            // If dropdown is empty, show a no content message
+            // If dropdown is empty, show a no content notice
             if(this.dropdown.innerHTML === "") {
-                const dropdownItem = this.createTemplate('notice', 'No options to select');
+                const dropdownItem = this.getTemplate('notice', 'No options to select');
 
                 optionListFragment.appendChild(dropdownItem);
                 this.dropdown.appendChild(optionListFragment);
             } else {
                 // Highlight first element in dropdown
-                const firstEl = this.dropdown.querySelector('[data-choice-option]');
-                firstEl.classList.add(this.options.classNames.highlightedState);
+                const firstEl = this.dropdown.querySelector('[data-option]');
+                if(firstEl) {
+                    firstEl.classList.add(this.options.classNames.highlightedState);
+                }
             }
         }
         
@@ -994,7 +976,7 @@ export class Choices {
             // Add each list item to list
             activeItems.forEach((item) => {
                 // Create new list element 
-                const listItem = this.createTemplate('item', item);
+                const listItem = this.getTemplate('item', item);
 
                 // Append it to list
                 itemListFragment.appendChild(listItem);
@@ -1013,13 +995,19 @@ export class Choices {
         }
     }
 
+    getTemplate(template, ...args) {
+        if(!template) return;
+        const templates = this.options.templates;
+        return templates[template](...args);
+    }
+
     /**
      * Create HTML element based on type and arguments
      * @param  {String}    template Template to create
      * @param  {...}       args     Data
      * @return {HTMLElement}        
      */
-    createTemplate(template, ...args) {
+    createTemplates() {
         const classNames = this.options.classNames;
         const templates = {
             containerOuter: () => {
@@ -1038,32 +1026,32 @@ export class Choices {
                 return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
             },
             notice: (label) => {
-                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }" data-choice-notice>${ label }</div>`);
+                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }">${ label }</div>`);
             },
             option: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ data.id }" data-choice-value="${ data.value }">
+                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
                         ${ data.label }
                     </div>
                 `);
             },
             optgroup: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ data.value }" data-choice-group-id="${ data.id }">
+                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }">
                         <div class="${ classNames.groupHeading }">${ data.value }</div>
                     </div>
                 `);
             },
             item: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-choice-item data-choice-id="${ data.id }" data-choice-value="${ data.value }">
+                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
                         ${ data.label }
                     </div>
                 `);
             },
         };
 
-        return templates[template](...args);
+        this.options.templates = extend(this.options.templates, templates);
     }
 
     /**
@@ -1102,6 +1090,9 @@ export class Choices {
      */
     init(callback = this.options.callbackOnInit) {
         this.initialised = true;
+
+        // Create required elements
+        this.createTemplates();
 
         // Generate input markup
         this.generateInput();

@@ -329,6 +329,15 @@ export const isInView = function(el, position, offset) {
     return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset)) ? true : false;
 };
 
+export const isScrolledIntoView = (el) => {
+    const dimensions = el.getBoundingClientRect();
+    const elemTop = dimensions.top;
+    const elemBottom = dimensions.bottom;
+    const isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+    
+    return isVisible;
+}
+
 /**
  * Remove html tags from a string
  * @param  {String}  Initial string/html
