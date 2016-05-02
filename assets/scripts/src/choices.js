@@ -3,7 +3,7 @@
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
-import { wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import { getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Sifter from 'sifter';
 
 /**
@@ -275,32 +275,25 @@ export class Choices {
             case upKey:
                 // If up or down key is pressed, traverse through options
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
-                    const selectableOptions = activeOptions.filter((option) => {
-                        return !option.selected;
-                    });
 
-                    let canHighlight = true;
+                    const currentEl = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                    let nextEl;
 
-                    if(e.keyCode === downKey) {
-                        this.highlightPosition < (selectableOptions.length - 1) ? this.highlightPosition++ : canHighlight = false;
-                    } else if(e.keyCode === upKey) {
-                        this.highlightPosition > 0 ? this.highlightPosition-- : canHighlight = false;
-                    }
-
-                    if(canHighlight) {
-                        const option = selectableOptions[this.highlightPosition];
-                        if(option) {
-                            const previousElement = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
-                            const currentElement = this.dropdown.querySelector(`[data-choice-id="${option.id}"]`);
-
-                            if(previousElement) {
-                                previousElement.classList.remove(this.options.classNames.highlightedState);
-                            }
-
-                            if(currentElement) {
-                                currentElement.classList.add(this.options.classNames.highlightedState);                         
-                            }
+                    if(currentEl) {
+                        if(e.keyCode === downKey) {
+                            nextEl = getAdjacentEl(currentEl, '[data-choice-option]', 1);
+                        } else if(e.keyCode === upKey) {
+                            nextEl = getAdjacentEl(currentEl, '[data-choice-option]', -1);
                         }
+                    } else {
+                        nextEl = this.dropdown.querySelector('[data-choice-option]');
+                    }
+                
+                    if(nextEl) {
+                        if(currentEl) {
+                            currentEl.classList.remove(this.options.classNames.highlightedState);                            
+                        }
+                        nextEl.classList.add(this.options.classNames.highlightedState);                         
                     }
                 }
                 break
@@ -342,6 +335,7 @@ export class Choices {
                             sort: [{field: 'value', direction: 'asc'}],
                             limit: 10
                         });
+
                         this.store.dispatch(filterOptions(results));
                     }, 100)
                     
@@ -427,8 +421,17 @@ export class Choices {
      * @return
      */
     onMouseOver(e) {
-        if(this.dropdown && e.target === this.dropdown) {
-            console.log('hover');
+        // If we have a dropdown and it is either the target or one of its children is the target
+        if(this.dropdown && (e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
+            if(e.target.hasAttribute('data-choice-option')) {
+                const highlightedOptions = this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`);
+                // Remove any highlighted options 
+                Array.from(highlightedOptions).forEach((element) => {
+                    element.classList.remove(this.options.classNames.highlightedState);
+                });
+
+                e.target.classList.add(this.options.classNames.highlightedState);
+            }
         }
     }
 
@@ -921,7 +924,6 @@ export class Choices {
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
         const activeItems = this.getItemsFilteredByActive();
-    
 
         // OPTIONS
         if(this.passedElement.type === 'select-multiple') {
@@ -947,7 +949,6 @@ export class Choices {
 
                         groupOptions.forEach((option, j) => {
                             const dropdownItem = this.createTemplate('option', option);
-
                             dropdownGroup.appendChild(dropdownItem);
                         });
 
@@ -969,6 +970,10 @@ export class Choices {
 
                 optionListFragment.appendChild(dropdownItem);
                 this.dropdown.appendChild(optionListFragment);
+            } else {
+                // Highlight first element in dropdown
+                const firstEl = this.dropdown.querySelector('[data-choice-option]');
+                firstEl.classList.add(this.options.classNames.highlightedState);
             }
         }
         

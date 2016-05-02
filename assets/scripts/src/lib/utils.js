@@ -273,7 +273,7 @@ export const getElemDistance = function(el) {
 /**
  * Determine element height multiplied by any offsets
  * @private
- * @param  {Node} el Element to test for
+ * @param  {HTMLElement} el Element to test for
  * @return {Number}    Height of element
  */
 export const getElementOffset = function(el, offset) {
@@ -282,6 +282,25 @@ export const getElementOffset = function(el, offset) {
     if(elOffset > 0) elOffset = 0;
 
     return Math.max(el.offsetHeight*elOffset);
+};
+
+/**
+ * Get the next or previous element from a given start point 
+ * @param  {HTMLElement} startEl    Element to start position from
+ * @param  {String}      className  The class we will look through 
+ * @param  {Number}      direction  Positive next element, negative previous element
+ * @return {[HTMLElement}           Found element
+ */
+export const getAdjacentEl = (startEl, className, direction = 1) => {
+    if(!startEl || !className) return; 
+
+    const parent = startEl.parentNode.parentNode;
+    const children = Array.from(parent.querySelectorAll(className));
+
+    const startPos = children.indexOf(startEl);
+    const operatorDirection = direction > 0 ? 1 : -1;
+    
+    return children[startPos + operatorDirection];
 };
 
 /**
@@ -301,7 +320,7 @@ export const getScrollPosition = function(position) {
 
 /**
  * Determine whether an element is within the viewport
- * @param  {Node}  el Element to test for
+ * @param  {HTMLElement}  el Element to test for
  * @return {String} Position of scroll
  * @return {Boolean}
  */
@@ -353,7 +372,7 @@ export const getRandomNumber = function(min, max) {
 /**
  * Turn a string into a node
  * @param  {String} String to convert
- * @return {Node}   Converted node element
+ * @return {HTMLElement}   Converted node element
  */
 export const strToEl = (function() {
     var tmpEl = document.createElement('div');
