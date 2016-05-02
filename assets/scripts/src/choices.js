@@ -341,7 +341,7 @@ export class Choices {
                         });
 
                         this.store.dispatch(filterOptions(results));
-                    }, 100)
+                    }, 500)
                     
                     handleFilter();
                 } else if(hasUnactiveOptions) {
@@ -399,6 +399,8 @@ export class Choices {
                 this.deselectAll();
             }
 
+            this.containerOuter.classList.remove(this.options.classNames.activeState);
+
             // Close all other dropodowns
             if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
@@ -439,7 +441,9 @@ export class Choices {
      * @return
      */
     onFocus(e) {
-        this.containerOuter.classList.add(this.options.classNames.activeState);
+        if(!this.containerOuter.classList.contains(this.options.classNames.activeState)) {
+            this.containerOuter.classList.add(this.options.classNames.activeState);
+        }
     }
 
     /**
@@ -448,7 +452,10 @@ export class Choices {
      * @return
      */
     onBlur(e) {
-        this.containerOuter.classList.remove(this.options.classNames.activeState);
+        const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
+        if(!hasActiveDropdown) {
+            this.containerOuter.classList.remove(this.options.classNames.activeState);
+        }
     }
 
     /** 
