@@ -3,7 +3,7 @@
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
-import { hasClass, wrap, getSiblings, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import { wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Sifter from 'sifter';
 
 /**
@@ -110,49 +110,7 @@ export class Choices {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onPaste = this.onPaste.bind(this);
-
-        const classNames = this.options.classNames;
-        this.templates = {
-            containerOuter: () => {
-                return strToEl(`<div class="${ classNames.containerOuter }"></div>`);
-            },
-            containerInner: () => {
-                return strToEl(`<div class="${ classNames.containerInner }"></div>`);
-            },
-            list: () => {
-                return strToEl(`<ul class="${ classNames.list } ${ classNames.listItems }"></ul>`);
-            },
-            input: () => {
-                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
-            },
-            dropdown: () => {
-                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
-            },
-            notice: (label) => {
-                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }" data-choice-notice>${ label }</div>`);
-            },
-            option: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ data.id }" data-choice-value="${ data.value }">
-                        ${ data.label }
-                    </div>
-                `);
-            },
-            optgroup: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ data.value }" data-choice-group-id="${ data.id }">
-                        <div class="${ classNames.groupHeading }">${ data.value }</div>
-                    </div>
-                `);
-            },
-            item: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-choice-item data-choice-id="${ data.id }" data-choice-value="${ data.value }">
-                        ${ data.label }
-                    </div>
-                `);
-            },
-        };
+        this.onMouseOver = this.onMouseOver.bind(this);
 
         // Let's have it large
         this.init();
@@ -269,6 +227,7 @@ export class Choices {
 
         const activeItems = this.getItemsFilteredByActive();
         const activeOptions = this.getOptionsFilteredByActive();
+
         const hasFocussedInput = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
         const hasItems = this.list && this.list.children;
@@ -411,6 +370,7 @@ export class Choices {
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
+            // If input is not in focus, it ought to be 
             if(this.input !== document.activeElement) {
                 this.input.focus();
             }
@@ -458,6 +418,17 @@ export class Choices {
         // Disable pasting into the input if option has been set
         if(!this.options.allowPaste) {
             e.preventDefault();
+        }
+    }
+
+    /**
+     * Mouse over (hover) event
+     * @param  {Object} e Event
+     * @return
+     */
+    onMouseOver(e) {
+        if(this.dropdown && e.target === this.dropdown) {
+            console.log('hover');
         }
     }
 
@@ -877,10 +848,10 @@ export class Choices {
      * @return
      */
     generateInput() {
-        const containerOuter = this.templates['containerOuter']();
-        const containerInner = this.templates['containerInner']();
-        const list = this.templates['list']();
-        const input = this.templates['input']();
+        const containerOuter = this.createTemplate('containerOuter');
+        const containerInner = this.createTemplate('containerInner');
+        const list = this.createTemplate('list');
+        const input = this.createTemplate('input');
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -911,7 +882,7 @@ export class Choices {
 
         if(this.passedElement.type === 'select-multiple') {
             this.highlightPosition = 0;
-            const dropdown = this.templates['dropdown']();
+            const dropdown = this.createTemplate('dropdown');
             const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
             
             containerOuter.appendChild(dropdown);
@@ -972,10 +943,10 @@ export class Choices {
                     });
 
                     if(groupOptions.length >= 1) {
-                        const dropdownGroup = this.templates['optgroup'](group);
+                        const dropdownGroup = this.createTemplate('optgroup', group);
 
                         groupOptions.forEach((option, j) => {
-                            const dropdownItem = this.templates['option'](option);
+                            const dropdownItem = this.createTemplate('option', option);
 
                             dropdownGroup.appendChild(dropdownItem);
                         });
@@ -985,7 +956,7 @@ export class Choices {
                 });
             } else if(activeOptions.length >= 1) {
                 activeOptions.forEach((option, i) => {
-                    const dropdownItem = this.templates['option'](option);    
+                    const dropdownItem = this.createTemplate('option', option);    
                     optionListFragment.appendChild(dropdownItem);
                 });
             }
@@ -994,7 +965,7 @@ export class Choices {
 
             // If dropdown is empty, show a no content message
             if(this.dropdown.innerHTML === "") {
-                const dropdownItem = this.templates['notice']('No options to select');      
+                const dropdownItem = this.createTemplate('notice', 'No options to select');
 
                 optionListFragment.appendChild(dropdownItem);
                 this.dropdown.appendChild(optionListFragment);
@@ -1018,7 +989,7 @@ export class Choices {
             // Add each list item to list
             activeItems.forEach((item) => {
                 // Create new list element 
-                const listItem = this.templates['item'](item);
+                const listItem = this.createTemplate('item', item);
 
                 // Append it to list
                 itemListFragment.appendChild(listItem);
@@ -1038,6 +1009,59 @@ export class Choices {
     }
 
     /**
+     * Create HTML element based on type and arguments
+     * @param  {String}    template Template to create
+     * @param  {...}       args     Data
+     * @return {HTMLElement}        
+     */
+    createTemplate(template, ...args) {
+        const classNames = this.options.classNames;
+        const templates = {
+            containerOuter: () => {
+                return strToEl(`<div class="${ classNames.containerOuter }"></div>`);
+            },
+            containerInner: () => {
+                return strToEl(`<div class="${ classNames.containerInner }"></div>`);
+            },
+            list: () => {
+                return strToEl(`<ul class="${ classNames.list } ${ classNames.listItems }"></ul>`);
+            },
+            input: () => {
+                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
+            },
+            dropdown: () => {
+                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
+            },
+            notice: (label) => {
+                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }" data-choice-notice>${ label }</div>`);
+            },
+            option: (data) => {
+                return strToEl(`
+                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState + ' ' + classNames.itemDisabled : classNames.itemSelectable }" data-choice-option data-choice-id="${ data.id }" data-choice-value="${ data.value }">
+                        ${ data.label }
+                    </div>
+                `);
+            },
+            optgroup: (data) => {
+                return strToEl(`
+                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-choice-value="${ data.value }" data-choice-group-id="${ data.id }">
+                        <div class="${ classNames.groupHeading }">${ data.value }</div>
+                    </div>
+                `);
+            },
+            item: (data) => {
+                return strToEl(`
+                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-choice-item data-choice-id="${ data.id }" data-choice-value="${ data.value }">
+                        ${ data.label }
+                    </div>
+                `);
+            },
+        };
+
+        return templates[template](...args);
+    }
+
+    /**
      * Trigger event listeners
      * @return
      */
@@ -1046,6 +1070,7 @@ export class Choices {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('click', this.onClick);
         document.addEventListener('paste', this.onPaste);
+        document.addEventListener('mouseover', this.onMouseOver);
 
         this.input.addEventListener('focus', this.onFocus);
         this.input.addEventListener('blur', this.onBlur);
@@ -1060,6 +1085,7 @@ export class Choices {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('click', this.onClick);
         document.removeEventListener('paste', this.onPaste);
+        document.removeEventListener('mouseover', this.onMouseOver);
 
         this.input.removeEventListener('focus', this.onFocus);
         this.input.removeEventListener('blur', this.onBlur);
