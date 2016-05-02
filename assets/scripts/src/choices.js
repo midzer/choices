@@ -90,6 +90,8 @@ export class Choices {
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
+        this.highlightPosition = 0;
+
         // Set preset items - this looks out of place
         this.presetItems = [];
         if(this.options.items.length) {
@@ -280,26 +282,20 @@ export class Choices {
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
 
                     const currentEl = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                    const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
 
                     if(currentEl) {
-                        if(e.keyCode === downKey) {
-                            nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', 1);
-                        } else if(e.keyCode === upKey) {
-                            nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', -1);
-                        }
+                        nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', directionInt);
                     } else {
                         nextEl = this.dropdown.querySelector('[data-option-selectable]');
                     }
                 
                     if(nextEl) {
-                        if(currentEl) {
-                            currentEl.classList.remove(this.options.classNames.highlightedState);                            
+                        this.highlightOption(nextEl);
+                        if(!isScrolledIntoView(nextEl, this.dropdown, directionInt)) {
+                            this.scrollToOption(nextEl, directionInt);
                         }
-                        if(!isScrolledIntoView(nextEl)) {
-                            nextEl.scrollIntoView();    
-                        }
-                        nextEl.classList.add(this.options.classNames.highlightedState);                         
                     }
                 }
                 break
@@ -432,13 +428,7 @@ export class Choices {
         // If we have a dropdown and it is either the target or one of its children is the target
         if(this.dropdown && (e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
             if(e.target.hasAttribute('data-option')) {
-                const highlightedOptions = this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`);
-                // Remove any highlighted options 
-                Array.from(highlightedOptions).forEach((element) => {
-                    element.classList.remove(this.options.classNames.highlightedState);
-                });
-
-                e.target.classList.add(this.options.classNames.highlightedState);
+                this.highlightOption(e.target);
             }
         }
     }
@@ -471,14 +461,58 @@ export class Choices {
 
     /**
      * Tests value against a regular expression
-     * @param  {string} value Value to test
-     * @return {Boolean}       Whether test passed/failed
+     * @param  {string} value   Value to test
+     * @return {Boolean}        Whether test passed/failed
      */
     regexFilter(value) {
         const expression = new RegExp(this.options.regexFilter, 'i');
         const passesTest = expression.test(value);
 
         return passesTest;
+    }
+
+    /**
+     * Scroll to an option element
+     * @param  {HTMLElement} option  Option to scroll to
+     * @param  {Number} direction  Whether option is above or below 
+     * @return
+     */
+    scrollToOption(option, direction) {
+        if(!option) return;
+        // Distance from bottom of element to top of parent
+        const optionPos = option.offsetTop + option.offsetHeight;
+        // Scroll position from top 
+        const containerPos = this.dropdown.scrollTop + this.dropdown.offsetHeight;
+
+        if(direction > 0) {
+            const scrollDiff = optionPos - containerPos;
+            this.dropdown.scrollTop += scrollDiff;    
+        } else {
+            this.dropdown.scrollTop = option.offsetTop;
+        }
+    }
+
+    highlightOption(el) {
+        // Highlight first element in dropdown
+        const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
+        const highlightedOptions = Array.from(this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`));
+        
+        // Remove any highlighted options 
+        highlightedOptions.forEach((el) => {
+            el.classList.remove(this.options.classNames.highlightedState);
+        });
+
+        if(el){
+            this.highlightPosition = options.indexOf(el);
+            el.classList.add(this.options.classNames.highlightedState);    
+        } else {
+            let el = options[this.highlightPosition];
+            if(!el) el = options[0];
+
+            if(el) {
+                el.classList.add(this.options.classNames.highlightedState);
+            }
+        }
     }
 
     /**
@@ -951,11 +985,7 @@ export class Choices {
                 optionListFragment.appendChild(dropdownItem);
                 this.dropdown.appendChild(optionListFragment);
             } else {
-                // Highlight first element in dropdown
-                const firstEl = this.dropdown.querySelector('[data-option]');
-                if(firstEl) {
-                    firstEl.classList.add(this.options.classNames.highlightedState);
-                }
+                this.highlightOption();
             }
         }
         

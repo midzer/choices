@@ -320,7 +320,7 @@ export const getScrollPosition = function(position) {
 
 /**
  * Determine whether an element is within the viewport
- * @param  {HTMLElement}  el Element to test for
+ * @param  {HTMLElement}  el Element to test
  * @return {String} Position of scroll
  * @return {Boolean}
  */
@@ -329,11 +329,25 @@ export const isInView = function(el, position, offset) {
     return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset)) ? true : false;
 };
 
-export const isScrolledIntoView = (el) => {
-    const dimensions = el.getBoundingClientRect();
-    const elemTop = dimensions.top;
-    const elemBottom = dimensions.bottom;
-    const isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+/**
+ * Determine whether an element is within 
+ * @param  {HTMLElement} el        Element to test
+ * @param  {HTMLElement} parent    Scrolling parent
+ * @param  {Number} direction      Whether element is visible from above or below 
+ * @return {Boolean}
+ */
+export const isScrolledIntoView = (el, parent, direction = 1) => {
+    if(!el) return;
+
+    let isVisible;
+
+    if(direction > 0) {
+        // In view from bottom
+        isVisible = (parent.scrollTop + parent.offsetHeight) >= (el.offsetTop + el.offsetHeight) ;
+    } else {
+        // In view from top
+        isVisible = el.offsetTop >= parent.scrollTop;
+    }
     
     return isVisible;
 }
