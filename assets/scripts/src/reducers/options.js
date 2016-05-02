@@ -45,6 +45,7 @@ const options = (state = [], action) => {
             const newState = state.map((option, index) => {
                 // Set active state based on whether option is 
                 // within filtered results
+        
                 option.active = filteredResults.some((result) => {
                     return result.id === index;
                 });

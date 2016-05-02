@@ -329,19 +329,19 @@ export class Choices {
             });
 
             if(this.input === document.activeElement) {
-                if(this.input.value) {
+                if(this.input.value && this.input.value.length > 1) {
+                    const options = this.getOptionsFiltedBySelectable();
+                    const sifter = new Sifter(options);
                     // If we have a value, filter options based on it 
                     const handleFilter = debounce(() => {
-                        const options = this.getOptionsFiltedBySelectable();
-                        const sifter = new Sifter(options);
                         const results = sifter.search(this.input.value, {
                             fields: ['label', 'value'],
-                            sort: [{field: 'value', direction: 'asc'}],
+                            sort: [{field: 'label', direction: 'asc'}],
                             limit: 10
                         });
-
+                        
                         this.store.dispatch(filterOptions(results));
-                    }, 500)
+                    }, 500);
                     
                     handleFilter();
                 } else if(hasUnactiveOptions) {
@@ -833,7 +833,7 @@ export class Choices {
     getOptionsFiltedBySelectable() {
         const options = this.getOptions();
         const valueArray = options.filter((option) => {
-            return option.disabled === false;
+            return option.selected === false && option.disabled !== true;
         },[]);
 
         return valueArray;
