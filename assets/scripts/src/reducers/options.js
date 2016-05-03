@@ -58,8 +58,6 @@ const options = (state = [], action) => {
                 return prev.score - next.score;
             });
 
-            console.log(filteredState);
-
             return filteredState;
 
         case 'ACTIVATE_OPTIONS':

@@ -28,8 +28,8 @@ export class Choices {
             const elements = document.querySelectorAll(element);
             if(elements.length > 1) {
                 for (let i = 1; i < elements.length; i++) {
-                    let el = elements[i];
-                    new Choices(el, options);
+                    const el = elements[i];
+                    new Choices(el, userOptions);
                 }
             }
         }
@@ -280,7 +280,6 @@ export class Choices {
             case upKey:
                 // If up or down key is pressed, traverse through options
                 if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
-
                     const currentEl = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
                     const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
@@ -292,10 +291,13 @@ export class Choices {
                     }
                 
                     if(nextEl) {
-                        this.highlightOption(nextEl);
+                        // We prevent default to stop the cursor moving 
+                        // when pressing the arrow
+                        e.preventDefault();
                         if(!isScrolledIntoView(nextEl, this.dropdown, directionInt)) {
                             this.scrollToOption(nextEl, directionInt);
                         }
+                        this.highlightOption(nextEl);
                     }
                 }
                 break
@@ -323,25 +325,32 @@ export class Choices {
         if(e.target !== this.input) return;
         
         if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
-            const options = this.getOptions();
-            const hasUnactiveOptions = options.some((option) => {
-                return option.active !== true; 
-            });
-
             if(this.input === document.activeElement) {
-                if(this.input.value) {
-                   const options = this.getOptionsFiltedBySelectable();
-                   const fuse = new Fuse(options, { 
-                       keys: ['label', 'value'],
-                       shouldSort: true,
-                       include: 'score',
-                   });
-                   const results = fuse.search(this.input.value);
-                   
-                   this.store.dispatch(filterOptions(results));
+                const options = this.getOptions();
+                const hasUnactiveOptions = options.some((option) => {
+                    return option.active !== true; 
+                });
 
+                // Check that have a value to search
+                if(this.input.value) {
+                    const handleFilter = debounce(() => {
+                        // Ensure value *still* has a value after 500 delay
+                        if(this.input.value && this.input.value.length >= 1) {
+                            const options = this.getOptionsFiltedBySelectable();
+                            const fuse = new Fuse(options, { 
+                                keys: ['label', 'value'],
+                                shouldSort: true,
+                                include: 'score',
+                            });
+                            const results = fuse.search(this.input.value);
+                            this.isSearching = true;
+                            this.store.dispatch(filterOptions(results));
+                        }
+                    }, 500);
+                    handleFilter();
                 } else if(hasUnactiveOptions) {
                     // Otherwise reset options to active
+                    this.isSearching = false;
                     this.store.dispatch(activateOptions());
                 }
             }
@@ -482,14 +491,22 @@ export class Choices {
      */
     scrollToOption(option, direction) {
         if(!option) return;
-        // Distance from bottom of element to top of parent
-        const optionPos = option.offsetTop + option.offsetHeight;
-        // Scroll position from top 
-        const containerPos = this.dropdown.scrollTop + this.dropdown.offsetHeight;
+        
+        const dropdownHeight = this.dropdown.offsetHeight;
+        const optionHeight = option.offsetHeight;
 
+        // Distance from bottom of element to top of parent
+        const optionPos = option.offsetTop + optionHeight;
+
+        // Scroll position of dropdown
+        const containerScrollPos = this.dropdown.scrollTop + dropdownHeight;
+
+        // Difference between the option and scroll position
+        const scrollDiff = optionPos - containerScrollPos;
+
+        // Scroll dropdown to top of option
         if(direction > 0) {
-            const scrollDiff = optionPos - containerPos;
-            this.dropdown.scrollTop += scrollDiff;    
+            this.dropdown.scrollTop += scrollDiff;
         } else {
             this.dropdown.scrollTop = option.offsetTop;
         }
@@ -498,24 +515,34 @@ export class Choices {
     highlightOption(el) {
         // Highlight first element in dropdown
         const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
-        const highlightedOptions = Array.from(this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`));
-        
-        // Remove any highlighted options 
-        highlightedOptions.forEach((el) => {
-            el.classList.remove(this.options.classNames.highlightedState);
-        });
 
-        if(el){
-            this.highlightPosition = options.indexOf(el);
-            el.classList.add(this.options.classNames.highlightedState);    
-        } else {
-            let el = options[this.highlightPosition];
-            if(!el) el = options[0];
+        if(options.length) {
+            const highlightedOptions = Array.from(this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`));
+            
+            // Remove any highlighted options 
+            highlightedOptions.forEach((el) => {
+                el.classList.remove(this.options.classNames.highlightedState);
+            });
+            
+            if(el){
+                // Highlight given option
+                el.classList.add(this.options.classNames.highlightedState); 
+                this.highlightPosition = options.indexOf(el);   
+            } else {
+                // Highlight option based on last known highlight location
+                let el;
 
-            if(el) {
-                el.classList.add(this.options.classNames.highlightedState);
-            }
+                if(options.length > this.highlightPosition) {
+                    el = options[this.highlightPosition];
+                } else {
+                    el = options[options.length - 1];
+                }
+
+                if(!el) el = options[0];
+                el.classList.add(this.options.classNames.highlightedState);    
+            }        
         }
+
     }
 
     /**
@@ -908,6 +935,7 @@ export class Choices {
             containerOuter.appendChild(dropdown);
 
             this.dropdown = dropdown;
+            this.isSearching = false;
         
             if(passedGroups.length) {
                 passedGroups.forEach((group, index) => {
@@ -916,7 +944,6 @@ export class Choices {
                 });
             } else {
                 const passedOptions = Array.from(this.passedElement.options);
-
                 passedOptions.forEach((option) => {
                     this.addOption(option);
                 });
@@ -947,14 +974,11 @@ export class Choices {
             const activeOptions = this.getOptionsFilteredByActive();
             const activeGroups = this.getGroupsFilteredByActive();
 
-            // Clear options
-            this.dropdown.innerHTML = '';
-
             // Create a fragment to store our list items (so we don't have to update the DOM for each item)
             const optionListFragment = document.createDocumentFragment();
 
             // If we have grouped options
-            if(activeGroups.length >= 1) {
+            if(activeGroups.length >= 1 && this.isSearching !== true) {
                 activeGroups.forEach((group, i) => {
                     // Grab options that are children of this group
                     const groupOptions = activeOptions.filter((option) => {
@@ -978,17 +1002,17 @@ export class Choices {
                     optionListFragment.appendChild(dropdownItem);
                 });
             }
-            
-            this.dropdown.appendChild(optionListFragment);
 
-            // If dropdown is empty, show a no content notice
-            if(this.dropdown.innerHTML === "") {
-                const dropdownItem = this.getTemplate('notice', 'No options to select');
+            // Clear options
+            this.dropdown.innerHTML = '';
 
-                optionListFragment.appendChild(dropdownItem);
+            if(optionListFragment.children.length) {
                 this.dropdown.appendChild(optionListFragment);
-            } else {
                 this.highlightOption();
+            } else {
+                // If dropdown is empty, show a no content notice
+                const dropdownItem = this.getTemplate('notice', 'No options to select');
+                this.dropdown.appendChild(dropdownItem);
             }
         }
         
