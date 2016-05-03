@@ -9,6 +9,7 @@ const options = (state = [], action) => {
                 disabled: action.disabled,
                 selected: false,
                 active: true,
+                score: 9999,
             }];
 
         case 'ADD_ITEM':
@@ -40,20 +41,26 @@ const options = (state = [], action) => {
             }
 
         case 'FILTER_OPTIONS':
-            const filteredResults = action.results.items;
-            let firstActive = false;
-            const newState = state.map((option, index) => {
+            const filteredResults = action.results;
+            const filteredState = state.map((option, index) => {
                 // Set active state based on whether option is 
                 // within filtered results
         
                 option.active = filteredResults.some((result) => {
-                    return result.id === index;
+                    if(result.item.id === option.id) {
+                        option.score = result.score;
+                        return true;
+                    }
                 });
 
                 return option;
+            }).sort((prev, next) => {
+                return prev.score - next.score;
             });
 
-            return newState;
+            console.log(filteredState);
+
+            return filteredState;
 
         case 'ACTIVATE_OPTIONS':
             return state.map((option) => {

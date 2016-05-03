@@ -4,7 +4,7 @@ import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
-import Sifter from 'sifter';
+import Fuse from 'fuse.js';
 
 /**
  * Choices
@@ -329,28 +329,24 @@ export class Choices {
             });
 
             if(this.input === document.activeElement) {
-                if(this.input.value && this.input.value.length > 1) {
-                    const options = this.getOptionsFiltedBySelectable();
-                    const sifter = new Sifter(options);
-                    // If we have a value, filter options based on it 
-                    const handleFilter = debounce(() => {
-                        const results = sifter.search(this.input.value, {
-                            fields: ['label', 'value'],
-                            sort: [{field: 'label', direction: 'asc'}],
-                            limit: 10
-                        });
-                        
-                        this.store.dispatch(filterOptions(results));
-                    }, 500);
-                    
-                    handleFilter();
+                if(this.input.value) {
+                   const options = this.getOptionsFiltedBySelectable();
+                   const fuse = new Fuse(options, { 
+                       keys: ['label', 'value'],
+                       shouldSort: true,
+                       include: 'score',
+                   });
+                   const results = fuse.search(this.input.value);
+                   
+                   this.store.dispatch(filterOptions(results));
+
                 } else if(hasUnactiveOptions) {
                     // Otherwise reset options to active
                     this.store.dispatch(activateOptions());
                 }
             }
         } 
-    }
+    } q
 
 
     /**
