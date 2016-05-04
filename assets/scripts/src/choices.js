@@ -1,10 +1,9 @@
 'use strict';
 
-import { createStore } from 'redux';
-import rootReducer from './reducers/index.js';
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';
+import Store from './store.js';
 
 /**
  * Choices
@@ -85,7 +84,7 @@ export class Choices {
         this.options = extend(defaultOptions, userOptions);
 
         // Create data store
-        this.store = createStore(rootReducer);
+        this.store = new Store();
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
@@ -227,8 +226,8 @@ export class Choices {
         const upKey = 38;
         const downKey = 40;
 
-        const activeItems = this.getItemsFilteredByActive();
-        const activeOptions = this.getOptionsFilteredByActive();
+        const activeItems = this.store.getItemsFilteredByActive();
+        const activeOptions = this.store.getOptionsFilteredByActive();
 
         const hasFocussedInput = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
@@ -326,7 +325,7 @@ export class Choices {
         
         if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
             if(this.input === document.activeElement) {
-                const options = this.getOptions();
+                const options = this.store.getOptions();
                 const hasUnactiveOptions = options.some((option) => {
                     return option.active !== true; 
                 });
@@ -336,7 +335,7 @@ export class Choices {
                     const handleFilter = debounce(() => {
                         // Ensure value *still* has a value after 500 delay
                         if(this.input.value && this.input.value.length >= 1) {
-                            const options = this.getOptionsFiltedBySelectable();
+                            const options = this.store.getOptionsFiltedBySelectable();
                             const fuse = new Fuse(options, { 
                                 keys: ['label', 'value'],
                                 shouldSort: true,
@@ -355,7 +354,7 @@ export class Choices {
                 }
             }
         } 
-    } q
+    }
 
 
     /**
@@ -364,7 +363,7 @@ export class Choices {
      * @return
      */
     onClick(e) {
-        const activeItems = this.getItemsFilteredByActive();
+        const activeItems = this.store.getItemsFilteredByActive();
         const hasShiftKey = e.shiftKey ? true : false;
 
         if(this.passedElement.type === 'select-multiple' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
@@ -383,7 +382,7 @@ export class Choices {
                 this.handleClick(activeItems, e.target, hasShiftKey);
             } else if(e.target.hasAttribute('data-option')) {
                 // If we are clicking on an option
-                const options = this.getOptionsFilteredByActive();
+                const options = this.store.getOptionsFilteredByActive();
                 const id = e.target.getAttribute('data-id');
                 const option = options.find((option) => {
                     return option.id === parseInt(id);
@@ -572,7 +571,7 @@ export class Choices {
      * @return
      */
     selectAll() {
-        const items = this.getItems();
+        const items = this.store.getItems();
         items.forEach((item) => {
             this.selectItem(item);
         });
@@ -583,7 +582,7 @@ export class Choices {
      * @return
      */
     deselectAll() {
-        const items = this.getItems();
+        const items = this.store.getItems();
         items.forEach((item) => {
             this.deselectItem(item);
         });
@@ -659,7 +658,7 @@ export class Choices {
             console.error('removeItemsByValue: No value was passed to be removed');
         }
 
-        const items = this.getItemsFilteredByActive();
+        const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
             if(item.value === value) {
@@ -675,7 +674,7 @@ export class Choices {
      * @return
      */
     removeAllItems() {
-        const items = this.getItemsFilteredByActive();
+        const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
             if(item.active) {
@@ -690,7 +689,7 @@ export class Choices {
      * @return
      */
     removeAllSelectedItems() {
-        const items = this.getItemsFilteredByActive();
+        const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
             if(item.selected && item.active) {
@@ -789,106 +788,6 @@ export class Choices {
         }
     }
 
-    /**
-     * Get items from store
-     * @return {Array} Item objects
-     */
-    getItems() {
-        const state = this.store.getState();
-        return state.items;
-    }
-
-    /**
-     * Get active items from store
-     * @return {Array} Item objects
-     */
-    getItemsFilteredByActive() {
-        const items = this.getItems();
-
-        const valueArray = items.filter((item) => {
-            return item.active === true;
-        }, []);
-
-        return valueArray;
-    }
-
-    /**
-     * Get items from store reduced to just their values
-     * @return {Array} Item objects
-     */
-    getItemsReducedToValues() {
-        const items = this.getItems();
-
-        const valueArray = items.reduce((prev, current) => {
-            prev.push(current.value);
-            return prev;
-        }, []);
-
-        return valueArray;
-    }
-
-    /**
-     * Get options from store 
-     * @return {Array} Option objects
-     */
-    getOptions() {
-        const state = this.store.getState();
-        return state.options;
-    }
-
-    /**
-     * Get active options from store
-     * @return {Array} Option objects
-     */
-    getOptionsFilteredByActive() {
-        const options = this.getOptions();
-        const valueArray = options.filter((option) => {
-            return option.active === true && option.selected !== true;
-        },[]);
-
-        return valueArray;
-    }
-
-    /**
-     * Get selectable options from store
-     * @return {Array} Option objects
-     */
-    getOptionsFiltedBySelectable() {
-        const options = this.getOptions();
-        const valueArray = options.filter((option) => {
-            return option.selected === false && option.disabled !== true;
-        },[]);
-
-        return valueArray;
-    }
-
-    /**
-     * Get groups from store
-     * @return {Array} Group objects
-     */
-    getGroups() {
-        const state = this.store.getState();
-        return state.groups;
-    }
-
-    /**
-     * Get active groups from store
-     * @return {Array} Group objects
-     */
-    getGroupsFilteredByActive() {
-        const groups = this.getGroups();
-        const options = this.getOptions();
-
-        const valueArray = groups.filter((group) => {
-            const isActive = group.active === true && group.disabled === false;
-            const hasActiveOptions = options.some((option) => {
-                return option.active === true && option.disabled === false;
-            });
-            return isActive && hasActiveOptions ? true : false;
-        },[]);
-
-        return valueArray;
-    }
 
     /**
      * Create DOM structure around passed select element
@@ -967,12 +866,12 @@ export class Choices {
      */
     render(callback = this.options.callbackOnRender) {
         const classNames = this.options.classNames;
-        const activeItems = this.getItemsFilteredByActive();
+        const activeItems = this.store.getItemsFilteredByActive();
 
         // OPTIONS
         if(this.passedElement.type === 'select-multiple') {
-            const activeOptions = this.getOptionsFilteredByActive();
-            const activeGroups = this.getGroupsFilteredByActive();
+            const activeOptions = this.store.getOptionsFilteredByActive();
+            const activeGroups = this.store.getGroupsFilteredByActive();
 
             // Create a fragment to store our list items (so we don't have to update the DOM for each item)
             const optionListFragment = document.createDocumentFragment();
@@ -1019,7 +918,7 @@ export class Choices {
         // ITEMS
         if(activeItems) {
             // Simplify store data to just values
-            const itemsFiltered = this.getItemsReducedToValues();
+            const itemsFiltered = this.store.getItemsReducedToValues();
 
             // Assign hidden input array of values
             this.passedElement.value = itemsFiltered.join(this.options.delimiter);
