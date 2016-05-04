@@ -114,21 +114,15 @@ h1, h2, h3, h4, h5, h6 {
         }
     }
     .choices__item--selectable {
-        transition: background-color .15s ease-in-out;
         &:after {
             content: "Press to select";
             font-size: 12px;
             opacity: 0;
             float: right;
-            transition: opacity .15s ease-in-out;
         }
         &.is-highlighted { 
             background-color: mix(#000000, #FFFFFF, 5%); 
-            transition: background-color .15s ease-in-out;
-            &:after { 
-                opacity: .5; 
-                transition: opacity .15s ease-in-out;
-            }
+            &:after { opacity: .5; }
         }
     }
 

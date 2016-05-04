@@ -3,21 +3,39 @@
 import { createStore } from 'redux';
 import rootReducer from './reducers/index.js';
 
+
 export class Store {
     constructor() {
-        this.store = createStore(rootReducer);
+        this.store = createStore(
+            rootReducer, 
+            window.devToolsExtension ? window.devToolsExtension() : undefined
+        );
     }
     
+    /**
+     * Get store object (wrapping Redux method)
+     * @return {Object} State
+     */
     getState() {
         return this.store.getState();
     }
 
-    dispatch(callback) {
-        this.store.dispatch(callback);
+    /**
+     * Dispatch event to store (wrapped Redux method)
+     * @param  {Function} action Action function to trigger
+     * @return
+     */
+    dispatch(action) {
+        this.store.dispatch(action);
     }
 
-    subscribe(callback) {
-        this.store.subscribe(callback);
+    /**
+     * Subscribe store to function call (wrapped Redux method)
+     * @param  {Function} onChange Function to trigger when state changes
+     * @return
+     */
+    subscribe(onChange) {
+        this.store.subscribe(onChange);
     }
 
     /**
@@ -122,4 +140,4 @@ export class Store {
     }
 };
 
-window.Store = module.exports = Store;
+module.exports = Store;
