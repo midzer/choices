@@ -76,6 +76,7 @@ h1, h2, h3, h4, h5, h6 {
       background-color: #00a5bb; }
 
 .choices__list--dropdown {
+  display: none;
   z-index: 1;
   position: absolute;
   width: 100%;
@@ -83,11 +84,11 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid #DDDDDD;
   top: 100%;
   margin-top: -1px;
-  display: none;
   border-bottom-left-radius: .25rem;
   border-bottom-right-radius: .25rem;
   max-height: 300px;
-  overflow: auto; }
+  overflow: auto;
+  will-change: scroll-position; }
   .is-active .choices__list--dropdown {
     border-color: #b7b7b7; }
   .choices__list--dropdown .choices__item {
