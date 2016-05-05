@@ -502,13 +502,50 @@ export class Choices {
         const containerScrollPos = this.dropdown.scrollTop + dropdownHeight;
 
         // Difference between the option and scroll position
-        const scrollDiff = optionPos - containerScrollPos;
+        let endPoint;
+
+        const animateScroll = (time, endPoint, direction) => {
+            let continueAnimation = false;
+
+            let easing, distance;
+            const strength = 4;
+
+            if(direction > 0) {
+                easing = (endPoint - this.dropdown.scrollTop)/strength;
+                distance = easing > 1 ? easing : 1;
+
+                this.dropdown.scrollTop = this.dropdown.scrollTop + distance;
+                if(this.dropdown.scrollTop < endPoint) {
+                    continueAnimation = true;
+                }
+            } else {
+                easing = (this.dropdown.scrollTop - endPoint)/strength;
+                distance = easing > 1 ? easing : 1;
+
+                this.dropdown.scrollTop = this.dropdown.scrollTop - distance;
+                if(this.dropdown.scrollTop > endPoint) {
+                    continueAnimation = true;
+                }
+            }
+
+            if(continueAnimation) {
+                requestAnimationFrame((time) => {
+                    animateScroll(time, endPoint, direction);
+                });
+            }
+        };
 
         // Scroll dropdown to top of option
         if(direction > 0) {
-            this.dropdown.scrollTop += scrollDiff;
+            endPoint = (this.dropdown.scrollTop + optionPos) - containerScrollPos;
+            requestAnimationFrame((time) => {
+                animateScroll(time, endPoint, 1);
+            });
         } else {
-            this.dropdown.scrollTop = option.offsetTop;
+            endPoint = option.offsetTop;
+            requestAnimationFrame((time) => {
+                animateScroll(time, endPoint, -1);
+            });
         }
     }
 
@@ -523,7 +560,7 @@ export class Choices {
             highlightedOptions.forEach((el) => {
                 el.classList.remove(this.options.classNames.highlightedState);
             });
-            
+
             if(el){
                 // Highlight given option
                 el.classList.add(this.options.classNames.highlightedState); 
@@ -533,8 +570,10 @@ export class Choices {
                 let el;
 
                 if(options.length > this.highlightPosition) {
+                    // If we have an option to highlight 
                     el = options[this.highlightPosition];
                 } else {
+                    // Otherwise highlight the option before
                     el = options[options.length - 1];
                 }
 
