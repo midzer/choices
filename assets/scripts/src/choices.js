@@ -64,6 +64,8 @@ export class Choices {
                 group: 'choices__group',
                 groupHeading : 'choices__heading',
                 activeState: 'is-active',
+                focusState: 'is-focused',
+                openState: 'is-open',
                 disabledState: 'is-disabled',
                 highlightedState: 'is-highlighted',
                 hiddenState: 'is-hidden',
@@ -408,7 +410,7 @@ export class Choices {
                 this.deselectAll();
             }
 
-            this.containerOuter.classList.remove(this.options.classNames.activeState);
+            this.containerOuter.classList.remove(this.options.classNames.focusState);
 
             // Close all other dropodowns
             if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
@@ -451,7 +453,7 @@ export class Choices {
      */
     onFocus(e) {
         if(!this.containerOuter.classList.contains(this.options.classNames.activeState)) {
-            this.containerOuter.classList.add(this.options.classNames.activeState);
+            this.containerOuter.classList.add(this.options.classNames.focusState);
         }
     }
 
@@ -463,7 +465,7 @@ export class Choices {
     onBlur(e) {
         const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
         if(!hasActiveDropdown) {
-            this.containerOuter.classList.remove(this.options.classNames.activeState);
+            this.containerOuter.classList.remove(this.options.classNames.focusState);
         }
     }
 
@@ -510,7 +512,6 @@ export class Choices {
 
         const animateScroll = (time, endPoint, direction) => {
             let continueAnimation = false;
-
             let easing, distance;
             const strength = 4;
 
@@ -742,8 +743,10 @@ export class Choices {
      * Show dropdown to user by adding active state class
      * @return
      */
-    showDropdown() {
+    showDropdown() { 
+        this.containerOuter.classList.add(this.options.classNames.openState);
         this.dropdown.classList.add(this.options.classNames.activeState);
+
         const dimensions = this.dropdown.getBoundingClientRect();
         const shouldFlip = dimensions.top + dimensions.height >= document.body.offsetHeight;
 
@@ -763,6 +766,7 @@ export class Choices {
         // A dropdown flips if it does not have space below the input
         const isFlipped = this.dropdown.classList.contains(this.options.classNames.flippedState);
 
+        this.containerOuter.classList.remove(this.options.classNames.openState);
         this.dropdown.classList.remove(this.options.classNames.activeState);
 
         if(isFlipped) {

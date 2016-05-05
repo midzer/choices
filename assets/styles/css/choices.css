@@ -48,7 +48,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: .25rem;
   font-size: 1.4rem;
   cursor: text; }
-  .is-active .choices__inner {
+  .is-focused .choices__inner {
     border-color: #b7b7b7; }
   .choices__inner:focus {
     outline: 1px solid #00BCD4;
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 300px;
   overflow: auto;
   will-change: scroll-position; }
-  .is-active .choices__list--dropdown {
+  .is-open .choices__list--dropdown {
     border-color: #b7b7b7; }
   .choices__list--dropdown .choices__item {
     padding: 1rem;
