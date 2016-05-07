@@ -3,7 +3,7 @@
 import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';
-import Store from './store.js';
+import Store from './store/index.js';
 
 /**
  * Choices
@@ -16,10 +16,6 @@ import Store from './store.js';
  */
 export class Choices {
     constructor(element = '[data-choice]', userOptions = {}) {
-        
-        // Cutting the mustard
-        const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
-        if (!cuttingTheMustard) console.error('init: Your browser doesn\'t support Choices');
 
         // If there are multiple elements, create a new instance 
         // for each element besides the first one (as that already has an instance)
@@ -49,13 +45,15 @@ export class Choices {
             prependValue: false,
             appendValue: false,
             selectAll: true,
+            templates: {},
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
                 input: 'choices__input',
                 inputCloned: 'choices__input--cloned',
                 list: 'choices__list',
-                listItems: 'choices__list--items',
+                listItems: 'choices__list--multiple',
+                listSingle: 'choices__list--single',
                 listDropdown: 'choices__list--dropdown',
                 item: 'choices__item',
                 itemSelectable: 'choices__item--selectable',
@@ -72,7 +70,6 @@ export class Choices {
                 flippedState: 'is-flipped',
                 selectedState: 'is-selected'
             },
-            templates: {},
             callbackOnInit: function() {},
             callbackOnRender: function() {},
             callbackOnRemoveItem: function() {},
@@ -116,8 +113,21 @@ export class Choices {
         this.onPaste = this.onPaste.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
 
-        // Let's have it large
-        this.init();
+        // Cutting the mustard
+        const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
+        if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
+
+        // Input type check
+        const inputTypes = ['select-one', 'select-multiple', 'text'];
+        const canInit = this.passedElement && inputTypes.includes(this.passedElement.type);
+
+        if(canInit) {
+            // Let's have it large
+            this.init();            
+        } else {
+            console.error('Choices: Incompatible input passed');
+        }
+
     }
     
     /** 
@@ -169,7 +179,7 @@ export class Choices {
      * @param  {Array} Active items
      * @return
      */
-    handleBackspaceKey(activeItems) {
+    handleBackspace(activeItems) {
         if(this.options.removeItems && activeItems) {
             const lastItem = activeItems[activeItems.length - 1];
             const hasSelectedItems = activeItems.some((item) => {
@@ -183,34 +193,11 @@ export class Choices {
                 this.removeItem(lastItem);
             } else {
                 this.selectItem(lastItem);
-                this.removeAllSelectedItems();
+                this.removeSelectedItems();
             }
         }
     };
 
-    /** 
-     * Handle what happens on a click event
-     * @param  {Array} activeItems    Items that are active
-     * @param  {HTMLElement} target   What triggered the click
-     * @param  {Boolean} hasShiftKey  Whether shift key is active
-     * @return
-     */
-    handleClick(activeItems, target, hasShiftKey) {
-        if(this.options.removeItems && target) {
-            const passedId = target.getAttribute('data-id');
-
-            // We only want to select one item with a click
-            // so we deselect any items that aren't the target
-            // unless shift is being pressed
-            activeItems.forEach((item) => {
-                if(item.id === parseInt(passedId) && !item.selected) {
-                    this.selectItem(item);
-                } else if(!hasShiftKey) {
-                    this.deselectItem(item);
-                }
-            });
-        }
-    }
 
     /**
      * Key down event
@@ -219,7 +206,7 @@ export class Choices {
      */
     onKeyDown(e) {
         if(e.target !== this.input) return;
-        
+
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const backKey = 46;
         const deleteKey = 8;
@@ -259,7 +246,7 @@ export class Choices {
                     this.handleEnter(activeItems, value);                    
                 }
 
-                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                if(this.dropdown && hasActiveDropdown) {
                     const highlighted = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
                 
                     if(highlighted) {
@@ -273,7 +260,7 @@ export class Choices {
                 break;
 
             case escapeKey:
-                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                if(this.dropdown && hasActiveDropdown) {
                     this.toggleDropdown();
                 }
                 break;
@@ -281,7 +268,7 @@ export class Choices {
             case downKey:
             case upKey:
                 // If up or down key is pressed, traverse through options
-                if(this.passedElement.type === 'select-multiple' && hasActiveDropdown) {
+                if(this.dropdown && hasActiveDropdown) {
                     const currentEl = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
                     const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
@@ -308,7 +295,7 @@ export class Choices {
             case deleteKey:
                 // If backspace or delete key is pressed and the input has no value
                 if(hasFocussedInput && !e.target.value) {
-                    this.handleBackspaceKey(activeItems);
+                    this.handleBackspace(activeItems);
                     e.preventDefault();
                 }
                 break;
@@ -325,8 +312,8 @@ export class Choices {
      */
     onKeyUp(e) {
         if(e.target !== this.input) return;
-        
-        if(this.passedElement.type === 'select-multiple' && this.options.allowSearch) {
+
+        if(this.dropdown && this.options.allowSearch) {
             if(this.input === document.activeElement) {
                 const options = this.store.getOptions();
                 const hasUnactiveOptions = options.some((option) => {
@@ -373,7 +360,7 @@ export class Choices {
         const activeItems = this.store.getItemsFilteredByActive();
         const hasShiftKey = e.shiftKey ? true : false;
 
-        if(this.passedElement.type === 'select-multiple' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
+        if(this.dropdown && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
             this.toggleDropdown();
         }
 
@@ -386,7 +373,20 @@ export class Choices {
 
             if(e.target.hasAttribute('data-item')) {
                 // If we are clicking on an item
-                this.handleClick(activeItems, e.target, hasShiftKey);
+                if(this.options.removeItems) {
+                    const passedId = e.target.getAttribute('data-id');
+
+                    // We only want to select one item with a click
+                    // so we deselect any items that aren't the target
+                    // unless shift is being pressed
+                    activeItems.forEach((item) => {
+                        if(item.id === parseInt(passedId) && !item.selected) {
+                            this.selectItem(item);
+                        } else if(!hasShiftKey) {
+                            this.deselectItem(item);
+                        }
+                    });
+                }
             } else if(e.target.hasAttribute('data-option')) {
                 // If we are clicking on an option
                 const options = this.store.getOptionsFilteredByActive();
@@ -396,7 +396,10 @@ export class Choices {
                 });
 
                 if(!option.selected && !option.disabled) {
-                    this.addItem(option.value, option.label, option.id);                    
+                    this.addItem(option.value, option.label, option.id);
+                    if(this.passedElement.type === 'select-one') {
+                        this.toggleDropdown();
+                    }
                 }
             }
 
@@ -413,7 +416,7 @@ export class Choices {
             this.containerOuter.classList.remove(this.options.classNames.focusState);
 
             // Close all other dropodowns
-            if(this.passedElement.type === 'select-multiple' && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
         }
@@ -658,6 +661,10 @@ export class Choices {
 
         this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
 
+        if(this.passedElement.type === 'select-one') {
+            this.removeActiveItems(id);
+        }  
+
         // Run callback if it is a function
         if(callback){
             if(isType('Function', callback)) {
@@ -714,13 +721,13 @@ export class Choices {
      * @param  {Boolean} selectedOnly Optionally remove only selected items
      * @return
      */
-    removeAllItems() {
+    removeActiveItems(excludedId) {
         const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
-            if(item.active) {
-                this.removeItem(item);    
-            }
+            if(item.active && excludedId !== item.id) {
+                this.removeItem(item);   
+            } 
         });
     }
 
@@ -729,7 +736,7 @@ export class Choices {
      * Note: removed items are soft deleted
      * @return
      */
-    removeAllSelectedItems() {
+    removeSelectedItems() {
         const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
@@ -848,13 +855,13 @@ export class Choices {
         const classNames = this.options.classNames;
         const templates = {
             containerOuter: () => {
-                return strToEl(`<div class="${ classNames.containerOuter }"></div>`);
+                return strToEl(`<div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }"></div>`);
             },
             containerInner: () => {
                 return strToEl(`<div class="${ classNames.containerInner }"></div>`);
             },
             list: () => {
-                return strToEl(`<ul class="${ classNames.list } ${ classNames.listItems }"></ul>`);
+                return strToEl(`<div class="${ classNames.list } ${ this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems }"></div>`);
             },
             input: () => {
                 return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
@@ -881,7 +888,7 @@ export class Choices {
             },
             item: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                    <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
                         ${ data.label }
                     </div>
                 `);
@@ -914,7 +921,7 @@ export class Choices {
         wrap(containerInner, containerOuter);
         
         // If placeholder has been enabled and we have a value
-        if (this.options.placeholder && this.options.placeholderValue) {
+        if (this.options.placeholder && this.options.placeholderValue && this.passedElement.type !== 'select-one') {
             input.placeholder = this.options.placeholderValue;  
             input.style.width = getWidthOfInput(input);
         }
@@ -928,7 +935,7 @@ export class Choices {
         containerInner.appendChild(list);
         containerInner.appendChild(input);
 
-        if(this.passedElement.type === 'select-multiple') {
+        if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
             this.highlightPosition = 0;
             const dropdown = this.getTemplate('dropdown');
             const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
@@ -949,6 +956,9 @@ export class Choices {
                     this.addOption(option);
                 });
             }
+
+        } else if(this.passedElement.type === 'select-one') {
+            console.log('select element');
         } else if(this.passedElement.type === 'text') {
             // Add any preset values seperated by delimiter
             this.presetItems.forEach((value) => {
@@ -984,8 +994,12 @@ export class Choices {
 
     renderOptions(options, fragment) {
         options.forEach((option, i) => {
-            const dropdownItem = this.getTemplate('option', option);    
-            fragment.appendChild(dropdownItem);
+            const dropdownItem = this.getTemplate('option', option);
+            if(this.passedElement.type === 'select-one') {
+                fragment.appendChild(dropdownItem);    
+            } else if(!option.selected) {
+                fragment.appendChild(dropdownItem);   
+            }
         });
     }
 
@@ -1020,32 +1034,40 @@ export class Choices {
     
         if(this.currentState !== this.prevState) {
             // OPTIONS
-            if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups) && this.passedElement.type === 'select-multiple') {
-                // Get active groups/options
-                const activeGroups = this.store.getGroupsFilteredByActive();
-                const activeOptions = this.store.getOptionsFilteredByActive();
+            if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups)) {
+                if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+                    // Get active groups/options
+                    const activeGroups = this.store.getGroupsFilteredByActive();
+                    const activeOptions = this.store.getOptionsFilteredByActive();
 
-                // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-                const optionListFragment = document.createDocumentFragment();
+                    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+                    const optionListFragment = document.createDocumentFragment();
 
-                // Clear options
-                this.dropdown.innerHTML = '';
+                    // Clear options
+                    this.dropdown.innerHTML = '';
 
-                // If we have grouped options
-                if(activeGroups.length >= 1 && this.isSearching !== true) {
-                    this.renderGroups(activeGroups, activeOptions, optionListFragment);
-                } else if(activeOptions.length >= 1) {
-                    this.renderOptions(activeOptions, optionListFragment);
-                }
+                    // If we have grouped options
+                    if(activeGroups.length >= 1 && this.isSearching !== true) {
+                        this.renderGroups(activeGroups, activeOptions, optionListFragment);
+                    } else if(activeOptions.length >= 1) {
+                        this.renderOptions(activeOptions, optionListFragment);
+                    }
 
-                // If we actually have anything to add to our dropdown
-                if(optionListFragment.children.length) {
-                    this.dropdown.appendChild(optionListFragment);
-                    this.highlightOption();
-                } else {
-                    // If dropdown is empty, show a no content notice
-                    const dropdownItem = this.getTemplate('notice', 'No options to select');
-                    this.dropdown.appendChild(dropdownItem);
+                    // If we actually have anything to add to our dropdown
+                    if(optionListFragment.children.length) {
+                        this.dropdown.appendChild(optionListFragment);
+                        this.highlightOption();
+                    } else {
+                        let dropdownItem;
+                        if(this.isSearching) {
+                            // If dropdown is empty, show a no content notice
+                            dropdownItem = this.getTemplate('notice', 'No results found');
+                        } else {
+                            // If dropdown is empty, show a no content notice
+                            dropdownItem = this.getTemplate('notice', 'No options to select');
+                        }
+                        this.dropdown.appendChild(dropdownItem);
+                    }
                 }
             }
             

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Choices</title>
     <link rel="stylesheet" href="assets/styles/css/choices.css">
-    <script src="assets/scripts/dist/bundle.js"></script>
+    <script src="assets/scripts/dist/choices.js"></script>
 </head>
 <body>
     <div class="container">
@@ -28,6 +28,13 @@
 
             <label for="choices-6">Text input with preset values passed through options</label>
             <input id="choices-6" type="text" placeholder="This is a placeholder">
+
+            <label for="choices-11">Single select box</label>
+            <select id="choices-11" name="choices-11" data-choice placeholder="This is a placeholder">
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2">Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
 
             <label for="choices-7">Select box</label>
             <select name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
@@ -129,7 +136,7 @@
                 // },
             });
 
-            choices5.removeAllItems();
+            choices5.removeActiveItems();
 
             const choices6 = new Choices('#choices-6', {
                 items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],

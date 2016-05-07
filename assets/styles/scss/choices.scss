@@ -74,7 +74,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .choices__list--options {}
 
-.choices__list--items {
+.choices__list--single {
+    display: inline-block;
+    padding: .4rem;
+}
+
+.choices__list--multiple {
     display: inline;
     .choices__item {
         display: inline-block;

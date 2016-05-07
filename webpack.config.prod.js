@@ -8,7 +8,7 @@ module.exports = {
     ],
     output: {
         path: path.join(__dirname, '/assets/scripts/dist'),
-        filename: 'bundle.js',
+        filename: 'choices.min.js',
         publicPath: '/assets/scripts/dist/'
     },
     plugins: [

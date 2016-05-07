@@ -1,7 +1,7 @@
 'use strict';
 
 import { createStore } from 'redux';
-import rootReducer from './reducers/index.js';
+import rootReducer from './../reducers/index.js';
 
 
 export class Store {
@@ -92,7 +92,7 @@ export class Store {
     getOptionsFilteredByActive() {
         const options = this.getOptions();
         const values = options.filter((option) => {
-            return option.active === true && option.selected !== true;
+            return option.active === true;
         },[]);
 
         return values;

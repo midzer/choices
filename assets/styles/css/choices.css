@@ -59,9 +59,13 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 0;
   list-style-type: none; }
 
-.choices__list--items {
+.choices__list--single {
+  display: inline-block;
+  padding: .4rem; }
+
+.choices__list--multiple {
   display: inline; }
-  .choices__list--items .choices__item {
+  .choices__list--multiple .choices__item {
     display: inline-block;
     border-radius: 2rem;
     padding: .4rem 1rem;
@@ -72,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #00b1c7;
     color: #FFFFFF;
     word-break: break-all; }
-    .choices__list--items .choices__item.is-selected {
+    .choices__list--multiple .choices__item.is-selected {
       background-color: #00a5bb; }
 
 .choices__list--dropdown {
