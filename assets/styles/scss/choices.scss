@@ -50,6 +50,33 @@ h1, h2, h3, h4, h5, h6 {
 .choices {
     margin-bottom: $global-guttering;
     position: relative;
+    &.is-disabled {
+        .choices__inner, .choices__input { 
+            background-color: lighten(#DDDDDD, 5%);
+            cursor: not-allowed; 
+            user-select: none;
+        }
+        .choices__item { cursor: not-allowed; }
+    }
+}
+
+.choices[data-type*="select-one"] {
+    &.is-open:after { 
+        border-color: transparent transparent darken(#DDDDDD, 15%) transparent; 
+        margin-top: -7.5px;
+    }
+    &:after {
+        content: "";
+        height: 0;
+        width: 0;
+        border-style: solid;
+        border-color: darken(#DDDDDD, 15%) transparent transparent transparent;
+        border-width: 5px;
+        position: absolute;
+        right: .75rem + .4rem;
+        top: 50%;
+        margin-top: -2.5px;  
+    } 
 }
 
 .choices__inner {
@@ -64,7 +91,6 @@ h1, h2, h3, h4, h5, h6 {
         outline: 1px solid #00BCD4;
         outline-offset: -1px;
     }
-
     .is-focused & { border-color: darken(#DDDDDD, 15%); }
     .is-open & { border-radius: .25rem .25rem 0 0; }
     .is-flipped.is-open & { border-radius: 0 0 .25rem .25rem; }
@@ -75,8 +101,6 @@ h1, h2, h3, h4, h5, h6 {
     padding-left: 0;
     list-style-type: none;
 }
-
-.choices__list--options {}
 
 .choices__list--single {
     display: inline-block;
@@ -93,10 +117,14 @@ h1, h2, h3, h4, h5, h6 {
         margin-right: .375rem;
         margin-bottom: .375rem;
         background-color: #00BCD4;
-        border: 1px solid darken(#00BCD4, 2.5%);
+        border: 1px solid darken(#00BCD4, 5%);
         color: #FFFFFF;
         word-break: break-all;
         &.is-selected { background-color: darken(#00BCD4, 5%); }
+        .is-disabled & {
+            background-color: darken(#DDDDDD, 15%);
+            border: 1px solid darken(#DDDDDD, 20%);
+        }
     }
 }
 
@@ -114,6 +142,8 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 300px;
     overflow: auto;
     will-change: scroll-position;
+    &.is-active { display: block; }
+    
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
@@ -136,8 +166,6 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .is-open & { border-color: darken(#DDDDDD, 15%); }
-
-    &.is-active { display: block; }
     .is-flipped & {
         top: auto;
         bottom: 100%;

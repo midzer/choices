@@ -11,47 +11,35 @@
     <div class="container">
         <div class="section">
             <h1>Choices</h1>
-            <label for="choices-1">Text input with no values and a limit of 5 items</label>
+            <h2>Text inputs</h2>
+            <label for="choices-1">Limited to 5</label>
             <input id="choices-1" type="text" value="preset-1 preset-2">
 
-            <label for="choices-2">Text input with preset values, custom classes and a placeholder. No duplicate values allowed</label>
+            <label for="choices-2">Unique values only</label>
             <input id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
 
-            <label for="choices-3">Text input that only allows email addresses</label>
+            <label for="choices-3">Email addresses only</label>
             <input id="choices-3" type="text" placeholder="This is a placeholder">
 
-            <label for="choices-4">Text input that disables adding items (destroyed)</label>
+            <label for="choices-4">Disabled</label>
             <input id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
-            <label for="choices-5">Text input that prepends and appends a value to each items return value</label>
+            <label for="choices-5">Prepends and appends a value to each items return value</label>
             <input id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
-            <label for="choices-6">Text input with preset values passed through options</label>
+            <label for="choices-6">Preset values passed through options</label>
             <input id="choices-6" type="text" placeholder="This is a placeholder">
 
-            <label for="choices-11">Single select box</label>
-            <select id="choices-11" name="choices-11" data-choice placeholder="This is a placeholder">
-                <option value="Dropdown item 1">Dropdown item 1</option>
-                <option value="Dropdown item 2">Dropdown item 2</option>
-                <option value="Dropdown item 3">Dropdown item 3</option>
-            </select>
-
-            <label for="choices-7">Select box</label>
+            <h2>Multiple select input</h2>
+            <label for="choices-7">Default</label>
             <select name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
-                <option value="Dropdown item 3" selected disabled>Dropdown item 3</option>
+                <option value="Dropdown item 3" selected>Dropdown item 3</option>
                 <option value="Dropdown item 4" disabled>Dropdown item 4</option>
             </select>
 
-            <label for="choices-8">Select box</label>
-            <select id="choices-8" name="choices-8" data-choice placeholder="This is a placeholder" multiple>
-                <option value="Dropdown item 1">Dropdown item 1</option>
-                <option value="Dropdown item 2">Dropdown item 2</option>
-                <option value="Dropdown item 3">Dropdown item 3</option>
-            </select>
-
-            <label for="choices-9">Select box with pre-selected option</label>
+            <label for="choices-9">With pre-selected option</label>
             <select id="choices-9" name="choices-9" data-choice placeholder="Choose an option" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2" selected>Dropdown item 2</option>
@@ -91,6 +79,17 @@
                     <option value="Vancouver">Vancouver</option>
                 </optgroup>
             </select>
+
+            <h2>Single select input</h2>
+            <label for="choices-11">Default</label>
+            <select id="choices-11" name="choices-11" data-choice placeholder="This is a placeholder">
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2">Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
+
+            <label for="choices-12">Options from remote source</label>
+            <select name="choices-12" id="choices-12" data-choice placeholder="Pick an Arctic Monkeys record"></select>
         </div>
     </div>
     <script>
@@ -100,15 +99,6 @@
                 delimiter: ' ',
                 editItems: true,
                 maxItems: 5,
-                // callbackOnRemoveItem: function(value) {
-                //     console.log(value);
-                // },
-                // callbackOnAddItem: function(id, value) {
-                //     console.log(id, value);
-                // },
-                // callbackOnRender: function(items) {
-                //     console.log(items);
-                // }
             });
 
             const choices2 = new Choices('#choices-2', {
@@ -126,43 +116,35 @@
             const choices4 = new Choices('#choices-4', {
                 addItems: false,
                 removeItems: false,
-            });
-
-            choices4.destroy();
+            }).disable();
 
             const choices5 = new Choices('#choices-5', {
                 prependValue: 'item-',
                 appendValue: `-${Date.now()}`,
-                // callbackOnRender: function(items, options) {
-                //     console.log(items);
-                // },
-            });
-
-            choices5.removeActiveItems();
+            }).removeActiveItems();
 
             const choices6 = new Choices('#choices-6', {
                 items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
-                // callbackOnRender: function(items, options, groups) {
-                //     console.log(items);
-                // },
             });
 
-            const choices7 = new Choices('#choices-7', {
-                // callbackOnRender: function(items, options) {
-                //     console.log(items);
-                // },
+            const choices7 = new Choices('#choices-7');
+
+            const choicesAjax = new Choices('#choices-12').ajax((callback) => {
+                fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
+                    .then((response) => {
+                        response.json().then(function(data) {  
+                            callback(data.releases, 'title', 'title');  
+                        });
+                    })
+                    .catch((error) => {
+                        callback();
+                    });
             });
 
             const choicesMultiple = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
-                // callbackOnRender: function(items, options, groups) {
-                //     console.log(options);
-                // },
             });
-
-            // choices6.addItem('josh2@joshuajohnson.co.uk', null, null, () => { console.log('Custom add item callback')});
-            // choices6.removeItemsByValue('josh@joshuajohnson.co.uk');
-            // console.log(choices6.getItemById(3));
+            
         });
     </script>
 </body>
