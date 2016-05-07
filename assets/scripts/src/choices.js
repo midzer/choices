@@ -316,8 +316,14 @@ export class Choices {
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
         if(this.passedElement.type === 'text') {
+            let dropdownItem;
             if(this.input.value) {
-                const dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
+                if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
+                    dropdownItem = this.getTemplate('notice', `Only ${ this.options.maxItems } options can be selected.`);
+                } else {
+                    dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
+                }
+                
                 this.dropdown.innerHTML = dropdownItem.outerHTML;
                 if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
                     this.showDropdown();    
@@ -1166,11 +1172,20 @@ export class Choices {
      * @return
      */
     destroy() {
+        this.passedElement.classList.remove(this.options.classNames.input, this.options.classNames.hiddenState);
+        this.passedElement.tabIndex = '';
+        this.passedElement.removeAttribute('style', 'display:none;');
+        this.passedElement.removeAttribute('aria-hidden');
+                
+        this.containerOuter.outerHTML = this.passedElement.outerHTML;
+
         this.passedElement = null;
         this.userOptions = null;
         this.options = null;
         this.initialised = null;
         this.store = null;
+
+        this.removeEventListeners();
     }
 };
 

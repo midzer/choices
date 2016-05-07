@@ -20,7 +20,7 @@
             <label for="choices-3">Text input that only allows email addresses</label>
             <input id="choices-3" type="text" placeholder="This is a placeholder">
 
-            <label for="choices-4">Text input that disables adding items</label>
+            <label for="choices-4">Text input that disables adding items (destroyed)</label>
             <input id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
             <label for="choices-5">Text input that prepends and appends a value to each items return value</label>
@@ -127,6 +127,8 @@
                 addItems: false,
                 removeItems: false,
             });
+
+            choices4.destroy();
 
             const choices5 = new Choices('#choices-5', {
                 prependValue: 'item-',
