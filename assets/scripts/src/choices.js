@@ -316,14 +316,13 @@ export class Choices {
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
         if(this.passedElement.type === 'text') {
-            if(this.input.value.length) {
+            if(this.input.value) {
                 const dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
                 this.dropdown.innerHTML = dropdownItem.outerHTML;
                 if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
                     this.showDropdown();    
                 }
             } else {
-                this.dropdown.innerHTML = '';
                 if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
                     this.hideDropdown();    
                 }
@@ -384,7 +383,7 @@ export class Choices {
                 this.input.focus();
             }
 
-            if(!this.passedElement.type === 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 // For select inputs we always want to show the dropdown if it isn't already showing
                 this.showDropdown();
             }
@@ -1027,9 +1026,6 @@ export class Choices {
         // Assign hidden input array of values
         this.passedElement.value = itemsFiltered.join(this.options.delimiter);
 
-        // Clear list
-        this.list.innerHTML = '';
-        
         // Add each list item to list
         items.forEach((item) => {
             // Create new list element 
@@ -1039,6 +1035,10 @@ export class Choices {
             fragment.appendChild(listItem);
         });
 
+        // Clear list
+        this.list.innerHTML = '';
+
+        // Update list
         this.list.appendChild(fragment);
     }
 
