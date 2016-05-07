@@ -11,7 +11,6 @@ import Store from './store/index.js';
  * To do:
  *    - Remove item by clicking a target
  *    - Set input width based on the size of the contents
- *    - Single select input support
  *    - Populate options by function
  */
 export class Choices {
@@ -759,9 +758,9 @@ export class Choices {
 
         // Whether or not the dropdown should appear above or below input
         if(shouldFlip) {
-            this.dropdown.classList.add(this.options.classNames.flippedState);
+            this.containerOuter.classList.add(this.options.classNames.flippedState);
         } else {
-            this.dropdown.classList.remove(this.options.classNames.flippedState);
+            this.containerOuter.classList.remove(this.options.classNames.flippedState);
         }
     }
 
@@ -771,13 +770,13 @@ export class Choices {
      */
     hideDropdown() {
         // A dropdown flips if it does not have space below the input
-        const isFlipped = this.dropdown.classList.contains(this.options.classNames.flippedState);
+        const isFlipped = this.containerOuter.classList.contains(this.options.classNames.flippedState);
 
         this.containerOuter.classList.remove(this.options.classNames.openState);
         this.dropdown.classList.remove(this.options.classNames.activeState);
 
         if(isFlipped) {
-            this.dropdown.classList.remove(this.options.classNames.flippedState);
+            this.containerOuter.classList.remove(this.options.classNames.flippedState);
         }
     }
 

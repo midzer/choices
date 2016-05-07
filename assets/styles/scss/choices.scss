@@ -59,11 +59,15 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: .25rem;
     font-size: 1.4rem;
     cursor: text;
-    .is-focused & { border-color: darken(#DDDDDD, 15%); }
+    overflow: hidden;
     &:focus { 
         outline: 1px solid #00BCD4;
         outline-offset: -1px;
     }
+
+    .is-focused & { border-color: darken(#DDDDDD, 15%); }
+    .is-open & { border-radius: .25rem .25rem 0 0; }
+    .is-flipped.is-open & { border-radius: 0 0 .25rem .25rem; }
 }
 
 .choices__list {
@@ -110,7 +114,6 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 300px;
     overflow: auto;
     will-change: scroll-position;
-    .is-open & { border-color: darken(#DDDDDD, 15%); }
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
@@ -132,16 +135,15 @@ h1, h2, h3, h4, h5, h6 {
         }
     }
 
+    .is-open & { border-color: darken(#DDDDDD, 15%); }
+
     &.is-active { display: block; }
-    &.is-flipped {
+    .is-flipped & {
         top: auto;
         bottom: 100%;
         margin-top: 0;
         margin-bottom: -1px;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: .25rem;
-        border-top-right-radius: .25rem;
+        border-radius: .25rem .25rem 0 0;
     }
 }
 
