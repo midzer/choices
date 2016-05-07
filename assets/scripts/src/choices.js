@@ -166,6 +166,7 @@ export class Choices {
                 
                 // All is good, add
                 if(canAddItem) {
+                    this.toggleDropdown();
                     this.addItem(value);
                     this.clearInput(this.passedElement);
                 }
@@ -219,12 +220,12 @@ export class Choices {
         const activeOptions = this.store.getOptionsFilteredByActive();
 
         const hasFocussedInput = this.input === document.activeElement;
-        const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
+        const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
         const hasItems = this.list && this.list.children;
         const keyString = String.fromCharCode(event.keyCode);
 
         // If a user is typing and the dropdown is not active
-        if(/[a-zA-Z0-9-_ ]/.test(keyString) && this.dropdown && !hasActiveDropdown) {
+        if(this.passedElement.type !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
             this.toggleDropdown();
         }
 
@@ -312,6 +313,23 @@ export class Choices {
     onKeyUp(e) {
         if(e.target !== this.input) return;
 
+        // We are typing into a text input and have a value, we want to show a dropdown
+        // notice. Otherwise hide the dropdown
+        if(this.passedElement.type === 'text') {
+            if(this.input.value.length) {
+                const dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
+                this.dropdown.innerHTML = dropdownItem.outerHTML;
+                if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                    this.showDropdown();    
+                }
+            } else {
+                this.dropdown.innerHTML = '';
+                if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                    this.hideDropdown();    
+                }
+            }
+        }
+
         if(this.dropdown && this.options.allowSearch) {
             if(this.input === document.activeElement) {
                 const options = this.store.getOptions();
@@ -359,15 +377,16 @@ export class Choices {
         const activeItems = this.store.getItemsFilteredByActive();
         const hasShiftKey = e.shiftKey ? true : false;
 
-        if(this.dropdown && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
-            this.toggleDropdown();
-        }
-
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
             // If input is not in focus, it ought to be 
             if(this.input !== document.activeElement) {
                 this.input.focus();
+            }
+
+            if(!this.passedElement.type === 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                // For select inputs we always want to show the dropdown if it isn't already showing
+                this.showDropdown();
             }
 
             if(e.target.hasAttribute('data-item')) {
@@ -415,7 +434,7 @@ export class Choices {
             this.containerOuter.classList.remove(this.options.classNames.focusState);
 
             // Close all other dropodowns
-            if(this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState)) {
+            if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
                 this.toggleDropdown();
             }
         }
@@ -440,8 +459,8 @@ export class Choices {
      * @return
      */
     onMouseOver(e) {
-        // If we have a dropdown and it is either the target or one of its children is the target
-        if(this.dropdown && (e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
+        // If the dropdown is either the target or one of its children is the target
+        if((e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
             if(e.target.hasAttribute('data-option')) {
                 this.highlightOption(e.target);
             }
@@ -465,7 +484,7 @@ export class Choices {
      * @return
      */
     onBlur(e) {
-        const hasActiveDropdown = this.dropdown && this.dropdown.classList.contains(this.options.classNames.activeState);
+        const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
         if(!hasActiveDropdown) {
             this.containerOuter.classList.remove(this.options.classNames.focusState);
         }
@@ -785,7 +804,6 @@ export class Choices {
      * @return
      */
     toggleDropdown() {
-        if(!this.dropdown) return;
         const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
 
         if(isActive) {
@@ -906,6 +924,7 @@ export class Choices {
         const containerInner = this.getTemplate('containerInner');
         const list = this.getTemplate('list');
         const input = this.getTemplate('input');
+        const dropdown = this.getTemplate('dropdown');
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -931,17 +950,15 @@ export class Choices {
         }
 
         containerOuter.appendChild(containerInner);
+        containerOuter.appendChild(dropdown);
         containerInner.appendChild(list);
         containerInner.appendChild(input);
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
             this.highlightPosition = 0;
-            const dropdown = this.getTemplate('dropdown');
-            const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
             
-            containerOuter.appendChild(dropdown);
-
-            this.dropdown = dropdown;
+            const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
+        
             this.isSearching = false;
         
             if(passedGroups.length) {
@@ -969,6 +986,7 @@ export class Choices {
         this.containerInner = containerInner;
         this.input = input;
         this.list = list;
+        this.dropdown = dropdown;
     }
 
     renderGroups(groups, options, fragment) {
