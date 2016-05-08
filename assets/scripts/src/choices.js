@@ -109,7 +109,7 @@ export class Choices {
         this.onBlur = this.onBlur.bind(this);
         this.onKeyUp = this.onKeyUp.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
-        this.onClick = this.onClick.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
 
@@ -216,7 +216,7 @@ export class Choices {
         const activeItems = this.store.getItemsFilteredByActive();
         const activeOptions = this.store.getOptionsFilteredByActive();
 
-        const hasFocussedInput = this.input === document.activeElement;
+        const hasFocusedInput = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
         const hasItems = this.list && this.list.children;
         const keyString = String.fromCharCode(event.keyCode);
@@ -295,7 +295,7 @@ export class Choices {
             case backKey:
             case deleteKey:
                 // If backspace or delete key is pressed and the input has no value
-                if(hasFocussedInput && !e.target.value) {
+                if(hasFocusedInput && !e.target.value) {
                     this.handleBackspace(activeItems);
                     e.preventDefault();
                 }
@@ -322,13 +322,16 @@ export class Choices {
                 if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
                     dropdownItem = this.getTemplate('notice', `Only ${ this.options.maxItems } options can be selected.`);
                 } else {
-                    dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);    
+                    dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
                 }
                 
-                this.dropdown.innerHTML = dropdownItem.outerHTML;
-                if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
-                    this.showDropdown();    
+                if((this.options.regexFilter && this.regexFilter(this.input.value)) || !this.options.regexFilter) {
+                    this.dropdown.innerHTML = dropdownItem.outerHTML;
+                    if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                        this.showDropdown();    
+                    }
                 }
+
             } else {
                 if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
                     this.hideDropdown();    
@@ -378,12 +381,17 @@ export class Choices {
      * @param  {Object} e Event
      * @return
      */
-    onClick(e) {
+    onMouseDown(e) {
         const activeItems = this.store.getItemsFilteredByActive();
-        const hasShiftKey = e.shiftKey ? true : false;
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
+            // Prevent blur event triggering causing dropdown to close
+            // in a race condition
+            e.preventDefault();
+
+            const hasShiftKey = e.shiftKey ? true : false;
+
             // If input is not in focus, it ought to be 
             if(this.input !== document.activeElement) {
                 this.input.focus();
@@ -427,17 +435,16 @@ export class Choices {
         } else {
             // Click is outside of our element so close dropdown and de-select items
             const hasSelectedItems = activeItems.some((item) => item.selected === true);
+            const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
 
-            if(hasSelectedItems) {
-                this.deselectAll();
-            }
-
+            // Deselect items
+            if(hasSelectedItems) this.deselectAll();
+        
+            // Remove focus state
             this.containerOuter.classList.remove(this.options.classNames.focusState);
 
-            // Close all other dropodowns
-            if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
-                this.toggleDropdown();
-            }
+            // Close all other dropdowns
+            if(hasActiveDropdown) this.toggleDropdown();
         }
     }
 
@@ -580,6 +587,11 @@ export class Choices {
         }
     }
 
+    /**
+     * Highlight option element 
+     * @param  {HTMLElement} el Element to highlight
+     * @return
+     */
     highlightOption(el) {
         // Highlight first element in dropdown
         const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
@@ -776,6 +788,10 @@ export class Choices {
      * @return
      */
     addOption(option, value, label, groupId = -1) {
+        if(!value) return
+
+        if(!label) { label = value; }
+
         // Generate unique id
         const options = this.store.getOptions();
         const id = options.length + 1;
@@ -852,11 +868,7 @@ export class Choices {
     toggleDropdown() {
         const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
 
-        if(isActive) {
-            this.hideDropdown();
-        } else {
-            this.showDropdown();
-        }
+        isActive ? this.hideDropdown() : this.showDropdown();
     }
 
     /**
@@ -871,12 +883,25 @@ export class Choices {
         }
     }
 
+    /** 
+     * Populate options via ajax callback
+     * @param  {Function} fn Passed 
+     * @return {[type]}      [description]
+     */
     ajax(fn) {
-        const callback = (results, title, label) => {
+        this.containerOuter.classList.add('is-loading');
+        this.input.placeholder = "Loading...";
+
+        const callback = (results, value, label) => {
             if(results && results.length) {
-                results.forEach((result) => {
+                this.containerOuter.classList.remove('is-loading');
+                this.input.placeholder = "";
+                results.forEach((result, index) => {
                     // Add each result to option dropdown
-                    this.addOption(null, result[title], result[label]);
+                    if(index === 0) { 
+                       this.addItem(result[value], result[label], index);
+                    }
+                    this.addOption(null, result[value], result[label]);
                 });
             }
         };
@@ -978,9 +1003,12 @@ export class Choices {
         wrap(containerInner, containerOuter);
         
         // If placeholder has been enabled and we have a value
-        if (this.options.placeholder && this.options.placeholderValue) {
-            input.placeholder = this.options.placeholderValue;  
-            input.style.width = getWidthOfInput(input);
+        if (this.options.placeholder && (this.options.placeholderValue || this.passedElement.placeholder)) {
+            if(this.passedElement.type !== 'select-one') {
+                const placeholder = this.options.placeholderValue || this.passedElement.placeholder;
+                input.placeholder = placeholder;  
+                input.style.width = getWidthOfInput(input);
+            }
         }
 
         if(!this.options.addItems) {
@@ -999,7 +1027,7 @@ export class Choices {
         
             this.isSearching = false;
         
-            if(passedGroups.length) {
+            if(passedGroups && passedGroups.length) {
                 passedGroups.forEach((group, index) => {
                     const isFirst = index === 0 ? true : false;
                     this.addGroup(group, index, isFirst);
@@ -1144,10 +1172,10 @@ export class Choices {
     addEventListeners() {
         document.addEventListener('keyup', this.onKeyUp);
         document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('click', this.onClick);
-        document.addEventListener('paste', this.onPaste);
+        document.addEventListener('mousedown', this.onMouseDown);
         document.addEventListener('mouseover', this.onMouseOver);
 
+        this.input.addEventListener('paste', this.onPaste);
         this.input.addEventListener('focus', this.onFocus);
         this.input.addEventListener('blur', this.onBlur);
     }
@@ -1159,10 +1187,10 @@ export class Choices {
     removeEventListeners() {
         document.removeEventListener('keyup', this.onKeyUp);
         document.removeEventListener('keydown', this.onKeyDown);
-        document.removeEventListener('click', this.onClick);
-        document.removeEventListener('paste', this.onPaste);
+        document.removeEventListener('mousedown', this.onMouseDown);
         document.removeEventListener('mouseover', this.onMouseOver);
-
+        
+        this.input.removeEventListener('paste', this.onPaste);
         this.input.removeEventListener('focus', this.onFocus);
         this.input.removeEventListener('blur', this.onBlur);
     }
