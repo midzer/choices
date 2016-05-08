@@ -9,9 +9,9 @@ import Store from './store/index.js';
  * Choices
  *
  * To do:
- *    - Remove item by clicking a target
+ *    - Map selected items to select options
  *    - Set input width based on the size of the contents
- *    - Populate options by function
+ *    - Remove item by clicking a target
  */
 export class Choices {
     constructor(element = '[data-choice]', userOptions = {}) {

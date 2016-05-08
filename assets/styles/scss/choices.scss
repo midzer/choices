@@ -1,5 +1,9 @@
 $global-guttering: 2.4rem;
 
+/*=============================================
+=            Generic styling                  =
+=============================================*/
+
 *, *:before, *:after {
     box-sizing: border-box
 }
@@ -47,6 +51,22 @@ h1, h2, h3, h4, h5, h6 {
     color: #333;
 }
 
+/*=====  End of Section comment block  ======*/
+
+
+/*===============================
+=            Choices            =
+===============================*/
+
+$choices-border-radius: .25rem;
+$choices-border-radius-item: 2rem;
+$choices-bg-color: #f9f9f9;
+$choices-bg-color-dropdown: #FFFFFF;
+$choices-text-color: #333333;
+$choices-keyline-color: #DDDDDD;
+$choices-primary-color: #00BCD4;
+$choices-disabled-color: #eaeaea;
+
 .choices {
     margin-bottom: $global-guttering;
     position: relative;
@@ -62,7 +82,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .choices[data-type*="select-one"] {
     &.is-open:after { 
-        border-color: transparent transparent darken(#DDDDDD, 15%) transparent; 
+        border-color: transparent transparent $choices-text-color transparent; 
         margin-top: -7.5px;
     }
     &:after {
@@ -70,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
         height: 0;
         width: 0;
         border-style: solid;
-        border-color: darken(#DDDDDD, 15%) transparent transparent transparent;
+        border-color: $choices-text-color transparent transparent transparent;
         border-width: 5px;
         position: absolute;
         right: .75rem + .4rem;
@@ -80,20 +100,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .choices__inner {
-    background-color: mix(#000000, #FFFFFF, 2.5%);
+    background-color: $choices-bg-color;
     padding: .75rem .75rem .375rem;
-    border: 1px solid #DDDDDD;
-    border-radius: .25rem;
+    border: 1px solid $choices-keyline-color;
+    border-radius: $choices-border-radius;
     font-size: 1.4rem;
     cursor: text;
     overflow: hidden;
-    &:focus { 
-        outline: 1px solid #00BCD4;
-        outline-offset: -1px;
-    }
-    .is-focused & { border-color: darken(#DDDDDD, 15%); }
-    .is-open & { border-radius: .25rem .25rem 0 0; }
-    .is-flipped.is-open & { border-radius: 0 0 .25rem .25rem; }
+    .is-focused & { border-color: darken($choices-keyline-color, 15%); }
+    .is-open & { border-radius: $choices-border-radius $choices-border-radius 0 0; }
+    .is-flipped.is-open & { border-radius: 0 0 $choices-border-radius $choices-border-radius; }
 }
 
 .choices__list {
@@ -104,26 +120,26 @@ h1, h2, h3, h4, h5, h6 {
 
 .choices__list--single {
     display: inline-block;
-    padding: .4rem;
+    .choices__item { padding: .4rem; }
 }
 
 .choices__list--multiple {
     display: inline;
     .choices__item {
         display: inline-block;
-        border-radius: 2rem;
+        border-radius: $choices-border-radius-item;
         padding: .4rem 1rem;
         font-size: 1.2rem;
         margin-right: .375rem;
         margin-bottom: .375rem;
-        background-color: #00BCD4;
-        border: 1px solid darken(#00BCD4, 5%);
+        background-color: $choices-primary-color;
+        border: 1px solid darken($choices-primary-color, 5%);
         color: #FFFFFF;
         word-break: break-all;
-        &.is-selected { background-color: darken(#00BCD4, 5%); }
+        &.is-selected { background-color: darken($choices-primary-color, 5%); }
         .is-disabled & {
-            background-color: darken(#DDDDDD, 15%);
-            border: 1px solid darken(#DDDDDD, 20%);
+            background-color: $choices-disabled-color;
+            border: 1px solid darken($choices-disabled-color, 5%);
         }
     }
 }
@@ -133,23 +149,23 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 1;
     position: absolute;
     width: 100%;
-    background-color: #FFFFFF;
-    border: 1px solid #DDDDDD;
+    background-color: $choices-bg-color-dropdown;
+    border: 1px solid $choices-keyline-color;
     top: 100%;
     margin-top: -1px;
-    border-bottom-left-radius: .25rem;
-    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: $choices-border-radius;
+    border-bottom-right-radius: $choices-border-radius;
     max-height: 300px;
     overflow: auto;
     will-change: scroll-position;
     &.is-active { display: block; }
-    
+
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
         &.is-selected { 
             opacity: .5; 
-            &:hover { background-color: #FFFFFF; }
+            &:hover { background-color: $choices-bg-color-dropdown; }
         }
     }
     .choices__item--selectable {
@@ -188,7 +204,7 @@ h1, h2, h3, h4, h5, h6 {
         font-weight: 600;
         font-size: 1.2rem;
         padding: 1rem;
-        border-bottom: 1px solid #EAEAEA;
+        border-bottom: 1px solid lighten($choices-keyline-color, 10%);
         color: lighten(#333, 30%); 
     }
 }
@@ -206,3 +222,6 @@ h1, h2, h3, h4, h5, h6 {
     padding: .4rem 0 .4rem .2rem;
     &:focus { outline: 0; }
 }
+
+
+/*=====  End of Choices  ======*/
