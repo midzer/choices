@@ -46,7 +46,7 @@
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
 
-            <label for="choices-10">Select box with option groups</label>
+            <label for="choices-10">Option groups</label>
             <select id="choices-10" name="choices-10" data-choice placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
                     <option value="London">London</option>
@@ -90,6 +90,40 @@
 
             <label for="choices-12">Options from remote source</label>
             <select name="choices-12" id="choices-12" data-choice placeholder="Pick an Arctic Monkeys record"></select>
+
+            <label for="choices-13">Option groups</label>
+            <select id="choices-13" name="choices-13" data-choice placeholder="This is a placeholder">
+                <optgroup label="UK">
+                    <option value="London">London</option>
+                    <option value="Manchester">Manchester</option>
+                    <option value="Liverpool">Liverpool</option>
+                </optgroup>
+                <optgroup label="FR">
+                    <option value="Paris">Paris</option>
+                    <option value="Lyon">Lyon</option>
+                    <option value="Marseille">Marseille</option>
+                </optgroup>
+                <optgroup label="DE" disabled>
+                    <option value="Hamburg">Hamburg</option>
+                    <option value="Munich">Munich</option>
+                    <option value="Berlin">Berlin</option>
+                </optgroup>
+                <optgroup label="US">
+                    <option value="New York">New York</option>
+                    <option value="Washington" disabled>Washington</option>
+                    <option value="Michigan">Michigan</option>
+                </optgroup>
+                <optgroup label="SP">
+                    <option value="Madrid">Madrid</option>
+                    <option value="Barcelona">Barcelona</option>
+                    <option value="Malaga">Malaga</option>
+                </optgroup>
+                <optgroup label="CA">
+                    <option value="Montreal">Montreal</option>
+                    <option value="Toronto">Toronto</option>
+                    <option value="Vancouver">Vancouver</option>
+                </optgroup>
+            </select>
         </div>
     </div>
     <script>

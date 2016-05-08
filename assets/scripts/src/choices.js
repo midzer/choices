@@ -1051,7 +1051,11 @@ export class Choices {
         groups.forEach((group, i) => {
             // Grab options that are children of this group
             const groupOptions = options.filter((option) => {
-                return option.groupId === group.id;
+                if(this.passedElement.type === 'select-one') {
+                    return option.groupId === group.id    
+                } else {
+                    return option.groupId === group.id && !option.selected;
+                }
             });
 
             if(groupOptions.length >= 1) {
