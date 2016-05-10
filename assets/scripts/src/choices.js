@@ -283,7 +283,6 @@ export class Choices {
                     if(nextEl) {
                         // We prevent default to stop the cursor moving 
                         // when pressing the arrow
-                        e.preventDefault();
                         if(!isScrolledIntoView(nextEl, this.dropdown, directionInt)) {
                             this.scrollToOption(nextEl, directionInt);
                         }
@@ -317,6 +316,7 @@ export class Choices {
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
         if(this.passedElement.type === 'text') {
+            const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
             let dropdownItem;
             if(this.input.value) {
                 if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
@@ -333,9 +333,7 @@ export class Choices {
                 }
 
             } else {
-                if(this.dropdown.classList.contains(this.options.classNames.activeState)) {
-                    this.hideDropdown();    
-                }
+                if(hasActiveDropdown) this.hideDropdown();
             }
         }
 
@@ -382,14 +380,15 @@ export class Choices {
      * @return
      */
     onMouseDown(e) {
-        const activeItems = this.store.getItemsFilteredByActive();
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
+
             // Prevent blur event triggering causing dropdown to close
             // in a race condition
             e.preventDefault();
 
+            const activeItems = this.store.getItemsFilteredByActive();
             const hasShiftKey = e.shiftKey ? true : false;
 
             // If input is not in focus, it ought to be 
@@ -434,11 +433,10 @@ export class Choices {
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            const hasSelectedItems = activeItems.some((item) => item.selected === true);
             const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
 
             // Deselect items
-            if(hasSelectedItems) this.deselectAll();
+            this.deselectAll();
         
             // Remove focus state
             this.containerOuter.classList.remove(this.options.classNames.focusState);
@@ -518,6 +516,7 @@ export class Choices {
      * @return {Boolean}        Whether test passed/failed
      */
     regexFilter(value) {
+        if(!value) return;
         const expression = new RegExp(this.options.regexFilter, 'i');
         return expression.test(value);
     }
@@ -1048,6 +1047,8 @@ export class Choices {
     }
 
     renderGroups(groups, options, fragment) {
+        const groupFragment = fragment || document.createDocumentFragment();
+
         groups.forEach((group, i) => {
             // Grab options that are children of this group
             const groupOptions = options.filter((option) => {
@@ -1061,32 +1062,30 @@ export class Choices {
             if(groupOptions.length >= 1) {
                 const dropdownGroup = this.getTemplate('optgroup', group);
 
-                groupOptions.forEach((option, j) => {
-                    const dropdownItem = this.getTemplate('option', option);
-                    if(this.passedElement.type === 'select-one') {
-                        dropdownGroup.appendChild(dropdownItem);    
-                    } else if(!option.selected) {
-                        dropdownGroup.appendChild(dropdownItem);   
-                    }
-                });
+                groupFragment.appendChild(dropdownGroup);
 
-                fragment.appendChild(dropdownGroup);
+                this.renderOptions(groupOptions, groupFragment);
             }
         });
     }
 
     renderOptions(options, fragment) {
+        // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+        const optsFragment = fragment || document.createDocumentFragment();
+
         options.forEach((option, i) => {
             const dropdownItem = this.getTemplate('option', option);
+
             if(this.passedElement.type === 'select-one') {
-                fragment.appendChild(dropdownItem);    
+                optsFragment.appendChild(dropdownItem);    
             } else if(!option.selected) {
-                fragment.appendChild(dropdownItem);   
+                optsFragment.appendChild(dropdownItem);   
             }
         });
     }
 
     renderItems(items, fragment) {
+        const itemListFragment = fragment || document.createDocumentFragment();
         // Simplify store data to just values
         const itemsFiltered = this.store.getItemsReducedToValues(items);
 
@@ -1099,14 +1098,14 @@ export class Choices {
             const listItem = this.getTemplate('item', item);
 
             // Append it to list
-            fragment.appendChild(listItem);
+            itemListFragment.appendChild(listItem);
         });
 
         // Clear list
         this.list.innerHTML = '';
 
         // Update list
-        this.list.appendChild(fragment);
+        this.list.appendChild(itemListFragment);
     }
 
     /**
@@ -1124,32 +1123,27 @@ export class Choices {
                     const activeGroups = this.store.getGroupsFilteredByActive();
                     const activeOptions = this.store.getOptionsFilteredByActive();
 
-                    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-                    const optionListFragment = document.createDocumentFragment();
+                    const optListFragment = document.createDocumentFragment();
 
                     // Clear options
                     this.dropdown.innerHTML = '';
 
                     // If we have grouped options
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
-                        this.renderGroups(activeGroups, activeOptions, optionListFragment);
+                        this.renderGroups(activeGroups, activeOptions, optListFragment);
                     } else if(activeOptions.length >= 1) {
-                        this.renderOptions(activeOptions, optionListFragment);
+                        this.renderOptions(activeOptions, optListFragment);
                     }
 
-                    // If we actually have anything to add to our dropdown
-                    if(optionListFragment.children.length) {
-                        this.dropdown.appendChild(optionListFragment);
+                    if(optListFragment.children.length) {
+                        // If we actually have anything to add to our dropdown
+                        // append it and highlight the first option
+                        this.dropdown.appendChild(optListFragment);
                         this.highlightOption();
                     } else {
-                        let dropdownItem;
-                        if(this.isSearching) {
-                            // If dropdown is empty, show a no content notice
-                            dropdownItem = this.getTemplate('notice', 'No results found');
-                        } else {
-                            // If dropdown is empty, show a no content notice
-                            dropdownItem = this.getTemplate('notice', 'No options to select');
-                        }
+                        // Otherwise show a notice
+                        const dropdownItem = this.isSearching ? this.getTemplate('notice', 'No results found') : this.getTemplate('notice', 'No options to select');
+            
                         this.dropdown.appendChild(dropdownItem);
                     }
                 }
@@ -1160,8 +1154,7 @@ export class Choices {
                 const activeItems = this.store.getItemsFilteredByActive();
                 if(activeItems) {
                     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-                    const itemListFragment = document.createDocumentFragment();
-                    this.renderItems(activeItems, itemListFragment);
+                    this.renderItems(activeItems);
                 }
             }
 
