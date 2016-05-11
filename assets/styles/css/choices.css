@@ -179,6 +179,14 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid #f7f7f7;
   color: gray; }
 
+.choices__button {
+  text-indent: -9999px;
+  background-color: white;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+       appearance: none;
+  border: 0; }
+
 .choices__input {
   background-color: #f9f9f9;
   font-size: 1.4rem;

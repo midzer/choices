@@ -209,6 +209,14 @@ $choices-disabled-color: #eaeaea;
     }
 }
 
+.choices__button {
+    text-indent: -9999px;
+    background-color: white;
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0;
+}
+
 .choices__input {
     background-color: mix(#000000, #FFFFFF, 2.5%);
     font-size: 1.4rem;

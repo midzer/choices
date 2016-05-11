@@ -32,6 +32,7 @@ export class Choices {
             items: [],
             addItems: true,
             removeItems: true,
+            removeButton: false,
             editItems: false,
             maxItems: false,
             delimiter: ',',
@@ -60,6 +61,7 @@ export class Choices {
                 itemOption: 'choices__item--option',
                 group: 'choices__group',
                 groupHeading : 'choices__heading',
+                button: 'choices__button',
                 activeState: 'is-active',
                 focusState: 'is-focused',
                 openState: 'is-open',
@@ -375,71 +377,79 @@ export class Choices {
      * @return
      */
     onMouseDown(e) {
+        // If not a right click
+        if(e.button !== 2) {
+            const activeItems = this.store.getItemsFilteredByActive();
 
-        const activeItems = this.store.getItemsFilteredByActive();
+            // If click is affecting a child node of our element
+            if(this.containerOuter.contains(e.target)) {
 
-        // If click is affecting a child node of our element
-        if(this.containerOuter.contains(e.target)) {
+                // Prevent blur event triggering causing dropdown to close
+                // in a race condition
+                e.preventDefault();
 
-            // Prevent blur event triggering causing dropdown to close
-            // in a race condition
-            e.preventDefault();
+                const hasShiftKey = e.shiftKey ? true : false;
 
-            const hasShiftKey = e.shiftKey ? true : false;
-
-            // If input is not in focus, it ought to be 
-            if(this.input !== document.activeElement) {
-                this.input.focus();
-            }
-
-            if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
-                // For select inputs we always want to show the dropdown if it isn't already showing
-                this.showDropdown();
-            }
-
-            if(e.target.hasAttribute('data-item')) {
-                // If we are clicking on an item
-                if(this.options.removeItems) {
-                    const passedId = e.target.getAttribute('data-id');
-
-                    // We only want to select one item with a click
-                    // so we deselect any items that aren't the target
-                    // unless shift is being pressed
-                    activeItems.forEach((item) => {
-                        if(item.id === parseInt(passedId) && !item.selected) {
-                            this.selectItem(item);
-                        } else if(!hasShiftKey) {
-                            this.deselectItem(item);
-                        }
-                    });
+                // If input is not in focus, it ought to be 
+                if(this.input !== document.activeElement) {
+                    this.input.focus();
                 }
-            } else if(e.target.hasAttribute('data-option')) {
-                // If we are clicking on an option
-                const options = this.store.getOptionsFilteredByActive();
-                const id = e.target.getAttribute('data-id');
-                const option = options.find((option) => option.id === parseInt(id));
 
-                if(!option.selected && !option.disabled) {
-                    this.addItem(option.value, option.label, option.id);
-                    if(this.passedElement.type === 'select-one') {
-                        this.toggleDropdown();
+                if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
+                    // For select inputs we always want to show the dropdown if it isn't already showing
+                    this.showDropdown();
+                }
+
+                if(e.target.hasAttribute('data-button')) {
+                    if(this.options.removeItems && this.options.removeButton) {
+                        const itemId = e.target.parentNode.getAttribute('data-id');
+                        const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
+                        this.removeItem(itemToRemove);
+                    }
+                } else if(e.target.hasAttribute('data-item')) {
+                    // If we are clicking on an item
+                    if(this.options.removeItems) {
+                        const passedId = e.target.getAttribute('data-id');
+
+                        // We only want to select one item with a click
+                        // so we deselect any items that aren't the target
+                        // unless shift is being pressed
+                        activeItems.forEach((item) => {
+                            if(item.id === parseInt(passedId) && !item.selected) {
+                                this.selectItem(item);
+                            } else if(!hasShiftKey) {
+                                this.deselectItem(item);
+                            }
+                        });
+                    }
+                } else if(e.target.hasAttribute('data-option')) {
+                    // If we are clicking on an option
+                    const options = this.store.getOptionsFilteredByActive();
+                    const id = e.target.getAttribute('data-id');
+                    const option = options.find((option) => option.id === parseInt(id));
+
+                    if(!option.selected && !option.disabled) {
+                        this.addItem(option.value, option.label, option.id);
+                        if(this.passedElement.type === 'select-one') {
+                            this.toggleDropdown();
+                        }
                     }
                 }
+
+            } else {
+                // Click is outside of our element so close dropdown and de-select items
+                const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
+                const hasSelectedItems = activeItems.some((item) => item.selected === true);
+
+                // De-select any selected items
+                if(hasSelectedItems) this.deselectAll();
+            
+                // Remove focus state
+                this.containerOuter.classList.remove(this.options.classNames.focusState);
+
+                // Close all other dropdowns
+                if(hasActiveDropdown) this.toggleDropdown();
             }
-
-        } else {
-            // Click is outside of our element so close dropdown and de-select items
-            const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
-            const hasSelectedItems = activeItems.some((item) => item.selected === true);
-
-            // De-select any selected items
-            if(hasSelectedItems) this.deselectAll();
-        
-            // Remove focus state
-            this.containerOuter.classList.remove(this.options.classNames.focusState);
-
-            // Close all other dropdowns
-            if(hasActiveDropdown) this.toggleDropdown();
         }
     }
 
@@ -960,11 +970,20 @@ export class Choices {
                 `);
             },
             item: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
-                        ${ data.label }
-                    </div>
-                `);
+                if(this.options.removeButton) {
+                    return strToEl(`
+                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                            ${ data.label }
+                            <button class="${ classNames.button }" data-button>Remove item</button>
+                        </div>
+                    `);
+                } else {
+                    return strToEl(`
+                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                            ${ data.label }
+                        </div>
+                    `);
+                }   
             },
         };
 
