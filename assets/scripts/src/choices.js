@@ -69,7 +69,7 @@ export class Choices {
                 highlightedState: 'is-highlighted',
                 hiddenState: 'is-hidden',
                 flippedState: 'is-flipped',
-                selectedState: 'is-selected'
+                selectedState: 'is-selected',
             },
             callbackOnInit: () => {},
             callbackOnRemoveItem: () => {},
@@ -972,7 +972,7 @@ export class Choices {
             item: (data) => {
                 if(this.options.removeButton) {
                     return strToEl(`
-                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
                             ${ data.label }
                             <button class="${ classNames.button }" data-button>Remove item</button>
                         </div>
@@ -1110,7 +1110,7 @@ export class Choices {
 
         if(this.passedElement.type === 'text') {
             // Assign hidden input array of values
-            this.passedElement.value = itemsFiltered.join(this.options.delimiter);            
+            this.passedElement.setAttribute('value', itemsFiltered.join(this.options.delimiter));          
         } else {
             const selectedOptionsFragment = document.createDocumentFragment();
 
@@ -1233,29 +1233,32 @@ export class Choices {
      * Initialise Choices
      * @return
      */
-    init(callback = this.options.callbackOnInit) {
-        this.initialised = true;
+    init(callback) {
+        if(this.initialised !== true) {
 
-        // Create required elements
-        this.createTemplates();
+            this.initialised = true;
 
-        // Generate input markup
-        this.generateInput();
+            // Create required elements
+            this.createTemplates();
 
-        this.store.subscribe(this.render);
+            // Generate input markup
+            this.generateInput();
 
-        // Render any items
-        this.render();
+            this.store.subscribe(this.render);
 
-        // Trigger event listeners 
-        this.addEventListeners();
+            // Render any items
+            this.render();
 
-        // Run callback if it is a function
-        if(callback){
-            if(isType('Function', callback)) {
-                callback();
-            } else {
-                console.error('callbackOnInit: Callback is not a function');
+            // Trigger event listeners 
+            this.addEventListeners();
+
+            // Run callback if it is a function
+            if(callback = this.options.callbackOnInit){
+                if(isType('Function', callback)) {
+                    callback();
+                } else {
+                    console.error('callbackOnInit: Callback is not a function');
+                }
             }
         }
     }
@@ -1269,14 +1272,12 @@ export class Choices {
         this.passedElement.tabIndex = '';
         this.passedElement.removeAttribute('style', 'display:none;');
         this.passedElement.removeAttribute('aria-hidden');
-        this.passedElement.addAttribute('data-choice');
                 
         this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
         this.passedElement = null;
         this.userOptions = null;
         this.options = null;
-        this.initialised = null;
         this.store = null;
 
         this.removeEventListeners();

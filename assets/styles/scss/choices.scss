@@ -32,6 +32,14 @@ label {
     font-weight: 500;
 }
 
+hr {
+    display: block;
+    margin: $global-guttering/2 0;
+    border: 0;
+    border-bottom: 1px solid #eaeaea;
+    height: 1px;
+}
+
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: $global-guttering/2;
@@ -136,6 +144,7 @@ $choices-disabled-color: #eaeaea;
         border: 1px solid darken($choices-primary-color, 5%);
         color: #FFFFFF;
         word-break: break-all;
+        &[data-deletable] { padding-right: .5rem; }
         &.is-selected { background-color: darken($choices-primary-color, 5%); }
         .is-disabled & {
             background-color: darken($choices-disabled-color, 25%);
@@ -211,10 +220,20 @@ $choices-disabled-color: #eaeaea;
 
 .choices__button {
     text-indent: -9999px;
-    background-color: white;
     -webkit-appearance: none;
     appearance: none;
     border: 0;
+    background-color: transparent;
+    background-image: url('../../icons/cross.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 8px;
+    border-left: 1px solid darken($choices-primary-color, 5%);
+    margin-left: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    line-height: 1;
+    cursor: pointer;
 }
 
 .choices__input {

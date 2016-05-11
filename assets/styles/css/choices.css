@@ -24,6 +24,13 @@ label {
   font-size: 1.4rem;
   font-weight: 500; }
 
+hr {
+  display: block;
+  margin: 1.2rem 0;
+  border: 0;
+  border-bottom: 1px solid #eaeaea;
+  height: 1px; }
+
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 1.2rem;
@@ -111,6 +118,8 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #00a5bb;
     color: #FFFFFF;
     word-break: break-all; }
+    .choices__list--multiple .choices__item[data-deletable] {
+      padding-right: .5rem; }
     .choices__list--multiple .choices__item.is-selected {
       background-color: #00a5bb; }
     .is-disabled .choices__list--multiple .choices__item {
@@ -181,11 +190,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .choices__button {
   text-indent: -9999px;
-  background-color: white;
   -webkit-appearance: none;
   -moz-appearance: none;
        appearance: none;
-  border: 0; }
+  border: 0;
+  background-color: transparent;
+  background-image: url("../../icons/cross.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px;
+  border-left: 1px solid #00a5bb;
+  margin-left: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  line-height: 1;
+  cursor: pointer; }
 
 .choices__input {
   background-color: #f9f9f9;

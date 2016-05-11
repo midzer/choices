@@ -11,10 +11,9 @@
     <div class="container">
         <div class="section">
             <h1>Choices</h1>
-            <input type="text" value="preset-1 preset-2">
             <h2>Text inputs</h2>
             <label for="choices-1">Limited to 5</label>
-            <input id="choices-1" type="text" value="preset-1 preset-2">
+            <input id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
 
             <label for="choices-2">Unique values only, no pasting</label>
             <input id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
@@ -30,6 +29,8 @@
 
             <label for="choices-6">Preset values passed through options</label>
             <input id="choices-6" type="text" placeholder="This is a placeholder">
+
+            <hr>
 
             <h2>Multiple select input</h2>
             <label for="choices-7">Default</label>
@@ -81,6 +82,8 @@
                 </optgroup>
             </select>
 
+            <hr>
+
             <h2>Single select input</h2>
             <label for="choices-11">Default</label>
             <select id="choices-11" name="choices-11" data-choice placeholder="This is a placeholder">
@@ -131,7 +134,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const firstElement = document.getElementById('choices-1');
             const choices1 = new Choices(firstElement, {
-                delimiter: ' ',
+                delimiter: ',',
                 editItems: true,
                 maxItems: 5,
                 removeButton: true
