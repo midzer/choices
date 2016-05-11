@@ -9,9 +9,9 @@ import Store from './store/index.js';
  * Choices
  *
  * To do:
- *    - Map selected items to select options
  *    - Set input width based on the size of the contents
  *    - Remove item by clicking a target
+ *    - Restoring input on .destroy()
  */
 export class Choices {
     constructor(element = '[data-choice]', userOptions = {}) {
@@ -1097,13 +1097,14 @@ export class Choices {
 
             // Add each list item to list
             items.forEach((item) => {
-                // Create new list element 
+                // Create a standard select option
                 const option = this.getTemplate('selectOption', item);
 
-                // Append it to list
+                // Append it to fragment
                 selectedOptionsFragment.appendChild(option);
             });
 
+            // Update selected options
             this.passedElement.innerHTML = "";
             this.passedElement.appendChild(selectedOptionsFragment);
         }
@@ -1133,7 +1134,7 @@ export class Choices {
     
         if(this.currentState !== this.prevState) {
 
-            // OPTIONS
+            // Options
             if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/options
@@ -1166,7 +1167,7 @@ export class Choices {
                 }
             }
             
-            // ITEMS
+            // Items
             if(this.currentState.items !== this.prevState.items) {
                 const activeItems = this.store.getItemsFilteredByActive();
                 if(activeItems) {
