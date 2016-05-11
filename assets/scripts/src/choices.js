@@ -179,9 +179,7 @@ export class Choices {
     handleBackspace(activeItems) {
         if(this.options.removeItems && activeItems) {
             const lastItem = activeItems[activeItems.length - 1];
-            const hasSelectedItems = activeItems.some((item) => {
-                return item.selected === true;
-            });
+            const hasSelectedItems = activeItems.some((item) => item.selected === true);
 
             // If editing the last item is allowed and there are not other selected items, 
             // we can edit the item value. Otherwise if we can remove items, remove all selected items
@@ -189,12 +187,11 @@ export class Choices {
                 this.input.value = lastItem.value;
                 this.removeItem(lastItem);
             } else {
-                this.selectItem(lastItem);
-                this.removeSelectedItems();
+                if(!hasSelectedItems) { this.selectItem(lastItem); }
+                this.removeSelectedItems();    
             }
         }
     };
-
 
     /**
      * Key down event
@@ -237,9 +234,7 @@ export class Choices {
                 break;
 
             case enterKey:
-                if(this.passedElement.type === 'select-one') {
-                    this.toggleDropdown();
-                }
+                if(this.passedElement.type === 'select-one') this.toggleDropdown();
 
                 // If enter key is pressed and the input has a value
                 if(e.target.value && this.passedElement.type === 'text') {
@@ -381,6 +376,8 @@ export class Choices {
      */
     onMouseDown(e) {
 
+        const activeItems = this.store.getItemsFilteredByActive();
+
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(e.target)) {
 
@@ -388,7 +385,6 @@ export class Choices {
             // in a race condition
             e.preventDefault();
 
-            const activeItems = this.store.getItemsFilteredByActive();
             const hasShiftKey = e.shiftKey ? true : false;
 
             // If input is not in focus, it ought to be 
@@ -434,9 +430,10 @@ export class Choices {
         } else {
             // Click is outside of our element so close dropdown and de-select items
             const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
+            const hasSelectedItems = activeItems.some((item) => item.selected === true);
 
-            // Deselect items
-            this.deselectAll();
+            // De-select any selected items
+            if(hasSelectedItems) this.deselectAll();
         
             // Remove focus state
             this.containerOuter.classList.remove(this.options.classNames.focusState);
@@ -945,6 +942,9 @@ export class Choices {
             notice: (label) => {
                 return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }">${ label }</div>`);
             },
+            selectOption: (data) => {
+                return strToEl(`<option value="${ data.value }" selected>${ data.label.trim() }</option>`);
+            },
             option: (data) => {
                 return strToEl(`
                     <div class="${ classNames.item } ${ classNames.itemOption } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
@@ -1089,8 +1089,24 @@ export class Choices {
         // Simplify store data to just values
         const itemsFiltered = this.store.getItemsReducedToValues(items);
 
-        // Assign hidden input array of values
-        this.passedElement.value = itemsFiltered.join(this.options.delimiter);
+        if(this.passedElement.type === 'text') {
+            // Assign hidden input array of values
+            this.passedElement.value = itemsFiltered.join(this.options.delimiter);            
+        } else {
+            const selectedOptionsFragment = document.createDocumentFragment();
+
+            // Add each list item to list
+            items.forEach((item) => {
+                // Create new list element 
+                const option = this.getTemplate('selectOption', item);
+
+                // Append it to list
+                selectedOptionsFragment.appendChild(option);
+            });
+
+            this.passedElement.innerHTML = "";
+            this.passedElement.appendChild(selectedOptionsFragment);
+        }
 
         // Add each list item to list
         items.forEach((item) => {
@@ -1116,6 +1132,7 @@ export class Choices {
         this.currentState = this.store.getState();
     
         if(this.currentState !== this.prevState) {
+
             // OPTIONS
             if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
