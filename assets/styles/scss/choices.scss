@@ -74,6 +74,7 @@ $choices-text-color: #333333;
 $choices-keyline-color: #DDDDDD;
 $choices-primary-color: #00BCD4;
 $choices-disabled-color: #eaeaea;
+$choices-button-icon-path: '../../icons/cross.svg';
 
 .choices {
     margin-bottom: $global-guttering;
@@ -141,11 +142,14 @@ $choices-disabled-color: #eaeaea;
         margin-right: .375rem;
         margin-bottom: .375rem;
         background-color: $choices-primary-color;
-        border: 1px solid darken($choices-primary-color, 5%);
+        border: 1px solid darken($choices-primary-color, 10%);
         color: #FFFFFF;
         word-break: break-all;
         &[data-deletable] { padding-right: .5rem; }
-        &.is-selected { background-color: darken($choices-primary-color, 5%); }
+        &.is-selected { 
+            background-color: darken($choices-primary-color, 5%); 
+            border: 1px solid darken($choices-primary-color, 15%);
+        }
         .is-disabled & {
             background-color: darken($choices-disabled-color, 25%);
             border: 1px solid darken($choices-disabled-color, 35%);
@@ -224,11 +228,11 @@ $choices-disabled-color: #eaeaea;
     appearance: none;
     border: 0;
     background-color: transparent;
-    background-image: url('../../icons/cross.svg');
+    background-image: url($choices-button-icon-path);
     background-repeat: no-repeat;
     background-position: center;
     background-size: 8px;
-    border-left: 1px solid darken($choices-primary-color, 5%);
+    border-left: 1px solid darken($choices-primary-color, 10%);
     margin-left: 4px;
     padding-left: 6px;
     padding-right: 6px;
