@@ -9,8 +9,8 @@ import Store from './store/index.js';
  * Choices
  *
  * To do:
- *    - Set input width based on the size of the contents
- *    - Remove item by clicking a target
+ *    - Pagination
+ *    - Single select box search in dropdown
  *    - Restoring input on .destroy()
  */
 export class Choices {
@@ -112,8 +112,9 @@ export class Choices {
         this.onKeyUp = this.onKeyUp.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
-        this.onPaste = this.onPaste.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
+        this.onPaste = this.onPaste.bind(this);
+        this.onInput = this.onInput.bind(this);
 
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
@@ -316,8 +317,14 @@ export class Choices {
             const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
             let dropdownItem;
             if(this.input.value) {
+
+                const activeItems = this.store.getItemsFilteredByActive();
+                const isUnique = !activeItems.some((item) => item.value === this.input.value);
+
                 if (this.options.maxItems && this.options.maxItems <= this.list.children.length) {
-                    dropdownItem = this.getTemplate('notice', `Only ${ this.options.maxItems } options can be selected.`);
+                    dropdownItem = this.getTemplate('notice', `Only ${ this.options.maxItems } options can be added.`);
+                } else if(!this.options.allowDuplicates && !isUnique) {
+                    dropdownItem = this.getTemplate('notice', `Only unique values can be added.`);
                 } else {
                     dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
                 }
@@ -342,8 +349,7 @@ export class Choices {
                 // Check that have a value to search
                 if(this.input.value && options.length) {
                     const handleFilter = () => {
-                        // Ensure value *still* has a value after 500 delay
-                        if(this.input.value && this.input.value.length >= 1) {
+                        if(this.input.value.length >= 1) {
                             const haystack = this.store.getOptionsFiltedBySelectable();
                             const needle = this.input.value;
 
@@ -355,6 +361,7 @@ export class Choices {
                             
                             const results = fuse.search(needle);
 
+                            this.highlightPosition = 0;
                             this.isSearching = true;
                             this.store.dispatch(filterOptions(results));
                         }
@@ -368,6 +375,10 @@ export class Choices {
                 }
             }
         } 
+    }
+
+    onInput(e) {
+        this.input.style.width = getWidthOfInput(this.input);
     }
 
 
@@ -515,6 +526,7 @@ export class Choices {
      */
     clearInput() {
         if (this.input.value) this.input.value = '';
+        this.input.style.width = getWidthOfInput(this.input);
     }
 
     /**
@@ -949,7 +961,7 @@ export class Choices {
             dropdown: () => {
                 return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
             },
-            notice: (label) => {
+            notice: (label, clickable) => {
                 return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }">${ label }</div>`);
             },
             selectOption: (data) => {
@@ -1209,6 +1221,7 @@ export class Choices {
         document.addEventListener('mousedown', this.onMouseDown);
         document.addEventListener('mouseover', this.onMouseOver);
 
+        this.input.addEventListener('input', this.onInput);
         this.input.addEventListener('paste', this.onPaste);
         this.input.addEventListener('focus', this.onFocus);
         this.input.addEventListener('blur', this.onBlur);
@@ -1224,6 +1237,7 @@ export class Choices {
         document.removeEventListener('mousedown', this.onMouseDown);
         document.removeEventListener('mouseover', this.onMouseOver);
         
+        this.input.removeEventListener('input', this.onInput);
         this.input.removeEventListener('paste', this.onPaste);
         this.input.removeEventListener('focus', this.onFocus);
         this.input.removeEventListener('blur', this.onBlur);

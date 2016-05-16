@@ -34,7 +34,7 @@ label {
 
 hr {
     display: block;
-    margin: $global-guttering/2 0;
+    margin: $global-guttering*1.5 0;
     border: 0;
     border-bottom: 1px solid #eaeaea;
     height: 1px;
@@ -43,7 +43,7 @@ hr {
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: $global-guttering/2;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .container {
