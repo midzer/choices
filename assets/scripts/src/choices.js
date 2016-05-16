@@ -984,7 +984,7 @@ export class Choices {
             item: (data) => {
                 if(this.options.removeButton) {
                     return strToEl(`
-                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
+                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
                             ${ data.label }
                             <button class="${ classNames.button }" data-button>Remove item</button>
                         </div>
