@@ -64,6 +64,15 @@ h1, h2, h3, h4, h5, h6 {
   .choices.is-disabled .choices__item {
     cursor: not-allowed; }
 
+.choices[data-type*="select-one"] .choices__inner {
+  padding-bottom: .75rem; }
+
+.choices[data-type*="select-one"] .choices__input {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  margin: 0; }
+
 .choices[data-type*="select-one"].is-open:after {
   border-color: transparent transparent #333333 transparent;
   margin-top: -7.5px; }

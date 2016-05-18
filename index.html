@@ -172,7 +172,7 @@
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then((response) => {
                         response.json().then(function(data) {  
-                            callback(data.releases, 'title', 'title');  
+                            callback(data.releases, 'title', 'title');
                         });
                     })
                     .catch((error) => {

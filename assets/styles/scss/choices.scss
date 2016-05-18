@@ -90,6 +90,13 @@ $choices-button-icon-path: '../../icons/cross.svg';
 }
 
 .choices[data-type*="select-one"] {
+    .choices__inner { padding-bottom: .75rem; }
+    .choices__input { 
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        margin: 0;
+    }
     &.is-open:after { 
         border-color: transparent transparent $choices-text-color transparent; 
         margin-top: -7.5px;
