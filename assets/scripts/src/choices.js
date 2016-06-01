@@ -44,6 +44,7 @@ export class Choices {
             prependValue: false,
             appendValue: false,
             selectAll: true,
+            loadingText: 'Loading...',
             templates: {},
             classNames: {
                 containerOuter: 'choices',
@@ -128,7 +129,6 @@ export class Choices {
         } else {
             console.error('Choices: Incompatible input passed');
         }
-
     }
     
     /** 
@@ -400,14 +400,14 @@ export class Choices {
 
                 const hasShiftKey = e.shiftKey ? true : false;
 
-                // If input is not in focus, it ought to be 
-                if(this.input !== document.activeElement) {
-                    this.input.focus();
-                }
-
                 if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.options.classNames.activeState)) {
                     // For select inputs we always want to show the dropdown if it isn't already showing
                     this.showDropdown();
+                }
+
+                // If input is not in focus, it ought to be 
+                if(this.input !== document.activeElement) {
+                    this.input.focus();
                 }
 
                 if(e.target.hasAttribute('data-button')) {
@@ -470,6 +470,7 @@ export class Choices {
      * @return
      */
     onPaste(e) {
+        if(e.target !== this.input) return;
         // Disable pasting into the input if option has been set
         if(!this.options.allowPaste) {
             e.preventDefault();
@@ -909,7 +910,7 @@ export class Choices {
      */
     ajax(fn) {
         this.containerOuter.classList.add('is-loading');
-        this.input.placeholder = "Loading...";
+        this.input.placeholder = this.options.loadingText;
 
         const callback = (results, value, label) => {
             if(results && results.length) {
@@ -1056,7 +1057,7 @@ export class Choices {
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             containerInner.appendChild(input);
-        } else {
+        } else if(this.options.allowSearch) {
             dropdown.insertBefore(input, dropdown.firstChild);
         }
 

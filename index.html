@@ -168,7 +168,7 @@
 
             const choices7 = new Choices('#choices-7');
 
-            const choicesAjax = new Choices('#choices-12').ajax((callback) => {
+            const choicesAjax = new Choices('#choices-12', { allowSearch: false }).ajax((callback) => {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then((response) => {
                         response.json().then(function(data) {  
