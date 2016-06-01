@@ -28,7 +28,7 @@
             <input id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
             <label for="choices-6">Preset values passed through options</label>
-            <input id="choices-6" type="text" placeholder="This is a placeholder">
+            <input id="choices-6" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
 
             <hr>
 
@@ -163,7 +163,7 @@
             }).removeActiveItems();
 
             const choices6 = new Choices('#choices-6', {
-                items: ['josh@joshuajohnson.co.uk', 'joe@bloggs.co.uk'],
+                items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
             const choices7 = new Choices('#choices-7');

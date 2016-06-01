@@ -65,6 +65,7 @@ h1, h2, h3, h4, h5, h6 {
     cursor: not-allowed; }
 
 .choices[data-type*="select-one"] .choices__inner {
+  cursor: pointer;
   padding-bottom: .75rem; }
 
 .choices[data-type*="select-one"] .choices__input {
@@ -89,13 +90,15 @@ h1, h2, h3, h4, h5, h6 {
   top: 50%;
   margin-top: -2.5px; }
 
+.choices[data-type*="select-multiple"] .choices__inner, .choices[data-type*="text"] .choices__inner {
+  cursor: text; }
+
 .choices__inner {
   background-color: #f9f9f9;
   padding: .75rem .75rem .375rem;
   border: 1px solid #DDDDDD;
   border-radius: 0.25rem;
   font-size: 1.4rem;
-  cursor: text;
   overflow: hidden; }
   .is-focused .choices__inner {
     border-color: #b7b7b7; }

@@ -82,38 +82,37 @@ export class Choices {
         this.store = new Store(this.render);
 
         // State tracking
-        this.initialised = false;
+        this.initialised  = false;
         this.currentState = {};
-        this.prevState = {};
+        this.prevState    = {};
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         this.highlightPosition = 0;
 
-        // Set preset items - this looks out of place
-        this.presetItems = [];
-        if(this.options.items.length) {
-            this.presetItems = this.options.items;
-        } else if(this.passedElement.value !== '') {
-            this.presetItems = this.passedElement.value.split(this.options.delimiter);
+        // Assign preset items from passed object first
+        this.presetItems = this.options.items;
+        // Then add any values passed from attribute
+        if(this.passedElement.value !== '') {
+            this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.options.delimiter));
         }
 
         // Bind methods
-        this.init = this.init.bind(this);
-        this.render = this.render.bind(this);
+        this.init    = this.init.bind(this);
+        this.render  = this.render.bind(this);
         this.destroy = this.destroy.bind(this);
         this.disable = this.disable.bind(this);
         
         // Bind event handlers
-        this.onFocus = this.onFocus.bind(this);
-        this.onBlur = this.onBlur.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onFocus     = this.onFocus.bind(this);
+        this.onBlur      = this.onBlur.bind(this);
+        this.onKeyUp     = this.onKeyUp.bind(this);
+        this.onKeyDown   = this.onKeyDown.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
-        this.onPaste = this.onPaste.bind(this);
-        this.onInput = this.onInput.bind(this);
+        this.onPaste     = this.onPaste.bind(this);
+        this.onInput     = this.onInput.bind(this);
 
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
@@ -204,21 +203,21 @@ export class Choices {
         if(e.target !== this.input) return;
 
         const ctrlDownKey = e.ctrlKey || e.metaKey;
-        const backKey = 46;
-        const deleteKey = 8;
-        const enterKey = 13;
-        const aKey = 65;
-        const escapeKey = 27;
-        const upKey = 38;
-        const downKey = 40;
+        const backKey     = 46;
+        const deleteKey   = 8;
+        const enterKey    = 13;
+        const aKey        = 65;
+        const escapeKey   = 27;
+        const upKey       = 38;
+        const downKey     = 40;
 
-        const activeItems = this.store.getItemsFilteredByActive();
-        const activeOptions = this.store.getOptionsFilteredByActive();
-
-        const hasFocusedInput = this.input === document.activeElement;
+        const activeItems       = this.store.getItemsFilteredByActive();
+        const activeOptions     = this.store.getOptionsFilteredByActive();
+        
+        const hasFocusedInput   = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
-        const hasItems = this.itemList && this.itemList.children;
-        const keyString = String.fromCharCode(event.keyCode);
+        const hasItems          = this.itemList && this.itemList.children;
+        const keyString         = String.fromCharCode(event.keyCode);
 
         // If a user is typing and the dropdown is not active
         if(this.passedElement.type !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
@@ -250,7 +249,7 @@ export class Choices {
                     if(highlighted) {
                         const value = highlighted.getAttribute('data-value');
                         const label = highlighted.innerHTML;
-                        const id = highlighted.getAttribute('data-id');
+                        const id    = highlighted.getAttribute('data-id');
                         this.addItem(value, label, id);
                         this.clearInput(this.passedElement);
                     }
@@ -267,7 +266,7 @@ export class Choices {
             case upKey:
                 // If up or down key is pressed, traverse through options
                 if(hasActiveDropdown) {
-                    const currentEl = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
+                    const currentEl    = this.dropdown.querySelector(`.${this.options.classNames.highlightedState}`);
                     const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
 
@@ -342,7 +341,7 @@ export class Choices {
 
         if(this.options.allowSearch) {
             if(this.input === document.activeElement) {
-                const options = this.store.getOptions();
+                const options            = this.store.getOptions();
                 const hasUnactiveOptions = options.some((option) => option.active !== true);
 
                 // Check that have a value to search
@@ -350,7 +349,7 @@ export class Choices {
                     const handleFilter = () => {
                         if(this.input.value.length >= 1) {
                             const haystack = this.store.getOptionsFiltedBySelectable();
-                            const needle = this.input.value;
+                            const needle   = this.input.value;
 
                             const fuse = new Fuse(haystack, { 
                                 keys: ['label', 'value'],
@@ -413,7 +412,7 @@ export class Choices {
 
                 if(e.target.hasAttribute('data-button')) {
                     if(this.options.removeItems && this.options.removeButton) {
-                        const itemId = e.target.parentNode.getAttribute('data-id');
+                        const itemId       = e.target.parentNode.getAttribute('data-id');
                         const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
                         this.removeItem(itemToRemove);
                     }
@@ -450,7 +449,7 @@ export class Choices {
             } else {
                 // Click is outside of our element so close dropdown and de-select items
                 const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
-                const hasSelectedItems = activeItems.some((item) => item.selected === true);
+                const hasSelectedItems  = activeItems.some((item) => item.selected === true);
 
                 // De-select any selected items
                 if(hasSelectedItems) this.deselectAll();
@@ -551,15 +550,15 @@ export class Choices {
     scrollToOption(option, direction) {
         if(!option) return;
         
-        const dropdownHeight = this.dropdown.offsetHeight;
-        const optionHeight = option.offsetHeight;
-
+        const dropdownHeight     = this.dropdown.offsetHeight;
+        const optionHeight       = option.offsetHeight;
+        
         // Distance from bottom of element to top of parent
-        const optionPos = option.offsetTop + optionHeight;
-
+        const optionPos          = option.offsetTop + optionHeight;
+        
         // Scroll position of dropdown
         const containerScrollPos = this.dropdown.scrollTop + dropdownHeight;
-
+        
         // Difference between the option and scroll position
         let endPoint;
 
@@ -696,9 +695,9 @@ export class Choices {
      * @param {String} value Value to add to store
      */
     addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
-        const items = this.store.getItems();
-        let passedValue = value.trim();
-        let passedLabel = label || passedValue;
+        const items        = this.store.getItems();
+        let passedValue    = value.trim();
+        let passedLabel    = label || passedValue;
         let passedOptionId = optionId || -1;
 
         // If a prepended value has been passed, prepend it
@@ -740,8 +739,8 @@ export class Choices {
             return;
         }
 
-        const id = item.id;
-        const value = item.value;
+        const id       = item.id;
+        const value    = item.value;
         const optionId = item.optionId;
 
         this.store.dispatch(removeItem(id, optionId));
@@ -813,8 +812,8 @@ export class Choices {
         if(!label) { label = value; }
 
         // Generate unique id
-        const options = this.store.getOptions();
-        const id = options.length + 1;
+        const options    = this.store.getOptions();
+        const id         = options.length + 1;
         const isDisabled = option && (option.disabled || option.parentNode.disabled);
 
         this.store.dispatch(addOption(value, label, id, groupId, isDisabled));
@@ -831,7 +830,7 @@ export class Choices {
      */
     addGroup(group, id, isFirst) {
         const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
-        const groupId = id;
+        const groupId      = id;
 
         if(groupOptions) {
             this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
@@ -1014,17 +1013,17 @@ export class Choices {
     generateInput() {
         const containerOuter = this.getTemplate('containerOuter');
         const containerInner = this.getTemplate('containerInner');
-        const itemList = this.getTemplate('itemList');
-        const optionList = this.getTemplate('optionList');
-        const input = this.getTemplate('input');
-        const dropdown = this.getTemplate('dropdown');
+        const itemList       = this.getTemplate('itemList');
+        const optionList     = this.getTemplate('optionList');
+        const input          = this.getTemplate('input');
+        const dropdown       = this.getTemplate('dropdown');
 
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
-        this.input = input;
-        this.optionList = optionList;
-        this.itemList = itemList;
-        this.dropdown = dropdown;
+        this.input          = input;
+        this.optionList     = optionList;
+        this.itemList       = itemList;
+        this.dropdown       = dropdown;
 
         // Hide passed input
         this.passedElement.classList.add(this.options.classNames.input, this.options.classNames.hiddenState);
@@ -1082,8 +1081,13 @@ export class Choices {
 
         } else if(this.passedElement.type === 'text') {
             // Add any preset values seperated by delimiter
-            this.presetItems.forEach((value) => {
-                this.addItem(value);
+            this.presetItems.forEach((item) => {
+                if(isType('Object', item)) {
+                    if(!item.value) return;
+                    this.addItem(item.value, item.label, item.id);
+                } else if(isType('String', item)) {
+                    this.addItem(item);
+                }
             });
         }
     }
@@ -1131,9 +1135,10 @@ export class Choices {
     }
 
     renderItems(items, fragment) {
+        // Create fragment to add elements to
         const itemListFragment = fragment || document.createDocumentFragment();
         // Simplify store data to just values
-        const itemsFiltered = this.store.getItemsReducedToValues(items);
+        const itemsFiltered    = this.store.getItemsReducedToValues(items);
 
         if(this.passedElement.type === 'text') {
             // Assign hidden input array of values
@@ -1184,9 +1189,9 @@ export class Choices {
             if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/options
-                    const activeGroups = this.store.getGroupsFilteredByActive();
-                    const activeOptions = this.store.getOptionsFilteredByActive();
-
+                    const activeGroups    = this.store.getGroupsFilteredByActive();
+                    const activeOptions   = this.store.getOptionsFilteredByActive();
+                    
                     const optListFragment = document.createDocumentFragment();
 
                     // Clear options
@@ -1305,9 +1310,9 @@ export class Choices {
         this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
         this.passedElement = null;
-        this.userOptions = null;
-        this.options = null;
-        this.store = null;
+        this.userOptions   = null;
+        this.options       = null;
+        this.store         = null;
 
         this.removeEventListeners();
     }

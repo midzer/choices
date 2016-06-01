@@ -90,7 +90,10 @@ $choices-button-icon-path: '../../icons/cross.svg';
 }
 
 .choices[data-type*="select-one"] {
-    .choices__inner { padding-bottom: .75rem; }
+    .choices__inner { 
+        cursor: pointer;
+        padding-bottom: .75rem; 
+    }
     .choices__input { 
         display: block;
         width: 100%;
@@ -115,13 +118,16 @@ $choices-button-icon-path: '../../icons/cross.svg';
     } 
 }
 
+.choices[data-type*="select-multiple"], .choices[data-type*="text"]  {
+    .choices__inner { cursor: text; }
+}
+
 .choices__inner {
     background-color: $choices-bg-color;
     padding: .75rem .75rem .375rem;
     border: 1px solid $choices-keyline-color;
     border-radius: $choices-border-radius;
     font-size: 1.4rem;
-    cursor: text;
     overflow: hidden;
     .is-focused & { border-color: darken($choices-keyline-color, 15%); }
     .is-open & { border-radius: $choices-border-radius $choices-border-radius 0 0; }
