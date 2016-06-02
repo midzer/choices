@@ -98,6 +98,8 @@ $choices-button-icon-path: '../../icons/cross.svg';
         display: block;
         width: 100%;
         padding: 1rem;
+        border-bottom: 1px solid $choices-keyline-color;
+        background-color: #FFFFFF;
         margin: 0;
     }
     &.is-open:after { 
@@ -129,7 +131,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
     border-radius: $choices-border-radius;
     font-size: 1.4rem;
     overflow: hidden;
-    .is-focused & { border-color: darken($choices-keyline-color, 15%); }
+    .is-focused &, .is-open & { border-color: darken($choices-keyline-color, 15%); }
     .is-open & { border-radius: $choices-border-radius $choices-border-radius 0 0; }
     .is-flipped.is-open & { border-radius: 0 0 $choices-border-radius $choices-border-radius; }
 }
@@ -142,7 +144,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices__list--single {
     display: inline-block;
-    .choices__item { padding: .4rem; }
+    padding: .4rem;
 }
 
 .choices__list--multiple {
@@ -181,10 +183,15 @@ $choices-button-icon-path: '../../icons/cross.svg';
     margin-top: -1px;
     border-bottom-left-radius: $choices-border-radius;
     border-bottom-right-radius: $choices-border-radius;
-    max-height: 300px;
-    overflow: auto;
-    will-change: scroll-position;
+    overflow: hidden;
     &.is-active { display: block; }
+
+    .choices__list {
+        position: relative;
+        max-height: 300px;
+        overflow: auto;
+        will-change: scroll-position;
+    }
 
     .choices__item {
         padding: 1rem;

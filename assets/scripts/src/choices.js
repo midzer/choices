@@ -235,7 +235,6 @@ export class Choices {
                 break;
 
             case enterKey:
-                if(this.passedElement.type === 'select-one') this.toggleDropdown();
 
                 // If enter key is pressed and the input has a value
                 if(e.target.value && this.passedElement.type === 'text') {
@@ -252,6 +251,12 @@ export class Choices {
                         const id    = highlighted.getAttribute('data-id');
                         this.addItem(value, label, id);
                         this.clearInput(this.passedElement);
+
+                        if(this.passedElement.type === 'select-one') {
+                            this.isSearching = false;
+                            this.store.dispatch(activateOptions());
+                            this.toggleDropdown();
+                        }
                     }
                 }
                 break;
@@ -279,7 +284,7 @@ export class Choices {
                     if(nextEl) {
                         // We prevent default to stop the cursor moving 
                         // when pressing the arrow
-                        if(!isScrolledIntoView(nextEl, this.dropdown, directionInt)) {
+                        if(!isScrolledIntoView(nextEl, this.optionList, directionInt)) {
                             this.scrollToOption(nextEl, directionInt);
                         }
                         this.highlightOption(nextEl);
@@ -290,7 +295,7 @@ export class Choices {
             case backKey:
             case deleteKey:
                 // If backspace or delete key is pressed and the input has no value
-                if(hasFocusedInput && !e.target.value) {
+                if(hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
                     this.handleBackspace(activeItems);
                     e.preventDefault();
                 }
@@ -441,6 +446,9 @@ export class Choices {
                     if(!option.selected && !option.disabled) {
                         this.addItem(option.value, option.label, option.id);
                         if(this.passedElement.type === 'select-one') {
+                            this.input.value = "";
+                            this.isSearching = false;
+                            this.store.dispatch(activateOptions(true));
                             this.toggleDropdown();
                         }
                     }
@@ -551,17 +559,17 @@ export class Choices {
     scrollToOption(option, direction) {
         if(!option) return;
         
-        const dropdownHeight     = this.dropdown.offsetHeight;
+        const dropdownHeight     = this.optionList.offsetHeight;
         const optionHeight       = option.offsetHeight;
-        
+
         // Distance from bottom of element to top of parent
-        const optionPos          = option.offsetTop + optionHeight;
+        const optionPos = option.offsetTop + optionHeight;
         
         // Scroll position of dropdown
-        const containerScrollPos = this.dropdown.scrollTop + dropdownHeight;
+        const containerScrollPos = this.optionList.scrollTop + dropdownHeight;
         
         // Difference between the option and scroll position
-        let endPoint;
+        let endPoint = direction > 0 ? ((this.optionList.scrollTop + optionPos) - containerScrollPos) : option.offsetTop;
 
         const animateScroll = (time, endPoint, direction) => {
             let continueAnimation = false;
@@ -569,19 +577,19 @@ export class Choices {
             const strength = 4;
 
             if(direction > 0) {
-                easing = (endPoint - this.dropdown.scrollTop)/strength;
+                easing = (endPoint - this.optionList.scrollTop)/strength;
                 distance = easing > 1 ? easing : 1;
 
-                this.dropdown.scrollTop = this.dropdown.scrollTop + distance;
-                if(this.dropdown.scrollTop < endPoint) {
+                this.optionList.scrollTop = this.optionList.scrollTop + distance;
+                if(this.optionList.scrollTop < endPoint) {
                     continueAnimation = true;
                 }
             } else {
-                easing = (this.dropdown.scrollTop - endPoint)/strength;
+                easing = (this.optionList.scrollTop - endPoint)/strength;
                 distance = easing > 1 ? easing : 1;
 
-                this.dropdown.scrollTop = this.dropdown.scrollTop - distance;
-                if(this.dropdown.scrollTop > endPoint) {
+                this.optionList.scrollTop = this.optionList.scrollTop - distance;
+                if(this.optionList.scrollTop > endPoint) {
                     continueAnimation = true;
                 }
             }
@@ -593,18 +601,9 @@ export class Choices {
             }
         };
 
-        // Scroll dropdown to top of option
-        if(direction > 0) {
-            endPoint = (this.dropdown.scrollTop + optionPos) - containerScrollPos;
-            requestAnimationFrame((time) => {
-                animateScroll(time, endPoint, 1);
-            });
-        } else {
-            endPoint = option.offsetTop;
-            requestAnimationFrame((time) => {
-                animateScroll(time, endPoint, -1);
-            });
-        }
+        requestAnimationFrame((time) => {
+            animateScroll(time, endPoint, direction);
+        });
     }
 
     /**
@@ -910,7 +909,10 @@ export class Choices {
      */
     ajax(fn) {
         this.containerOuter.classList.add('is-loading');
-        this.input.placeholder = this.options.loadingText;
+        // this.input.placeholder = this.options.loadingText;
+
+        const placeholderItem = this.getTemplate('item', { id: -1, value: 'Loading', label: this.options.loadingText, active: true});
+        this.itemList.appendChild(placeholderItem);
 
         const callback = (results, value, label) => {
             if(results && results.length) {
@@ -1041,9 +1043,9 @@ export class Choices {
         
         // If placeholder has been enabled and we have a value
         if (this.options.placeholder && (this.options.placeholderValue || this.passedElement.placeholder)) {
+            const placeholder = this.options.placeholderValue || this.passedElement.placeholder;
+            input.placeholder = placeholder;  
             if(this.passedElement.type !== 'select-one') {
-                const placeholder = this.options.placeholderValue || this.passedElement.placeholder;
-                input.placeholder = placeholder;  
                 input.style.width = getWidthOfInput(input);
             }
         }
@@ -1139,7 +1141,7 @@ export class Choices {
         // Create fragment to add elements to
         const itemListFragment = fragment || document.createDocumentFragment();
         // Simplify store data to just values
-        const itemsFiltered    = this.store.getItemsReducedToValues(items);
+        const itemsFiltered = this.store.getItemsReducedToValues(items);
 
         if(this.passedElement.type === 'text') {
             // Assign hidden input array of values
