@@ -559,8 +559,8 @@ export class Choices {
     scrollToOption(option, direction) {
         if(!option) return;
         
-        const dropdownHeight     = this.optionList.offsetHeight;
-        const optionHeight       = option.offsetHeight;
+        const dropdownHeight = this.optionList.offsetHeight;
+        const optionHeight   = option.offsetHeight;
 
         // Distance from bottom of element to top of parent
         const optionPos = option.offsetTop + optionHeight;
