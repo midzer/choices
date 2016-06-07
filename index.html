@@ -166,7 +166,7 @@
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
-            const choices7 = new Choices('#choices-7', { allowSearch: false });
+            const choices7 = new Choices('#choices-7', { allowSearch: false }).setValue(['Set value 1', 'Set value 2']);
 
             const choicesAjax = new Choices('#choices-12').ajax((callback) => {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')

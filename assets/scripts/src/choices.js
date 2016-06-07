@@ -86,11 +86,13 @@ export class Choices {
         this.initialised  = false;
         this.currentState = {};
         this.prevState    = {};
+        this.currentValue = '';
 
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         this.highlightPosition = 0;
+        this.canSearch = this.options.allowSearch;
 
         // Assign preset items from passed object first
         this.presetItems = this.options.items;
@@ -224,10 +226,13 @@ export class Choices {
             this.showDropdown();
         }
 
+        this.canSearch = this.options.allowSearch;
+
         switch (e.keyCode) {
             case aKey:
                 // If CTRL + A or CMD + A have been pressed and there are items to select
                 if(ctrlDownKey && hasItems) {
+                    this.canSearch = false;
                     if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
                         this.selectAll(this.itemList.children);
                     }
@@ -235,7 +240,6 @@ export class Choices {
                 break;
 
             case enterKey:
-
                 // If enter key is pressed and the input has a value
                 if(e.target.value && this.passedElement.type === 'text') {
                     const value = this.input.value;
@@ -275,6 +279,8 @@ export class Choices {
                     const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
 
+                    this.canSearch = false;
+
                     if(currentEl) {
                         nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', directionInt);
                     } else {
@@ -289,6 +295,10 @@ export class Choices {
                         }
                         this.highlightOption(nextEl);
                     }
+
+                    // Prevent default to maintain cursor position whilst
+                    // traversing dropdown options
+                    e.preventDefault();
                 }
                 break
 
@@ -313,6 +323,7 @@ export class Choices {
      */
     onKeyUp(e) {
         if(e.target !== this.input) return;
+        const keyString = String.fromCharCode(event.keyCode);
 
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
@@ -320,7 +331,6 @@ export class Choices {
             const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
             let dropdownItem;
             if(this.input.value) {
-
                 const activeItems = this.store.getItemsFilteredByActive();
                 const isUnique = !activeItems.some((item) => item.value === this.input.value);
 
@@ -344,26 +354,29 @@ export class Choices {
             }
         }
 
-        if(this.options.allowSearch) {
+        // If we have enabled text search
+        if(this.canSearch) {
             if(this.input === document.activeElement) {
                 const options            = this.store.getOptions();
                 const hasUnactiveOptions = options.some((option) => option.active !== true);
 
-                // Check that have a value to search
-                if(this.input.value && options.length) {
+                // Check that we have a value to search and the input was an alphanumeric character
+                if(this.input.value && options.length && /[a-zA-Z0-9-_ ]/.test(keyString)) {
                     const handleFilter = () => {
-                        if(this.input.value.length >= 1) {
-                            const haystack = this.store.getOptionsFiltedBySelectable();
-                            const needle   = this.input.value;
+                        const newValue = this.input.value.trim();
+                        const currentValue = this.currentValue.trim();
 
+                        if(newValue.length >= 1 && newValue !== currentValue + ' ') {
+                            const haystack = this.store.getOptionsFiltedBySelectable();
+                            const needle   = newValue;
                             const fuse = new Fuse(haystack, { 
                                 keys: ['label', 'value'],
                                 shouldSort: true,
                                 include: 'score',
                             });
-                            
                             const results = fuse.search(needle);
 
+                            this.currentValue = newValue;
                             this.highlightPosition = 0;
                             this.isSearching = true;
                             this.store.dispatch(filterOptions(results));
@@ -380,6 +393,11 @@ export class Choices {
         } 
     }
 
+    /**
+     * Input event
+     * @param  {Object} e Event
+     * @return
+     */
     onInput(e) {
         if(this.passedElement.type !== 'select-one') {
             this.input.style.width = getWidthOfInput(this.input);    
@@ -888,6 +906,16 @@ export class Choices {
         const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
 
         isActive ? this.hideDropdown() : this.showDropdown();
+    }
+
+    /**
+     * Set value of input 
+     * @return
+     */
+    setValue(values) {
+        if(isType('Array', values)) {
+            console.log(values);
+        }
     }
 
     /**
