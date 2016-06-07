@@ -912,10 +912,25 @@ export class Choices {
      * Set value of input 
      * @return
      */
-    setValue(values) {
-        if(isType('Array', values)) {
-            console.log(values);
-        }
+    setValue(args) {
+        const values = [...args];
+
+        values.forEach((item, index) => {
+            if(isType('Object', item)) {
+                if(!item.value) return;
+                this.addItem(item.value, item.label, item.id);
+            } else if(isType('String', item)) {
+                this.addItem(item);
+            }
+        });
+    }
+
+    /**
+     * Clear value of inputs
+     * @return
+     */
+    clearValue() {
+
     }
 
     /**
