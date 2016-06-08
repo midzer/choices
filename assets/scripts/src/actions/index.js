@@ -58,3 +58,9 @@ export const addGroup = (value, id, active, disabled) => {
         disabled,
     }
 };
+
+export const clearAll = () => {
+    return {
+        type: 'CLEAR_ALL',
+    }
+};

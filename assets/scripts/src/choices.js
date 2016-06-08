@@ -1,6 +1,6 @@
 'use strict';
 
-import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup } from './actions/index';
+import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup, clearAll } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';
 import Store from './store/index.js';
@@ -38,7 +38,7 @@ export class Choices {
             allowDuplicates: true,
             allowPaste: true,
             allowSearch: true, 
-            regexFilter: false,
+            _regexFilter: false,
             placeholder: true,
             placeholderValue: '',
             prependValue: false,
@@ -80,7 +80,7 @@ export class Choices {
         this.options = extend(defaultOptions, userOptions);
 
         // Create data store
-        this.store = new Store(this.render);
+        this.store = new Store(this._render);
 
         // State tracking
         this.initialised  = false;
@@ -103,27 +103,26 @@ export class Choices {
 
         // Bind methods
         this.init    = this.init.bind(this);
-        this.render  = this.render.bind(this);
+        this._render  = this._render.bind(this);
         this.destroy = this.destroy.bind(this);
         this.disable = this.disable.bind(this);
         
         // Bind event handlers
-        this.onFocus     = this.onFocus.bind(this);
-        this.onBlur      = this.onBlur.bind(this);
-        this.onKeyUp     = this.onKeyUp.bind(this);
-        this.onKeyDown   = this.onKeyDown.bind(this);
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseOver = this.onMouseOver.bind(this);
-        this.onPaste     = this.onPaste.bind(this);
-        this.onInput     = this.onInput.bind(this);
+        this._onFocus     = this._onFocus.bind(this);
+        this._onBlur      = this._onBlur.bind(this);
+        this._onKeyUp     = this._onKeyUp.bind(this);
+        this._onKeyDown   = this._onKeyDown.bind(this);
+        this._onMouseDown = this._onMouseDown.bind(this);
+        this._onMouseOver = this._onMouseOver.bind(this);
+        this._onPaste     = this._onPaste.bind(this);
+        this._onInput     = this._onInput.bind(this);
 
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
         if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
         // Input type check
-        const inputTypes = ['select-one', 'select-multiple', 'text'];
-        const canInit = this.passedElement && inputTypes.includes(this.passedElement.type);
+        const canInit = this.passedElement && ['select-one', 'select-multiple', 'text'].includes(this.passedElement.type);
 
         if(canInit) {
             // Let's have it large
@@ -132,13 +131,408 @@ export class Choices {
             console.error('Choices: Incompatible input passed');
         }
     }
+
+    /**
+     * Initialise Choices
+     * @return
+     * @public
+     */
+    init(callback) {
+        if(this.initialised !== true) {
+
+            this.initialised = true;
+
+            // Create required elements
+            this._createTemplates();
+
+            // Generate input markup
+            this._createInput();
+
+            this.store.subscribe(this._render);
+
+            // Render any items
+            this._render();
+
+            // Trigger event listeners 
+            this._addEventListeners();
+
+            // Run callback if it is a function
+            if(callback = this.options.callbackOnInit){
+                if(isType('Function', callback)) {
+                    callback();
+                } else {
+                    console.error('callbackOnInit: Callback is not a function');
+                }
+            }
+        }
+    }
     
+    /**
+     * Destroy Choices and nullify values
+     * @return
+     * @public
+     */
+    destroy() {
+        this.passedElement.classList.remove(this.options.classNames.input, this.options.classNames.hiddenState);
+        this.passedElement.tabIndex = '';
+        this.passedElement.removeAttribute('style', 'display:none;');
+        this.passedElement.removeAttribute('aria-hidden');
+                
+        this.containerOuter.outerHTML = this.passedElement.outerHTML;
+
+        this.passedElement = null;
+        this.userOptions   = null;
+        this.options       = null;
+        this.store         = null;
+
+        this._removeEventListeners();
+    }
+
+    /**
+     * Select item (a selected item can be deleted)
+     * @param  {Element} item Element to select
+     * @return {Object} Class instance
+     * @public
+     */
+    selectItem(item) {
+        if(!item) return;
+        const id = item.id;
+        this.store.dispatch(selectItem(id, true));
+
+        return this;
+    }
+
+    /** 
+     * Deselect item
+     * @param  {Element} item Element to de-select
+     * @return {Object} Class instance
+     * @public
+     */
+    deselectItem(item) {
+        if(!item) return;
+        const id = item.id;
+        this.store.dispatch(selectItem(id, false));
+
+        return this;
+    }
+
+    /**
+     * Select items within store
+     * @return {Object} Class instance
+     * @public
+     */
+    selectAll() {
+        const items = this.store.getItems();
+        items.forEach((item) => {
+            this.selectItem(item);
+        });
+
+        return this;
+    }
+
+    /**
+     * Deselect items within store
+     * @return {Object} Class instance
+     * @public
+     */
+    deselectAll() {
+        const items = this.store.getItems();
+        items.forEach((item) => {
+            this.deselectItem(item);
+        });
+
+        return this;
+    }
+
+    /**
+     * Add item to store with correct value
+     * @param {String} value Value to add to store
+     * @return {Object} Class instance
+     * @public
+     */
+    addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
+        const items        = this.store.getItems();
+        let passedValue    = value.trim();
+        let passedLabel    = label || passedValue;
+        let passedOptionId = optionId || -1;
+
+        // If a prepended value has been passed, prepend it
+        if(this.options.prependValue) {
+            passedValue = this.options.prependValue + passedValue.toString();
+        }
+
+        // If an appended value has been passed, append it
+        if(this.options.appendValue) {
+            passedValue = passedValue + this.options.appendValue.toString();
+        }
+
+        // Generate unique id
+        const id = items ? items.length + 1 : 1;
+
+        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
+
+        if(this.passedElement.type === 'select-one') {
+            this.removeActiveItems(id);
+        }  
+
+        // Run callback if it is a function
+        if(callback){
+            if(isType('Function', callback)) {
+                callback(id, passedValue, this.passedElement);
+            } else {
+                console.error('callbackOnAddItem: Callback is not a function');
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove item from store
+     * @param
+     * @return {Object} Class instance
+     * @public
+     */
+    removeItem(item, callback = this.options.callbackOnRemoveItem) {
+        if(!item || !isType('Object', item)) {
+            console.error('removeItem: No item object was passed to be removed');
+            return;
+        }
+
+        const id       = item.id;
+        const value    = item.value;
+        const optionId = item.optionId;
+
+        this.store.dispatch(removeItem(id, optionId));
+
+        // Run callback
+        if(callback){
+            if(!isType('Function', callback)) console.error('callbackOnRemoveItem: Callback is not a function'); return;
+            callback(id, value, this.passedElement);
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove an item from the store by its value
+     * @param  {String} value Value to search for
+     * @return {Object} Class instance
+     * @public
+     */
+    removeItemsByValue(value) {
+        if(!value || !isType('String', value)) console.error('removeItemsByValue: No value was passed to be removed'); return;
+
+        const items = this.store.getItemsFilteredByActive();
+
+        items.forEach((item) => {
+            if(item.value === value) {
+                this.removeItem(item);
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Remove all items from store array
+     * Note: removed items are soft deleted
+     * @param  {Boolean} selectedOnly Optionally remove only selected items
+     * @return {Object} Class instance
+     * @public
+     */
+    removeActiveItems(excludedId) {
+        const items = this.store.getItemsFilteredByActive();
+
+        items.forEach((item) => {
+            if(item.active && excludedId !== item.id) {
+                this.removeItem(item);   
+            } 
+        });
+
+        return this;
+    }
+
+    /** 
+     * Remove all selected items from store
+     * Note: removed items are soft deleted
+     * @return {Object} Class instance
+     * @public
+     */
+    removeSelectedItems() {
+        const items = this.store.getItemsFilteredByActive();
+
+        items.forEach((item) => {
+            if(item.selected && item.active) {
+                this.removeItem(item);
+            }
+        });
+
+        return this;
+    }
+
+    /** 
+     * Show dropdown to user by adding active state class
+     * @return {Object} Class instance
+     * @public
+     */
+    showDropdown() { 
+        this.containerOuter.classList.add(this.options.classNames.openState);
+        this.dropdown.classList.add(this.options.classNames.activeState);
+
+        const dimensions = this.dropdown.getBoundingClientRect();
+        const shouldFlip = dimensions.top + dimensions.height >= document.body.offsetHeight;
+
+        // Whether or not the dropdown should appear above or below input
+        if(shouldFlip) {
+            this.containerOuter.classList.add(this.options.classNames.flippedState);
+        } else {
+            this.containerOuter.classList.remove(this.options.classNames.flippedState);
+        }
+
+        return this;
+    }
+
+    /** 
+     * Hide dropdown from user
+     * @return {Object} Class instance
+     * @public
+     */
+    hideDropdown() {
+        // A dropdown flips if it does not have space below the input
+        const isFlipped = this.containerOuter.classList.contains(this.options.classNames.flippedState);
+
+        this.containerOuter.classList.remove(this.options.classNames.openState);
+        this.dropdown.classList.remove(this.options.classNames.activeState);
+
+        if(isFlipped) {
+            this.containerOuter.classList.remove(this.options.classNames.flippedState);
+        }
+
+        return this;
+    }
+
+    /** 
+     * Determine whether to hide or show dropdown based on its current state
+     * @return {Object} Class instance
+     * @public
+     */
+    toggleDropdown() {
+        const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
+
+        isActive ? this.hideDropdown() : this.showDropdown();
+
+        return this;
+    }
+
+    /**
+     * Set value of input 
+     * @param {Array} args Array of value objects or value strings
+     * @return {Object} Class instance
+     * @public
+     */
+    setValue(args) {
+        // Convert args to an itterable array
+        const values = [...args];
+
+        values.forEach((item, index) => {
+            if(isType('Object', item)) {
+                if(!item.value) return;
+                // If we are dealing with a select input, we need to create an option first 
+                // that is then selected. For text inputs we can just add items normally.
+                if(this.passedElement.type !== 'text') {
+                    this._addOption(true, false, item.value, item.label, -1);
+                } else {
+                    this.addItem(item.value, item.label, item.id);    
+                }
+            } else if(isType('String', item)) {
+                if(this.passedElement.type !== 'text') {
+                    this._addOption(true, false, item, item, -1);
+                } else {
+                    this.addItem(item);
+                }
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Clear value of inputs
+     * @return {Object} Class instance
+     * @public
+     */
+    clearValue() {
+        this.store.dispatch(clearAll());
+        return this;
+    }
+
+    /**
+     * Disable 
+     * @return {Object} Class instance
+     * @public
+     */
+    disable() {
+        this.passedElement.disabled = true;
+        if(this.initialised) {
+            this.input.disabled = true;
+            this.containerOuter.classList.add(this.options.classNames.disabledState);
+        }
+        return this;
+    }
+
+    /** 
+     * Populate options via ajax callback
+     * @param  {Function} fn Passed 
+     * @return {Object} Class instance
+     * @public
+     */
+    ajax(fn) {
+        this.containerOuter.classList.add('is-loading');
+        // this.input.placeholder = this.options.loadingText;
+
+        const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.options.loadingText, active: true});
+        this.itemList.appendChild(placeholderItem);
+
+        const callback = (results, value, label) => {
+            if(results && results.length) {
+                this.containerOuter.classList.remove('is-loading');
+                this.input.placeholder = "";
+                results.forEach((result, index) => {
+                    // Add each result to option dropdown
+                    if(index === 0) { 
+                       this.addItem(result[value], result[label], index);
+                    }
+                    this._addOption(false, false, result[value], result[label]);
+                });
+            }
+        };
+
+        fn(callback);
+        return this;
+    }
+
+    /** 
+     * Set value of input to blank
+     * @return {Object} Class instance
+     * @public
+     */
+    clearInput() {
+        if (this.input.value) this.input.value = '';
+        if(this.passedElement.type !== 'select-one') {
+            this.input.style.width = getWidthOfInput(this.input);
+        }
+
+        return this;
+    }
+
     /** 
      * Process enter key event
      * @param  {Array} activeItems Items that are currently active
      * @return
+     * @private
      */
-    handleEnter(activeItems, value) {
+    _handleEnter(activeItems, value) {
         let canUpdate = true;
 
         if(this.options.addItems) {
@@ -159,10 +553,10 @@ export class Choices {
             let canAddItem = true;
 
             // If a user has supplied a regular expression filter
-            if(this.options.regexFilter) {
+            if(this.options._regexFilter) {
                 // Determine whether we can update based on whether 
                 // our regular expression passes 
-                canAddItem = this.regexFilter(value);
+                canAddItem = this._regexFilter(value);
             }
             
             // All is good, add
@@ -178,8 +572,9 @@ export class Choices {
      * Process back space event
      * @param  {Array} Active items
      * @return
+     * @private
      */
-    handleBackspace(activeItems) {
+    _handleBackspace(activeItems) {
         if(this.options.removeItems && activeItems) {
             const lastItem = activeItems[activeItems.length - 1];
             const hasSelectedItems = activeItems.some((item) => item.selected === true);
@@ -201,7 +596,7 @@ export class Choices {
      * @param  {Object} e Event
      * @return
      */
-    onKeyDown(e) {
+    _onKeyDown(e) {
         if(e.target !== this.input) return;
 
         const ctrlDownKey = e.ctrlKey || e.metaKey;
@@ -243,7 +638,7 @@ export class Choices {
                 // If enter key is pressed and the input has a value
                 if(e.target.value && this.passedElement.type === 'text') {
                     const value = this.input.value;
-                    this.handleEnter(activeItems, value);                    
+                    this._handleEnter(activeItems, value);                    
                 }
 
                 if(hasActiveDropdown) {
@@ -291,9 +686,9 @@ export class Choices {
                         // We prevent default to stop the cursor moving 
                         // when pressing the arrow
                         if(!isScrolledIntoView(nextEl, this.optionList, directionInt)) {
-                            this.scrollToOption(nextEl, directionInt);
+                            this._scrollToOption(nextEl, directionInt);
                         }
-                        this.highlightOption(nextEl);
+                        this._highlightOption(nextEl);
                     }
 
                     // Prevent default to maintain cursor position whilst
@@ -306,7 +701,7 @@ export class Choices {
             case deleteKey:
                 // If backspace or delete key is pressed and the input has no value
                 if(hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
-                    this.handleBackspace(activeItems);
+                    this._handleBackspace(activeItems);
                     e.preventDefault();
                 }
                 break;
@@ -320,8 +715,9 @@ export class Choices {
      * Key up event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onKeyUp(e) {
+    _onKeyUp(e) {
         if(e.target !== this.input) return;
         const keyString = String.fromCharCode(event.keyCode);
 
@@ -335,14 +731,14 @@ export class Choices {
                 const isUnique = !activeItems.some((item) => item.value === this.input.value);
 
                 if (this.options.maxItems && this.options.maxItems <= this.itemList.children.length) {
-                    dropdownItem = this.getTemplate('notice', `Only ${ this.options.maxItems } options can be added.`);
+                    dropdownItem = this._getTemplate('notice', `Only ${ this.options.maxItems } options can be added.`);
                 } else if(!this.options.allowDuplicates && !isUnique) {
-                    dropdownItem = this.getTemplate('notice', `Only unique values can be added.`);
+                    dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
                 } else {
-                    dropdownItem = this.getTemplate('notice', `Add "${ this.input.value }"`);
+                    dropdownItem = this._getTemplate('notice', `Add "${ this.input.value }"`);
                 }
                 
-                if((this.options.regexFilter && this.regexFilter(this.input.value)) || !this.options.regexFilter) {
+                if((this.options._regexFilter && this._regexFilter(this.input.value)) || !this.options._regexFilter) {
                     this.dropdown.innerHTML = dropdownItem.outerHTML;
                     if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
                         this.showDropdown();    
@@ -397,8 +793,9 @@ export class Choices {
      * Input event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onInput(e) {
+    _onInput(e) {
         if(this.passedElement.type !== 'select-one') {
             this.input.style.width = getWidthOfInput(this.input);    
         }
@@ -408,8 +805,9 @@ export class Choices {
      * Click event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onMouseDown(e) {
+    _onMouseDown(e) {
         // If not a right click
         if(e.button !== 2) {
             const activeItems = this.store.getItemsFilteredByActive();
@@ -489,13 +887,28 @@ export class Choices {
         }
     }
 
+    /**
+     * Mouse over (hover) event
+     * @param  {Object} e Event
+     * @return
+     * @private
+     */
+    _onMouseOver(e) {
+        // If the dropdown is either the target or one of its children is the target
+        if((e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
+            if(e.target.hasAttribute('data-option')) {
+                this._highlightOption(e.target);
+            }
+        }
+    }
 
     /**
      * Paste event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onPaste(e) {
+    _onPaste(e) {
         if(e.target !== this.input) return;
         // Disable pasting into the input if option has been set
         if(!this.options.allowPaste) {
@@ -503,26 +916,14 @@ export class Choices {
         }
     }
 
-    /**
-     * Mouse over (hover) event
-     * @param  {Object} e Event
-     * @return
-     */
-    onMouseOver(e) {
-        // If the dropdown is either the target or one of its children is the target
-        if((e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
-            if(e.target.hasAttribute('data-option')) {
-                this.highlightOption(e.target);
-            }
-        }
-    }
 
     /**
      * Focus event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onFocus(e) {
+    _onFocus(e) {
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
         if(e.target === this.input && !hasActiveDropdown) {
             this.containerOuter.classList.add(this.options.classNames.focusState);
@@ -536,8 +937,9 @@ export class Choices {
      * Blur event
      * @param  {Object} e Event
      * @return
+     * @private
      */
-    onBlur(e) {
+    _onBlur(e) {
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
         if(e.target === this.input && !hasActiveDropdown) {
             this.containerOuter.classList.remove(this.options.classNames.focusState);
@@ -546,25 +948,16 @@ export class Choices {
         }
     }
 
-    /** 
-     * Set value of input to blank
-     * @return
-     */
-    clearInput() {
-        if (this.input.value) this.input.value = '';
-        if(this.passedElement.type !== 'select-one') {
-            this.input.style.width = getWidthOfInput(this.input);
-        }
-    }
 
     /**
      * Tests value against a regular expression
      * @param  {string} value   Value to test
      * @return {Boolean}        Whether test passed/failed
+     * @private
      */
-    regexFilter(value) {
+    _regexFilter(value) {
         if(!value) return;
-        const expression = new RegExp(this.options.regexFilter, 'i');
+        const expression = new RegExp(this.options._regexFilter, 'i');
         return expression.test(value);
     }
 
@@ -573,8 +966,9 @@ export class Choices {
      * @param  {HTMLElement} option  Option to scroll to
      * @param  {Number} direction  Whether option is above or below 
      * @return
+     * @private
      */
-    scrollToOption(option, direction) {
+    _scrollToOption(option, direction) {
         if(!option) return;
         
         const dropdownHeight = this.optionList.offsetHeight;
@@ -628,8 +1022,9 @@ export class Choices {
      * Highlight option element 
      * @param  {HTMLElement} el Element to highlight
      * @return
+     * @private
      */
-    highlightOption(el) {
+    _highlightOption(el) {
         // Highlight first element in dropdown
         const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
 
@@ -661,161 +1056,6 @@ export class Choices {
                 el.classList.add(this.options.classNames.highlightedState);    
             }        
         }
-
-    }
-
-    /**
-     * Select item (a selected item can be deleted)
-     * @param  {Element} item Element to select
-     * @return
-     */
-    selectItem(item) {
-        if(!item) return;
-        const id = item.id;
-        this.store.dispatch(selectItem(id, true));
-    }
-
-    /** 
-     * Deselect item
-     * @param  {Element} item Element to de-select
-     * @return
-     */
-    deselectItem(item) {
-        if(!item) return;
-        const id = item.id;
-        this.store.dispatch(selectItem(id, false));
-    }
-
-    /**
-     * Select items within store
-     * @return
-     */
-    selectAll() {
-        const items = this.store.getItems();
-        items.forEach((item) => {
-            this.selectItem(item);
-        });
-    }
-
-    /**
-     * Deselect items within store
-     * @return
-     */
-    deselectAll() {
-        const items = this.store.getItems();
-        items.forEach((item) => {
-            this.deselectItem(item);
-        });
-    }
-
-    /**
-     * Add item to store with correct value
-     * @param {String} value Value to add to store
-     */
-    addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
-        const items        = this.store.getItems();
-        let passedValue    = value.trim();
-        let passedLabel    = label || passedValue;
-        let passedOptionId = optionId || -1;
-
-        // If a prepended value has been passed, prepend it
-        if(this.options.prependValue) {
-            passedValue = this.options.prependValue + passedValue.toString();
-        }
-
-        // If an appended value has been passed, append it
-        if(this.options.appendValue) {
-            passedValue = passedValue + this.options.appendValue.toString();
-        }
-
-        // Generate unique id
-        const id = items ? items.length + 1 : 1;
-
-        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
-
-        if(this.passedElement.type === 'select-one') {
-            this.removeActiveItems(id);
-        }  
-
-        // Run callback if it is a function
-        if(callback){
-            if(isType('Function', callback)) {
-                callback(id, passedValue, this.passedElement);
-            } else {
-                console.error('callbackOnAddItem: Callback is not a function');
-            }
-        }
-    }
-
-    /**
-     * Remove item from store
-     * @param
-     */
-    removeItem(item, callback = this.options.callbackOnRemoveItem) {
-        if(!item || !isType('Object', item)) {
-            console.error('removeItem: No item object was passed to be removed');
-            return;
-        }
-
-        const id       = item.id;
-        const value    = item.value;
-        const optionId = item.optionId;
-
-        this.store.dispatch(removeItem(id, optionId));
-
-        // Run callback
-        if(callback){
-            if(!isType('Function', callback)) console.error('callbackOnRemoveItem: Callback is not a function'); return;
-            callback(id, value, this.passedElement);
-        }
-    }
-
-    /**
-     * Remove an item from the store by its value
-     * @param  {String} value Value to search for
-     * @return
-     */
-    removeItemsByValue(value) {
-        if(!value || !isType('String', value)) console.error('removeItemsByValue: No value was passed to be removed'); return;
-
-        const items = this.store.getItemsFilteredByActive();
-
-        items.forEach((item) => {
-            if(item.value === value) {
-                this.removeItem(item);
-            }
-        });
-    }
-
-    /**
-     * Remove all items from store array
-     * Note: removed items are soft deleted
-     * @param  {Boolean} selectedOnly Optionally remove only selected items
-     * @return
-     */
-    removeActiveItems(excludedId) {
-        const items = this.store.getItemsFilteredByActive();
-
-        items.forEach((item) => {
-            if(item.active && excludedId !== item.id) {
-                this.removeItem(item);   
-            } 
-        });
-    }
-
-    /** 
-     * Remove all selected items from store
-     * Note: removed items are soft deleted
-     * @return
-     */
-    removeSelectedItems() {
-        const items = this.store.getItemsFilteredByActive();
-
-        items.forEach((item) => {
-            if(item.selected && item.active) {
-                this.removeItem(item);
-            }
-        });
     }
 
     /** 
@@ -823,8 +1063,9 @@ export class Choices {
      * @param {Object}  option   Option to add
      * @param {Number}  groupId  ID of the options group
      * @return
+     * @private
      */
-    addOption(option, value, label, groupId = -1) {
+    _addOption(isSelected, isDisabled, value, label, groupId = -1) {
         if(!value) return
 
         if(!label) { label = value; }
@@ -832,11 +1073,10 @@ export class Choices {
         // Generate unique id
         const options    = this.store.getOptions();
         const id         = options.length + 1;
-        const isDisabled = option && (option.disabled || option.parentNode.disabled);
 
         this.store.dispatch(addOption(value, label, id, groupId, isDisabled));
 
-        if(option && option.selected && !isDisabled) {
+        if(isSelected && !isDisabled) {
             this.addItem(value, label, id);
         }
     }
@@ -845,133 +1085,22 @@ export class Choices {
      * Add group to dropdown
      * @param {Object} group Group to add
      * @param {Number} index Whether this is the first group to add
+     * @return
+     * @private
      */
-    addGroup(group, id, isFirst) {
+    _addGroup(group, id, isFirst) {
         const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
         const groupId      = id;
 
         if(groupOptions) {
             this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
-
             groupOptions.forEach((option, optionIndex) => {
-                // We want to pre-highlight the first option
-                const highlighted = isFirst && optionIndex === 0 ? true : false;
-                this.addOption(option, option.value, option.innerHTML, groupId);   
+                const isDisabled = option.disabled || option.parentNode.disabled;
+                this._addOption(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
             });
         } else {
             this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
         }
-    }
-
-    /** 
-     * Show dropdown to user by adding active state class
-     * @return
-     */
-    showDropdown() { 
-        this.containerOuter.classList.add(this.options.classNames.openState);
-        this.dropdown.classList.add(this.options.classNames.activeState);
-
-        const dimensions = this.dropdown.getBoundingClientRect();
-        const shouldFlip = dimensions.top + dimensions.height >= document.body.offsetHeight;
-
-        // Whether or not the dropdown should appear above or below input
-        if(shouldFlip) {
-            this.containerOuter.classList.add(this.options.classNames.flippedState);
-        } else {
-            this.containerOuter.classList.remove(this.options.classNames.flippedState);
-        }
-    }
-
-    /** 
-     * Hide dropdown from user
-     * @return {[type]} [description]
-     */
-    hideDropdown() {
-        // A dropdown flips if it does not have space below the input
-        const isFlipped = this.containerOuter.classList.contains(this.options.classNames.flippedState);
-
-        this.containerOuter.classList.remove(this.options.classNames.openState);
-        this.dropdown.classList.remove(this.options.classNames.activeState);
-
-        if(isFlipped) {
-            this.containerOuter.classList.remove(this.options.classNames.flippedState);
-        }
-    }
-
-    /** 
-     * Determine whether to hide or show dropdown based on its current state
-     * @return
-     */
-    toggleDropdown() {
-        const isActive = this.dropdown.classList.contains(this.options.classNames.activeState);
-
-        isActive ? this.hideDropdown() : this.showDropdown();
-    }
-
-    /**
-     * Set value of input 
-     * @return
-     */
-    setValue(args) {
-        const values = [...args];
-
-        values.forEach((item, index) => {
-            if(isType('Object', item)) {
-                if(!item.value) return;
-                this.addItem(item.value, item.label, item.id);
-            } else if(isType('String', item)) {
-                this.addItem(item);
-            }
-        });
-    }
-
-    /**
-     * Clear value of inputs
-     * @return
-     */
-    clearValue() {
-
-    }
-
-    /**
-     * Disable 
-     * @return {[type]} [description]
-     */
-    disable() {
-        this.passedElement.disabled = true;
-        if(this.initialised) {
-            this.input.disabled = true;
-            this.containerOuter.classList.add(this.options.classNames.disabledState);
-        }
-    }
-
-    /** 
-     * Populate options via ajax callback
-     * @param  {Function} fn Passed 
-     * @return {[type]}      [description]
-     */
-    ajax(fn) {
-        this.containerOuter.classList.add('is-loading');
-        // this.input.placeholder = this.options.loadingText;
-
-        const placeholderItem = this.getTemplate('item', { id: -1, value: 'Loading', label: this.options.loadingText, active: true});
-        this.itemList.appendChild(placeholderItem);
-
-        const callback = (results, value, label) => {
-            if(results && results.length) {
-                this.containerOuter.classList.remove('is-loading');
-                this.input.placeholder = "";
-                results.forEach((result, index) => {
-                    // Add each result to option dropdown
-                    if(index === 0) { 
-                       this.addItem(result[value], result[label], index);
-                    }
-                    this.addOption(null, result[value], result[label]);
-                });
-            }
-        };
-
-        fn(callback);
     }
 
     /**
@@ -979,8 +1108,9 @@ export class Choices {
      * @param  {String}    template Name of template to get
      * @param  {...}       args     Data to pass to template
      * @return {HTMLElement}        Template
+     * @private
      */
-    getTemplate(template, ...args) {
+    _getTemplate(template, ...args) {
         if(!template) return;
         const templates = this.options.templates;
         return templates[template](...args);
@@ -989,8 +1119,9 @@ export class Choices {
     /**
      * Create HTML element based on type and arguments
      * @return
+     * @private
      */
-    createTemplates() {
+    _createTemplates() {
         const classNames = this.options.classNames;
         const templates = {
             containerOuter: () => {
@@ -1055,14 +1186,15 @@ export class Choices {
     /**
      * Create DOM structure around passed select element
      * @return
+     * @private
      */
-    generateInput() {
-        const containerOuter = this.getTemplate('containerOuter');
-        const containerInner = this.getTemplate('containerInner');
-        const itemList       = this.getTemplate('itemList');
-        const optionList     = this.getTemplate('optionList');
-        const input          = this.getTemplate('input');
-        const dropdown       = this.getTemplate('dropdown');
+    _createInput() {
+        const containerOuter = this._getTemplate('containerOuter');
+        const containerInner = this._getTemplate('containerInner');
+        const itemList       = this._getTemplate('itemList');
+        const optionList     = this._getTemplate('optionList');
+        const input          = this._getTemplate('input');
+        const dropdown       = this._getTemplate('dropdown');
 
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
@@ -1116,12 +1248,13 @@ export class Choices {
             if(passedGroups && passedGroups.length) {
                 passedGroups.forEach((group, index) => {
                     const isFirst = index === 0 ? true : false;
-                    this.addGroup(group, index, isFirst);
+                    this._addGroup(group, index, isFirst);
                 });
             } else {
                 const passedOptions = Array.from(this.passedElement.options);
                 passedOptions.forEach((option) => {
-                    this.addOption(option, option.value, option.innerHTML);
+                    const isDisabled = option.disabled || option.parentNode.disabled;
+                    this._addOption(option.selected, isDisabled, option.value, option.innerHTML);
                 });
             }
 
@@ -1138,7 +1271,15 @@ export class Choices {
         }
     }
 
-    renderGroups(groups, options, fragment) {
+    /**
+     * Render group options into a DOM fragment and append to options list
+     * @param  {Array} groups    Groups to add to list
+     * @param  {Array} options   Options to add to groups
+     * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
+     * @return {DocumentFragment} Populated options fragment
+     * @private
+     */
+    _renderGroups(groups, options, fragment) {
         const groupFragment = fragment || document.createDocumentFragment();
 
         groups.forEach((group, i) => {
@@ -1152,23 +1293,30 @@ export class Choices {
             });
 
             if(groupOptions.length >= 1) {
-                const dropdownGroup = this.getTemplate('optgroup', group);
+                const dropdownGroup = this._getTemplate('optgroup', group);
 
                 groupFragment.appendChild(dropdownGroup);
 
-                this.renderOptions(groupOptions, groupFragment);
+                this._renderOptions(groupOptions, groupFragment);
             }
         });
 
         return groupFragment;
     }
 
-    renderOptions(options, fragment) {
+    /**
+     * Render options into a DOM fragment and append to options list
+     * @param  {Array} options    Options to add to list
+     * @param  {DocumentFragment} fragment Fragment to add options to (optional)
+     * @return {DocumentFragment} Populated options fragment
+     * @private
+     */
+    _renderOptions(options, fragment) {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
         const optsFragment = fragment || document.createDocumentFragment();
 
         options.forEach((option, i) => {
-            const dropdownItem = this.getTemplate('option', option);
+            const dropdownItem = this._getTemplate('option', option);
 
             if(this.passedElement.type === 'select-one') {
                 optsFragment.appendChild(dropdownItem);    
@@ -1180,7 +1328,14 @@ export class Choices {
         return optsFragment;
     }
 
-    renderItems(items, fragment) {
+    /**
+     * Render items into a DOM fragment and append to items list
+     * @param  {Array} items    Items to add to list
+     * @param  {DocumentFragment} fragment Fragrment to add items to (optional)
+     * @return
+     * @private
+     */
+    _renderItems(items, fragment) {
         // Create fragment to add elements to
         const itemListFragment = fragment || document.createDocumentFragment();
         // Simplify store data to just values
@@ -1195,7 +1350,7 @@ export class Choices {
             // Add each list item to list
             items.forEach((item) => {
                 // Create a standard select option
-                const option = this.getTemplate('selectOption', item);
+                const option = this._getTemplate('selectOption', item);
 
                 // Append it to fragment
                 selectedOptionsFragment.appendChild(option);
@@ -1209,26 +1364,24 @@ export class Choices {
         // Add each list item to list
         items.forEach((item) => {
             // Create new list element 
-            const listItem = this.getTemplate('item', item);
+            const listItem = this._getTemplate('item', item);
 
             // Append it to list
             itemListFragment.appendChild(listItem);
         });
 
-        // Clear list
-        this.itemList.innerHTML = '';
-
-        // Update list
-        this.itemList.appendChild(itemListFragment);
+        return itemListFragment;
     }
 
     /**
      * Render DOM with values
      * @return
+     * @private
      */
-    render() {
+    _render() {
         this.currentState = this.store.getState();
     
+        // Only _render if our state has actually changed
         if(this.currentState !== this.prevState) {
 
             // Options
@@ -1237,28 +1390,27 @@ export class Choices {
                     // Get active groups/options
                     const activeGroups    = this.store.getGroupsFilteredByActive();
                     const activeOptions   = this.store.getOptionsFilteredByActive();
-                    
-                    const optListFragment = document.createDocumentFragment();
+
+                    let optListFragment = document.createDocumentFragment();
 
                     // Clear options
                     this.optionList.innerHTML = '';
 
                     // If we have grouped options
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
-                        this.renderGroups(activeGroups, activeOptions, optListFragment);
+                        optListFragment = this._renderGroups(activeGroups, activeOptions, optListFragment);
                     } else if(activeOptions.length >= 1) {
-                        this.renderOptions(activeOptions, optListFragment);
+                        optListFragment = this._renderOptions(activeOptions, optListFragment);
                     }
 
                     if(optListFragment.children.length) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first option
                         this.optionList.appendChild(optListFragment);
-                        this.highlightOption();
+                        this._highlightOption();
                     } else {
                         // Otherwise show a notice
-                        const dropdownItem = this.isSearching ? this.getTemplate('notice', 'No results found') : this.getTemplate('notice', 'No options to select');
-            
+                        const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No options to select');
                         this.optionList.appendChild(dropdownItem);
                     }
                 }
@@ -1269,7 +1421,16 @@ export class Choices {
                 const activeItems = this.store.getItemsFilteredByActive();
                 if(activeItems) {
                     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-                    this.renderItems(activeItems);
+                    const itemListFragment = this._renderItems(activeItems);
+
+                    // Clear list
+                    this.itemList.innerHTML = '';
+
+                    // If we have items to add
+                    if(itemListFragment.children.length) {
+                        // Update list
+                        this.itemList.appendChild(itemListFragment);
+                    }
                 }
             }
 
@@ -1280,87 +1441,35 @@ export class Choices {
     /**
      * Trigger event listeners
      * @return
+     * @private
      */
-    addEventListeners() {
-        document.addEventListener('keyup', this.onKeyUp);
-        document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('mousedown', this.onMouseDown);
-        document.addEventListener('mouseover', this.onMouseOver);
+    _addEventListeners() {
+        document.addEventListener('keyup', this._onKeyUp);
+        document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('mousedown', this._onMouseDown);
+        document.addEventListener('mouseover', this._onMouseOver);
 
-        this.input.addEventListener('input', this.onInput);
-        this.input.addEventListener('paste', this.onPaste);
-        this.input.addEventListener('focus', this.onFocus);
-        this.input.addEventListener('blur', this.onBlur);
+        this.input.addEventListener('input', this._onInput);
+        this.input.addEventListener('paste', this._onPaste);
+        this.input.addEventListener('focus', this._onFocus);
+        this.input.addEventListener('blur', this._onBlur);
     }
 
     /**
      * Destroy event listeners
      * @return
+     * @private
      */
-    removeEventListeners() {
-        document.removeEventListener('keyup', this.onKeyUp);
-        document.removeEventListener('keydown', this.onKeyDown);
-        document.removeEventListener('mousedown', this.onMouseDown);
-        document.removeEventListener('mouseover', this.onMouseOver);
+    _removeEventListeners() {
+        document.removeEventListener('keyup', this._onKeyUp);
+        document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('mousedown', this._onMouseDown);
+        document.removeEventListener('mouseover', this._onMouseOver);
         
-        this.input.removeEventListener('input', this.onInput);
-        this.input.removeEventListener('paste', this.onPaste);
-        this.input.removeEventListener('focus', this.onFocus);
-        this.input.removeEventListener('blur', this.onBlur);
-    }
-
-    /**
-     * Initialise Choices
-     * @return
-     */
-    init(callback) {
-        if(this.initialised !== true) {
-
-            this.initialised = true;
-
-            // Create required elements
-            this.createTemplates();
-
-            // Generate input markup
-            this.generateInput();
-
-            this.store.subscribe(this.render);
-
-            // Render any items
-            this.render();
-
-            // Trigger event listeners 
-            this.addEventListeners();
-
-            // Run callback if it is a function
-            if(callback = this.options.callbackOnInit){
-                if(isType('Function', callback)) {
-                    callback();
-                } else {
-                    console.error('callbackOnInit: Callback is not a function');
-                }
-            }
-        }
-    }
-    
-    /**
-     * Destroy Choices and nullify values
-     * @return
-     */
-    destroy() {
-        this.passedElement.classList.remove(this.options.classNames.input, this.options.classNames.hiddenState);
-        this.passedElement.tabIndex = '';
-        this.passedElement.removeAttribute('style', 'display:none;');
-        this.passedElement.removeAttribute('aria-hidden');
-                
-        this.containerOuter.outerHTML = this.passedElement.outerHTML;
-
-        this.passedElement = null;
-        this.userOptions   = null;
-        this.options       = null;
-        this.store         = null;
-
-        this.removeEventListeners();
+        this.input.removeEventListener('input', this._onInput);
+        this.input.removeEventListener('paste', this._onPaste);
+        this.input.removeEventListener('focus', this._onFocus);
+        this.input.removeEventListener('blur', this._onBlur);
     }
 };
 
