@@ -47,7 +47,7 @@ To install via NPM, run `npm install --save-dev choices.js`
 #### items
 <strong>Type:</strong> `Array` <strong>Default:</strong> `[]`
 
-Usage: Add pre-selected items to input. 
+<strong>Usage:</strong> Add pre-selected items to input. 
 
 Pass an array of strings: 
 
