@@ -198,43 +198,55 @@ classNames: {
 
 
 ## Methods
-#### `highlightAll();`
+#### highlightAll();
 <strong>Usage:</strong> Highlight each chosen item (selected items can be removed).
 
-#### `unhighlightAll();`
+
+#### unhighlightAll();
 <strong>Usage:</strong> Un-highlight each chosen item.
 
-#### `removeItemsByValue(value);`
+
+#### removeItemsByValue(value);
 <strong>Usage:</strong> Remove each item by a given value.
 
-#### `removeActiveItems(excludedId);`
+
+#### removeActiveItems(excludedId);
 <strong>Usage:</strong> Remove each selectable item.
 
-#### `removeSelectedItems();`
+
+#### removeSelectedItems();
 <strong>Usage:</strong> Remove each item the user has selected.
 
-#### `showDropdown();`
-<strong>Usage:</strong> Show option list dropdown
 
-#### `hideDropdown();`
-<strong>Usage:</strong> Hide option list dropdown
+#### showDropdown();
+<strong>Usage:</strong> Show option list dropdown.
 
-#### `toggleDropdown();`
+
+#### hideDropdown();
+<strong>Usage:</strong> Hide option list dropdown.
+
+
+#### toggleDropdown();
 <strong>Usage:</strong> Toggle dropdown between showing/hidden.
 
-#### `setValue(args);`
+
+#### setValue(args);
 <strong>Usage:</strong> Set value of input based on an array of objects or strings.
 
-#### `clearValue();`
+
+#### clearValue();
 <strong>Usage:</strong> Clear value of input.
 
-#### `clearInput();`
+
+#### clearInput();
 <strong>Usage:</strong> Clear input.
 
-#### `disable();`
+
+#### disable();
 <strong>Usage:</strong> Disable input from selecting further options.
 
-#### `ajax(fn);`
+
+#### ajax(fn);
 <strong>Usage:</strong> Populate options via a callback.
 
 
@@ -250,6 +262,7 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 * ```npm start```
 * ```npm run js:build```
 * ```npm run css:watch```
+* ```npm run css:build```
 
 ## Contributions
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using npm scripts...bla bla bla
