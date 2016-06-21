@@ -33,17 +33,17 @@ export class Choices {
             removeItems: true,
             removeButton: false,
             editItems: false,
-            maxItems: false,
+            maxItems: null,
             delimiter: ',',
             allowDuplicates: true,
             allowPaste: true,
             allowSearch: true, 
-            _regexFilter: false,
+            regexFilter: null,
             placeholder: true,
-            placeholderValue: '',
-            prependValue: false,
-            appendValue: false,
-            selectAll: true,
+            placeholderValue: null,
+            prependValue: null,
+            appendValue: null,
+            highlightAll: true,
             loadingText: 'Loading...',
             templates: {},
             classNames: {
@@ -80,7 +80,7 @@ export class Choices {
         this.options = extend(defaultOptions, userOptions);
 
         // Create data store
-        this.store = new Store(this._render);
+        this.store = new Store(this.render);
 
         // State tracking
         this.initialised  = false;
@@ -103,7 +103,7 @@ export class Choices {
 
         // Bind methods
         this.init    = this.init.bind(this);
-        this._render  = this._render.bind(this);
+        this.render  = this.render.bind(this);
         this.destroy = this.destroy.bind(this);
         this.disable = this.disable.bind(this);
         
@@ -148,10 +148,10 @@ export class Choices {
             // Generate input markup
             this._createInput();
 
-            this.store.subscribe(this._render);
+            this.store.subscribe(this.render);
 
             // Render any items
-            this._render();
+            this.render();
 
             // Trigger event listeners 
             this._addEventListeners();
@@ -217,11 +217,11 @@ export class Choices {
     }
 
     /**
-     * Select items within store
+     * Highlight items within store
      * @return {Object} Class instance
      * @public
      */
-    selectAll() {
+    highlightAll() {
         const items = this.store.getItems();
         items.forEach((item) => {
             this.selectItem(item);
@@ -245,76 +245,6 @@ export class Choices {
     }
 
     /**
-     * Add item to store with correct value
-     * @param {String} value Value to add to store
-     * @return {Object} Class instance
-     * @public
-     */
-    addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
-        const items        = this.store.getItems();
-        let passedValue    = value.trim();
-        let passedLabel    = label || passedValue;
-        let passedOptionId = optionId || -1;
-
-        // If a prepended value has been passed, prepend it
-        if(this.options.prependValue) {
-            passedValue = this.options.prependValue + passedValue.toString();
-        }
-
-        // If an appended value has been passed, append it
-        if(this.options.appendValue) {
-            passedValue = passedValue + this.options.appendValue.toString();
-        }
-
-        // Generate unique id
-        const id = items ? items.length + 1 : 1;
-
-        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
-
-        if(this.passedElement.type === 'select-one') {
-            this.removeActiveItems(id);
-        }  
-
-        // Run callback if it is a function
-        if(callback){
-            if(isType('Function', callback)) {
-                callback(id, passedValue, this.passedElement);
-            } else {
-                console.error('callbackOnAddItem: Callback is not a function');
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * Remove item from store
-     * @param
-     * @return {Object} Class instance
-     * @public
-     */
-    removeItem(item, callback = this.options.callbackOnRemoveItem) {
-        if(!item || !isType('Object', item)) {
-            console.error('removeItem: No item object was passed to be removed');
-            return;
-        }
-
-        const id       = item.id;
-        const value    = item.value;
-        const optionId = item.optionId;
-
-        this.store.dispatch(removeItem(id, optionId));
-
-        // Run callback
-        if(callback){
-            if(!isType('Function', callback)) console.error('callbackOnRemoveItem: Callback is not a function'); return;
-            callback(id, value, this.passedElement);
-        }
-
-        return this;
-    }
-
-    /**
      * Remove an item from the store by its value
      * @param  {String} value Value to search for
      * @return {Object} Class instance
@@ -327,7 +257,7 @@ export class Choices {
 
         items.forEach((item) => {
             if(item.value === value) {
-                this.removeItem(item);
+                this._removeItem(item);
             }
         });
 
@@ -337,7 +267,7 @@ export class Choices {
     /**
      * Remove all items from store array
      * Note: removed items are soft deleted
-     * @param  {Boolean} selectedOnly Optionally remove only selected items
+     * @param  {Number} excludedId Optionally exclude item by ID
      * @return {Object} Class instance
      * @public
      */
@@ -346,7 +276,7 @@ export class Choices {
 
         items.forEach((item) => {
             if(item.active && excludedId !== item.id) {
-                this.removeItem(item);   
+                this._removeItem(item);   
             } 
         });
 
@@ -364,7 +294,7 @@ export class Choices {
 
         items.forEach((item) => {
             if(item.selected && item.active) {
-                this.removeItem(item);
+                this._removeItem(item);
             }
         });
 
@@ -443,13 +373,13 @@ export class Choices {
                 if(this.passedElement.type !== 'text') {
                     this._addOption(true, false, item.value, item.label, -1);
                 } else {
-                    this.addItem(item.value, item.label, item.id);    
+                    this._addItem(item.value, item.label, item.id);    
                 }
             } else if(isType('String', item)) {
                 if(this.passedElement.type !== 'text') {
                     this._addOption(true, false, item, item, -1);
                 } else {
-                    this.addItem(item);
+                    this._addItem(item);
                 }
             }
         });
@@ -501,7 +431,7 @@ export class Choices {
                 results.forEach((result, index) => {
                     // Add each result to option dropdown
                     if(index === 0) { 
-                       this.addItem(result[value], result[label], index);
+                       this._addItem(result[value], result[label], index);
                     }
                     this._addOption(false, false, result[value], result[label]);
                 });
@@ -553,7 +483,7 @@ export class Choices {
             let canAddItem = true;
 
             // If a user has supplied a regular expression filter
-            if(this.options._regexFilter) {
+            if(this.options.regexFilter) {
                 // Determine whether we can update based on whether 
                 // our regular expression passes 
                 canAddItem = this._regexFilter(value);
@@ -562,7 +492,7 @@ export class Choices {
             // All is good, add
             if(canAddItem) {
                 this.toggleDropdown();
-                this.addItem(value);
+                this._addItem(value);
                 this.clearInput(this.passedElement);
             }
         }
@@ -583,7 +513,7 @@ export class Choices {
             // we can edit the item value. Otherwise if we can remove items, remove all selected items
             if(this.options.editItems && !hasSelectedItems && lastItem) {
                 this.input.value = lastItem.value;
-                this.removeItem(lastItem);
+                this._removeItem(lastItem);
             } else {
                 if(!hasSelectedItems) { this.selectItem(lastItem); }
                 this.removeSelectedItems();    
@@ -628,8 +558,9 @@ export class Choices {
                 // If CTRL + A or CMD + A have been pressed and there are items to select
                 if(ctrlDownKey && hasItems) {
                     this.canSearch = false;
-                    if(this.options.removeItems && !this.input.value && this.options.selectAll && this.input === document.activeElement) {
-                        this.selectAll(this.itemList.children);
+                    if(this.options.removeItems && !this.input.value && this.options.highlightAll && this.input === document.activeElement) {
+                        // Highlight items
+                        this.highlightAll(this.itemList.children);
                     }
                 }
                 break;
@@ -648,7 +579,7 @@ export class Choices {
                         const value = highlighted.getAttribute('data-value');
                         const label = highlighted.innerHTML;
                         const id    = highlighted.getAttribute('data-id');
-                        this.addItem(value, label, id);
+                        this._addItem(value, label, id);
                         this.clearInput(this.passedElement);
 
                         if(this.passedElement.type === 'select-one') {
@@ -738,7 +669,7 @@ export class Choices {
                     dropdownItem = this._getTemplate('notice', `Add "${ this.input.value }"`);
                 }
                 
-                if((this.options._regexFilter && this._regexFilter(this.input.value)) || !this.options._regexFilter) {
+                if((this.options.regexFilter && this._regexFilter(this.input.value)) || !this.options.regexFilter) {
                     this.dropdown.innerHTML = dropdownItem.outerHTML;
                     if(!this.dropdown.classList.contains(this.options.classNames.activeState)) {
                         this.showDropdown();    
@@ -835,7 +766,7 @@ export class Choices {
                     if(this.options.removeItems && this.options.removeButton) {
                         const itemId       = e.target.parentNode.getAttribute('data-id');
                         const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
-                        this.removeItem(itemToRemove);
+                        this._removeItem(itemToRemove);
                     }
                 } else if(e.target.hasAttribute('data-item')) {
                     // If we are clicking on an item
@@ -860,7 +791,7 @@ export class Choices {
                     const option = options.find((option) => option.id === parseInt(id));
 
                     if(!option.selected && !option.disabled) {
-                        this.addItem(option.value, option.label, option.id);
+                        this._addItem(option.value, option.label, option.id);
                         if(this.passedElement.type === 'select-one') {
                             this.input.value = "";
                             this.isSearching = false;
@@ -875,8 +806,8 @@ export class Choices {
                 const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
                 const hasSelectedItems  = activeItems.some((item) => item.selected === true);
 
-                // De-select any selected items
-                if(hasSelectedItems) this.deselectAll();
+                // De-select any highlighted items
+                if(hasSelectedItems) this.unhighlightAll();
             
                 // Remove focus state
                 this.containerOuter.classList.remove(this.options.classNames.focusState);
@@ -957,7 +888,7 @@ export class Choices {
      */
     _regexFilter(value) {
         if(!value) return;
-        const expression = new RegExp(this.options._regexFilter, 'i');
+        const expression = new RegExp(this.options.regexFilter, 'i');
         return expression.test(value);
     }
 
@@ -1058,6 +989,77 @@ export class Choices {
         }
     }
 
+
+    /**
+     * Add item to store with correct value
+     * @param {String} value Value to add to store
+     * @return {Object} Class instance
+     * @public
+     */
+    _addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
+        const items        = this.store.getItems();
+        let passedValue    = value.trim();
+        let passedLabel    = label || passedValue;
+        let passedOptionId = optionId || -1;
+
+        // If a prepended value has been passed, prepend it
+        if(this.options.prependValue) {
+            passedValue = this.options.prependValue + passedValue.toString();
+        }
+
+        // If an appended value has been passed, append it
+        if(this.options.appendValue) {
+            passedValue = passedValue + this.options.appendValue.toString();
+        }
+
+        // Generate unique id
+        const id = items ? items.length + 1 : 1;
+
+        this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
+
+        if(this.passedElement.type === 'select-one') {
+            this.removeActiveItems(id);
+        }  
+
+        // Run callback if it is a function
+        if(callback){
+            if(isType('Function', callback)) {
+                callback(id, passedValue, this.passedElement);
+            } else {
+                console.error('callbackOnAddItem: Callback is not a function');
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove item from store
+     * @param
+     * @return {Object} Class instance
+     * @public
+     */
+    _removeItem(item, callback = this.options.callbackOnRemoveItem) {
+        if(!item || !isType('Object', item)) {
+            console.error('removeItem: No item object was passed to be removed');
+            return;
+        }
+
+        const id       = item.id;
+        const value    = item.value;
+        const optionId = item.optionId;
+
+        this.store.dispatch(removeItem(id, optionId));
+
+        // Run callback
+        if(callback){
+            if(!isType('Function', callback)) console.error('callbackOnRemoveItem: Callback is not a function'); return;
+            callback(id, value, this.passedElement);
+        }
+
+        return this;
+    }
+
     /** 
      * Add option to dropdown
      * @param {Object}  option   Option to add
@@ -1077,7 +1079,7 @@ export class Choices {
         this.store.dispatch(addOption(value, label, id, groupId, isDisabled));
 
         if(isSelected && !isDisabled) {
-            this.addItem(value, label, id);
+            this._addItem(value, label, id);
         }
     }
 
@@ -1163,7 +1165,7 @@ export class Choices {
                 `);
             },
             item: (data) => {
-                if(this.options.removeButton) {
+                if(this.options.removeButton && this.passedElement.type !== 'select-one') {
                     return strToEl(`
                         <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
                             ${ data.label }
@@ -1263,9 +1265,9 @@ export class Choices {
             this.presetItems.forEach((item) => {
                 if(isType('Object', item)) {
                     if(!item.value) return;
-                    this.addItem(item.value, item.label, item.id);
+                    this._addItem(item.value, item.label, item.id);
                 } else if(isType('String', item)) {
-                    this.addItem(item);
+                    this._addItem(item);
                 }
             });
         }
@@ -1279,7 +1281,7 @@ export class Choices {
      * @return {DocumentFragment} Populated options fragment
      * @private
      */
-    _renderGroups(groups, options, fragment) {
+    renderGroups(groups, options, fragment) {
         const groupFragment = fragment || document.createDocumentFragment();
 
         groups.forEach((group, i) => {
@@ -1297,7 +1299,7 @@ export class Choices {
 
                 groupFragment.appendChild(dropdownGroup);
 
-                this._renderOptions(groupOptions, groupFragment);
+                this.renderOptions(groupOptions, groupFragment);
             }
         });
 
@@ -1311,7 +1313,7 @@ export class Choices {
      * @return {DocumentFragment} Populated options fragment
      * @private
      */
-    _renderOptions(options, fragment) {
+    renderOptions(options, fragment) {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
         const optsFragment = fragment || document.createDocumentFragment();
 
@@ -1335,7 +1337,7 @@ export class Choices {
      * @return
      * @private
      */
-    _renderItems(items, fragment) {
+    renderItems(items, fragment) {
         // Create fragment to add elements to
         const itemListFragment = fragment || document.createDocumentFragment();
         // Simplify store data to just values
@@ -1378,10 +1380,10 @@ export class Choices {
      * @return
      * @private
      */
-    _render() {
+    render() {
         this.currentState = this.store.getState();
     
-        // Only _render if our state has actually changed
+        // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
 
             // Options
@@ -1398,9 +1400,9 @@ export class Choices {
 
                     // If we have grouped options
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
-                        optListFragment = this._renderGroups(activeGroups, activeOptions, optListFragment);
+                        optListFragment = this.renderGroups(activeGroups, activeOptions, optListFragment);
                     } else if(activeOptions.length >= 1) {
-                        optListFragment = this._renderOptions(activeOptions, optListFragment);
+                        optListFragment = this.renderOptions(activeOptions, optListFragment);
                     }
 
                     if(optListFragment.children.length) {
@@ -1421,7 +1423,7 @@ export class Choices {
                 const activeItems = this.store.getItemsFilteredByActive();
                 if(activeItems) {
                     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-                    const itemListFragment = this._renderItems(activeItems);
+                    const itemListFragment = this.renderItems(activeItems);
 
                     // Clear list
                     this.itemList.innerHTML = '';
