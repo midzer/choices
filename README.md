@@ -34,7 +34,7 @@ Coming soon.
         placeholderValue: '',
         prependValue: false,
         appendValue: false,
-        selectAll: true,
+        highlightAll: true,
         loadingText: 'Loading...',
     });
 </script>
