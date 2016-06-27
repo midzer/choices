@@ -4,7 +4,7 @@ const items = (state = [], action) => {
             // Add object to items array
             let newState = [...state, {
                 id: action.id,
-                optionId: action.optionId,
+                choiceId: action.choiceId,
                 value: action.value,
                 label: action.label,
                 active: true,

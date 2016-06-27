@@ -1,18 +1,18 @@
-export const addItem = (value, label, id, optionId) => {
+export const addItem = (value, label, id, choiceId) => {
     return {
         type: 'ADD_ITEM',
         value,
         label,
         id,
-        optionId,
+        choiceId,
     }
 };
 
-export const removeItem = (id, optionId) => {
+export const removeItem = (id, choiceId) => {
     return {
         type: 'REMOVE_ITEM',
         id,
-        optionId,
+        choiceId,
     }
 };
 
@@ -24,9 +24,9 @@ export const selectItem = (id, selected) => {
     }
 };
 
-export const addOption = (value, label, id, groupId, disabled) => {
+export const addChoice = (value, label, id, groupId, disabled) => {
     return {
-        type: 'ADD_OPTION',
+        type: 'ADD_CHOICE',
         value,
         label,
         id,
@@ -35,14 +35,14 @@ export const addOption = (value, label, id, groupId, disabled) => {
     }
 };
 
-export const filterOptions = (results) => {
+export const filterChoices = (results) => {
     return {
-        type: 'FILTER_OPTIONS',
+        type: 'FILTER_CHOICES',
         results,
     }
 };
 
-export const activateOptions = (active = true) => {
+export const activateChoices = (active = true) => {
     return {
         type: 'ACTIVATE_OPTIONS',
         active,

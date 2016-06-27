@@ -75,35 +75,35 @@ export class Store {
     }
 
     /**
-     * Get options from store 
+     * Get choices from store 
      * @return {Array} Option objects
      */
-    getOptions() {
+    getChoices() {
         const state = this.store.getState();
-        return state.options;
+        return state.choices;
     }
 
     /**
-     * Get active options from store
+     * Get active choices from store
      * @return {Array} Option objects
      */
-    getOptionsFilteredByActive() {
-        const options = this.getOptions();
-        const values = options.filter((option) => {
-            return option.active === true;
+    getChoicesFilteredByActive() {
+        const choices = this.getChoices();
+        const values = choices.filter((choice) => {
+            return choice.active === true;
         },[]);
 
         return values;
     }
 
     /**
-     * Get selectable options from store
+     * Get selectable choices from store
      * @return {Array} Option objects
      */
-    getOptionsFiltedBySelectable() {
-        const options = this.getOptions();
-        const values = options.filter((option) => {
-            return option.selected === false && option.disabled !== true;
+    getChoicesFiltedBySelectable() {
+        const choices = this.getChoices();
+        const values = choices.filter((choice) => {
+            return choice.selected === false && choice.disabled !== true;
         },[]);
 
         return values;
@@ -124,11 +124,11 @@ export class Store {
      */
     getGroupsFilteredByActive() {
         const groups = this.getGroups();
-        const options = this.getOptions();
+        const choices = this.getChoices();
 
         const values = groups.filter((group) => {
             const isActive = group.active === true && group.disabled === false;
-            const hasActiveOptions = options.some((option) => {
+            const hasActiveOptions = choices.some((option) => {
                 return option.active === true && option.disabled === false;
             });
             return isActive && hasActiveOptions ? true : false;

@@ -1,6 +1,6 @@
-const options = (state = [], action) => {
+const choices = (state = [], action) => {
     switch (action.type) {
-        case 'ADD_OPTION':
+        case 'ADD_CHOICE':
             return [...state, {
                 id: action.id,
                 groupId: action.groupId,
@@ -15,9 +15,9 @@ const options = (state = [], action) => {
         case 'ADD_ITEM':
             // When an item is added and it has an associated option,
             // we want to disable it so it can't be chosen again
-            if(action.optionId > -1) {
+            if(action.choiceId > -1) {
                 return state.map((option) => {
-                    if(option.id === parseInt(action.optionId)) {
+                    if(option.id === parseInt(action.choiceId)) {
                         option.selected = true;
                     }
                     return option;
@@ -29,9 +29,9 @@ const options = (state = [], action) => {
         case 'REMOVE_ITEM':
             // When an item is removed and it has an associated option,
             // we want to re-enable it so it can be chosen again
-            if(action.optionId > -1) {
+            if(action.choiceId > -1) {
                 return state.map((option) => {
-                    if(option.id === parseInt(action.optionId)) {
+                    if(option.id === parseInt(action.choiceId)) {
                         option.selected = false;
                     }
                     return option;
@@ -40,7 +40,7 @@ const options = (state = [], action) => {
                 return state;
             }
 
-        case 'FILTER_OPTIONS':
+        case 'FILTER_CHOICES':
             const filteredResults = action.results;
             const filteredState = state.map((option, index) => {
                 // Set active state based on whether option is 
@@ -60,7 +60,7 @@ const options = (state = [], action) => {
 
             return filteredState;
 
-        case 'ACTIVATE_OPTIONS':
+        case 'ACTIVATE_CHOICES':
             return state.map((option) => {
                 option.active = action.active;
 
@@ -73,4 +73,4 @@ const options = (state = [], action) => {
     }
 }
 
-export default options;
+export default choices;

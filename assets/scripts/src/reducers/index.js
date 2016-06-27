@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 import items from './items';
 import groups from './groups';
-import options from './options';
+import choices from './choices';
 
 const appReducer = combineReducers({
     items,
     groups,
-    options
+    choices
 });
 
 const rootReducer = (state, action) => {

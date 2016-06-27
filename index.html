@@ -141,13 +141,13 @@
             });
 
             const choices2 = new Choices('#choices-2', {
-                allowPaste: false,
-                allowDuplicates: false,
+                paste: false,
+                duplicateItems: false,
                 editItems: true,
             });
 
             const choices3 = new Choices('#choices-3', {
-                allowDuplicates: false,
+                duplicates: false,
                 editItems: true,
                 regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             });
@@ -166,7 +166,7 @@
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
-            const choices7 = new Choices('#choices-7', { allowSearch: false }).setValue(['Set value 1', 'Set value 2']);
+            const choices7 = new Choices('#choices-7', { Search: false }).setValue(['Set value 1', 'Set value 2']);
             
             const choicesAjax = new Choices('#choices-12').ajax((callback) => {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')

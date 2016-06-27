@@ -1,6 +1,6 @@
 'use strict';
 
-import { addItem, removeItem, selectItem, addOption, filterOptions, activateOptions, addGroup, clearAll } from './actions/index';
+import { addItem, removeItem, selectItem, addChoice, filterChoices, activateChoices, addGroup, clearAll } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';
 import Store from './store/index.js';
@@ -29,21 +29,20 @@ export class Choices {
 
         const defaultOptions = {
             items: [],
+            maxItemCount: -1,
             addItems: true,
             removeItems: true,
-            removeButton: false,
+            removeItemButton: false,
             editItems: false,
-            maxItems: null,
+            duplicateItems: true,
             delimiter: ',',
-            allowDuplicates: true,
-            allowPaste: true,
-            allowSearch: true, 
+            paste: true,
+            searchOptions: true, 
             regexFilter: null,
             placeholder: true,
             placeholderValue: null,
             prependValue: null,
             appendValue: null,
-            highlightAll: true,
             loadingText: 'Loading...',
             templates: {},
             classNames: {
@@ -72,8 +71,8 @@ export class Choices {
                 selectedState: 'is-selected',
             },
             callbackOnInit: () => {},
-            callbackOnRemoveItem: () => {},
-            callbackOnAddItem: () => {}
+            callbackOnAddItem: (id, value, passedInput) => {},
+            callbackOnRemoveItem: (id, value, passedInput) => {},
         };
 
         // Merge options with user options
@@ -92,7 +91,7 @@ export class Choices {
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         this.highlightPosition = 0;
-        this.canSearch = this.options.allowSearch;
+        this.canSearch = this.options.searchOptions;
 
         // Assign preset items from passed object first
         this.presetItems = this.options.items;
@@ -371,13 +370,13 @@ export class Choices {
                 // If we are dealing with a select input, we need to create an option first 
                 // that is then selected. For text inputs we can just add items normally.
                 if(this.passedElement.type !== 'text') {
-                    this._addOption(true, false, item.value, item.label, -1);
+                    this._addChoice(true, false, item.value, item.label, -1);
                 } else {
                     this._addItem(item.value, item.label, item.id);    
                 }
             } else if(isType('String', item)) {
                 if(this.passedElement.type !== 'text') {
-                    this._addOption(true, false, item, item, -1);
+                    this._addChoice(true, false, item, item, -1);
                 } else {
                     this._addItem(item);
                 }
@@ -433,7 +432,7 @@ export class Choices {
                     if(index === 0) { 
                        this._addItem(result[value], result[label], index);
                     }
-                    this._addOption(false, false, result[value], result[label]);
+                    this._addChoice(false, false, result[value], result[label]);
                 });
             }
         };
@@ -466,11 +465,11 @@ export class Choices {
         let canUpdate = true;
 
         if(this.options.addItems) {
-            if (this.options.maxItems && this.options.maxItems <= this.itemList.children.length) {
+            if (this.options.maxItemCount && this.options.maxItemCount > 0 && this.options.maxItemCount <= this.itemList.children.length) {
                 // If there is a max entry limit and we have reached that limit
                 // don't update
                 canUpdate = false;
-            } else if(this.options.allowDuplicates === false && this.passedElement.value) {
+            } else if(this.options.duplicateItems === false && this.passedElement.value) {
                 // If no duplicates are allowed, and the value already exists
                 // in the array, don't update
                 canUpdate = !activeItems.some((item) => item.value === value );
@@ -539,7 +538,7 @@ export class Choices {
         const downKey     = 40;
 
         const activeItems       = this.store.getItemsFilteredByActive();
-        const activeOptions     = this.store.getOptionsFilteredByActive();
+        const activeOptions     = this.store.getChoicesFilteredByActive();
         
         const hasFocusedInput   = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
@@ -551,14 +550,14 @@ export class Choices {
             this.showDropdown();
         }
 
-        this.canSearch = this.options.allowSearch;
+        this.canSearch = this.options.searchOptions;
 
         switch (e.keyCode) {
             case aKey:
                 // If CTRL + A or CMD + A have been pressed and there are items to select
                 if(ctrlDownKey && hasItems) {
                     this.canSearch = false;
-                    if(this.options.removeItems && !this.input.value && this.options.highlightAll && this.input === document.activeElement) {
+                    if(this.options.removeItems && !this.input.value && this.input === document.activeElement) {
                         // Highlight items
                         this.highlightAll(this.itemList.children);
                     }
@@ -584,7 +583,7 @@ export class Choices {
 
                         if(this.passedElement.type === 'select-one') {
                             this.isSearching = false;
-                            this.store.dispatch(activateOptions());
+                            this.store.dispatch(activateChoices());
                             this.toggleDropdown();
                         }
                     }
@@ -616,10 +615,10 @@ export class Choices {
                     if(nextEl) {
                         // We prevent default to stop the cursor moving 
                         // when pressing the arrow
-                        if(!isScrolledIntoView(nextEl, this.optionList, directionInt)) {
-                            this._scrollToOption(nextEl, directionInt);
+                        if(!isScrolledIntoView(nextEl, this.choiceList, directionInt)) {
+                            this._scrollToChoice(nextEl, directionInt);
                         }
-                        this._highlightOption(nextEl);
+                        this._highlightChoice(nextEl);
                     }
 
                     // Prevent default to maintain cursor position whilst
@@ -661,9 +660,9 @@ export class Choices {
                 const activeItems = this.store.getItemsFilteredByActive();
                 const isUnique = !activeItems.some((item) => item.value === this.input.value);
 
-                if (this.options.maxItems && this.options.maxItems <= this.itemList.children.length) {
-                    dropdownItem = this._getTemplate('notice', `Only ${ this.options.maxItems } options can be added.`);
-                } else if(!this.options.allowDuplicates && !isUnique) {
+                if (this.options.maxItemCount && this.options.maxItemCount > 0 && this.options.maxItemCount <= this.itemList.children.length) {
+                    dropdownItem = this._getTemplate('notice', `Only ${ this.options.maxItemCount } options can be added.`);
+                } else if(!this.options.duplicateItems && !isUnique) {
                     dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
                 } else {
                     dropdownItem = this._getTemplate('notice', `Add "${ this.input.value }"`);
@@ -684,7 +683,7 @@ export class Choices {
         // If we have enabled text search
         if(this.canSearch) {
             if(this.input === document.activeElement) {
-                const options            = this.store.getOptions();
+                const options            = this.store.getChoices();
                 const hasUnactiveOptions = options.some((option) => option.active !== true);
 
                 // Check that we have a value to search and the input was an alphanumeric character
@@ -694,7 +693,7 @@ export class Choices {
                         const currentValue = this.currentValue.trim();
 
                         if(newValue.length >= 1 && newValue !== currentValue + ' ') {
-                            const haystack = this.store.getOptionsFiltedBySelectable();
+                            const haystack = this.store.getChoicesFiltedBySelectable();
                             const needle   = newValue;
                             const fuse = new Fuse(haystack, { 
                                 keys: ['label', 'value'],
@@ -706,7 +705,7 @@ export class Choices {
                             this.currentValue = newValue;
                             this.highlightPosition = 0;
                             this.isSearching = true;
-                            this.store.dispatch(filterOptions(results));
+                            this.store.dispatch(filterChoices(results));
                         }
                     };
 
@@ -714,7 +713,7 @@ export class Choices {
                 } else if(hasUnactiveOptions) {
                     // Otherwise reset options to active
                     this.isSearching = false;
-                    this.store.dispatch(activateOptions());
+                    this.store.dispatch(activateChoices());
                 }
             }
         } 
@@ -763,7 +762,7 @@ export class Choices {
                 }
 
                 if(e.target.hasAttribute('data-button')) {
-                    if(this.options.removeItems && this.options.removeButton) {
+                    if(this.options.removeItems && this.options.removeItemButton) {
                         const itemId       = e.target.parentNode.getAttribute('data-id');
                         const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
                         this._removeItem(itemToRemove);
@@ -786,7 +785,7 @@ export class Choices {
                     }
                 } else if(e.target.hasAttribute('data-option')) {
                     // If we are clicking on an option
-                    const options = this.store.getOptionsFilteredByActive();
+                    const options = this.store.getChoicesFilteredByActive();
                     const id = e.target.getAttribute('data-id');
                     const option = options.find((option) => option.id === parseInt(id));
 
@@ -795,7 +794,7 @@ export class Choices {
                         if(this.passedElement.type === 'select-one') {
                             this.input.value = "";
                             this.isSearching = false;
-                            this.store.dispatch(activateOptions(true));
+                            this.store.dispatch(activateChoices(true));
                             this.toggleDropdown();
                         }
                     }
@@ -828,7 +827,7 @@ export class Choices {
         // If the dropdown is either the target or one of its children is the target
         if((e.target === this.dropdown || findAncestor(e.target, this.options.classNames.listDropdown))) {
             if(e.target.hasAttribute('data-option')) {
-                this._highlightOption(e.target);
+                this._highlightChoice(e.target);
             }
         }
     }
@@ -842,7 +841,7 @@ export class Choices {
     _onPaste(e) {
         if(e.target !== this.input) return;
         // Disable pasting into the input if option has been set
-        if(!this.options.allowPaste) {
+        if(!this.options.paste) {
             e.preventDefault();
         }
     }
@@ -899,20 +898,20 @@ export class Choices {
      * @return
      * @private
      */
-    _scrollToOption(option, direction) {
+    _scrollToChoice(option, direction) {
         if(!option) return;
         
-        const dropdownHeight = this.optionList.offsetHeight;
+        const dropdownHeight = this.choiceList.offsetHeight;
         const optionHeight   = option.offsetHeight;
 
         // Distance from bottom of element to top of parent
-        const optionPos = option.offsetTop + optionHeight;
+        const choicePos = option.offsetTop + optionHeight;
         
         // Scroll position of dropdown
-        const containerScrollPos = this.optionList.scrollTop + dropdownHeight;
+        const containerScrollPos = this.choiceList.scrollTop + dropdownHeight;
         
         // Difference between the option and scroll position
-        let endPoint = direction > 0 ? ((this.optionList.scrollTop + optionPos) - containerScrollPos) : option.offsetTop;
+        let endPoint = direction > 0 ? ((this.choiceList.scrollTop + choicePos) - containerScrollPos) : option.offsetTop;
 
         const animateScroll = (time, endPoint, direction) => {
             let continueAnimation = false;
@@ -920,19 +919,19 @@ export class Choices {
             const strength = 4;
 
             if(direction > 0) {
-                easing = (endPoint - this.optionList.scrollTop)/strength;
+                easing = (endPoint - this.choiceList.scrollTop)/strength;
                 distance = easing > 1 ? easing : 1;
 
-                this.optionList.scrollTop = this.optionList.scrollTop + distance;
-                if(this.optionList.scrollTop < endPoint) {
+                this.choiceList.scrollTop = this.choiceList.scrollTop + distance;
+                if(this.choiceList.scrollTop < endPoint) {
                     continueAnimation = true;
                 }
             } else {
-                easing = (this.optionList.scrollTop - endPoint)/strength;
+                easing = (this.choiceList.scrollTop - endPoint)/strength;
                 distance = easing > 1 ? easing : 1;
 
-                this.optionList.scrollTop = this.optionList.scrollTop - distance;
-                if(this.optionList.scrollTop > endPoint) {
+                this.choiceList.scrollTop = this.choiceList.scrollTop - distance;
+                if(this.choiceList.scrollTop > endPoint) {
                     continueAnimation = true;
                 }
             }
@@ -955,11 +954,11 @@ export class Choices {
      * @return
      * @private
      */
-    _highlightOption(el) {
+    _highlightChoice(el) {
         // Highlight first element in dropdown
         const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
 
-        if(options.length) {
+        if(options && options.length) {
             const highlightedOptions = Array.from(this.dropdown.querySelectorAll(`.${this.options.classNames.highlightedState}`));
             
             // Remove any highlighted options 
@@ -996,11 +995,11 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    _addItem(value, label, optionId = -1, callback = this.options.callbackOnAddItem) {
+    _addItem(value, label, choiceId = -1, callback = this.options.callbackOnAddItem) {
         const items        = this.store.getItems();
         let passedValue    = value.trim();
         let passedLabel    = label || passedValue;
-        let passedOptionId = optionId || -1;
+        let passedOptionId = choiceId || -1;
 
         // If a prepended value has been passed, prepend it
         if(this.options.prependValue) {
@@ -1047,9 +1046,9 @@ export class Choices {
 
         const id       = item.id;
         const value    = item.value;
-        const optionId = item.optionId;
+        const choiceId = item.choiceId;
 
-        this.store.dispatch(removeItem(id, optionId));
+        this.store.dispatch(removeItem(id, choiceId));
 
         // Run callback
         if(callback){
@@ -1061,22 +1060,20 @@ export class Choices {
     }
 
     /** 
-     * Add option to dropdown
-     * @param {Object}  option   Option to add
-     * @param {Number}  groupId  ID of the options group
+     * Add choice to dropdoww
      * @return
      * @private
      */
-    _addOption(isSelected, isDisabled, value, label, groupId = -1) {
+    _addChoice(isSelected, isDisabled, value, label, groupId = -1) {
         if(!value) return
 
         if(!label) { label = value; }
 
         // Generate unique id
-        const options    = this.store.getOptions();
-        const id         = options.length + 1;
+        const choices    = this.store.getChoices();
+        const id         = choices ? choices.length + 1 : 1;
 
-        this.store.dispatch(addOption(value, label, id, groupId, isDisabled));
+        this.store.dispatch(addChoice(value, label, id, groupId, isDisabled));
 
         if(isSelected && !isDisabled) {
             this._addItem(value, label, id);
@@ -1098,7 +1095,7 @@ export class Choices {
             this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
             groupOptions.forEach((option, optionIndex) => {
                 const isDisabled = option.disabled || option.parentNode.disabled;
-                this._addOption(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
+                this._addChoice(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
             });
         } else {
             this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
@@ -1135,7 +1132,7 @@ export class Choices {
             itemList: () => {
                 return strToEl(`<div class="${ classNames.list } ${ this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems }"></div>`);
             },
-            optionList: () => {
+            choiceList: () => {
                 return strToEl(`<div class="${ classNames.list }"></div>`);
             },
             input: () => {
@@ -1165,7 +1162,7 @@ export class Choices {
                 `);
             },
             item: (data) => {
-                if(this.options.removeButton && this.passedElement.type !== 'select-one') {
+                if(this.options.removeItemButton && this.passedElement.type !== 'select-one') {
                     return strToEl(`
                         <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
                             ${ data.label }
@@ -1194,14 +1191,14 @@ export class Choices {
         const containerOuter = this._getTemplate('containerOuter');
         const containerInner = this._getTemplate('containerInner');
         const itemList       = this._getTemplate('itemList');
-        const optionList     = this._getTemplate('optionList');
+        const choiceList     = this._getTemplate('choiceList');
         const input          = this._getTemplate('input');
         const dropdown       = this._getTemplate('dropdown');
 
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
         this.input          = input;
-        this.optionList     = optionList;
+        this.choiceList     = choiceList;
         this.itemList       = itemList;
         this.dropdown       = dropdown;
 
@@ -1232,11 +1229,11 @@ export class Choices {
         containerOuter.appendChild(containerInner);
         containerOuter.appendChild(dropdown);
         containerInner.appendChild(itemList);
-        dropdown.appendChild(optionList);
+        dropdown.appendChild(choiceList);
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             containerInner.appendChild(input);
-        } else if(this.options.allowSearch) {
+        } else if(this.options.searchOptions) {
             dropdown.insertBefore(input, dropdown.firstChild);
         }
 
@@ -1256,7 +1253,7 @@ export class Choices {
                 const passedOptions = Array.from(this.passedElement.options);
                 passedOptions.forEach((option) => {
                     const isDisabled = option.disabled || option.parentNode.disabled;
-                    this._addOption(option.selected, isDisabled, option.value, option.innerHTML);
+                    this._addChoice(option.selected, isDisabled, option.value, option.innerHTML);
                 });
             }
 
@@ -1391,12 +1388,12 @@ export class Choices {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/options
                     const activeGroups    = this.store.getGroupsFilteredByActive();
-                    const activeOptions   = this.store.getOptionsFilteredByActive();
+                    const activeOptions   = this.store.getChoicesFilteredByActive();
 
                     let optListFragment = document.createDocumentFragment();
 
                     // Clear options
-                    this.optionList.innerHTML = '';
+                    this.choiceList.innerHTML = '';
 
                     // If we have grouped options
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
@@ -1408,12 +1405,12 @@ export class Choices {
                     if(optListFragment.children.length) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first option
-                        this.optionList.appendChild(optListFragment);
-                        this._highlightOption();
+                        this.choiceList.appendChild(optListFragment);
+                        this._highlightChoice();
                     } else {
                         // Otherwise show a notice
                         const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No options to select');
-                        this.optionList.appendChild(dropdownItem);
+                        this.choiceList.appendChild(dropdownItem);
                     }
                 }
             }
