@@ -57,7 +57,7 @@ export class Choices {
                 item: 'choices__item',
                 itemSelectable: 'choices__item--selectable',
                 itemDisabled: 'choices__item--disabled',
-                itemOption: 'choices__item--option',
+                itemChoice: 'choices__item--choice',
                 group: 'choices__group',
                 groupHeading : 'choices__heading',
                 button: 'choices__button',
@@ -538,7 +538,7 @@ export class Choices {
         const downKey     = 40;
 
         const activeItems       = this.store.getItemsFilteredByActive();
-        const activeOptions     = this.store.getChoicesFilteredByActive();
+        const activeChoices     = this.store.getChoicesFilteredByActive();
         
         const hasFocusedInput   = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown.classList.contains(this.options.classNames.activeState);
@@ -684,7 +684,7 @@ export class Choices {
         if(this.canSearch) {
             if(this.input === document.activeElement) {
                 const options            = this.store.getChoices();
-                const hasUnactiveOptions = options.some((option) => option.active !== true);
+                const hasUnactiveChoices = options.some((option) => option.active !== true);
 
                 // Check that we have a value to search and the input was an alphanumeric character
                 if(this.input.value && options.length && /[a-zA-Z0-9-_ ]/.test(keyString)) {
@@ -710,7 +710,7 @@ export class Choices {
                     };
 
                     handleFilter();
-                } else if(hasUnactiveOptions) {
+                } else if(hasUnactiveChoices) {
                     // Otherwise reset options to active
                     this.isSearching = false;
                     this.store.dispatch(activateChoices());
@@ -1142,14 +1142,14 @@ export class Choices {
                 return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
             },
             notice: (label, clickable) => {
-                return strToEl(`<div class="${ classNames.item } ${ classNames.itemOption }">${ label }</div>`);
+                return strToEl(`<div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>`);
             },
             selectOption: (data) => {
                 return strToEl(`<option value="${ data.value }" selected>${ data.label.trim() }</option>`);
             },
             option: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemOption } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
+                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
                         ${ data.label }
                     </div>
                 `);
@@ -1379,7 +1379,7 @@ export class Choices {
      */
     render() {
         this.currentState = this.store.getState();
-    
+
         // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
 
@@ -1388,28 +1388,28 @@ export class Choices {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/options
                     const activeGroups    = this.store.getGroupsFilteredByActive();
-                    const activeOptions   = this.store.getChoicesFilteredByActive();
+                    const activeChoices   = this.store.getChoicesFilteredByActive();
 
-                    let optListFragment = document.createDocumentFragment();
+                    let choiceListFragment = document.createDocumentFragment();
 
                     // Clear options
                     this.choiceList.innerHTML = '';
 
                     // If we have grouped options
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
-                        optListFragment = this.renderGroups(activeGroups, activeOptions, optListFragment);
-                    } else if(activeOptions.length >= 1) {
-                        optListFragment = this.renderOptions(activeOptions, optListFragment);
+                        choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+                    } else if(activeChoices.length >= 1) {
+                        choiceListFragment = this.renderOptions(activeChoices, choiceListFragment);
                     }
 
-                    if(optListFragment.children.length) {
+                    if(choiceListFragment.children.length) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first option
-                        this.choiceList.appendChild(optListFragment);
+                        this.choiceList.appendChild(choiceListFragment);
                         this._highlightChoice();
                     } else {
                         // Otherwise show a notice
-                        const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No options to select');
+                        const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No choices to choose from');
                         this.choiceList.appendChild(dropdownItem);
                     }
                 }
