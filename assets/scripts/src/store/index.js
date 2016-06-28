@@ -89,6 +89,7 @@ export class Store {
      */
     getChoicesFilteredByActive() {
         const choices = this.getChoices();
+
         const values = choices.filter((choice) => {
             return choice.active === true;
         },[]);
@@ -128,8 +129,8 @@ export class Store {
 
         const values = groups.filter((group) => {
             const isActive = group.active === true && group.disabled === false;
-            const hasActiveOptions = choices.some((option) => {
-                return option.active === true && option.disabled === false;
+            const hasActiveOptions = choices.some((choice) => {
+                return choice.active === true && choice.disabled === false;
             });
             return isActive && hasActiveOptions ? true : false;
         },[]);

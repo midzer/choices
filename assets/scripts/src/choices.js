@@ -417,27 +417,31 @@ export class Choices {
      * @public
      */
     ajax(fn) {
-        this.containerOuter.classList.add('is-loading');
-        // this.input.placeholder = this.options.loadingText;
+        if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+            this.containerOuter.classList.add('is-loading');
+            // this.input.placeholder = this.options.loadingText;
 
-        const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.options.loadingText, active: true});
-        this.itemList.appendChild(placeholderItem);
+            const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.options.loadingText, active: true});
+            this.itemList.appendChild(placeholderItem);
 
-        const callback = (results, value, label) => {
-            if(results && results.length) {
-                this.containerOuter.classList.remove('is-loading');
-                this.input.placeholder = "";
-                results.forEach((result, index) => {
-                    // Add each result to option dropdown
-                    if(index === 0) { 
-                       this._addItem(result[value], result[label], index);
-                    }
-                    this._addChoice(false, false, result[value], result[label]);
-                });
-            }
-        };
+            const callback = (results, value, label) => {
+                if(results && results.length) {
+                    this.containerOuter.classList.remove('is-loading');
+                    this.input.placeholder = "";
+                    results.forEach((result, index) => {
+                        // Select first choice in list if single select input
+                        if(index === 0 && this.passedElement.type === 'select-one') { 
+                           this._addChoice(true, false, result[value], result[label]);
+                        } else {
+                            this._addChoice(false, false, result[value], result[label]);    
+                        }
+                    });
+                }
+            };
 
-        fn(callback);
+            fn(callback);
+        }
+
         return this;
     }
 
@@ -1296,7 +1300,7 @@ export class Choices {
 
                 groupFragment.appendChild(dropdownGroup);
 
-                this.renderOptions(groupOptions, groupFragment);
+                this.renderChoices(groupOptions, groupFragment);
             }
         });
 
@@ -1305,26 +1309,26 @@ export class Choices {
 
     /**
      * Render options into a DOM fragment and append to options list
-     * @param  {Array} options    Options to add to list
+     * @param  {Array} choices    Options to add to list
      * @param  {DocumentFragment} fragment Fragment to add options to (optional)
      * @return {DocumentFragment} Populated options fragment
      * @private
      */
-    renderOptions(options, fragment) {
+    renderChoices(choices, fragment) {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-        const optsFragment = fragment || document.createDocumentFragment();
+        const choicesFragment = fragment || document.createDocumentFragment();
 
-        options.forEach((option, i) => {
-            const dropdownItem = this._getTemplate('option', option);
+        choices.forEach((choice, i) => {
+            const dropdownItem = this._getTemplate('option', choice);
 
             if(this.passedElement.type === 'select-one') {
-                optsFragment.appendChild(dropdownItem);    
-            } else if(!option.selected) {
-                optsFragment.appendChild(dropdownItem);   
+                choicesFragment.appendChild(dropdownItem);    
+            } else if(!choice.selected) {
+                choicesFragment.appendChild(dropdownItem);   
             }
         });
 
-        return optsFragment;
+        return choicesFragment;
     }
 
     /**
@@ -1380,11 +1384,11 @@ export class Choices {
     render() {
         this.currentState = this.store.getState();
 
+
         // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
-
             // Options
-            if((this.currentState.options !== this.prevState.options || this.currentState.groups !== this.prevState.groups)) {
+            if((this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/options
                     const activeGroups    = this.store.getGroupsFilteredByActive();
@@ -1399,7 +1403,7 @@ export class Choices {
                     if(activeGroups.length >= 1 && this.isSearching !== true) {
                         choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
                     } else if(activeChoices.length >= 1) {
-                        choiceListFragment = this.renderOptions(activeChoices, choiceListFragment);
+                        choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
                     }
 
                     if(choiceListFragment.children.length) {
