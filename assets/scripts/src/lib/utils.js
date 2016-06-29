@@ -439,4 +439,13 @@ export const getWidthOfInput = (input) => {
     }
 
     return `${width}px`;    
-}
+};
+
+export const sortByAlpha = (a, b) => {
+    const labelA = a.label.toLowerCase();
+    const labelB = b.label.toLowerCase();
+
+    if (labelA < labelB) return -1;
+    if (labelA > labelB) return 1;
+    return 0;
+};

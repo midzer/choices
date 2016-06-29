@@ -44,7 +44,7 @@ export const filterChoices = (results) => {
 
 export const activateChoices = (active = true) => {
     return {
-        type: 'ACTIVATE_OPTIONS',
+        type: 'ACTIVATE_CHOICES',
         active,
     }
 };

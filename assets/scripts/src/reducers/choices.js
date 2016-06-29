@@ -1,3 +1,5 @@
+import { sortByAlpha } from './../lib/utils.js';
+
 const choices = (state = [], action) => {
     switch (action.type) {
         case 'ADD_CHOICE':
@@ -10,7 +12,7 @@ const choices = (state = [], action) => {
                 selected: false,
                 active: true,
                 score: 9999,
-            }];
+            }].sort(sortByAlpha);
 
         case 'ADD_ITEM':
             // When an item is added and it has an associated choice,
@@ -63,9 +65,8 @@ const choices = (state = [], action) => {
         case 'ACTIVATE_CHOICES':
             return state.map((choice) => {
                 choice.active = action.active;
-
                 return choice;
-            });
+            }).sort(sortByAlpha);
             
 
         default:
