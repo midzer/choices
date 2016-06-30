@@ -1,19 +1,15 @@
 'use strict';
 
-import { addItem, removeItem, selectItem, addChoice, filterChoices, activateChoices, addGroup, clearAll } from './actions/index';
-import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import { addItem, removeItem, highlightItem, addChoice, filterChoices, activateChoices, addGroup, clearAll } from './actions/index';
+import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, isElement, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';
 import Store from './store/index.js';
 
 /**
  * Choices
- *
- * To do:
- *    - Pagination
- *    - Single select box search in dropdown
  */
 export class Choices {
-    constructor(element = '[data-option]', userConfig = {}) {
+    constructor(element = '[data-choice]', userConfig = {}) {
 
         // If there are multiple elements, create a new instance 
         // for each element besides the first one (as that already has an instance)
@@ -68,7 +64,7 @@ export class Choices {
                 highlightedState: 'is-highlighted',
                 hiddenState: 'is-hidden',
                 flippedState: 'is-flipped',
-                selectedState: 'is-selected',
+                loadingState: 'is-loading',
             },
             callbackOnInit: () => {},
             callbackOnAddItem: (id, value, passedInput) => {},
@@ -121,11 +117,11 @@ export class Choices {
         if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
         // Input type check
-        const canInit = this.passedElement && ['select-one', 'select-multiple', 'text'].includes(this.passedElement.type);
+        const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].includes(this.passedElement.type);
 
         if(canInit) {
             // If element has already been initalised with Choices
-            if(this.passedElement.hasAttribute('data-choice')) return
+            if(this.passedElement.getAttribute('data-choice') === 'active') return
 
             // Let's go 
             this.init();
@@ -196,10 +192,10 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    selectItem(item) {
+    highlightItem(item) {
         if(!item) return;
         const id = item.id;
-        this.store.dispatch(selectItem(id, true));
+        this.store.dispatch(highlightItem(id, true));
 
         return this;
     }
@@ -210,10 +206,10 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    deselectItem(item) {
+    unhighlightItem(item) {
         if(!item) return;
         const id = item.id;
-        this.store.dispatch(selectItem(id, false));
+        this.store.dispatch(highlightItem(id, false));
 
         return this;
     }
@@ -226,7 +222,7 @@ export class Choices {
     highlightAll() {
         const items = this.store.getItems();
         items.forEach((item) => {
-            this.selectItem(item);
+            this.highlightItem(item);
         });
 
         return this;
@@ -237,10 +233,10 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    deselectAll() {
+    unhighlightAll() {
         const items = this.store.getItems();
         items.forEach((item) => {
-            this.deselectItem(item);
+            this.unhighlightItem(item);
         });
 
         return this;
@@ -291,11 +287,11 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    removeSelectedItems() {
+    removeHighlightedItems() {
         const items = this.store.getItemsFilteredByActive();
 
         items.forEach((item) => {
-            if(item.selected && item.active) {
+            if(item.highlighted && item.active) {
                 this._removeItem(item);
             }
         });
@@ -424,8 +420,7 @@ export class Choices {
     ajax(fn) {
         if(this.initialised === true) {
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-                this.containerOuter.classList.add('is-loading');
-                // this.input.placeholder = this.config.loadingText;
+                this.containerOuter.classList.add(this.config.classNames.loadingState);
 
                 const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
                 this.itemList.appendChild(placeholderItem);
@@ -434,7 +429,7 @@ export class Choices {
                     if(!isType('Array', results) || !value) return;
 
                     if(results && results.length) {
-                        this.containerOuter.classList.remove('is-loading');
+                        this.containerOuter.classList.remove(this.config.classNames.loadingState);
                         this.input.placeholder = "";
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
@@ -485,7 +480,7 @@ export class Choices {
             } else if(this.config.duplicateItems === false && this.passedElement.value) {
                 // If no duplicates are allowed, and the value already exists
                 // in the array, don't update
-                canUpdate = !activeItems.some((item) => item.value === value );
+                canUpdate = !activeItems.some((item) => item.value === value);
             }   
         } else {
             canUpdate = false;
@@ -519,16 +514,16 @@ export class Choices {
     _handleBackspace(activeItems) {
         if(this.config.removeItems && activeItems) {
             const lastItem = activeItems[activeItems.length - 1];
-            const hasSelectedItems = activeItems.some((item) => item.selected === true);
+            const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
             // If editing the last item is allowed and there are not other selected items, 
             // we can edit the item value. Otherwise if we can remove items, remove all selected items
-            if(this.config.editItems && !hasSelectedItems && lastItem) {
+            if(this.config.editItems && !hasHighlightedItems && lastItem) {
                 this.input.value = lastItem.value;
                 this._removeItem(lastItem);
             } else {
-                if(!hasSelectedItems) { this.selectItem(lastItem); }
-                this.removeSelectedItems();    
+                if(!hasHighlightedItems) { this.highlightItem(lastItem); }
+                this.removeHighlightedItems();    
             }
         }
     };
@@ -601,6 +596,7 @@ export class Choices {
                         }
                     }
                 }
+
                 break;
 
             case escapeKey:
@@ -695,12 +691,13 @@ export class Choices {
 
         // If we have enabled text search
         if(this.canSearch) {
+            // .. and our input is in focus
             if(this.input === document.activeElement) {
-                const options            = this.store.getChoices();
-                const hasUnactiveChoices = options.some((option) => option.active !== true);
+                const choices            = this.store.getChoices();
+                const hasUnactiveChoices = choices.some((option) => option.active !== true);
 
                 // Check that we have a value to search and the input was an alphanumeric character
-                if(this.input.value && options.length && /[a-zA-Z0-9-_ ]/.test(keyString)) {
+                if(this.input.value && choices.length && /[a-zA-Z0-9-_ ]/.test(keyString)) {
                     const handleFilter = () => {
                         const newValue = this.input.value.trim();
                         const currentValue = this.currentValue.trim();
@@ -724,7 +721,7 @@ export class Choices {
 
                     handleFilter();
                 } else if(hasUnactiveChoices) {
-                    // Otherwise reset options to active
+                    // Otherwise reset choices to active
                     this.isSearching = false;
                     this.store.dispatch(activateChoices(true));
                 }
@@ -789,21 +786,21 @@ export class Choices {
                         // so we deselect any items that aren't the target
                         // unless shift is being pressed
                         activeItems.forEach((item) => {
-                            if(item.id === parseInt(passedId) && !item.selected) {
-                                this.selectItem(item);
+                            if(item.id === parseInt(passedId) && !item.highlighted) {
+                                this.highlightItem(item);
                             } else if(!hasShiftKey) {
-                                this.deselectItem(item);
+                                this.unhighlightItem(item);
                             }
                         });
                     }
                 } else if(e.target.hasAttribute('data-option')) {
                     // If we are clicking on an option
-                    const options = this.store.getChoicesFilteredByActive();
                     const id = e.target.getAttribute('data-id');
-                    const option = options.find((option) => option.id === parseInt(id));
+                    const choices = this.store.getChoicesFilteredByActive();
+                    const choice = choices.find((choice) => choice.id === parseInt(id));
 
-                    if(!option.selected && !option.disabled) {
-                        this._addItem(option.value, option.label, option.id);
+                    if(!choice.selected && !choice.disabled) {
+                        this._addItem(choice.value, choice.label, choice.id);
                         if(this.passedElement.type === 'select-one') {
                             this.input.value = "";
                             this.isSearching = false;
@@ -816,10 +813,10 @@ export class Choices {
             } else {
                 // Click is outside of our element so close dropdown and de-select items
                 const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-                const hasSelectedItems  = activeItems.some((item) => item.selected === true);
+                const hasHighlightedItems  = activeItems.some((item) => item.highlighted === true);
 
                 // De-select any highlighted items
-                if(hasSelectedItems) {
+                if(hasHighlightedItems) {
                     this.unhighlightAll();
                 }
             
@@ -913,20 +910,20 @@ export class Choices {
      * @return
      * @private
      */
-    _scrollToChoice(option, direction) {
-        if(!option) return;
+    _scrollToChoice(choice, direction) {
+        if(!choice) return;
         
         const dropdownHeight = this.choiceList.offsetHeight;
-        const optionHeight   = option.offsetHeight;
+        const choiceHeight   = choice.offsetHeight;
 
         // Distance from bottom of element to top of parent
-        const choicePos = option.offsetTop + optionHeight;
+        const choicePos = choice.offsetTop + choiceHeight;
         
         // Scroll position of dropdown
         const containerScrollPos = this.choiceList.scrollTop + dropdownHeight;
         
-        // Difference between the option and scroll position
-        let endPoint = direction > 0 ? ((this.choiceList.scrollTop + choicePos) - containerScrollPos) : option.offsetTop;
+        // Difference between the choice and scroll position
+        let endPoint = direction > 0 ? ((this.choiceList.scrollTop + choicePos) - containerScrollPos) : choice.offsetTop;
 
         const animateScroll = (time, endPoint, direction) => {
             let continueAnimation = false;
@@ -964,40 +961,40 @@ export class Choices {
     }
 
     /**
-     * Highlight option element 
+     * Highlight choice
      * @param  {HTMLElement} el Element to highlight
      * @return
      * @private
      */
     _highlightChoice(el) {
         // Highlight first element in dropdown
-        const options = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
+        const choices = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
 
-        if(options && options.length) {
-            const highlightedOptions = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
+        if(choices && choices.length) {
+            const highlightedChoices = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
             
-            // Remove any highlighted options 
-            highlightedOptions.forEach((el) => {
+            // Remove any highlighted choices 
+            highlightedChoices.forEach((el) => {
                 el.classList.remove(this.config.classNames.highlightedState);
             });
 
             if(el){
                 // Highlight given option
                 el.classList.add(this.config.classNames.highlightedState); 
-                this.highlightPosition = options.indexOf(el);   
+                this.highlightPosition = choices.indexOf(el);   
             } else {
                 // Highlight option based on last known highlight location
                 let el;
 
-                if(options.length > this.highlightPosition) {
+                if(choices.length > this.highlightPosition) {
                     // If we have an option to highlight 
-                    el = options[this.highlightPosition];
+                    el = choices[this.highlightPosition];
                 } else {
                     // Otherwise highlight the option before
-                    el = options[options.length - 1];
+                    el = choices[choices.length - 1];
                 }
 
-                if(!el) el = options[0];
+                if(!el) el = choices[0];
                 el.classList.add(this.config.classNames.highlightedState);    
             }        
         }
@@ -1103,12 +1100,12 @@ export class Choices {
      * @private
      */
     _addGroup(group, id, isFirst) {
-        const groupOptions = Array.from(group.getElementsByTagName('OPTION'));
+        const groupChoices = Array.from(group.getElementsByTagName('OPTION'));
         const groupId      = id;
 
-        if(groupOptions) {
+        if(groupChoices) {
             this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
-            groupOptions.forEach((option, optionIndex) => {
+            groupChoices.forEach((option, optionIndex) => {
                 const isDisabled = option.disabled || option.parentNode.disabled;
                 this._addChoice(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
             });
@@ -1147,8 +1144,38 @@ export class Choices {
             itemList: () => {
                 return strToEl(`<div class="${ classNames.list } ${ this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems }"></div>`);
             },
+            item: (data) => {
+                if(this.config.removeItemButton && this.passedElement.type !== 'select-one') {
+                    return strToEl(`
+                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
+                            ${ data.label }
+                            <button class="${ classNames.button }" data-button>Remove item</button>
+                        </div>
+                    `);
+                } else {
+                    return strToEl(`
+                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                            ${ data.label }
+                        </div>
+                    `);
+                }   
+            },
             choiceList: () => {
                 return strToEl(`<div class="${ classNames.list }"></div>`);
+            },
+            choiceGroup: (data) => {
+                return strToEl(`
+                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }">
+                        <div class="${ classNames.groupHeading }">${ data.value }</div>
+                    </div>
+                `);
+            },
+            choice: (data) => {
+                return strToEl(`
+                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
+                        ${ data.label }
+                    </div>
+                `);
             },
             input: () => {
                 return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
@@ -1159,38 +1186,8 @@ export class Choices {
             notice: (label, clickable) => {
                 return strToEl(`<div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>`);
             },
-            selectOption: (data) => {
-                return strToEl(`<option value="${ data.value }" selected>${ data.label.trim() }</option>`);
-            },
             option: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
-                        ${ data.label }
-                    </div>
-                `);
-            },
-            optgroup: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }">
-                        <div class="${ classNames.groupHeading }">${ data.value }</div>
-                    </div>
-                `);
-            },
-            item: (data) => {
-                if(this.config.removeItemButton && this.passedElement.type !== 'select-one') {
-                    return strToEl(`
-                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
-                            ${ data.label }
-                            <button class="${ classNames.button }" data-button>Remove item</button>
-                        </div>
-                    `);
-                } else {
-                    return strToEl(`
-                        <div class="${ classNames.item } ${ data.selected ? classNames.selectedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
-                            ${ data.label }
-                        </div>
-                    `);
-                }   
+                return strToEl(`<option value="${ data.value }" selected>${ data.label.trim() }</option>`);
             },
         };
 
@@ -1222,7 +1219,7 @@ export class Choices {
         this.passedElement.tabIndex = '-1';
         this.passedElement.setAttribute('style', 'display:none;');
         this.passedElement.setAttribute('aria-hidden', 'true');
-        this.passedElement.setAttribute('data-choice', '');
+        this.passedElement.setAttribute('data-choice', 'active');
 
         // Wrap input in container preserving DOM ordering
         wrap(this.passedElement, containerInner);
@@ -1286,32 +1283,32 @@ export class Choices {
     }
 
     /**
-     * Render group options into a DOM fragment and append to options list
+     * Render group choices into a DOM fragment and append to choice list
      * @param  {Array} groups    Groups to add to list
-     * @param  {Array} options   Options to add to groups
+     * @param  {Array} choices   Choices to add to groups
      * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
      * @return {DocumentFragment} Populated options fragment
      * @private
      */
-    renderGroups(groups, options, fragment) {
+    renderGroups(groups, choices, fragment) {
         const groupFragment = fragment || document.createDocumentFragment();
 
         groups.forEach((group, i) => {
             // Grab options that are children of this group
-            const groupOptions = options.filter((option) => {
+            const groupChoices = choices.filter((choice) => {
                 if(this.passedElement.type === 'select-one') {
-                    return option.groupId === group.id    
+                    return choice.groupId === group.id    
                 } else {
-                    return option.groupId === group.id && !option.selected;
+                    return choice.groupId === group.id && !choice.selected;
                 }
             });
 
-            if(groupOptions.length >= 1) {
-                const dropdownGroup = this._getTemplate('optgroup', group);
+            if(groupChoices.length >= 1) {
+                const dropdownGroup = this._getTemplate('choiceGroup', group);
 
                 groupFragment.appendChild(dropdownGroup);
 
-                this.renderChoices(groupOptions, groupFragment);
+                this.renderChoices(groupChoices, groupFragment);
             }
         });
 
@@ -1319,10 +1316,10 @@ export class Choices {
     }
 
     /**
-     * Render options into a DOM fragment and append to options list
-     * @param  {Array} choices    Options to add to list
-     * @param  {DocumentFragment} fragment Fragment to add options to (optional)
-     * @return {DocumentFragment} Populated options fragment
+     * Render choices into a DOM fragment and append to choice list
+     * @param  {Array} choices    Choices to add to list
+     * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
+     * @return {DocumentFragment} Populated choices fragment
      * @private
      */
     renderChoices(choices, fragment) {
@@ -1330,7 +1327,7 @@ export class Choices {
         const choicesFragment = fragment || document.createDocumentFragment();
 
         choices.forEach((choice, i) => {
-            const dropdownItem = this._getTemplate('option', choice);
+            const dropdownItem = this._getTemplate('choice', choice);
 
             if(this.passedElement.type === 'select-one') {
                 choicesFragment.appendChild(dropdownItem);    
@@ -1364,13 +1361,13 @@ export class Choices {
             // Add each list item to list
             items.forEach((item) => {
                 // Create a standard select option
-                const option = this._getTemplate('selectOption', item);
+                const option = this._getTemplate('option', item);
 
                 // Append it to fragment
                 selectedOptionsFragment.appendChild(option);
             });
 
-            // Update selected options
+            // Update selected choices
             this.passedElement.innerHTML = "";
             this.passedElement.appendChild(selectedOptionsFragment);
         }
@@ -1395,19 +1392,18 @@ export class Choices {
     render() {
         this.currentState = this.store.getState();
 
-
         // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
             // Options
             if((this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
-                    // Get active groups/options
+                    // Get active groups/choices
                     const activeGroups    = this.store.getGroupsFilteredByActive();
                     const activeChoices   = this.store.getChoicesFilteredByActive();
 
                     let choiceListFragment = document.createDocumentFragment();
 
-                    // Clear options
+                    // Clear choices
                     this.choiceList.innerHTML = '';
 
                     // If we have grouped options
@@ -1419,7 +1415,7 @@ export class Choices {
 
                     if(choiceListFragment.children.length) {
                         // If we actually have anything to add to our dropdown
-                        // append it and highlight the first option
+                        // append it and highlight the first choice
                         this.choiceList.appendChild(choiceListFragment);
                         this._highlightChoice();
                     } else {

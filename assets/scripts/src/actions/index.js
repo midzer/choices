@@ -16,11 +16,11 @@ export const removeItem = (id, choiceId) => {
     }
 };
 
-export const selectItem = (id, selected) => {
+export const highlightItem = (id, highlighted) => {
     return {
-        type: 'SELECT_ITEM',
+        type: 'HIGHLIGHT_ITEM',
         id,
-        selected,
+        highlighted,
     }
 };
 

@@ -8,12 +8,12 @@ const items = (state = [], action) => {
                 value: action.value,
                 label: action.label,
                 active: true,
-                selected: false
+                highlighted: false
             }];
 
             return newState.map((item) => {
-                if(item.selected) {
-                    item.selected = false;
+                if(item.highlighted) {
+                    item.highlighted = false;
                 }
                 return item;
             });
@@ -27,10 +27,10 @@ const items = (state = [], action) => {
                 return item;
             });
 
-        case 'SELECT_ITEM':        
+        case 'HIGHLIGHT_ITEM':      
             return state.map((item) => {
                 if(item.id === action.id) {
-                    item.selected = action.selected;
+                    item.highlighted = action.highlighted;
                 }
 
                 return item;

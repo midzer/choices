@@ -8,9 +8,9 @@ const choices = (state = [], action) => {
                 groupId: action.groupId,
                 value: action.value,
                 label: action.label,
-                disabled: action.disabled,
-                selected: false,
-                active: true,
+                disabled: action.disabled, // A disabled choice appears in the choice dropdown but cannot be selected
+                selected: false, // A selected choice has been added to the passed input's value (added as an item)
+                active: true, // An active choice appears within the choice dropdown
                 score: 9999,
             }].sort(sortByAlpha);
 

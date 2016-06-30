@@ -161,7 +161,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
         color: #FFFFFF;
         word-break: break-all;
         &[data-deletable] { padding-right: .5rem; }
-        &.is-selected { 
+        &.is-highlighted { 
             background-color: darken($choices-primary-color, 5%); 
             border: 1px solid darken($choices-primary-color, 15%);
         }
@@ -196,11 +196,8 @@ $choices-button-icon-path: '../../icons/cross.svg';
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
-        &.is-selected { 
-            opacity: .5; 
-            &:hover { background-color: $choices-bg-color-dropdown; }
-        }
     }
+    
     .choices__item--selectable {
         &:after {
             content: "Press to select";

@@ -48,7 +48,7 @@ Coming soon.
             item: 'choices__item',
             itemSelectable: 'choices__item--selectable',
             itemDisabled: 'choices__item--disabled',
-            itemOption: 'choices__item--choice',
+            itemChoice: 'choices__item--choice',
             group: 'choices__group',
             groupHeading : 'choices__heading',
             button: 'choices__button',
@@ -59,7 +59,6 @@ Coming soon.
             highlightedState: 'is-highlighted',
             hiddenState: 'is-hidden',
             flippedState: 'is-flipped',
-            selectedState: 'is-selected',
         },
         callbackOnInit: () => {},
         callbackOnAddItem: (id, value, passedInput) => {},
@@ -76,7 +75,7 @@ To install via NPM, run `npm install --save-dev choices.js`
 | ------ | ---------- |
 | Choice | A choice is a value a user can select. A choice would be equivelant to the `<option></option>` element within a select input.  |
 | Group  | A group is a collection of choices. A group should be seen as equivalent to a `<optgroup></optgroup>` element within a select input.|
-| Item   | An item is an inputted value (if you are using Choices with a text input) or a selected choice (if you are using Choices with  a select element). |
+| Item   | An item is an inputted value (if you are using Choices with a text input) or a selected choice (if you are using Choices with  a select element). An item is equivelent to a selected option element: `<option selected></option>`|
 
 ## Options
 ### items
@@ -135,17 +134,17 @@ Pass an array of objects:
 
 <strong>Usage:</strong> What divides each value (only affects text input types).
 
-### allowDuplicates
+### duplicates
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
 <strong>Usage:</strong> Whether a user can input a duplicate item (only affects text input types).
 
-### allowPaste
+### paste
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
 <strong>Usage:</strong> Whether a user can paste into the input.
 
-### allowSearch
+### search
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
 <strong>Usage:</strong> Whether a user can filter options by searching (only affects select input types).
@@ -178,7 +177,7 @@ Pass an array of objects:
 ### highlightAll
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
-<strong>Usage:</strong> Whether a user can highlight items.
+<strong>Usage:</strong> Whether a user can highlight items. Highlighted items can be deleted by pressing the backspace key.
 
 ### loadingText
 <strong>Type:</strong> `String` <strong>Default:</strong>`Loading...`
@@ -212,7 +211,7 @@ classNames: {
     highlightedState: 'is-highlighted',
     hiddenState: 'is-hidden',
     flippedState: 'is-flipped',
-    selectedState: 'is-selected',
+    selectedState: 'is-highlighted',
 }
 ```
 
@@ -265,7 +264,7 @@ choices.disable();
 <strong>Usage:</strong> Remove each selectable item.
 
 
-### removeSelectedItems();
+### removeHighlightedItems();
 <strong>Usage:</strong> Remove each item the user has selected.
 
 

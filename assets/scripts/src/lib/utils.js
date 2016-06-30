@@ -25,6 +25,30 @@ export const isType = function(type, obj) {
 };
 
 /**
+ * Tests to see if a passed object is a node
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+export const isNode = (o) => {
+    return (
+        typeof Node === "object" ? o instanceof Node : 
+        o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+    );
+};
+
+/**
+ * Tests to see if a passed object is an element
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+export const isElement = (o) => {
+    return (
+        typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+        o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+    );
+}
+
+/**
  * Merges unspecified amount of objects into new object
  * @private
  * @return {Object} Merged object of arguments
