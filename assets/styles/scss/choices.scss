@@ -151,19 +151,20 @@ $choices-button-icon-path: '../../icons/cross.svg';
     display: inline;
     .choices__item {
         display: inline-block;
+        vertical-align: middle;
         border-radius: $choices-border-radius-item;
         padding: .4rem 1rem;
         font-size: 1.2rem;
         margin-right: .375rem;
         margin-bottom: .375rem;
         background-color: $choices-primary-color;
-        border: 1px solid darken($choices-primary-color, 10%);
+        border: 1px solid darken($choices-primary-color, 5%);
         color: #FFFFFF;
         word-break: break-all;
         &[data-deletable] { padding-right: .5rem; }
         &.is-highlighted { 
             background-color: darken($choices-primary-color, 5%); 
-            border: 1px solid darken($choices-primary-color, 15%);
+            border: 1px solid darken($choices-primary-color, 10%);
         }
         .is-disabled & {
             background-color: darken($choices-disabled-color, 25%);
@@ -185,19 +186,24 @@ $choices-button-icon-path: '../../icons/cross.svg';
     border-bottom-right-radius: $choices-border-radius;
     overflow: hidden;
     &.is-active { display: block; }
-
+    .is-open & { border-color: darken(#DDDDDD, 15%); }
+    .is-flipped & {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: -1px;
+        border-radius: .25rem .25rem 0 0;
+    }
     .choices__list {
         position: relative;
         max-height: 300px;
         overflow: auto;
         will-change: scroll-position;
     }
-
     .choices__item {
         padding: 1rem;
         font-size: 1.4rem;
     }
-    
     .choices__item--selectable {
         &:after {
             content: "Press to select";
@@ -209,15 +215,6 @@ $choices-button-icon-path: '../../icons/cross.svg';
             background-color: mix(#000000, #FFFFFF, 5%); 
             &:after { opacity: .5; }
         }
-    }
-
-    .is-open & { border-color: darken(#DDDDDD, 15%); }
-    .is-flipped & {
-        top: auto;
-        bottom: 100%;
-        margin-top: 0;
-        margin-bottom: -1px;
-        border-radius: .25rem .25rem 0 0;
     }
 }
 
@@ -251,6 +248,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
     background-size: 8px;
     border-left: 1px solid darken($choices-primary-color, 10%);
     margin-left: 4px;
+    margin-right: -4px;
     padding-left: 6px;
     padding-right: 6px;
     line-height: 1;

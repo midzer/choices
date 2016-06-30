@@ -41,15 +41,15 @@
                 <option value="Dropdown item 4" disabled>Dropdown item 4</option>
             </select>
 
-            <label for="choices-9">With pre-selected option</label>
-            <select id="choices-9" name="choices-9" placeholder="Choose an option" multiple>
+            <label for="choices-8">With pre-selected option</label>
+            <select name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2" selected>Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
             
-            <label for="choices-10">Option groups</label>
-            <select id="choices-10" name="choices-10" placeholder="This is a placeholder" multiple>
+            <label for="choices-9">Option groups</label>
+            <select name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -82,21 +82,24 @@
                 </optgroup>
             </select>
 
+            <label for="choices-10">Options from remote source</label>
+            <select name="choices-10" id="choices-10" placeholder="Pick an Arctic Monkeys record" multiple></select>
+
             <hr>
 
             <h2>Single select input</h2>
             <label for="choices-11">Default</label>
-            <select id="choices-11" name="choices-11" placeholder="This is a placeholder">
+            <select name="choices-11" id="choices-11" placeholder="This is a placeholder">
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
 
             <label for="choices-12">Options from remote source</label>
-            <select name="choices-12" id="choices-12" class="choices-ajax" placeholder="Pick an Arctic Monkeys record"></select>
+            <select name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
 
             <label for="choices-13">Option groups</label>
-            <select id="choices-13" name="choices-13" placeholder="This is a placeholder">
+            <select name="choices-13" id="choices-13" placeholder="This is a placeholder">
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -132,12 +135,11 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const firstElement = document.getElementById('choices-1');
-            const choices1 = new Choices(firstElement, {
+            const choices1 = new Choices(document.getElementById('choices-1'), {
                 delimiter: ',',
                 editItems: true,
                 maxItems: 5,
-                removeButton: true
+                removeItemButton: true
             });
 
             const choices2 = new Choices('#choices-2', {
@@ -167,8 +169,26 @@
             });
 
             const choices7 = new Choices('#choices-7', { Search: false }).setValue(['Set value 1', 'Set value 2']);
-            
-            const choicesAjax = new Choices('.choices-ajax', { placeholder: true, placeholderValue: 'Pick an Arctic Monkeys record'}).ajax((callback) => {
+
+            const choices10 = new Choices('#choices-10', { 
+                placeholder: true, 
+                placeholderValue: 'Pick an Strokes record'
+            }).ajax((callback) => {
+                fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
+                    .then((response) => {
+                        response.json().then(function(data) {
+                            callback(data.releases, 'title', 'title');
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            });
+
+            const choices12 = new Choices('#choices-12', { 
+                placeholder: true, 
+                placeholderValue: 'Pick an Arctic Monkeys record'
+            }).ajax((callback) => {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then((response) => {
                         response.json().then(function(data) {
@@ -178,13 +198,12 @@
                     .catch((error) => {
                         console.log(error);
                     });
-            })
+            });
 
             const choicesMultiple = new Choices('select', {
                 placeholderValue: 'This is a placeholder set in the config',
                 removeButton: true
             });
-            
         });
     </script>
 </body>

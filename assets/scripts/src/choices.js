@@ -420,12 +420,10 @@ export class Choices {
         if(this.initialised === true) {
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
                 this.containerOuter.classList.add(this.config.classNames.loadingState);
-
                 if(this.passedElement.type === 'select-one') { 
                     const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
                     this.itemList.appendChild(placeholderItem);
                 }
-
                 const callback = (results, value, label) => {
                     if(!isType('Array', results) || !value) return;
 
@@ -435,18 +433,16 @@ export class Choices {
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 
-                               this._addChoice(true, false, result[value], result[label]);
+                                this._addChoice(true, false, result[value], result[label]);
                             } else {
                                 this._addChoice(false, false, result[value], result[label]);    
                             }
                         });
                     }
                 };
-
                 fn(callback);
             }
         }
-
         return this;
     }
 
@@ -460,7 +456,6 @@ export class Choices {
         if(this.passedElement.type !== 'select-one') {
             this.input.style.width = getWidthOfInput(this.input);
         }
-
         return this;
     }
 
@@ -698,7 +693,7 @@ export class Choices {
                 const hasUnactiveChoices = choices.some((option) => option.active !== true);
 
                 // Check that we have a value to search and the input was an alphanumeric character
-                if(this.input.value && choices.length && /[a-zA-Z0-9-_ ]/.test(keyString)) {
+                if(this.input.value && choices.length && /[\b\a-zA-Z0-9-_ ]/.test(keyString)) {
                     const handleFilter = () => {
                         const newValue = this.input.value.trim();
                         const currentValue = this.currentValue.trim();
