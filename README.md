@@ -35,7 +35,6 @@ Coming soon.
         prependValue: null,
         appendValue: null,
         loadingText: 'Loading...',
-        templates: {},
         classNames: {
             containerOuter: 'choices',
             containerInner: 'choices__inner',
@@ -59,6 +58,7 @@ Coming soon.
             highlightedState: 'is-highlighted',
             hiddenState: 'is-hidden',
             flippedState: 'is-flipped',
+            loadingState: 'is-loading',
         },
         callbackOnInit: () => {},
         callbackOnAddItem: (id, value, passedInput) => {},

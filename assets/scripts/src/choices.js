@@ -40,7 +40,6 @@ export class Choices {
             prependValue: null,
             appendValue: null,
             loadingText: 'Loading...',
-            templates: {},
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
@@ -422,15 +421,17 @@ export class Choices {
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
                 this.containerOuter.classList.add(this.config.classNames.loadingState);
 
-                const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
-                this.itemList.appendChild(placeholderItem);
+                if(this.passedElement.type === 'select-one') { 
+                    const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
+                    this.itemList.appendChild(placeholderItem);
+                }
 
                 const callback = (results, value, label) => {
                     if(!isType('Array', results) || !value) return;
 
                     if(results && results.length) {
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                        this.input.placeholder = "";
+                        // this.input.placeholder = "";
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 
@@ -1191,7 +1192,8 @@ export class Choices {
             },
         };
 
-        this.config.templates = extend(this.config.templates, templates);
+        // this.config.templates = extend(this.config.templates, templates);
+        this.config.templates = templates;
     }
 
     /**
