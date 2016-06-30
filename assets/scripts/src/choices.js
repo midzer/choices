@@ -40,6 +40,7 @@ export class Choices {
             prependValue: null,
             appendValue: null,
             loadingText: 'Loading...',
+            logState: false,
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
@@ -1391,7 +1392,12 @@ export class Choices {
 
         // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
-            // Options
+            // Log state
+            if(this.config.logState) {
+                console.info(this.currentState);
+            }
+
+            // Choices
             if((this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups)) {
                 if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/choices

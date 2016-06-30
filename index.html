@@ -11,6 +11,7 @@
     <div class="container">
         <div class="section">
             <h1>Choices</h1>
+            <p>A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
             <h2>Text inputs</h2>
             <label for="choices-1">Limited to 5</label>
             <input id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
@@ -42,14 +43,14 @@
             </select>
 
             <label for="choices-8">With pre-selected option</label>
-            <select name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
+            <select data-choice name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2" selected>Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
             
             <label for="choices-9">Option groups</label>
-            <select name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
+            <select data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -89,7 +90,7 @@
 
             <h2>Single select input</h2>
             <label for="choices-11">Default</label>
-            <select name="choices-11" id="choices-11" placeholder="This is a placeholder">
+            <select data-choice name="choices-11" id="choices-11" placeholder="This is a placeholder">
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
@@ -99,7 +100,7 @@
             <select name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
 
             <label for="choices-13">Option groups</label>
-            <select name="choices-13" id="choices-13" placeholder="This is a placeholder">
+            <select data-choice name="choices-13" id="choices-13" placeholder="This is a placeholder">
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -131,6 +132,9 @@
                     <option value="Vancouver">Vancouver</option>
                 </optgroup>
             </select>
+
+            <label for="choices-14">Countries remote source</label>
+            <select name="choices-14" id="choices-14" placeholder="Pick a country"></select>
         </div>
     </div>
     <script>
@@ -191,7 +195,7 @@
             }).ajax((callback) => {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then((response) => {
-                        response.json().then(function(data) {
+                        response.json().then((data) => {
                             callback(data.releases, 'title', 'title');
                         });
                     })
@@ -200,7 +204,21 @@
                     });
             });
 
-            const choicesMultiple = new Choices('select', {
+            const choices14 = new Choices('#choices-14', {
+                logState: true
+            }).ajax((callback) => {
+                fetch('https://restcountries.eu/rest/v1/all')
+                    .then((response) => {
+                        response.json().then((data) => {
+                            callback(data, 'alpha2Code', 'name');
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            })
+
+            const choicesMultiple = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
                 removeButton: true
             });
