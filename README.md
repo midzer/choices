@@ -75,7 +75,7 @@ To install via NPM, run `npm install --save-dev choices.js`
 | ------ | ---------- |
 | Choice | A choice is a value a user can select. A choice would be equivelant to the `<option></option>` element within a select input.  |
 | Group  | A group is a collection of choices. A group should be seen as equivalent to a `<optgroup></optgroup>` element within a select input.|
-| Item   | An item is an inputted value (if you are using Choices with a text input) or a selected choice (if you are using Choices with  a select element). An item is equivelent to a selected option element: `<option selected></option>`|
+| Item   | An item is an inputted value (text input) or a selected choice (select element). In the context of a select element, an item is equivelent to a selected option element: `<option value="Hello" selected></option>` whereas in the context of a text input an item is equivelant to `<input type="text" value="Hello">`|
 
 ## Options
 ### items
