@@ -244,6 +244,11 @@ const choices = new Choices(element, {
 }).setValue(['Set value 1', 'Set value 2']).disable();
 
 // Calling a method directly
+const choices = new Choices(element, {
+    addItems: false,
+    removeItems: false,
+});
+
 choices.setValue(['Set value 1', 'Set value 2'])
 choices.disable();
 ```
