@@ -40,7 +40,6 @@ export class Choices {
             prependValue: null,
             appendValue: null,
             loadingText: 'Loading...',
-            logState: false,
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
@@ -69,6 +68,7 @@ export class Choices {
             callbackOnInit: () => {},
             callbackOnAddItem: (id, value, passedInput) => {},
             callbackOnRemoveItem: (id, value, passedInput) => {},
+            callbackOnRender: () => {},
         };
 
         // Merge options with user options
@@ -1392,10 +1392,6 @@ export class Choices {
 
         // Only render if our state has actually changed
         if(this.currentState !== this.prevState) {
-            // Log state
-            if(this.config.logState) {
-                console.info(this.currentState);
-            }
 
             // Choices
             if((this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups)) {
@@ -1444,6 +1440,14 @@ export class Choices {
                         // Update list
                         this.itemList.appendChild(itemListFragment);
                     }
+                }
+            }
+
+            if(callback = this.config.callbackOnRender){
+                if(isType('Function', callback)) {
+                    callback();
+                } else {
+                    console.error('callbackOnRender: Callback is not a function');
                 }
             }
 
