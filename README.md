@@ -174,11 +174,6 @@ Pass an array of objects:
 
 <strong>Usage:</strong> Append a value to each item added to input (only affects text input types).
 
-### highlightAll
-<strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
-
-<strong>Usage:</strong> Whether a user can highlight items. Highlighted items can be deleted by pressing the backspace key.
-
 ### loadingText
 <strong>Type:</strong> `String` <strong>Default:</strong>`Loading...`
 
