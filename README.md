@@ -1,4 +1,4 @@
-# Choices.js
+# Choices.js [![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)](https://travis-ci.org/jshjohnson/Choices)
 A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency. 
 
 Coming soon.
