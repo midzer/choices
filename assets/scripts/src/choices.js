@@ -117,7 +117,7 @@ export class Choices {
         if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
         // Input type check
-        const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].includes(this.passedElement.type);
+        const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
 
         if(canInit) {
             // If element has already been initalised with Choices
@@ -1434,7 +1434,7 @@ export class Choices {
                     this.itemList.innerHTML = '';
 
                     // If we have items to add
-                    if(itemListFragment.children.length) {
+                    if(itemListFragment.children && itemListFragment.children.length) {
                         // Update list
                         this.itemList.appendChild(itemListFragment);
                     }
