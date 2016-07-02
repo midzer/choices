@@ -63,6 +63,7 @@ Coming soon.
         callbackOnInit: () => {},
         callbackOnAddItem: (id, value, passedInput) => {},
         callbackOnRemoveItem: (id, value, passedInput) => {},
+        callbackOnRender: () => {},
     });
 </script>
 ```
