@@ -33,7 +33,7 @@ export class Choices {
             duplicateItems: true,
             delimiter: ',',
             paste: true,
-            searchOptions: true, 
+            search: true, 
             regexFilter: null,
             placeholder: true,
             placeholderValue: null,
@@ -87,7 +87,7 @@ export class Choices {
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         this.highlightPosition = 0;
-        this.canSearch = this.config.searchOptions;
+        this.canSearch = this.config.search;
 
         // Assign preset items from passed object first
         this.presetItems = this.config.items;
@@ -548,14 +548,14 @@ export class Choices {
         const hasFocusedInput   = this.input === document.activeElement;
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
         const hasItems          = this.itemList && this.itemList.children;
-        const keyString         = String.fromCharCode(event.keyCode);
+        const keyString         = String.fromCharCode(e.keyCode);
 
         // If a user is typing and the dropdown is not active
         if(this.passedElement.type !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
             this.showDropdown();
         }
 
-        this.canSearch = this.config.searchOptions;
+        this.canSearch = this.config.search;
 
         switch (e.keyCode) {
             case aKey:
@@ -1243,17 +1243,16 @@ export class Choices {
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             containerInner.appendChild(input);
-        } else if(this.config.searchOptions) {
+        } else if(this.config.search) {
             dropdown.insertBefore(input, dropdown.firstChild);
         }
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
-            this.highlightPosition = 0;
-            
             const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
-        
+
+            this.highlightPosition = 0;
             this.isSearching = false;
-        
+            
             if(passedGroups && passedGroups.length) {
                 passedGroups.forEach((group, index) => {
                     const isFirst = index === 0 ? true : false;
@@ -1266,7 +1265,6 @@ export class Choices {
                     this._addChoice(option.selected, isDisabled, option.value, option.innerHTML);
                 });
             }
-
         } else if(this.passedElement.type === 'text') {
             // Add any preset values seperated by delimiter
             this.presetItems.forEach((item) => {
@@ -1443,9 +1441,9 @@ export class Choices {
                 }
             }
 
-            if(callback = this.config.callbackOnRender){
-                if(isType('Function', callback)) {
-                    callback();
+            if(this.config.callbackOnRender){
+                if(isType('Function', this.config.callbackOnRender)) {
+                    this.config.callbackOnRender();
                 } else {
                     console.error('callbackOnRender: Callback is not a function');
                 }

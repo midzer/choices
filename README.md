@@ -1,4 +1,4 @@
-# Choices.js - beta
+# Choices.js
 A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency. 
 
 Coming soon.
@@ -28,7 +28,7 @@ Coming soon.
         duplicateItems: true,
         delimiter: ',',
         paste: true,
-        searchOptions: true, 
+        search: true, 
         regexFilter: null,
         placeholder: true,
         placeholderValue: null,
