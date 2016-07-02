@@ -1410,7 +1410,7 @@ export class Choices {
                         choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
                     }
 
-                    if(choiceListFragment.children.length) {
+                    if(choiceListFragment.children && choiceListFragment.children.length) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first choice
                         this.choiceList.appendChild(choiceListFragment);
