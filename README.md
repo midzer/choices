@@ -6,17 +6,17 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
 <script src="/assets/js/dist/choices.min.js"></script>
 <script>
     // Pass multiple elements:
-    var choices = new Choices(elements);
+    const choices = new Choices(elements);
     
     // Pass single element:
-    var choice = new Choices(element);
+    const choice = new Choices(element);
     
     // Pass reference
-    var choice = new Choices('[data-choice']);
-    var choice = new Choices('.js-choice');
+    const choice = new Choices('[data-choice']);
+    const choice = new Choices('.js-choice');
     
     // Passing options (with default options)
-    var choices = new Choices(elements, {
+    const choices = new Choices(elements, {
         items: [],
         maxItemCount: -1,
         addItems: true,
@@ -76,7 +76,7 @@ To install via NPM, run `npm install --save-dev choices.js`
 | Group  | A group is a collection of choices. A group should be seen as equivalent to a `<optgroup></optgroup>` element within a select input.|
 | Item   | An item is an inputted value (text input) or a selected choice (select element). In the context of a select element, an item is equivelent to a selected option element: `<option value="Hello" selected></option>` whereas in the context of a text input an item is equivelant to `<input type="text" value="Hello">`|
 
-## Options
+## Configuration options
 ### items
 <strong>Type:</strong>  <strong>Default:</strong> `[]`
 
