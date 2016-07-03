@@ -9,11 +9,11 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
     const choices = new Choices(elements);
     
     // Pass single element:
-    const choice = new Choices(element);
+    const choices = new Choices(element);
     
     // Pass reference
-    const choice = new Choices('[data-choice']);
-    const choice = new Choices('.js-choice');
+    const choices = new Choices('[data-choice']);
+    const choices = new Choices('.js-choice');
     
     // Passing options (with default options)
     const choices = new Choices(elements, {
