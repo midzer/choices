@@ -67,7 +67,7 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
 ```
 
 ## Installation
-To install via NPM, run `npm install --save-dev choices.js`
+Coming to NPM soon. 
 
 ## Terminology
 | Word   | Definition |
