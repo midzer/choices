@@ -2,8 +2,14 @@
 A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 ## Setup
+
 ```html
-<script src="/assets/js/dist/choices.min.js"></script>
+<!-- Include base CSS (optional) -->
+<link rel="stylesheet" href="assets/styles/css/base.min.css">
+<!-- Include Choices CSS -->
+<link rel="stylesheet" href="assets/styles/css/choices.min.css">
+<!-- Include Choices JavaScript -->
+<script src="/assets/scripts/dist/choices.min.js"></script>
 <script>
     // Pass multiple elements:
     const choices = new Choices(elements);
@@ -79,7 +85,6 @@ Coming to NPM soon.
 ## Configuration options
 ### items
 <strong>Type:</strong>  <strong>Default:</strong> `[]`
-
 <strong>Usage:</strong> Add pre-selected items to input. 
 
 Pass an array of strings: 
