@@ -1,5 +1,6 @@
 'use strict';
 
+import './lib/polyfills.js';
 import { addItem, removeItem, highlightItem, addChoice, filterChoices, activateChoices, addGroup, clearAll } from './actions/index';
 import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, isElement, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
 import Fuse from 'fuse.js';

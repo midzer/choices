@@ -17,7 +17,6 @@ module.exports = function(config) {
             dir: '../tests/reports/coverage',
             reporters: [{
                 type: 'html',
-                subdir: 'report-html'
             }]
         },
         webpack: {
