@@ -177,7 +177,8 @@
              
             const choices10 = new Choices('#choices-10', { 
                 placeholder: true, 
-                placeholderValue: 'Pick an Strokes record'
+                placeholderValue: 'Pick an Strokes record',
+                callbackOnRender: (state) => console.log(state)
             }).ajax((callback) => {
                 fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then((response) => {

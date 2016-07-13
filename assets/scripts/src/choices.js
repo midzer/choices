@@ -69,7 +69,7 @@ export class Choices {
             callbackOnInit: () => {},
             callbackOnAddItem: (id, value, passedInput) => {},
             callbackOnRemoveItem: (id, value, passedInput) => {},
-            callbackOnRender: () => {},
+            callbackOnRender: (state) => {},
         };
 
         // Merge options with user options
@@ -431,7 +431,6 @@ export class Choices {
 
                     if(results && results.length) {
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                        // this.input.placeholder = "";
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 
@@ -654,7 +653,7 @@ export class Choices {
      */
     _onKeyUp(e) {
         if(e.target !== this.input) return;
-        const keyString = String.fromCharCode(event.keyCode);
+        const keyString = String.fromCharCode(e.keyCode);
 
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
@@ -695,7 +694,7 @@ export class Choices {
                 const hasUnactiveChoices = choices.some((option) => option.active !== true);
 
                 // Check that we have a value to search and the input was an alphanumeric character
-                if(this.input.value && choices.length && /[\b\a-zA-Z0-9-_ ]/.test(keyString)) {
+                if(this.input.value && this.input.value.length > 1) {
                     const handleFilter = () => {
                         const newValue = this.input.value.trim();
                         const currentValue = this.currentValue.trim();
@@ -1005,11 +1004,11 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    _addItem(value, label, choiceId = -1, callback = this.config.callbackOnAddItem) {
+    _addItem(value, label, choiceId = -1) {
         const items        = this.store.getItems();
         let passedValue    = value.trim();
         let passedLabel    = label || passedValue;
-        let passedOptionId = choiceId || -1;
+        let passedOptionId = parseInt(choiceId) || -1;
 
         // If a prepended value has been passed, prepend it
         if(this.config.prependValue) {
@@ -1031,7 +1030,8 @@ export class Choices {
         }  
 
         // Run callback if it is a function
-        if(callback){
+        if(this.config.callbackOnAddItem){
+            const callback = this.config.callbackOnAddItem;
             if(isType('Function', callback)) {
                 callback(id, passedValue, this.passedElement);
             } else {
@@ -1411,7 +1411,7 @@ export class Choices {
                         choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
                     }
 
-                    if(choiceListFragment.children && choiceListFragment.children.length) {
+                    if(choiceListFragment.childNodes) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first choice
                         this.choiceList.appendChild(choiceListFragment);
@@ -1444,7 +1444,7 @@ export class Choices {
 
             if(this.config.callbackOnRender){
                 if(isType('Function', this.config.callbackOnRender)) {
-                    this.config.callbackOnRender();
+                    this.config.callbackOnRender(this.currentState);
                 } else {
                     console.error('callbackOnRender: Callback is not a function');
                 }

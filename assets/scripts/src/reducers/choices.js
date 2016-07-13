@@ -15,18 +15,27 @@ const choices = (state = [], action) => {
             }].sort(sortByAlpha);
 
         case 'ADD_ITEM':
+            let newState = state;
+
+            // If all choices need to be activated
+            if(action.activateOptions) {
+                newState = state.map((choice) => {
+                    choice.active = action.active;
+                    return choice;
+                }).sort(sortByAlpha);
+            }
             // When an item is added and it has an associated choice,
             // we want to disable it so it can't be chosen again
             if(action.choiceId > -1) {
-                return state.map((choice) => {
+                newState = state.map((choice) => {
                     if(choice.id === parseInt(action.choiceId)) {
                         choice.selected = true;
                     }
                     return choice;
                 });
-            } else {
-                return state;
             }
+
+            return newState;
 
         case 'REMOVE_ITEM':
             // When an item is removed and it has an associated choice,

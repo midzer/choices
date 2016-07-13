@@ -127,9 +127,80 @@ describe('Choices', function() {
             this.input.multiple = false;
             this.input.placeholder = 'Placeholder text';
 
+            for (let i = 1; i < 4; i++) {
+                const option = document.createElement('option');
+
+                option.value = `Value ${i}`;
+                option.innerHTML = `Value ${i}`;
+                
+                this.input.appendChild(option);
+            }
+
             document.body.appendChild(this.input);
             
             this.choices = new Choices(this.input);
+        });
+
+        it('should open the choice list on focussing', function() {
+            this.choices.input.focus();
+            expect(this.choices.dropdown.classList).toContain('is-active');
+        });
+
+        it('should select the first choice', function() {            
+            expect(this.choices.currentState.items[0].value).toContain('Value 1');
+        });
+
+        it('should highlight the choices on keydown', function() {
+            this.choices.input.focus();
+
+            for (var i = 0; i < 2; i++) {
+               // Key down to third choice
+               this.choices._onKeyDown({
+                   target: this.choices.input,
+                   keyCode: 40,
+                   ctrlKey: false,
+                   preventDefault: () => {}
+               });
+            }
+
+            expect(this.choices.highlightPosition).toBe(2);
+        });
+
+        it('should select choice on enter key press', function() {
+            this.choices.input.focus();
+
+            // Key down to second choice
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 40,
+                ctrlKey: false,
+                preventDefault: () => {}
+            });
+    
+            // Key down to select choice
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            expect(this.choices.currentState.items.length).toBe(2);
+        });
+
+        it('should filter choices when searching', function() {
+            this.choices.input.focus();
+            this.choices.input.value = 'Value 3';
+
+            // Key down to search
+            this.choices._onKeyUp({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            const mostAccurateResult = this.choices.currentState.choices[0];
+
+            expect(this.choices.isSearching && mostAccurateResult.value === 'Value 3').toBeTruthy;
         });
     });
 
@@ -139,7 +210,7 @@ describe('Choices', function() {
             this.input.className = 'js-choices';
             this.input.multiple = true;
 
-            for (var i = 1; i < 4; i++) {
+            for (let i = 1; i < 4; i++) {
                 const option = document.createElement('option');
 
                 option.value = `Value ${i}`;
