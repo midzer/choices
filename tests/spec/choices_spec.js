@@ -1,3 +1,5 @@
+import 'whatwg-fetch';
+import 'es6-promise';
 import Choices from '../../assets/scripts/src/choices.js';
 
 describe('Choices', function() {
@@ -26,6 +28,12 @@ describe('Choices', function() {
             expect(this.choices.initialised).toBe(true);
         });
 
+        it('should not re-initialise if passed element again', function() {
+            const reinitialise = new Choices(this.choices.passedElement);
+            spyOn(reinitialise, '_createTemplates'); 
+            expect(reinitialise._createTemplates).not.toHaveBeenCalled();
+        })
+
         it('should have a blank state', function() {
             const blankState = {
                 items: [],
@@ -35,7 +43,31 @@ describe('Choices', function() {
             expect(this.choices.currentState).toEqual(blankState);
         });
 
-        it('should expose public methods', function(){
+        it('should have config options', function() {
+            expect(this.choices.config.items).toEqual(jasmine.any(Array));
+            expect(this.choices.config.maxItemCount).toEqual(jasmine.any(Number));
+            expect(this.choices.config.addItems).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.removeItems).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.removeItemButton).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.editItems).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.duplicateItems).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.delimiter).toEqual(jasmine.any(String));
+            expect(this.choices.config.paste).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.search).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.regexFilter).toEqual(null);
+            expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.placeholderValue).toEqual(null);
+            expect(this.choices.config.prependValue).toEqual(null);
+            expect(this.choices.config.appendValue).toEqual(null);
+            expect(this.choices.config.loadingText).toEqual(jasmine.any(String));
+            expect(this.choices.config.classNames).toEqual(jasmine.any(Object));
+            expect(this.choices.config.callbackOnInit).toEqual(jasmine.any(Function));
+            expect(this.choices.config.callbackOnAddItem).toEqual(jasmine.any(Function));
+            expect(this.choices.config.callbackOnRemoveItem).toEqual(jasmine.any(Function));
+            expect(this.choices.config.callbackOnRender).toEqual(jasmine.any(Function));
+        });
+
+        it('should expose public methods', function() {
             expect(this.choices.init).toEqual(jasmine.any(Function));
             expect(this.choices.destroy).toEqual(jasmine.any(Function));
             expect(this.choices.highlightItem).toEqual(jasmine.any(Function));
@@ -240,6 +272,45 @@ describe('Choices', function() {
 
         it('should add a placeholder (set in config) to the search input', function() {
             expect(this.choices.input.placeholder).toEqual('Placeholder text');
+        });
+    });
+
+    describe('should handle AJAX-populated choices', function() {
+        beforeEach(function() {
+            this.input = document.createElement('select');
+            this.input.className = 'js-choices';
+            this.input.multiple = false;
+            this.input.placeholder = 'Placeholder text';
+
+            for (let i = 1; i < 4; i++) {
+                const option = document.createElement('option');
+
+                option.value = `Value ${i}`;
+                option.innerHTML = `Value ${i}`;
+                
+                this.input.appendChild(option);
+            }
+
+            document.body.appendChild(this.input);
+            
+            this.choices = new Choices(this.input);
+            spyOn(this.choices, 'ajax'); 
+
+            this.choices.ajax((callback) => {
+                fetch('https://restcountries.eu/rest/v1/all')
+                    .then((response) => {
+                        response.json().then((data) => {
+                            callback(data, 'alpha2Code', 'name');
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            });
+        });
+
+        it('should call ajax()', function() {
+            expect(this.choices.ajax).toHaveBeenCalledWith(jasmine.any(Function));
         });
     });
 });

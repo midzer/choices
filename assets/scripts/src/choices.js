@@ -122,7 +122,7 @@ export class Choices {
 
         if(canInit) {
             // If element has already been initalised with Choices
-            if(this.passedElement.getAttribute('data-choice') === 'active') return
+            if(this.passedElement.getAttribute('data-choice') === 'active') return;
 
             // Let's go 
             this.init();

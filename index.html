@@ -206,9 +206,7 @@
                     });
             });
 
-            const choices14 = new Choices('#choices-14', {
-                logState: true
-            }).ajax((callback) => {
+            const choices14 = new Choices('#choices-14').ajax((callback) => {
                 fetch('https://restcountries.eu/rest/v1/all')
                     .then((response) => {
                         response.json().then((data) => {
@@ -218,7 +216,7 @@
                     .catch((error) => {
                         console.log(error);
                     });
-            })
+            });
 
             const choicesMultiple = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
