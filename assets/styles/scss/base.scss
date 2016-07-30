@@ -72,6 +72,9 @@ h6, .h6 { font-size: $global-font-size-h6; }
     background-color: #FFFFFF;
     padding: $global-guttering;
     color: #333;
+    & > *:last-child,
+    & > *:last-child > *:last-child,
+    & > *:last-child > *:last-child > *:last-child { margin-bottom: 0; }
 }
 
 /*=====  End of Section comment block  ======*/

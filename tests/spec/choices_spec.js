@@ -259,6 +259,11 @@ describe('Choices', function() {
             
             this.choices = new Choices(this.input, {
                 placeholderValue: 'Placeholder text',
+                choices: [
+                    {value: 'One', label: 'Label One', selected: true, disabled: false},
+                    {value: 'Two', label: 'Label Two', disabled: true},
+                    {value: 'Three', label: 'Label Three'},
+                ],
             });;
         });
 
@@ -266,8 +271,8 @@ describe('Choices', function() {
             expect(this.choices.currentState.items.length).toBeGreaterThan(1);
         });
 
-        it('should add any unselected options as choices', function() {
-            expect(this.choices.currentState.choices.length).toBeGreaterThan(1);
+        it('should add options defined in the config + pre-defined options', function() {
+            expect(this.choices.currentState.choices.length).toEqual(6);
         });
 
         it('should add a placeholder (set in config) to the search input', function() {
