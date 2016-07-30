@@ -67,13 +67,6 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
             flippedState: 'is-flipped',
             loadingState: 'is-loading',
         },
-        sortFunction: (a, b) => {
-            const labelA = (a.label || a.value).toLowerCase();
-            const labelB = (b.label || b.value).toLowerCase();
-            if (labelA < labelB) return -1;
-            if (labelA > labelB) return 1;
-            return 0;
-        },
         callbackOnInit: () => {},
         callbackOnAddItem: (id, value, passedInput) => {},
         callbackOnRemoveItem: (id, value, passedInput) => {},
