@@ -1308,24 +1308,25 @@ export class Choices {
     renderGroups(groups, choices, fragment) {
         const groupFragment = fragment || document.createDocumentFragment();
 
-        groups.forEach((group, i) => {
-            // Grab options that are children of this group
-            const groupChoices = choices.filter((choice) => {
-                if(this.passedElement.type === 'select-one') {
-                    return choice.groupId === group.id    
-                } else {
-                    return choice.groupId === group.id && !choice.selected;
+        groups
+            .forEach((group, i) => {
+                // Grab options that are children of this group
+                const groupChoices = choices.filter((choice) => {
+                    if(this.passedElement.type === 'select-one') {
+                        return choice.groupId === group.id    
+                    } else {
+                        return choice.groupId === group.id && !choice.selected;
+                    }
+                });
+
+                if(groupChoices.length >= 1) {
+                    const dropdownGroup = this._getTemplate('choiceGroup', group);
+
+                    groupFragment.appendChild(dropdownGroup);
+
+                    this.renderChoices(groupChoices, groupFragment);
                 }
             });
-
-            if(groupChoices.length >= 1) {
-                const dropdownGroup = this._getTemplate('choiceGroup', group);
-
-                groupFragment.appendChild(dropdownGroup);
-
-                this.renderChoices(groupChoices, groupFragment);
-            }
-        });
 
         return groupFragment;
     }
@@ -1341,15 +1342,16 @@ export class Choices {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
         const choicesFragment = fragment || document.createDocumentFragment();
 
-        choices.forEach((choice, i) => {
-            const dropdownItem = this._getTemplate('choice', choice);
+        choices
+            .forEach((choice, i) => {
+                const dropdownItem = this._getTemplate('choice', choice);
 
-            if(this.passedElement.type === 'select-one') {
-                choicesFragment.appendChild(dropdownItem);    
-            } else if(!choice.selected) {
-                choicesFragment.appendChild(dropdownItem);   
-            }
-        });
+                if(this.passedElement.type === 'select-one') {
+                    choicesFragment.appendChild(dropdownItem);    
+                } else if(!choice.selected) {
+                    choicesFragment.appendChild(dropdownItem);   
+                }
+            });
 
         return choicesFragment;
     }
