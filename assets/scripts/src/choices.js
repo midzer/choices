@@ -26,6 +26,7 @@ export class Choices {
 
         const defaultConfig = {
             items: [],
+            options: [],
             maxItemCount: -1,
             addItems: true,
             removeItems: true,
@@ -90,8 +91,12 @@ export class Choices {
         this.highlightPosition = 0;
         this.canSearch = this.config.search;
 
+        // Assing preset optiosn from passed object
+        this.presetOptions = this.config.options;
+
         // Assign preset items from passed object first
         this.presetItems = this.config.items;
+
         // Then add any values passed from attribute
         if(this.passedElement.value) {
             this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
@@ -1261,9 +1266,22 @@ export class Choices {
                 });
             } else {
                 const passedOptions = Array.from(this.passedElement.options);
-                passedOptions.forEach((option) => {
-                    const isDisabled = option.disabled || option.parentNode.disabled;
-                    this._addChoice(option.selected, isDisabled, option.value, option.innerHTML);
+                let allOptions = [];
+
+                // Create array of options from option elements
+                passedOptions.forEach((o) => {
+                    allOptions.push({
+                        value: o.value,
+                        label: o.innerHTML,
+                        selected: o.selected,
+                        disabled: o.disabled || o.parentNode.disabled
+                    });
+                });
+
+                allOptions = allOptions.concat(this.presetOptions);
+
+                allOptions.forEach((o) => {
+                    this._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
                 });
             }
         } else if(this.passedElement.type === 'text') {

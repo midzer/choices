@@ -26,6 +26,7 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
     // Passing options (with default options)
     const choices = new Choices(elements, {
         items: [],
+        options: [],
         maxItemCount: -1,
         addItems: true,
         removeItems: true,
@@ -87,8 +88,11 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
 
 ## Configuration options
 ### items
-<strong>Type:</strong>  <strong>Default:</strong> `[]`
-<strong>Usage:</strong> Add pre-selected items to input. 
+<strong>Type:</strong> `Array`  <strong>Default:</strong> `[]`
+
+<strong>Usage:</strong> Add pre-selected items to text input. 
+
+<strong>Input types affected:</strong> `text`
 
 Pass an array of strings: 
 
@@ -109,28 +113,62 @@ Pass an array of objects:
 }]
 ```
 
+### options
+<strong>Type:</strong> `Array`  <strong>Default:</strong> `[]`
+
+<strong>Usage:</strong> Add options to select input. 
+
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+Pass an array of objects:
+
+```
+[{ 
+	value: 'Option 1',
+	label: 'Option 1', 
+	selected: true,
+	disabled: false,
+},
+{ 
+	value: 'Option 2',
+	label: 'Option 2', 
+	selected: false,
+	disabled: true,
+}]
+```
+
 ### maxItemCount
 <strong>Type:</strong> `Number` <strong>Default:</strong>`-1`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
 
 <strong>Usage:</strong> The amount of items a user can input/select ("-1" indicates no limit).
 
 ### addItems
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
+<strong>Input types affected:</strong> `text`
+
 <strong>Usage:</strong> Whether a user can add items to the passed input's value.
 
 ### removeItems
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
 
 <strong>Usage:</strong> Whether a user can remove items (only affects text and multiple select input types).
 
 ### removeButton
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`false`
 
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Whether a button should show that, when clicked, will remove an item (only affects text and multiple select input types).
 
 ### editItems
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`false`
+
+<strong>Input types affected:</strong> `text`
 
 <strong>Usage:</strong> Whether a user can edit selected items (only affects text input types).
 
@@ -139,50 +177,70 @@ Pass an array of objects:
 ### delimiter
 <strong>Type:</strong> `String` <strong>Default:</strong>`,`
 
-<strong>Usage:</strong> What divides each value (only affects text input types).
+<strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> What divides each value.
 
 ### duplicates
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
-<strong>Usage:</strong> Whether a user can input a duplicate item (only affects text input types).
+<strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> Whether a user can input a duplicate item.
 
 ### paste
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`.
 
 <strong>Usage:</strong> Whether a user can paste into the input.
 
 ### search
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
+<strong>Input types affected:</strong> `select-one`, `select-multiple`.
+
 <strong>Usage:</strong> Whether a user can filter options by searching (only affects select input types).
 
 ### regexFilter
 <strong>Type:</strong> `Regex` <strong>Default:</strong>`null`
 
-<strong>Usage:</strong> A filter that will need to pass for a user to successfully add an item (only affects text input types).
+<strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> A filter that will need to pass for a user to successfully add an item.
 
 ### placeholder
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
+
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Whether the input should show a placeholder. Used in conjunction with `placeholderValue`. If `placeholder` is set to true and no value is passed to `placeholderValue`, the passed input's placeholder attribute will be used as the  placeholder value.
 
 ### placeholderValue
 <strong>Type:</strong> `String` <strong>Default:</strong>`null`
 
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
 <strong>Usage:</strong> The value of the inputs placeholder.
 
 ### prependValue
 <strong>Type:</strong> `String` <strong>Default:</strong>`null`
+
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Prepend a value to each item added to input (only affects text input types).
 
 ### appendValue
 <strong>Type:</strong> `String` <strong>Default:</strong>`null`
 
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Append a value to each item added to input (only affects text input types).
 
 ### loadingText
 <strong>Type:</strong> `String` <strong>Default:</strong>`Loading...`
+
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
 
 <strong>Usage:</strong> The loading text that is shown when options are populated via an AJAX callback.
 
@@ -217,20 +275,28 @@ classNames: {
 }
 ```
 
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Classes added to HTML generated by Choices. By default classnames follow the [BEM](http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/) notation.
 
 ### callbackOnInit
 <strong>Type:</strong> `Function` <strong>Default:</strong>`() => {}`
+
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Function to run once Choices initialises.
 
 ### callbackOnAddItem
 <strong>Type:</strong> `Function` <strong>Default:</strong>`(id, value, passedInput) => {}`
 
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Function to run each time an item is added.
 
 ### callbackOnRemoveItem
 <strong>Type:</strong> `Function` <strong>Default:</strong>`(id, value, passedInput) => {}`
+
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Function to run each time an item is removed.
 
@@ -256,54 +322,80 @@ choices.disable();
 ```
 
 ### highlightAll();
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Highlight each chosen item (selected items can be removed).
 
 
 ### unhighlightAll();
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Un-highlight each chosen item.
 
 
 ### removeItemsByValue(value);
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Remove each item by a given value.
 
 
 ### removeActiveItems(excludedId);
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Remove each selectable item.
 
 
 ### removeHighlightedItems();
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Remove each item the user has selected.
 
 
 ### showDropdown();
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Show option list dropdown (only affects select inputs).
 
 
 ### hideDropdown();
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Hide option list dropdown (only affects select inputs).
 
 
 ### toggleDropdown();
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
 <strong>Usage:</strong> Toggle dropdown between showing/hidden.
 
 
 ### setValue(args);
-<strong>Usage:</strong> Set value of input based on an array of objects or strings. This behaves exactly the same as passing items via the `items` option but can be called after initialising Choices on an text input (only affects text inputs).
+<strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> Set value of input based on an array of objects or strings. This behaves exactly the same as passing items via the `items` option but can be called after initialising Choices on an text input.
 
 
 ### clearValue();
+<strong>Input types affected:</strong> `text`
+
 <strong>Usage:</strong> Clear value of input.
 
 
 ### clearInput();
-<strong>Usage:</strong> Clear input of any user inputted text (only affects text inputs).
+<strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> Clear input of any user inputted text.
 
 
 ### disable();
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Disable input from selecting further options.
 
 
 ### ajax(fn);
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
 <strong>Usage:</strong> Populate options via a callback.
 
 
