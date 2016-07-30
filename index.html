@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Choices</title>
+    
+    <!-- Ignore these -->
     <link rel="stylesheet" href="assets/styles/css/base.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
+
+    <!-- Choices includes -->
     <link rel="stylesheet" href="assets/styles/css/choices.min.css">
     <script src="assets/scripts/dist/choices.min.js"></script>
 </head>
@@ -145,91 +150,91 @@
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const choices1 = new Choices(document.getElementById('choices-1'), {
+        document.addEventListener('DOMContentLoaded', function() {
+            var choices1 = new Choices(document.getElementById('choices-1'), {
                 delimiter: ',',
                 editItems: true,
                 maxItemCount: 5,
                 removeItemButton: true
             });
 
-            const choices2 = new Choices('#choices-2', {
+            var choices2 = new Choices('#choices-2', {
                 paste: false,
                 duplicateItems: false,
                 editItems: true,
             });
 
-            const choices3 = new Choices('#choices-3', {
+            var choices3 = new Choices('#choices-3', {
                 duplicates: false,
                 editItems: true,
                 regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             });
 
-            const choices4 = new Choices('#choices-4', {
+            var choices4 = new Choices('#choices-4', {
                 addItems: false,
                 removeItems: false,
             }).disable();
 
-            const choices5 = new Choices('#choices-5', {
+            var choices5 = new Choices('#choices-5', {
                 prependValue: 'item-',
                 appendValue: `-${Date.now()}`,
             }).removeActiveItems();
 
-            const choices6 = new Choices('#choices-6', {
+            var choices6 = new Choices('#choices-6', {
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
-            const choices7 = new Choices('#choices-7', { search: false }).setValue(['Set value 1', 'Set value 2']);
+            var choices7 = new Choices('#choices-7', { search: false }).setValue(['Set value 1', 'Set value 2']);
              
-            const choices10 = new Choices('#choices-10', { 
+            var choices10 = new Choices('#choices-10', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Strokes record',
-                // callbackOnRender: (state) => console.log(state)
-            }).ajax((callback) => {
+                callbackOnRender: function(state) { console.log(state) }
+            }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-                    .then((response) => {
+                    .then(function(response) {
                         response.json().then(function(data) {
                             callback(data.releases, 'title', 'title');
                         });
                     })
-                    .catch((error) => {
+                    .catch(function(error) {
                         console.log(error);
                     });
             });
 
-            const choices12 = new Choices('#choices-12', { 
+            var choices12 = new Choices('#choices-12', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Arctic Monkeys record'
-            }).ajax((callback) => {
+            }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-                    .then((response) => {
-                        response.json().then((data) => {
+                    .then(function(response) {
+                        response.json().then(function(data) {
                             callback(data.releases, 'title', 'title');
                         });
                     })
-                    .catch((error) => {
+                    .catch(function(error) {
                         console.log(error);
                     });
             });
 
-            const choices14 = new Choices('#choices-14').ajax((callback) => {
+            var choices14 = new Choices('#choices-14').ajax(function(callback) {
                 fetch('https://restcountries.eu/rest/v1/all')
-                    .then((response) => {
-                        response.json().then((data) => {
+                    .then(function(response) {
+                        response.json().then(function(data) {
                             callback(data, 'alpha2Code', 'name');
                         });
                     })
-                    .catch((error) => {
+                    .catch(function(error) {
                         console.log(error);
                     });
             });
 
-            const choicesMultiple = new Choices('[data-choice]', {
+            var choicesMultiple = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
                 removeButton: true
             });
 
-            const choices15 = new Choices('#choices-15', {
+            var choices15 = new Choices('#choices-15', {
                 choices: [
                     {value: 'One', label: 'Label One', selected: true, disabled: false},
                     {value: 'Two', label: 'Label Two', disabled: true},
