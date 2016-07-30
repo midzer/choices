@@ -54,6 +54,12 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
 }
 
+a, a:visited, a:focus { 
+    color: #00bcd4; 
+    text-decoration: none;
+    font-weight: bolder;
+}
+
 h1, .h1 { font-size: $global-font-size-h1; }
 h2, .h2 { font-size: $global-font-size-h2; }
 h3, .h3 { font-size: $global-font-size-h3; }
