@@ -13,8 +13,9 @@ $choices-disabled-color: #eaeaea;
 $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices {
-    margin-bottom: $choices-guttering;
     position: relative;
+    margin-bottom: $choices-guttering;
+    &:last-child { margin-bottom: 0; }
     &.is-disabled {
         .choices__inner, .choices__input { 
             background-color: lighten(#DDDDDD, 5%);
