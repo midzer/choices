@@ -701,8 +701,8 @@ export class Choices {
                 // Check that we have a value to search and the input was an alphanumeric character
                 if(this.input.value && this.input.value.length > 1) {
                     const handleFilter = () => {
-                        const newValue = this.input.value.trim();
-                        const currentValue = this.currentValue.trim();
+                        const newValue = isType('String', this.input.value) ? this.input.value.trim() : this.input.value;
+                        const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
 
                         if(newValue.length >= 1 && newValue !== currentValue + ' ') {
                             const haystack = this.store.getChoicesFiltedBySelectable();
@@ -1011,7 +1011,7 @@ export class Choices {
      */
     _addItem(value, label, choiceId = -1) {
         const items        = this.store.getItems();
-        let passedValue    = value.trim();
+        let passedValue    = isType('String', value) ? value.trim() : value;
         let passedLabel    = label || passedValue;
         let passedOptionId = parseInt(choiceId) || -1;
 
@@ -1190,7 +1190,7 @@ export class Choices {
                 return strToEl(`<div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>`);
             },
             option: (data) => {
-                return strToEl(`<option value="${ data.value }" selected>${ data.label.trim() }</option>`);
+                return strToEl(`<option value="${ data.value }" selected>${ data.label }</option>`);
             },
         };
 

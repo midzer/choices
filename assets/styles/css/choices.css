@@ -119,6 +119,7 @@
     position: relative;
     max-height: 300px;
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
     will-change: scroll-position; }
   .choices__list--dropdown .choices__item {
     padding: 1rem;

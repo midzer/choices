@@ -135,6 +135,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
         position: relative;
         max-height: 300px;
         overflow: auto;
+        -webkit-overflow-scrolling: touch;
         will-change: scroll-position;
     }
     .choices__item {
