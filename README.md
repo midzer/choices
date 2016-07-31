@@ -377,12 +377,64 @@ choices.disable();
 
 <strong>Usage:</strong> Toggle dropdown between showing/hidden.
 
+### setChoices(choices, value, label);
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+<strong>Usage:</strong> Set choices of select input via an array of objects, a value name and a label name. This behaves exactly the same as passing items via the `choices` option but can be called after initialising Choices.
+
+<strong>Example:</strong>
+
+```js
+const choices = new Choices(element);
+
+choices.setChoices([
+    {value: 'One', label: 'Label One', disabled: true},
+    {value: 'Two', label: 'Label Two' selected: true},
+    {value: 'Three', label: 'Label Three'},
+], 'value', 'label');
+```
 
 ### setValue(args);
 <strong>Input types affected:</strong> `text`
 
-<strong>Usage:</strong> Set value of input based on an array of objects or strings. This behaves exactly the same as passing items via the `items` option but can be called after initialising Choices on an text input.
+<strong>Usage:</strong> Set value of input based on an array of objects or strings. This behaves exactly the same as passing items via the `items` option but can be called after initialising Choices.
 
+<strong>Example:</strong>
+
+```js
+const example = new Choices(element);
+
+// via an array of objects
+
+example.setValue([
+    {value: 'One', label: 'Label One'},
+    {value: 'Two', label: 'Label Two'},
+    {value: 'Three', label: 'Label Three'},
+]);
+
+// or via an array of strings
+
+example.setValue(['Four','Five','Six']);
+```
+
+### setValueByChoice(value);
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+<strong>Usage:</strong> Set value of input based on existing Choice.
+
+<strong>Example:</strong>
+
+```js
+const example = new Choices(element, {
+    choices: [
+        {value: 'One', label: 'Label One'},
+        {value: 'Two', label: 'Label Two', disabled: true},
+        {value: 'Three', label: 'Label Three'},
+    ],
+});
+
+example.setValueByChoice('Two'); // Choice with value of 'Two' has now been selected.
+```
 
 ### clearValue();
 <strong>Input types affected:</strong> `text`

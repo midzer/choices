@@ -42,7 +42,8 @@
   position: absolute;
   right: 1.15rem;
   top: 50%;
-  margin-top: -2.5px; }
+  margin-top: -2.5px;
+  pointer-events: none; }
 
 .choices[data-type*="select-multiple"] .choices__inner, .choices[data-type*="text"] .choices__inner {
   cursor: text; }

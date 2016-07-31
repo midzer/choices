@@ -362,7 +362,8 @@ export class Choices {
     }
 
     /**
-     * Set value of input 
+     * Set value of input. If the input is a select box, a choice will be created and selected otherwise
+     * an item will created directly.
      * @param {Array} args Array of value objects or value strings
      * @return {Object} Class instance
      * @public
@@ -396,6 +397,46 @@ export class Choices {
     }
 
     /**
+     * Select value of select box via the value of an existing choice
+     * @param {Array/String} value An array of strings of a single string
+     * @return {Object} Class instance
+     * @public
+     */
+    setValueByChoice(value) {
+        if (this.passedElement.type !== 'text') {
+            const choices = this.store.getChoices();
+            
+            // If only one value has been passed, convert to array
+            if (!isType('Array', value)) {
+                value = [value];
+            }
+            
+            // Loop through each value and 
+            value.forEach((val, index) => {
+                const foundChoice = choices.find((choice) => {
+                    // Check 'value' property exists and the choice isn't already selected
+                    if(choice.value === val) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+
+                if(foundChoice) {
+                    if(!foundChoice.selected) {
+                        this._addItem(foundChoice.value, foundChoice.label, foundChoice.id);    
+                    } else {
+                        console.warn('Attempting to select choice already selected');
+                    }
+                } else {
+                    console.warn('Attempting to select choice that does not exist');
+                }
+            })
+        }
+        return this;
+    }
+
+    /**
     * Direct populate choices
     * @param  {Array} choices - Choices to insert 
     * @param  {string} value - Name of 'value' property
@@ -413,9 +454,9 @@ export class Choices {
                     choices.forEach((result, index) => {
                         // Select first choice in list if single select input
                         if(index === 0 && this.passedElement.type === 'select-one') { 
-                            this._addChoice(true, false, result[value], result[label]);
+                            this._addChoice(true, result.disabled ? result.disabled : false, result[value], result[label]);
                         } else {
-                            this._addChoice(false, false, result[value], result[label]);    
+                            this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);    
                         }
                     });
                 }
@@ -1355,8 +1396,12 @@ export class Choices {
 
                 allChoices
                     .concat(this.presetChoices)
-                    .forEach((o) => {
-                        this._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
+                    .forEach((o, index) => {
+                        if(index === 0) {
+                            this._addChoice(true, o.disabled ? o.disabled : false, o.value, o.label);
+                        } else {
+                            this._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
+                        }
                     });
             }
         } else if(this.passedElement.type === 'text') {

@@ -147,6 +147,9 @@
             <select name="choices-15" id="choices-15" placeholder="This is a placeholder">
                 <option value="0">Zero</option>
             </select>
+
+            <label for="choices-16">Option selected via config</label>
+            <select name="choices-16" id="choices-16" placeholder="This is a placeholder"></select>
         </div>
     </div>
     <script>
@@ -243,18 +246,27 @@
 
             var choices15 = new Choices('#choices-15', {
                 choices: [
-                    {value: 'One', label: 'Label One', selected: true, disabled: false},
+                    {value: 'One', label: 'Label One'},
                     {value: 'Two', label: 'Label Two', disabled: true},
                     {value: 'Three', label: 'Label Three'},
                 ],
             });
 
             choices15.setChoices([
-                {value: 'Four', label: 'Label Four'},
+                {value: 'Four', label: 'Label Four', disabled: true},
                 {value: 'Five', label: 'Label Five'},
-                {value: 'Six', label: 'Label Six'},
+                {value: 'Six', label: 'Label Six', selected: true},
             ], 'value', 'label');
 
+            var choices16 = new Choices('#choices-16', {
+                choices: [
+                    {value: 'One', label: 'Label One'},
+                    {value: 'Two', label: 'Label Two', disabled: true},
+                    {value: 'Three', label: 'Label Three'},
+                ],
+            });
+
+            choices16.setValueByChoice('Two');
         });
     </script>
 </body>
