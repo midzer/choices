@@ -189,7 +189,7 @@
             var choices10 = new Choices('#choices-10', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Strokes record',
-                callbackOnRender: function(state) { console.log(state) }
+                callbackOnChange: function(value, passedInput) { console.log(value) }
             }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
                     .then(function(response) {
@@ -241,6 +241,12 @@
                     {value: 'Three', label: 'Label Three'},
                 ],
             });
+
+            choices15.setChoices([
+                {value: 'Four', label: 'Label Four'},
+                {value: 'Five', label: 'Label Five'},
+                {value: 'Six', label: 'Label Six'},
+            ], 'value', 'label');
 
         });
     </script>

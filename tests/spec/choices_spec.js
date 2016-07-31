@@ -45,6 +45,7 @@ describe('Choices', function() {
 
         it('should have config options', function() {
             expect(this.choices.config.items).toEqual(jasmine.any(Array));
+            expect(this.choices.config.choices).toEqual(jasmine.any(Array));
             expect(this.choices.config.maxItemCount).toEqual(jasmine.any(Number));
             expect(this.choices.config.addItems).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.removeItems).toEqual(jasmine.any(Boolean));
@@ -64,7 +65,7 @@ describe('Choices', function() {
             expect(this.choices.config.callbackOnInit).toEqual(jasmine.any(Function));
             expect(this.choices.config.callbackOnAddItem).toEqual(jasmine.any(Function));
             expect(this.choices.config.callbackOnRemoveItem).toEqual(jasmine.any(Function));
-            expect(this.choices.config.callbackOnRender).toEqual(jasmine.any(Function));
+            expect(this.choices.config.callbackOnChange).toEqual(jasmine.any(Function));
         });
 
         it('should expose public methods', function() {
@@ -156,7 +157,6 @@ describe('Choices', function() {
         beforeEach(function() {
             this.input = document.createElement('select');
             this.input.className = 'js-choices';
-            this.input.multiple = false;
             this.input.placeholder = 'Placeholder text';
 
             for (let i = 1; i < 4; i++) {
@@ -219,6 +219,28 @@ describe('Choices', function() {
             expect(this.choices.currentState.items.length).toBe(2);
         });
 
+        it('should trigger a change callback on selection', function() {
+            spyOn(this.choices.config, 'callbackOnChange'); 
+            this.choices.input.focus();
+
+            // Key down to second choice
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 40,
+                ctrlKey: false,
+                preventDefault: () => {}
+            });
+            
+            // Key down to select choice
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(HTMLElement));
+        });
+
         it('should filter choices when searching', function() {
             this.choices.input.focus();
             this.choices.input.value = 'Value 3';
@@ -240,7 +262,7 @@ describe('Choices', function() {
         beforeEach(function() {
             this.input = document.createElement('select');
             this.input.className = 'js-choices';
-            this.input.multiple = true;
+            this.input.setAttribute('multiple', '');
 
             for (let i = 1; i < 4; i++) {
                 const option = document.createElement('option');
@@ -264,7 +286,7 @@ describe('Choices', function() {
                     {value: 'Two', label: 'Label Two', disabled: true},
                     {value: 'Three', label: 'Label Three'},
                 ],
-            });;
+            });
         });
 
         it('should add any pre-defined values', function() {

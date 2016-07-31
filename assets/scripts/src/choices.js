@@ -70,7 +70,7 @@ export class Choices {
             callbackOnInit: () => {},
             callbackOnAddItem: (id, value, passedInput) => {},
             callbackOnRemoveItem: (id, value, passedInput) => {},
-            callbackOnRender: (state) => {},
+            callbackOnChange: (value, passedInput) => {},
         };
 
         // Merge options with user options
@@ -177,6 +177,8 @@ export class Choices {
      * @public
      */
     destroy() {
+        this._removeEventListeners();
+
         this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
         this.passedElement.tabIndex = '';
         this.passedElement.removeAttribute('style', 'display:none;');
@@ -188,8 +190,6 @@ export class Choices {
         this.userConfig   = null;
         this.config       = null;
         this.store         = null;
-
-        this._removeEventListeners();
     }
 
     /**
@@ -368,28 +368,59 @@ export class Choices {
      * @public
      */
     setValue(args) {
-        // Convert args to an itterable array
-        const values = [...args];
+        if(this.initialised === true) {
+            // Convert args to an itterable array
+            const values = [...args];
 
-        values.forEach((item, index) => {
-            if(isType('Object', item)) {
-                if(!item.value) return;
-                // If we are dealing with a select input, we need to create an option first 
-                // that is then selected. For text inputs we can just add items normally.
-                if(this.passedElement.type !== 'text') {
-                    this._addChoice(true, false, item.value, item.label, -1);
-                } else {
-                    this._addItem(item.value, item.label, item.id);    
+            values.forEach((item, index) => {
+                if(isType('Object', item)) {
+                    if(!item.value) return;
+                    // If we are dealing with a select input, we need to create an option first 
+                    // that is then selected. For text inputs we can just add items normally.
+                    if(this.passedElement.type !== 'text') {
+                        this._addChoice(true, false, item.value, item.label, -1);
+                    } else {
+                        this._addItem(item.value, item.label, item.id);    
+                    }
+                } else if(isType('String', item)) {
+                    if(this.passedElement.type !== 'text') {
+                        this._addChoice(true, false, item, item, -1);
+                    } else {
+                        this._addItem(item);
+                    }
                 }
-            } else if(isType('String', item)) {
-                if(this.passedElement.type !== 'text') {
-                    this._addChoice(true, false, item, item, -1);
-                } else {
-                    this._addItem(item);
+            });
+        }
+
+        return this;
+    }
+
+    /**
+    * Direct populate choices
+    * @param  {Array} choices - Choices to insert 
+    * @param  {string} value - Name of 'value' property
+    * @param  {string} label - Name of 'label' property
+    * @return {Object} Class instance
+    * @public
+    */
+    setChoices(choices, value, label){
+        if(this.initialised === true) {
+            if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+                if(!isType('Array', choices) || !value) return;
+
+                if(choices && choices.length) {
+                    this.containerOuter.classList.remove(this.config.classNames.loadingState);
+                    choices.forEach((result, index) => {
+                        // Select first choice in list if single select input
+                        if(index === 0 && this.passedElement.type === 'select-one') { 
+                            this._addChoice(true, false, result[value], result[label]);
+                        } else {
+                            this._addChoice(false, false, result[value], result[label]);    
+                        }
+                    });
                 }
             }
-        });
-
+        }
         return this;
     }
 
@@ -466,6 +497,25 @@ export class Choices {
     }
 
     /** 
+     * Call change callback
+     * @param  {string} value - last added/deleted/selected value
+     * @return
+     * @private
+     */
+    _triggerChange(value) {
+        if(!value) return;
+        // Run callback if it is a function
+        if(this.config.callbackOnChange){
+            const callback = this.config.callbackOnChange;
+            if(isType('Function', callback)) {
+                callback(value, this.passedElement);
+            } else {
+                console.error('callbackOnChange: Callback is not a function');
+            }
+        }
+    }
+
+    /** 
      * Process enter key event
      * @param  {Array} activeItems Items that are currently active
      * @return
@@ -502,6 +552,7 @@ export class Choices {
             if(canAddItem) {
                 this.toggleDropdown();
                 this._addItem(value);
+                this._triggerChange(value);
                 this.clearInput(this.passedElement);
             }
         }
@@ -523,6 +574,7 @@ export class Choices {
             if(this.config.editItems && !hasHighlightedItems && lastItem) {
                 this.input.value = lastItem.value;
                 this._removeItem(lastItem);
+                this._triggerChange(lastItem.value);
             } else {
                 if(!hasHighlightedItems) { this.highlightItem(lastItem); }
                 this.removeHighlightedItems();    
@@ -589,6 +641,7 @@ export class Choices {
                         const label = highlighted.innerHTML;
                         const id    = highlighted.getAttribute('data-id');
                         this._addItem(value, label, id);
+                        this._triggerChange(value);
                         this.clearInput(this.passedElement);
 
                         if(this.passedElement.type === 'select-one') {
@@ -778,6 +831,7 @@ export class Choices {
                         const itemId       = e.target.parentNode.getAttribute('data-id');
                         const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
                         this._removeItem(itemToRemove);
+                        this._triggerChange(itemToRemove.value);
                     }
                 } else if(e.target.hasAttribute('data-item')) {
                     // If we are clicking on an item
@@ -803,6 +857,7 @@ export class Choices {
 
                     if(!choice.selected && !choice.disabled) {
                         this._addItem(choice.value, choice.label, choice.id);
+                        this._triggerChange(choice.value);
                         if(this.passedElement.type === 'select-one') {
                             this.input.value = "";
                             this.isSearching = false;
@@ -872,7 +927,13 @@ export class Choices {
         if(e.target === this.input && !hasActiveDropdown) {
             this.containerOuter.classList.add(this.config.classNames.focusState);
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple'){
-                this.showDropdown();    
+                this.showDropdown();  
+            }
+        } else if(this.passedElement.type === 'select-one' && e.target === this.containerOuter && !hasActiveDropdown) {            
+            this.containerOuter.classList.add(this.config.classNames.focusState);
+            this.showDropdown();
+            if(this.config.search) {
+                this.input.focus();
             }
         }
     }
@@ -885,9 +946,15 @@ export class Choices {
      */
     _onBlur(e) {
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-        if(e.target === this.input && !hasActiveDropdown) {
+
+        // If the blurred element is this input
+        if(e.target === this.input) {
+            // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
-        } else {
+        }
+
+        // Close the dropdown if there is one
+        if(hasActiveDropdown) {
             this.hideDropdown();
         }
     }
@@ -1139,7 +1206,15 @@ export class Choices {
         const classNames = this.config.classNames;
         const templates = {
             containerOuter: () => {
-                return strToEl(`<div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }"></div>`);
+                if(this.passedElement.type === 'select-one') {
+                    return strToEl(`
+                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" tabindex="0"></div>
+                    `);
+                } else {
+                    return strToEl(`
+                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }"></div>
+                    `);
+                }
             },
             containerInner: () => {
                 return strToEl(`<div class="${ classNames.containerInner }"></div>`);
@@ -1430,8 +1505,8 @@ export class Choices {
                     } else if(activeChoices.length >= 1) {
                         choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
                     }
-
-                    if(choiceListFragment.childNodes) {
+        
+                    if(choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
                         // If we actually have anything to add to our dropdown
                         // append it and highlight the first choice
                         this.choiceList.appendChild(choiceListFragment);
@@ -1462,14 +1537,6 @@ export class Choices {
                 }
             }
 
-            if(this.config.callbackOnRender){
-                if(isType('Function', this.config.callbackOnRender)) {
-                    this.config.callbackOnRender(this.currentState);
-                } else {
-                    console.error('callbackOnRender: Callback is not a function');
-                }
-            }
-
             this.prevState = this.currentState;
         }
     }
@@ -1484,6 +1551,10 @@ export class Choices {
         document.addEventListener('keydown', this._onKeyDown);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.addEventListener('focus', this._onFocus);
+        }
 
         this.input.addEventListener('input', this._onInput);
         this.input.addEventListener('paste', this._onPaste);
@@ -1501,6 +1572,10 @@ export class Choices {
         document.removeEventListener('keydown', this._onKeyDown);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.removeEventListener('focus', this._onFocus);
+        }
         
         this.input.removeEventListener('input', this._onInput);
         this.input.removeEventListener('paste', this._onPaste);
