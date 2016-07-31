@@ -26,7 +26,7 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
     // Passing options (with default options)
     const choices = new Choices(elements, {
         items: [],
-        options: [],
+        choices: [],
         maxItemCount: -1,
         addItems: true,
         removeItems: true,
