@@ -10,26 +10,33 @@ $global-font-size-h6:    1.4rem;
 =            Generic styling                  =
 =============================================*/
 
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+}
+
+
 *, *:before, *:after {
     box-sizing: border-box
 }
 
-html {
-    font-size: 62.5%;
-}
+html { font-size: 62.5%; }
 
 html, body {
+    position: relative;
     margin: 0;
-    height: 100%;
-    widows: 100%;
+    width: 100%;
 }
 
 body {
-    background-color: #333333;
     font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 1.6rem;
     line-height: 1.4;
     color: #FFFFFF;
+    background-color: #333;
+    background: linear-gradient(to left bottom,#333,#262626);
+    height: 100%;
+    overflow-x: hidden;
 }
 
 label {
@@ -55,9 +62,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a, a:visited, a:focus { 
-    color: #00bcd4; 
+    color: #FFFFFF; 
     text-decoration: none;
-    font-weight: bolder;
+    font-weight: 600;
 }
 
 h1, .h1 { font-size: $global-font-size-h1; }
@@ -70,14 +77,16 @@ h6, .h6 { font-size: $global-font-size-h6; }
 .container {
     display: block;
     margin: auto;
-    max-width: 35em;
-    padding: $global-guttering;
+    max-width: 40em;
+    padding: $global-guttering*2;
+    @media (max-width: 620px) { padding: 0; }
 }
 
 .section {
     background-color: #FFFFFF;
     padding: $global-guttering;
     color: #333;
+    a, a:visited, a:focus { color: #00bcd4; }
 }
 
 /*=====  End of Section comment block  ======*/

@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Choices</title>
-    
+    <meta name=description itemprop=description content="A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.">
+
     <!-- Ignore these -->
     <link rel="stylesheet" href="assets/styles/css/base.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
@@ -16,9 +17,10 @@
 <body>
     <div class="container">
         <div class="section">
-            <h1>Choices</h1>
+            <h1>Choices.js</h1>
             <p>A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
             <p>For all config options, visit the <a href="https://github.com/jshjohnson/Choices">GitHub repo</a>.</p>
+            <hr>
             <h2>Text inputs</h2>
             <label for="choices-1">Limited to 5 values</label>
             <input id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
@@ -187,7 +189,7 @@
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
-            var choices7 = new Choices('#choices-7', { search: false }).setValue(['Set value 1', 'Set value 2']);
+            var choices7 = new Choices('#choices-7', { search: false });
              
             var choices10 = new Choices('#choices-10', { 
                 placeholder: true, 
@@ -250,9 +252,7 @@
                     {value: 'Two', label: 'Label Two', disabled: true},
                     {value: 'Three', label: 'Label Three'},
                 ],
-            });
-
-            choices15.setChoices([
+            }).setChoices([
                 {value: 'Four', label: 'Label Four', disabled: true},
                 {value: 'Five', label: 'Label Five'},
                 {value: 'Six', label: 'Label Six', selected: true},
@@ -264,9 +264,7 @@
                     {value: 'Two', label: 'Label Two', disabled: true},
                     {value: 'Three', label: 'Label Three'},
                 ],
-            });
-
-            choices16.setValueByChoice('Two');
+            }).setValueByChoice('Two');
         });
     </script>
 </body>
