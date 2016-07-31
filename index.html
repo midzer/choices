@@ -20,7 +20,7 @@
             <p>A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
             <p>For all config options, visit the <a href="https://github.com/jshjohnson/Choices">GitHub repo</a>.</p>
             <h2>Text inputs</h2>
-            <label for="choices-1">Limited to 5</label>
+            <label for="choices-1">Limited to 5 values</label>
             <input id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
 
             <label for="choices-2">Unique values only, no pasting</label>
@@ -90,7 +90,7 @@
                 </optgroup>
             </select>
 
-            <label for="choices-10">Options from remote source</label>
+            <label for="choices-10">Options from remote source (Fetch API)</label>
             <select name="choices-10" id="choices-10" placeholder="Pick an Arctic Monkeys record" multiple></select>
 
             <hr>
@@ -103,7 +103,7 @@
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
 
-            <label for="choices-12">Options from remote source</label>
+            <label for="choices-12">Options from remote source (Fetch API)</label>
             <select name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
 
             <label for="choices-13">Option groups</label>
@@ -140,7 +140,7 @@
                 </optgroup>
             </select>
 
-            <label for="choices-14">Countries remote source</label>
+            <label for="choices-14">Countries from remote source (XHR)</label>
             <select name="choices-14" id="choices-14" placeholder="Pick a country"></select>
 
             <label for="choices-15">Options added via config</label>
@@ -218,15 +218,22 @@
             });
 
             var choices14 = new Choices('#choices-14').ajax(function(callback) {
-                fetch('https://restcountries.eu/rest/v1/all')
-                    .then(function(response) {
-                        response.json().then(function(data) {
+                var request = new XMLHttpRequest();
+                request.open('get', 'https://restcountries.eu/rest/v1/all', true);
+                request.onreadystatechange = function() {
+                    var status;
+                    var data;
+                    if (request.readyState == 4) {
+                        status = request.status;
+                        if (status == 200) {
+                            data = JSON.parse(request.responseText);
                             callback(data, 'alpha2Code', 'name');
-                        });
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
+                        } else {
+                            console.log(status);
+                        }
+                    }
+                }
+                request.send();
             });
 
             var choicesMultiple = new Choices('[data-choice]', {
