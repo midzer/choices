@@ -874,28 +874,20 @@ export class Choices {
 
             const hasShiftKey = e.shiftKey ? true : false;
 
-                if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
-                    if(this.passedElement.type !== 'text') {
-                        // For select inputs we always want to show the dropdown if it isn't already showing
-                        this.showDropdown();
-                        if(this.canSearch){
-                            this.input.focus();
-                        }
-                    }else{
-                        // If input is not in focus, it ought to be 
-                        if(this.input !== document.activeElement) {
-                            this.input.focus();
-                        }
+            if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                if(this.passedElement.type !== 'text') {
+                    // For select inputs we always want to show the dropdown if it isn't already showing
+                    this.showDropdown();
+                    if(this.canSearch) {
+                        this.input.focus();
                     }
+                }else{
+                    // If input is not in focus, it ought to be 
+                    if(this.input !== document.activeElement) {
+                        this.input.focus();
+                    }
+                }
 
-                } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
-                    this.hideDropdown();
-                }
-                
-                // If input is not in focus, it ought to be 
-                if(this.input !== document.activeElement) {
-                    this.input.focus();
-                }
             } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
                 this.hideDropdown();
             }
