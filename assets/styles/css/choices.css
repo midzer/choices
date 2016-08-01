@@ -15,6 +15,8 @@
             user-select: none; }
   .choices.is-disabled .choices__item {
     cursor: not-allowed; }
+  .choices:focus {
+    outline: none; }
 
 .choices[data-type*="select-one"] .choices__inner {
   cursor: pointer;
