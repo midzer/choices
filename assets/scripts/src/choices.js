@@ -117,6 +117,9 @@ export class Choices {
         this._onMouseOver = this._onMouseOver.bind(this);
         this._onPaste     = this._onPaste.bind(this);
         this._onInput     = this._onInput.bind(this);
+        
+        // Focus containerOuter but not show dropdown if true
+        this._focusAndHideDropdown = false;
 
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
@@ -557,6 +560,7 @@ export class Choices {
         
         // Keep focus on select-one element
         if(this.passedElement.type === 'select-one'){
+            this._focusAndHideDropdown = true;
             this.containerOuter.focus();
         }
     }
@@ -707,7 +711,16 @@ export class Choices {
             case downKey:
             case upKey:
                 // If up or down key is pressed, traverse through options
-                if(hasActiveDropdown) {
+                if(hasActiveDropdown || this.passedElement.type === 'select-one') {
+                    
+                    // Show dropdown if focus
+                    if(!hasActiveDropdown){
+                        this.showDropdown();
+                        if(this.canSearch) {
+                            this.input.focus();
+                        }
+                    }
+                    
                     const currentEl    = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
                     const directionInt = e.keyCode === downKey ? 1 : -1;
                     let nextEl;
@@ -867,12 +880,16 @@ export class Choices {
                     if(this.passedElement.type !== 'text') {
                         // For select inputs we always want to show the dropdown if it isn't already showing
                         this.showDropdown();
+                        if(this.canSearch){
+                            this.input.focus();
+                        }
+                    }else{
+                        // If input is not in focus, it ought to be 
+                        if(this.input !== document.activeElement) {
+                            this.input.focus();
+                        }
                     }
-                    
-                    // If input is not in focus, it ought to be 
-                    if(this.input !== document.activeElement) {
-                        this.input.focus();
-                    }
+
                 } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
                     this.hideDropdown();
                 }
@@ -986,9 +1003,11 @@ export class Choices {
         } else if(this.passedElement.type === 'select-one' && e.target === this.containerOuter && !hasActiveDropdown) {            
             this.containerOuter.classList.add(this.config.classNames.focusState);
             this.showDropdown();
-            if(this.canSearch) {
+            
+            if(!this._focusAndHideDropdown){
                 this.input.focus();
             }
+            this._focusAndHideDropdown = false;
         }
     }
 
