@@ -844,97 +844,94 @@ export class Choices {
      * @private
      */
     _onMouseDown(e) {
-        // If not a right click
-        // if(e.button !== 2) {
-            const activeItems = this.store.getItemsFilteredByActive();
-            const target = e.target || e.touches[0].target;
+        const activeItems = this.store.getItemsFilteredByActive();
+        const target = e.target || e.touches[0].target;
 
-            // If click is affecting a child node of our element
-            if(this.containerOuter.contains(target)) {
+        // If click is affecting a child node of our element
+        if(this.containerOuter.contains(target)) {
 
-                // Prevent blur event triggering causing dropdown to close
-                // in a race condition
-                e.preventDefault();
+            // Prevent blur event triggering causing dropdown to close
+            // in a race condition
+            e.preventDefault();
 
-                const hasShiftKey = e.shiftKey ? true : false;
+            const hasShiftKey = e.shiftKey ? true : false;
 
-                if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
-                    if(this.passedElement.type !== 'text') {
-                        // For select inputs we always want to show the dropdown if it isn't already showing
-                        this.showDropdown();
-                    }
-                    
-                    // If input is not in focus, it ought to be 
-                    if(this.input !== document.activeElement) {
-                        this.input.focus();
-                    }
-                } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
-                    this.hideDropdown();
+            if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                if(this.passedElement.type !== 'text') {
+                    // For select inputs we always want to show the dropdown if it isn't already showing
+                    this.showDropdown();
                 }
+                
+                // If input is not in focus, it ought to be 
+                if(this.input !== document.activeElement) {
+                    this.input.focus();
+                }
+            } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
+                this.hideDropdown();
+            }
 
-                if(target.hasAttribute('data-button')) {
-                    // If we are clicking on a button
-                    if(this.config.removeItems && this.config.removeItemButton) {
-                        const itemId       = target.parentNode.getAttribute('data-id');
-                        const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
+            if(target.hasAttribute('data-button')) {
+                // If we are clicking on a button
+                if(this.config.removeItems && this.config.removeItemButton) {
+                    const itemId       = target.parentNode.getAttribute('data-id');
+                    const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
 
-                        // Remove item associated with button
-                        this._removeItem(itemToRemove);
-                        this._triggerChange(itemToRemove.value);
-                    }
-                } else if(target.hasAttribute('data-item')) {
-                    // If we are clicking on an item
-                    if(this.config.removeItems) {
-                        const passedId = target.getAttribute('data-id');
+                    // Remove item associated with button
+                    this._removeItem(itemToRemove);
+                    this._triggerChange(itemToRemove.value);
+                }
+            } else if(target.hasAttribute('data-item')) {
+                // If we are clicking on an item
+                if(this.config.removeItems) {
+                    const passedId = target.getAttribute('data-id');
 
-                        // We only want to select one item with a click
-                        // so we deselect any items that aren't the target
-                        // unless shift is being pressed
-                        activeItems.forEach((item) => {
-                            if(item.id === parseInt(passedId) && !item.highlighted) {
-                                this.highlightItem(item);
-                            } else if(!hasShiftKey) {
-                                this.unhighlightItem(item);
-                            }
-                        });
-                    }
-                } else if(target.hasAttribute('data-option')) {
-                    // If we are clicking on an option
-                    const id = target.getAttribute('data-id');
-                    const choices = this.store.getChoicesFilteredByActive();
-                    const choice = choices.find((choice) => choice.id === parseInt(id));
-
-                    if(!choice.selected && !choice.disabled) {
-                        this._addItem(choice.value, choice.label, choice.id);
-                        this._triggerChange(choice.value);
-                        if(this.passedElement.type === 'select-one') {
-                            this.input.value = "";
-                            this.isSearching = false;
-                            this.store.dispatch(activateChoices(true));
-                            this.toggleDropdown();
+                    // We only want to select one item with a click
+                    // so we deselect any items that aren't the target
+                    // unless shift is being pressed
+                    activeItems.forEach((item) => {
+                        if(item.id === parseInt(passedId) && !item.highlighted) {
+                            this.highlightItem(item);
+                        } else if(!hasShiftKey) {
+                            this.unhighlightItem(item);
                         }
+                    });
+                }
+            } else if(target.hasAttribute('data-option')) {
+                // If we are clicking on an option
+                const id = target.getAttribute('data-id');
+                const choices = this.store.getChoicesFilteredByActive();
+                const choice = choices.find((choice) => choice.id === parseInt(id));
+
+                if(!choice.selected && !choice.disabled) {
+                    this._addItem(choice.value, choice.label, choice.id);
+                    this._triggerChange(choice.value);
+                    if(this.passedElement.type === 'select-one') {
+                        this.input.value = "";
+                        this.isSearching = false;
+                        this.store.dispatch(activateChoices(true));
+                        this.toggleDropdown();
                     }
-                }
-
-            } else {
-                // Click is outside of our element so close dropdown and de-select items
-                const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-                const hasHighlightedItems  = activeItems.some((item) => item.highlighted === true);
-
-                // De-select any highlighted items
-                if(hasHighlightedItems) {
-                    this.unhighlightAll();
-                }
-            
-                // Remove focus state
-                this.containerOuter.classList.remove(this.config.classNames.focusState);
-
-                // Close all other dropdowns
-                if(hasActiveDropdown) {
-                    this.toggleDropdown();
                 }
             }
-        // }
+
+        } else {
+            // Click is outside of our element so close dropdown and de-select items
+            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+            const hasHighlightedItems  = activeItems.some((item) => item.highlighted === true);
+
+            // De-select any highlighted items
+            if(hasHighlightedItems) {
+                this.unhighlightAll();
+            }
+        
+            // Remove focus state
+            this.containerOuter.classList.remove(this.config.classNames.focusState);
+
+            // Close all other dropdowns
+            if(hasActiveDropdown) {
+                this.toggleDropdown();
+            }
+        }
     }
 
     /**
@@ -1603,7 +1600,6 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
-        // document.addEventListener('touchstart', this._onMouseDown);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
 
@@ -1625,7 +1621,6 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
-        // document.removeEventListener('touchstart', this._onMouseDown);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
 
