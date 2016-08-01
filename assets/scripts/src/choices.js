@@ -395,6 +395,31 @@ export class Choices {
 
         return this;
     }
+    
+    /**
+     * Get value(s)
+     * @param {Boolean} onlyValue Get only values of selected items, otherwise return selected items
+     * @return {Array/String} selected value (select-one) or array of selected items (inputs & select-multiple)
+     * @public
+     */
+    getValue(onlyValue){
+        const items = this.passedElement.type === 'text' ? this.store.getState().items : this.store.getState().choices;
+        let selectedItems = [];
+         
+        items.forEach((item) => {
+            if (this.passedElement.type === 'text'){
+                selectedItems.push(onlyValue ? item.value : item);
+            }else if(item.selected) {
+                selectedItems.push(onlyValue ? item.value : item);
+            }
+        });
+         
+        if (this.passedElement.type == 'select-one') {
+            return selectedItems[0];
+        } else {
+            return selectedItems;
+        }
+    }
 
     /**
      * Select value of select box via the value of an existing choice
