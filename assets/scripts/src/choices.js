@@ -860,6 +860,10 @@ export class Choices {
                 if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.config.classNames.activeState)) {
                     // For select inputs we always want to show the dropdown if it isn't already showing
                     this.showDropdown();
+                    
+                    if(this.passedElement.type === 'select-one' && !this.canSearch){
+                        this.containerOuter.focus();
+                    }
                 }
 
                 // If input is not in focus, it ought to be 
