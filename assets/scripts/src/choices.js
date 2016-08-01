@@ -554,6 +554,11 @@ export class Choices {
                 console.error('callbackOnChange: Callback is not a function');
             }
         }
+        
+        // Keep focus on select-one element
+        if(this.passedElement.type === 'select-one'){
+            this.containerOuter.focus();
+        }
     }
 
     /** 
