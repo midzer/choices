@@ -845,11 +845,12 @@ export class Choices {
      */
     _onMouseDown(e) {
         // If not a right click
-        if(e.button !== 2) {
+        // if(e.button !== 2) {
             const activeItems = this.store.getItemsFilteredByActive();
+            const target = e.target || e.touches[0].target;
 
             // If click is affecting a child node of our element
-            if(this.containerOuter.contains(e.target)) {
+            if(this.containerOuter.contains(target)) {
 
                 // Prevent blur event triggering causing dropdown to close
                 // in a race condition
@@ -857,27 +858,34 @@ export class Choices {
 
                 const hasShiftKey = e.shiftKey ? true : false;
 
-                if(this.passedElement.type !== 'text' && !this.dropdown.classList.contains(this.config.classNames.activeState)) {
-                    // For select inputs we always want to show the dropdown if it isn't already showing
-                    this.showDropdown();
+                if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                    if(this.passedElement.type !== 'text') {
+                        // For select inputs we always want to show the dropdown if it isn't already showing
+                        this.showDropdown();
+                    }
+                    
+                    // If input is not in focus, it ought to be 
+                    if(this.input !== document.activeElement) {
+                        this.input.focus();
+                    }
+                } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                    this.hideDropdown();
                 }
 
-                // If input is not in focus, it ought to be 
-                if(this.input !== document.activeElement) {
-                    this.input.focus();
-                }
-
-                if(e.target.hasAttribute('data-button')) {
+                if(target.hasAttribute('data-button')) {
+                    // If we are clicking on a button
                     if(this.config.removeItems && this.config.removeItemButton) {
-                        const itemId       = e.target.parentNode.getAttribute('data-id');
+                        const itemId       = target.parentNode.getAttribute('data-id');
                         const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
+
+                        // Remove item associated with button
                         this._removeItem(itemToRemove);
                         this._triggerChange(itemToRemove.value);
                     }
-                } else if(e.target.hasAttribute('data-item')) {
+                } else if(target.hasAttribute('data-item')) {
                     // If we are clicking on an item
                     if(this.config.removeItems) {
-                        const passedId = e.target.getAttribute('data-id');
+                        const passedId = target.getAttribute('data-id');
 
                         // We only want to select one item with a click
                         // so we deselect any items that aren't the target
@@ -890,9 +898,9 @@ export class Choices {
                             }
                         });
                     }
-                } else if(e.target.hasAttribute('data-option')) {
+                } else if(target.hasAttribute('data-option')) {
                     // If we are clicking on an option
-                    const id = e.target.getAttribute('data-id');
+                    const id = target.getAttribute('data-id');
                     const choices = this.store.getChoicesFilteredByActive();
                     const choice = choices.find((choice) => choice.id === parseInt(id));
 
@@ -926,7 +934,7 @@ export class Choices {
                     this.toggleDropdown();
                 }
             }
-        }
+        // }
     }
 
     /**
@@ -1595,6 +1603,7 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('touchstart', this._onMouseDown);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
 
@@ -1616,6 +1625,7 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('touchstart', this._onMouseDown);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
 
