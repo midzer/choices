@@ -86,6 +86,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
 .choices__list--single {
     display: inline-block;
     padding: .4rem;
+    pointer-events: none;
 }
 
 .choices__list--multiple {
