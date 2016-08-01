@@ -1603,7 +1603,7 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
-        document.addEventListener('touchstart', this._onMouseDown);
+        // document.addEventListener('touchstart', this._onMouseDown);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
 
@@ -1625,7 +1625,7 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
-        document.removeEventListener('touchstart', this._onMouseDown);
+        // document.removeEventListener('touchstart', this._onMouseDown);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
 
