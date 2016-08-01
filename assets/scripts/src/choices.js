@@ -1600,6 +1600,10 @@ export class Choices {
 
         if(this.passedElement.type && this.passedElement.type === 'select-one') {
             this.containerOuter.addEventListener('focus', this._onFocus);
+            
+            if(!this.canSearch) {
+                this.containerOuter.addEventListener('blur', this._onBlur);
+            }
         }
 
         this.input.addEventListener('input', this._onInput);
@@ -1621,6 +1625,10 @@ export class Choices {
 
         if(this.passedElement.type && this.passedElement.type === 'select-one') {
             this.containerOuter.removeEventListener('focus', this._onFocus);
+            
+            if(!this.canSearch) {
+                this.containerOuter.removeEventListener('blur', this._onBlur);
+            }
         }
         
         this.input.removeEventListener('input', this._onInput);
