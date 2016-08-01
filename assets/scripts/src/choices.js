@@ -629,7 +629,7 @@ export class Choices {
      * @return
      */
     _onKeyDown(e) {
-        if(e.target !== this.input) return;
+        if(e.target !== this.input && e.target !== this.containerOuter) return;
 
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const backKey     = 46;
