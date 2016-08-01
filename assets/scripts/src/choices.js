@@ -868,7 +868,7 @@ export class Choices {
                     if(this.input !== document.activeElement) {
                         this.input.focus();
                     }
-                } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
                     this.hideDropdown();
                 }
 
