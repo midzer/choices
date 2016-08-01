@@ -22,6 +22,9 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
     // Pass reference
     const choices = new Choices('[data-choice']);
     const choices = new Choices('.js-choice');
+
+    // Pass jQuery element
+    const choices = new Choices($('.js-choice')[0]);
     
     // Passing options (with default options)
     const choices = new Choices(elements, {
