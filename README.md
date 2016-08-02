@@ -383,18 +383,45 @@ choices.disable();
 ### setChoices(choices, value, label);
 <strong>Input types affected:</strong> `select-one`, `select-multiple`
 
-<strong>Usage:</strong> Set choices of select input via an array of objects, a value name and a label name. This behaves exactly the same as passing items via the `choices` option but can be called after initialising Choices.
+<strong>Usage:</strong> Set choices of select input via an array of objects, a value name and a label name. This behaves the same as passing items via the `choices` option but can be called after initialising Choices. This can also be used to add groups of choices (see example 2);
 
-<strong>Example:</strong>
+<strong>Example 1:</strong>
 
 ```js
-const choices = new Choices(element);
+const example = new Choices(element);
 
-choices.setChoices([
+example.setChoices([
     {value: 'One', label: 'Label One', disabled: true},
     {value: 'Two', label: 'Label Two' selected: true},
     {value: 'Three', label: 'Label Three'},
 ], 'value', 'label');
+```
+
+<strong>Example 2:</strong>
+
+```js
+const example = new Choices(element);
+
+example.setChoices([{
+    label: 'Group one',
+    id: 1,
+    disabled: false,
+    choices: [
+        {value: 'Child One', label: 'Child One', selected: true},
+        {value: 'Child Two', label: 'Child Two',  disabled: true},
+        {value: 'Child Three', label: 'Child Three'},
+    ]
+}, 
+{
+    label: 'Group two',
+    id: 2,
+    disabled: false,
+    choices: [
+        {value: 'Child Four', label: 'Child Four', disabled: true},
+        {value: 'Child Five', label: 'Child Five'},
+        {value: 'Child Six', label: 'Child Six'},
+    ]
+}], 'value', 'label');
 ```
 
 ### getValue(valueOnly)

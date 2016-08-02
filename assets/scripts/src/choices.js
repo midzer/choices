@@ -517,7 +517,7 @@ export class Choices {
     }
 
     /**
-     * Disable 
+     * Disable interaction with Choices 
      * @return {Object} Class instance
      * @public
      */
@@ -526,6 +526,19 @@ export class Choices {
         if(this.initialised) {
             this.input.disabled = true;
             this.containerOuter.classList.add(this.config.classNames.disabledState);
+        }
+        return this;
+    }
+
+    /**
+     * Enable interaction with Choices
+     * @return {Object} Class instance
+     */
+    enable() {
+        this.passedElement.disabled = false;
+        if(this.initialised) {
+            this.input.disabled = false;
+            this.containerOuter.classList.remove(this.config.classNames.disabledState);
         }
         return this;
     }
