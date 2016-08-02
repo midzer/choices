@@ -709,9 +709,18 @@ export class Choices {
                     this._handleEnter(activeItems, value);                    
                 }
 
+                // Show dropdown if focus
+                if(!hasActiveDropdown && this.passedElement.type === 'select-one'){
+                    e.preventDefault();
+                    this.showDropdown();
+                    if(this.canSearch) {
+                        this.input.focus();
+                    }
+                }
+
                 if(hasActiveDropdown) {
                     const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
-                
+            
                     if(highlighted) {
                         const value = highlighted.getAttribute('data-value');
                         const label = highlighted.innerHTML;
@@ -1030,6 +1039,7 @@ export class Choices {
             if(!this._focusAndHideDropdown){
                 this.input.focus();
             }
+
             this._focusAndHideDropdown = false;
         }
     }
@@ -1064,7 +1074,8 @@ export class Choices {
      */
     _regexFilter(value) {
         if(!value) return;
-        const expression = new RegExp(this.config.regexFilter, 'i');
+        const regex = this.config.regexFilter;
+        const expression = new RegExp(regex.source, 'i');
         return expression.test(value);
     }
 
