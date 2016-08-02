@@ -494,13 +494,36 @@ example.setValueByChoice('Two'); // Choice with value of 'Two' has now been sele
 ### disable();
 <strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
-<strong>Usage:</strong> Disable input from selecting further options.
+<strong>Usage:</strong> Disables input from accepting new value/sselecting further choices.
+
+### enable();
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
+<strong>Usage:</strong> Enables input to accept new values/select further choices.
 
 
 ### ajax(fn);
 <strong>Input types affected:</strong> `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Populate options via a callback.
+
+<strong>Example:</strong>
+
+```js
+var example = new Choices(element);
+
+example.ajax(function(callback) {
+    fetch(url)
+        .then(function(response) {
+            response.json().then(function(data) {
+                callback(data, 'value', 'label');
+            });
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+});
+```
 
 
 ## Browser compatibility
