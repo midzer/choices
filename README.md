@@ -448,7 +448,6 @@ const valueArray = example.getValue(); // returns [{ active: true, choiceId: 1, 
 const example = new Choices(element);
 
 // via an array of objects
-
 example.setValue([
     {value: 'One', label: 'Label One'},
     {value: 'Two', label: 'Label Two'},
@@ -456,7 +455,6 @@ example.setValue([
 ]);
 
 // or via an array of strings
-
 example.setValue(['Four','Five','Six']);
 ```
 
