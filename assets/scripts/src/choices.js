@@ -316,7 +316,10 @@ export class Choices {
      */
     showDropdown() { 
         this.containerOuter.classList.add(this.config.classNames.openState);
+        this.containerOuter.setAttribute('aria-expanded', 'true');
+
         this.dropdown.classList.add(this.config.classNames.activeState);
+        
 
         const dimensions = this.dropdown.getBoundingClientRect();
         const shouldFlip = this.config.flip ? dimensions.top + dimensions.height >= document.body.offsetHeight : false;
@@ -341,6 +344,8 @@ export class Choices {
         const isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
 
         this.containerOuter.classList.remove(this.config.classNames.openState);
+        this.containerOuter.setAttribute('aria-expanded', 'false');
+
         this.dropdown.classList.remove(this.config.classNames.activeState);
 
         if(isFlipped) {
@@ -482,11 +487,17 @@ export class Choices {
                 if(choices && choices.length) {
                     this.containerOuter.classList.remove(this.config.classNames.loadingState);
                     choices.forEach((result, index) => {
-                        // Select first choice in list if single select input
-                        if(index === 0 && this.passedElement.type === 'select-one') { 
-                            this._addChoice(true, result.disabled ? result.disabled : false, result[value], result[label]);
+                        if(isType('Object', result)) {
+                            const isFirst = index === 0 ? true : false;
+                            this._addGroup(result, index, isFirst);
+                            this.setChoices(result.choices, value, label);
                         } else {
-                            this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);    
+                            // Select first choice in list if single select input
+                            if(index === 0 && this.passedElement.type === 'select-one') { 
+                                this._addChoice(true, result.disabled ? result.disabled : false, result[value], result[label]);
+                            } else {
+                                this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);    
+                            }
                         }
                     });
                 }
@@ -914,17 +925,16 @@ export class Choices {
                 if(this.passedElement.type !== 'text') {
                     // For select inputs we always want to show the dropdown if it isn't already showing
                     this.showDropdown();
-                    if(this.canSearch) {
+                    if(this.passedElement.type === 'select-multiple' || this.canSearch) {
                         this.input.focus();
                     }
-                }else{
+                } else {
                     // If input is not in focus, it ought to be 
                     if(this.input !== document.activeElement) {
                         this.input.focus();
                     }
                 }
-
-            } else if(this.passedElement.type === 'select-one' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
+            } else if(this.passedElement.type !== 'text' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
                 this.hideDropdown();
             }
 
@@ -1156,6 +1166,7 @@ export class Choices {
             // Remove any highlighted choices 
             highlightedChoices.forEach((el) => {
                 el.classList.remove(this.config.classNames.highlightedState);
+                el.setAttribute('aria-selected', 'false');
             });
 
             if(el){
@@ -1175,7 +1186,8 @@ export class Choices {
                 }
 
                 if(!el) el = choices[0];
-                el.classList.add(this.config.classNames.highlightedState);    
+                el.classList.add(this.config.classNames.highlightedState);
+                el.setAttribute('aria-selected', 'true');
             }        
         }
     }
@@ -1281,13 +1293,13 @@ export class Choices {
      * @private
      */
     _addGroup(group, id, isFirst) {
-        const groupChoices = Array.from(group.getElementsByTagName('OPTION'));
+        const groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
         const groupId      = id;
 
         if(groupChoices) {
             this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
-            groupChoices.forEach((option, optionIndex) => {
-                const isDisabled = option.disabled || option.parentNode.disabled;
+            groupChoices.forEach((option) => {
+                const isDisabled = (option.disabled || option.parentNode && option.parentNode.disabled) || false;
                 this._addChoice(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
             });
         } else {
@@ -1319,11 +1331,11 @@ export class Choices {
             containerOuter: () => {
                 if(this.passedElement.type === 'select-one') {
                     return strToEl(`
-                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" tabindex="0"></div>
+                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" tabindex="0" aria-haspopup="true" aria-expanded="false"></div>
                     `);
                 } else {
                     return strToEl(`
-                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }"></div>
+                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" aria-haspopup="true" aria-expanded="false"></div>
                     `);
                 }
             },
@@ -1350,33 +1362,42 @@ export class Choices {
                 }   
             },
             choiceList: () => {
-                return strToEl(`<div class="${ classNames.list }"></div>`);
+                return strToEl(`<div class="${ classNames.list }" dir="ltr"></div>`);
             },
             choiceGroup: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }">
+                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }" role="group">
                         <div class="${ classNames.groupHeading }">${ data.value }</div>
                     </div>
                 `);
             },
             choice: (data) => {
-                return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }">
-                        ${ data.label }
-                    </div>
-                `);
+                if(data.groupId > 0) {
+                   return strToEl(`
+                       <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="treeitem">
+                           ${ data.label }
+                       </div>
+                   `); 
+               } else {
+                    return strToEl(`
+                        <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="option">
+                            ${ data.label }
+                        </div>
+                    `);
+               }
+
             },
             input: () => {
-                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }">`);
+                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" aria-autocomplete="list" role="textbox">`);
             },
             dropdown: () => {
-                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }"></div>`);
+                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }" aria-expanded="false"></div>`);
             },
             notice: (label, clickable) => {
                 return strToEl(`<div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>`);
             },
             option: (data) => {
-                return strToEl(`<option value="${ data.value }" selected>${ data.label }</option>`);
+                return strToEl(`<option value="${ data.value }" selected>${ data.label }</option>`);    
             },
         };
 
@@ -1418,8 +1439,8 @@ export class Choices {
         wrap(containerInner, containerOuter);
         
         // If placeholder has been enabled and we have a value
-        if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.placeholder)) {
-            const placeholder = this.config.placeholderValue || this.passedElement.placeholder;
+        if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+            const placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');
             input.placeholder = placeholder;  
             if(this.passedElement.type !== 'select-one') {
                 input.style.width = getWidthOfInput(input);
