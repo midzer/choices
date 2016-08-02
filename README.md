@@ -397,6 +397,19 @@ choices.setChoices([
 ], 'value', 'label');
 ```
 
+### getValue(valueOnly)
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+
+<strong>Usage:</strong> Get value(s) of input (i.e. inputted items (text) or selected choices (select)). Optionally pass an argument of `true` to only return values rather than value objects.
+
+<strong>Example:</strong>
+
+```js
+const example = new Choices(element);
+const values = example.getValue(true); // returns ['value 1', 'value 2'];
+const valueArray = example.getValue(); // returns [{ active: true, choiceId: 1, highlighted: false, id: 1, label: 'Label 1', value: 'Value 1'},  { active: true, choiceId: 2, highlighted: false, id: 2, label: 'Label 2', value: 'Value 2'}];
+```
+
 ### setValue(args);
 <strong>Input types affected:</strong> `text`
 

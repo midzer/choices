@@ -163,6 +163,8 @@
                 removeItemButton: true
             });
 
+            console.log(choices1.getValue());
+
             var choices2 = new Choices('#choices-2', {
                 paste: false,
                 duplicateItems: false,
@@ -265,6 +267,7 @@
                     {value: 'Three', label: 'Label Three'},
                 ],
             }).setValueByChoice('Two');
+
         });
     </script>
 </body>

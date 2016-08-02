@@ -361,6 +361,32 @@ export class Choices {
         return this;
     }
 
+
+    /**
+     * Get value(s) of input (i.e. inputted items (text) or selected choices (select))
+     * @param {Boolean} valueOnly Get only values of selected items, otherwise return selected items
+     * @return {Array/String} selected value (select-one) or array of selected items (inputs & select-multiple)
+     * @public
+     */
+    getValue(valueOnly = false){
+        const items = this.store.getItemsFilteredByActive();
+        let selectedItems = [];
+         
+        items.forEach((item) => {
+            if (this.passedElement.type === 'text'){
+                selectedItems.push(valueOnly ? item.value : item);
+            } else if(item.active) {
+                selectedItems.push(valueOnly ? item.value : item);
+            }
+        });
+         
+        if (this.passedElement.type == 'select-one') {
+            return selectedItems[0];
+        } else {
+            return selectedItems;
+        }
+    }
+
     /**
      * Set value of input. If the input is a select box, a choice will be created and selected otherwise
      * an item will created directly.
@@ -394,31 +420,6 @@ export class Choices {
         }
 
         return this;
-    }
-    
-    /**
-     * Get value(s)
-     * @param {Boolean} onlyValue Get only values of selected items, otherwise return selected items
-     * @return {Array/String} selected value (select-one) or array of selected items (inputs & select-multiple)
-     * @public
-     */
-    getValue(onlyValue){
-        const items = this.passedElement.type === 'text' ? this.store.getState().items : this.store.getState().choices;
-        let selectedItems = [];
-         
-        items.forEach((item) => {
-            if (this.passedElement.type === 'text'){
-                selectedItems.push(onlyValue ? item.value : item);
-            }else if(item.selected) {
-                selectedItems.push(onlyValue ? item.value : item);
-            }
-        });
-         
-        if (this.passedElement.type == 'select-one') {
-            return selectedItems[0];
-        } else {
-            return selectedItems;
-        }
     }
 
     /**
