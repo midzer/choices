@@ -36,6 +36,7 @@ export class Choices {
             delimiter: ',',
             paste: true,
             search: true, 
+            flip: true,
             regexFilter: null,
             placeholder: true,
             placeholderValue: null,
@@ -318,7 +319,7 @@ export class Choices {
         this.dropdown.classList.add(this.config.classNames.activeState);
 
         const dimensions = this.dropdown.getBoundingClientRect();
-        const shouldFlip = dimensions.top + dimensions.height >= document.body.offsetHeight;
+        const shouldFlip = this.config.flip ? dimensions.top + dimensions.height >= document.body.offsetHeight : false;
 
         // Whether or not the dropdown should appear above or below input
         if(shouldFlip) {
