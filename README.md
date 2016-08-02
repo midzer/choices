@@ -38,7 +38,8 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
         duplicateItems: true,
         delimiter: ',',
         paste: true,
-        search: true, 
+        search: true,
+        flip: true,
         regexFilter: null,
         placeholder: true,
         placeholderValue: null,
@@ -200,6 +201,13 @@ Pass an array of objects:
 <strong>Usage:</strong> Whether a user can paste into the input.
 
 ### search
+<strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
+
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`.
+
+<strong>Usage:</strong> Whether the dropdown list should appear above the input if there is not enough space within the browser viewport.
+
+### flip
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
 
 <strong>Input types affected:</strong> `select-one`, `select-multiple`.
