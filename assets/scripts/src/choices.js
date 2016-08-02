@@ -526,6 +526,7 @@ export class Choices {
         if(this.initialised) {
             this.input.disabled = true;
             this.containerOuter.classList.add(this.config.classNames.disabledState);
+            this.containerOuter.setAttribute('aria-disabled', 'true');
         }
         return this;
     }
@@ -539,6 +540,7 @@ export class Choices {
         if(this.initialised) {
             this.input.disabled = false;
             this.containerOuter.classList.remove(this.config.classNames.disabledState);
+            this.containerOuter.removeAttribute('aria-disabled');
         }
         return this;
     }
@@ -553,6 +555,7 @@ export class Choices {
         if(this.initialised === true) {
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
                 this.containerOuter.classList.add(this.config.classNames.loadingState);
+                this.containerOuter.setAttribute('aria-busy', 'true');
                 if(this.passedElement.type === 'select-one') { 
                     const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
                     this.itemList.appendChild(placeholderItem);
@@ -571,6 +574,8 @@ export class Choices {
                             }
                         });
                     }
+
+                    this.containerOuter.removeAttribute('aria-busy');
                 };
                 fn(callback);
             }
@@ -1379,7 +1384,7 @@ export class Choices {
             },
             choiceGroup: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }" role="group">
+                    <div class="${ classNames.group } ${ data.disabled ? classNames.itemDisabled : '' }" data-group data-id="${ data.id }" data-value="${ data.value }" role="group" ${ data.disabled ? 'aria-disabled="true"' : '' }>
                         <div class="${ classNames.groupHeading }">${ data.value }</div>
                     </div>
                 `);
@@ -1387,13 +1392,13 @@ export class Choices {
             choice: (data) => {
                 if(data.groupId > 0) {
                    return strToEl(`
-                       <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="treeitem">
+                       <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="treeitem">
                            ${ data.label }
                        </div>
                    `); 
                } else {
                     return strToEl(`
-                        <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="option">
+                        <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="option">
                             ${ data.label }
                         </div>
                     `);
