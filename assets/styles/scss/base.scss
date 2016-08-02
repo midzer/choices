@@ -26,6 +26,7 @@ html, body {
     position: relative;
     margin: 0;
     width: 100%;
+    height: 100%;
 }
 
 body {
@@ -34,8 +35,6 @@ body {
     line-height: 1.4;
     color: #FFFFFF;
     background-color: #333;
-    background: linear-gradient(to left bottom,#333,#262626);
-    height: 100%;
     overflow-x: hidden;
 }
 

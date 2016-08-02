@@ -145,7 +145,7 @@
             <label for="choices-14">Countries from remote source (XHR)</label>
             <select name="choices-14" id="choices-14" placeholder="Pick a country"></select>
 
-            <label for="choices-15">Options added via config</label>
+            <label for="choices-15">Options added via config with no search</label>
             <select name="choices-15" id="choices-15" placeholder="This is a placeholder">
                 <option value="0">Zero</option>
             </select>
@@ -208,7 +208,7 @@
                         console.log(error);
                     });
             });
-
+            
             var choices12 = new Choices('#choices-12', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Arctic Monkeys record'
@@ -245,7 +245,7 @@
 
             var choicesMultiple = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
-                removeButton: true
+                removeButton: true,
             });
 
             var choices15 = new Choices('#choices-15', {

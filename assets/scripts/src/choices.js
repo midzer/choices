@@ -1053,15 +1053,18 @@ export class Choices {
     _onBlur(e) {
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
-        // If the blurred element is this input
-        if(e.target === this.input) {
+        // If the blurred element is this input or the outer container
+        if(e.target === this.input || e.target === this.containerOuter) {
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
-        }
 
-        // Close the dropdown if there is one
-        if(hasActiveDropdown) {
-            this.hideDropdown();
+            // Close the dropdown if there is one
+            if(hasActiveDropdown) {
+                if(e.target === this.input || e.target === this.containerOuter && !this.config.search) {
+                    this.hideDropdown();    
+                }
+            }
+
         }
     }
 
@@ -1666,10 +1669,7 @@ export class Choices {
 
         if(this.passedElement.type && this.passedElement.type === 'select-one') {
             this.containerOuter.addEventListener('focus', this._onFocus);
-            
-            if(!this.canSearch) {
-                this.containerOuter.addEventListener('blur', this._onBlur);
-            }
+            this.containerOuter.addEventListener('blur', this._onBlur);
         }
 
         this.input.addEventListener('input', this._onInput);
@@ -1691,10 +1691,7 @@ export class Choices {
 
         if(this.passedElement.type && this.passedElement.type === 'select-one') {
             this.containerOuter.removeEventListener('focus', this._onFocus);
-            
-            if(!this.canSearch) {
-                this.containerOuter.removeEventListener('blur', this._onBlur);
-            }
+            this.containerOuter.removeEventListener('blur', this._onBlur);
         }
         
         this.input.removeEventListener('input', this._onInput);

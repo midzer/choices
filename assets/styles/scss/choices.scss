@@ -24,9 +24,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
         }
         .choices__item { cursor: not-allowed; }
     }
-    &:focus{
-      outline: none;
-    }
+    &:focus { outline: none; }
 }
 
 .choices[data-type*="select-one"] {
