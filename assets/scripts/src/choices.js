@@ -1408,7 +1408,7 @@ export class Choices {
 
             },
             input: () => {
-                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" aria-autocomplete="list" role="textbox">`);
+                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox">`);
             },
             dropdown: () => {
                 return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }" aria-expanded="false"></div>`);
