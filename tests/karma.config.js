@@ -6,13 +6,21 @@ module.exports = function(config) {
         files: [
             '../tests/**/*_spec.js',
         ],
-        plugins: [webpack, 'karma-jasmine', 'karma-phantomjs-launcher', 'karma-coverage', 'karma-spec-reporter', 'es6-shim'],
+        plugins: [
+            webpack, 
+            'karma-jasmine', 
+            'karma-phantomjs-launcher', 
+            'karma-coverage', 
+            'karma-spec-reporter', 
+            'karma-htmlfile-reporter',
+            'es6-shim'
+        ],
         browsers: ['PhantomJS'],
         preprocessors: {
             '**/*_spec.js': ['webpack'],
             'src/**/*.js': ['webpack']
         },
-        reporters: ['spec', 'coverage'],
+        reporters: ['spec', 'coverage', 'html'],
         coverageReporter: {
             dir: '../tests/reports/coverage',
             reporters: [{
@@ -32,5 +40,8 @@ module.exports = function(config) {
         webpackMiddleware: {
             noInfo: true
         },
+        htmlReporter: {
+            outputFile: 'results/unit-tests.html'
+        }
     });
 };
