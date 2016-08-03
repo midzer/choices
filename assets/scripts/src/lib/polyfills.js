@@ -1,29 +1,33 @@
 // Production steps of ECMA-262, Edition 6, 22.1.2.1
 // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
 if (!Array.from) {
-    Array.from = (function () {
+    Array.from = (function() {
         var toStr = Object.prototype.toString;
 
-        var isCallable = function (fn) {
+        var isCallable = function(fn) {
             return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
         };
 
-        var toInteger = function (value) {
+        var toInteger = function(value) {
             var number = Number(value);
-            if (isNaN(number)) { return 0; }
-            if (number === 0 || !isFinite(number)) { return number; }
+            if (isNaN(number)) {
+                return 0;
+            }
+            if (number === 0 || !isFinite(number)) {
+                return number;
+            }
             return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
         };
 
         var maxSafeInteger = Math.pow(2, 53) - 1;
 
-        var toLength = function (value) {
+        var toLength = function(value) {
             var len = toInteger(value);
             return Math.min(Math.max(len, 0), maxSafeInteger);
         };
 
         // The length property of the from method is 1.
-        return function from(arrayLike/*, mapFn, thisArg */) {
+        return function from(arrayLike /*, mapFn, thisArg */ ) {
             // 1. Let C be the this value.
             var C = this;
 
@@ -83,25 +87,57 @@ if (!Array.from) {
 
 // Reference: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find
 if (!Array.prototype.find) {
-  Array.prototype.find = function(predicate) {
-    'use strict';
-    if (this == null) {
-      throw new TypeError('Array.prototype.find called on null or undefined');
-    }
-    if (typeof predicate !== 'function') {
-      throw new TypeError('predicate must be a function');
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    var value;
+    Array.prototype.find = function(predicate) {
+        'use strict';
+        if (this == null) {
+            throw new TypeError('Array.prototype.find called on null or undefined');
+        }
+        if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+        }
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        var value;
 
-    for (var i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate.call(thisArg, value, i, list)) {
-        return value;
-      }
-    }
-    return undefined;
-  };
+        for (var i = 0; i < length; i++) {
+            value = list[i];
+            if (predicate.call(thisArg, value, i, list)) {
+                return value;
+            }
+        }
+        return undefined;
+    };
 }
+
+(function() {
+    "use strict";
+
+    var lastTime = 0,
+        vendors = ['ms', 'moz', 'webkit', 'o'],
+        x;
+
+    for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+            window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime(),
+                timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+                id = window.setTimeout(function() {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function(id) {
+            window.clearTimeout(id);
+        };
+    }
+}());
