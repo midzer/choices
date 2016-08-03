@@ -512,10 +512,10 @@ const example = new Choices(element, {
 example.setValueByChoice('Two'); // Choice with value of 'Two' has now been selected.
 ```
 
-### clearValue();
-<strong>Input types affected:</strong> `text`
+### clearStore();
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
-<strong>Usage:</strong> Clear value of input.
+<strong>Usage:</strong> Removes all items, choices and groups. Use with caution.
 
 
 ### clearInput();

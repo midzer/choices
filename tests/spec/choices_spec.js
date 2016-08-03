@@ -87,7 +87,7 @@ describe('Choices', function() {
             expect(this.choices.setValue).toEqual(jasmine.any(Function));
             expect(this.choices.setValueByChoice).toEqual(jasmine.any(Function));
             expect(this.choices.setChoices).toEqual(jasmine.any(Function));
-            expect(this.choices.clearValue).toEqual(jasmine.any(Function));
+            expect(this.choices.clearStore).toEqual(jasmine.any(Function));
             expect(this.choices.disable).toEqual(jasmine.any(Function));
             expect(this.choices.enable).toEqual(jasmine.any(Function));
             expect(this.choices.ajax).toEqual(jasmine.any(Function));
@@ -181,7 +181,7 @@ describe('Choices', function() {
 
         it('should open the choice list on focussing', function() {
             this.choices.input.focus();
-            expect(this.choices.dropdown.classList).toContain('is-active');
+            expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
         });
 
         it('should select the first choice', function() {            
@@ -308,25 +308,197 @@ describe('Choices', function() {
         });
     });
 
-    describe('should handle AJAX-populated choices', function() {
+    describe('should handle public methods on select input types', function() {
         beforeEach(function() {
             this.input = document.createElement('select');
             this.input.className = 'js-choices';
-            this.input.multiple = false;
+            this.input.multiple = true;
             this.input.placeholder = 'Placeholder text';
 
-            for (let i = 1; i < 4; i++) {
+            for (let i = 1; i < 10; i++) {
                 const option = document.createElement('option');
 
                 option.value = `Value ${i}`;
                 option.innerHTML = `Value ${i}`;
+
+                if(i % 2) { 
+                    option.selected = true;
+                }
                 
                 this.input.appendChild(option);
             }
 
             document.body.appendChild(this.input);
-            
             this.choices = new Choices(this.input);
+        });
+
+        it('should handle highlightItem()', function() {
+            const items = this.choices.currentState.items;
+            const randomItem = items[Math.floor(Math.random()*items.length)];
+
+            this.choices.highlightItem(randomItem);
+
+            expect(randomItem.highlighted).toBe(true);
+        });
+
+        it('should handle unhighlightItem()', function() {
+            const items = this.choices.currentState.items;
+            const randomItem = items[Math.floor(Math.random()*items.length)];
+
+            this.choices.unhighlightItem(randomItem);
+
+            expect(randomItem.highlighted).toBe(false);
+        });
+
+        it('should handle highlightAll()', function() {
+            const items = this.choices.currentState.items;
+
+            this.choices.highlightAll();
+
+            const unhighlightedItems = items.some((item) => item.highlighted === false);
+
+            expect(unhighlightedItems).toBe(false);
+        });
+
+        it('should handle unhighlightAll()', function() {
+            const items = this.choices.currentState.items;
+
+            this.choices.unhighlightAll();
+
+            const highlightedItems = items.some((item) => item.highlighted === true);
+
+            expect(highlightedItems).toBe(false);
+        });
+
+        it('should handle removeHighlightedItems()', function() {
+            const items = this.choices.currentState.items;
+            this.choices.highlightAll();
+            this.choices.removeHighlightedItems();
+
+            const activeItems = items.some((item) => item.active === true);
+
+            expect(activeItems).toBe(false);
+        });
+
+        it('should handle showDropdown()', function() {
+            this.choices.showDropdown();
+            const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
+            const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
+            const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+            expect(hasOpenState && hasAttr && hasActiveState).toBe(true);
+        });
+
+        it('should handle hideDropdown()', function() {
+            this.choices.showDropdown();
+            this.choices.hideDropdown();
+            const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
+            const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
+            const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+
+            expect(hasOpenState && hasAttr && hasActiveState).toBe(false);
+        });
+
+        it('should handle toggleDropdown()', function() {
+            spyOn(this.choices, 'hideDropdown'); 
+            this.choices.showDropdown();
+            this.choices.toggleDropdown();
+            expect(this.choices.hideDropdown).toHaveBeenCalled();
+        });
+
+        it('should handle hideDropdown()', function() {
+            this.choices.showDropdown();
+            expect(this.choices.containerOuter.classList).toContain(this.choices.config.classNames.openState);
+        });
+
+        it('should handle getValue()', function() {
+            const valueObjects = this.choices.getValue();
+            const valueStrings = this.choices.getValue(true);
+
+            expect(valueStrings[0]).toEqual(jasmine.any(String));
+            expect(valueObjects[0]).toEqual(jasmine.any(Object));
+            expect(valueObjects).toEqual(jasmine.any(Array));
+            expect(valueObjects.length).toEqual(5);
+        });
+
+        it('should handle setValue()', function() {
+            this.choices.setValue(['Set value 1', 'Set value 2', 'Set value 3']);
+            const valueStrings = this.choices.getValue(true);
+
+            expect(valueStrings[valueStrings.length - 1]).toBe('Set value 3');
+            expect(valueStrings[valueStrings.length - 2]).toBe('Set value 2');
+            expect(valueStrings[valueStrings.length - 3]).toBe('Set value 1');
+        });
+
+        it('should handle setValueByChoice()', function() {
+            const choices = this.choices.store.getChoicesFilteredByActive();
+            const randomChoice = choices[Math.floor(Math.random()*choices.length)];
+
+            this.choices.highlightAll();
+            this.choices.removeHighlightedItems();
+            this.choices.setValueByChoice(randomChoice.value);
+
+            const value = this.choices.getValue(true);
+
+            expect(value[0]).toBe(randomChoice.value);
+        });
+
+        it('should handle setChoices()', function() {
+            this.choices.setChoices([{
+                label: 'Group one',
+                id: 1,
+                disabled: false,
+                choices: [
+                    {value: 'Child One', label: 'Child One', selected: true},
+                    {value: 'Child Two', label: 'Child Two',  disabled: true},
+                    {value: 'Child Three', label: 'Child Three'},
+                ]
+            }, 
+            {
+                label: 'Group two',
+                id: 2,
+                disabled: false,
+                choices: [
+                    {value: 'Child Four', label: 'Child Four', disabled: true},
+                    {value: 'Child Five', label: 'Child Five'},
+                    {value: 'Child Six', label: 'Child Six'},
+                ]
+            }], 'value', 'label');
+            
+    
+            const groups = this.choices.currentState.groups;
+            const choices = this.choices.currentState.choices;
+
+            expect(groups[groups.length - 1].value).toEqual('Group two');
+            expect(groups[groups.length - 2].value).toEqual('Group one');
+            expect(choices[choices.length - 1].value).toEqual('Child Six');
+            expect(choices[choices.length - 2].value).toEqual('Child Five');
+        });
+
+        it('should handle clearStore()', function() {
+            this.choices.clearStore();
+
+            expect(this.choices.currentState.items).toEqual([]);
+            expect(this.choices.currentState.choices).toEqual([]);
+            expect(this.choices.currentState.groups).toEqual([]);
+        });
+
+        it('should handle disable()', function() {
+            this.choices.disable();
+
+            expect(this.choices.input.disabled).toBe(true);
+            expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
+            expect(this.choices.containerOuter.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('should handle enable()', function() {
+            this.choices.enable();
+
+            expect(this.choices.input.disabled).toBe(false);
+            expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
+            expect(this.choices.containerOuter.hasAttribute('aria-disabled')).toBe(false);
+        });
+
+        it('should handle ajax()', function() {
             spyOn(this.choices, 'ajax'); 
 
             this.choices.ajax((callback) => {
@@ -340,10 +512,36 @@ describe('Choices', function() {
                         console.log(error);
                     });
             });
-        });
-
-        it('should call ajax()', function() {
+            
             expect(this.choices.ajax).toHaveBeenCalledWith(jasmine.any(Function));
         });
     });
+
+    describe('should handle public methods on text input types', function() {
+        beforeEach(function() {
+            this.input = document.createElement('input');
+            this.input.type = "text";
+            this.input.className = 'js-choices';
+            this.input.value = "Value 1, Value 2, Value 3, Value 4";
+
+            document.body.appendChild(this.input);
+            this.choices = new Choices(this.input);
+        });
+
+        it('should handle clearInput()', function() {
+            this.choices.clearInput();
+            expect(this.choices.input.value).toBe('');
+        });
+
+        it('should handle removeItemsByValue()', function() {
+            const items = this.choices.currentState.items;
+            const randomItem = items[Math.floor(Math.random()*items.length)];
+
+            this.choices.removeItemsByValue(randomItem.value);
+            
+            expect(randomItem.active).toBe(false);
+
+        });
+    });
+
 });

@@ -1,5 +1,3 @@
-import { sortByAlpha } from './../lib/utils.js';
-
 const groups = (state = [], action) => {
     switch (action.type) {
         case 'ADD_GROUP':

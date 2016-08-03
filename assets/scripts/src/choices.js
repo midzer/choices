@@ -261,7 +261,10 @@ export class Choices {
      * @public
      */
     removeItemsByValue(value) {
-        if(!value || !isType('String', value)) console.error('removeItemsByValue: No value was passed to be removed'); return;
+        if(!value || !isType('String', value)) {
+            console.error('removeItemsByValue: No value was passed to be removed');
+            return;
+        }
 
         const items = this.store.getItemsFilteredByActive();
 
@@ -276,7 +279,7 @@ export class Choices {
 
     /**
      * Remove all items from store array
-     * Note: removed items are soft deleted
+     * @note Removed items are soft deleted
      * @param  {Number} excludedId Optionally exclude item by ID
      * @return {Object} Class instance
      * @public
@@ -295,7 +298,7 @@ export class Choices {
 
     /** 
      * Remove all selected items from store
-     * Note: removed items are soft deleted
+     * @note Removed items are soft deleted
      * @return {Object} Class instance
      * @public
      */
@@ -322,7 +325,6 @@ export class Choices {
 
         this.dropdown.classList.add(this.config.classNames.activeState);
         
-
         const dimensions = this.dropdown.getBoundingClientRect();
         const shouldFlip = this.config.flip ? dimensions.top + dimensions.height >= document.body.offsetHeight : false;
 
@@ -450,13 +452,10 @@ export class Choices {
             
             // Loop through each value and 
             value.forEach((val, index) => {
+
                 const foundChoice = choices.find((choice) => {
                     // Check 'value' property exists and the choice isn't already selected
-                    if(choice.value === val) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return choice.value === val;
                 });
 
                 if(foundChoice) {
@@ -503,11 +502,12 @@ export class Choices {
     }
 
     /**
-     * Clear value of inputs
+     * Clear items,choices and groups
+     * @note Hard delete
      * @return {Object} Class instance
      * @public
      */
-    clearValue() {
+    clearStore() {
         this.store.dispatch(clearAll());
         return this;
     }
@@ -1218,6 +1218,7 @@ export class Choices {
     /**
      * Add item to store with correct value
      * @param {String} value Value to add to store
+     * @param {String} label Label to add to store
      * @return {Object} Class instance
      * @public
      */
@@ -1261,7 +1262,8 @@ export class Choices {
 
     /**
      * Remove item from store
-     * @param
+     * @param {Object} item Item to remove
+     * @param {Function} callback Callback to trigger
      * @return {Object} Class instance
      * @public
      */
@@ -1279,7 +1281,10 @@ export class Choices {
 
         // Run callback
         if(callback){
-            if(!isType('Function', callback)) console.error('callbackOnRemoveItem: Callback is not a function'); return;
+            if(!isType('Function', callback)) {
+                console.error('callbackOnRemoveItem: Callback is not a function'); 
+                return;
+            }
             callback(id, value, this.passedElement);
         }
 
@@ -1287,7 +1292,12 @@ export class Choices {
     }
 
     /** 
-     * Add choice to dropdoww
+     * Add choice to dropdown
+     * @param {Boolean} isSelected Whether choice is selected
+     * @param {Boolean} isDisabled Whether choice is disabled
+     * @param {String} value Value of choice
+     * @param {String} Label Label of choice
+     * @param {Number} groupId ID of group choice is within. Negative number indicates no group
      * @return
      * @private
      */
@@ -1310,7 +1320,8 @@ export class Choices {
     /**
      * Add group to dropdown
      * @param {Object} group Group to add
-     * @param {Number} index Whether this is the first group to add
+     * @param {Number} id Group ID
+     * @param {Boolean} isFirst Whether this is the first group to add
      * @return
      * @private
      */
