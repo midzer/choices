@@ -1,5 +1,3 @@
-import { sortByAlpha } from './../lib/utils.js';
-
 const choices = (state = [], action) => {
     switch (action.type) {
         case 'ADD_CHOICE':
@@ -12,7 +10,7 @@ const choices = (state = [], action) => {
                 selected: false, // A selected choice has been added to the passed input's value (added as an item)
                 active: true, // An active choice appears within the choice dropdown
                 score: 9999,
-            }].sort(sortByAlpha);
+            }];
 
         case 'ADD_ITEM':
             let newState = state;
@@ -22,7 +20,7 @@ const choices = (state = [], action) => {
                 newState = state.map((choice) => {
                     choice.active = action.active;
                     return choice;
-                }).sort(sortByAlpha);
+                });
             }
             // When an item is added and it has an associated choice,
             // we want to disable it so it can't be chosen again
@@ -65,8 +63,6 @@ const choices = (state = [], action) => {
                 });
 
                 return choice;
-            }).sort((prev, next) => {
-                return prev.score - next.score;
             });
 
             return filteredState;
@@ -75,8 +71,7 @@ const choices = (state = [], action) => {
             return state.map((choice) => {
                 choice.active = action.active;
                 return choice;
-            }).sort(sortByAlpha);
-            
+            });            
 
         default:
             return state;

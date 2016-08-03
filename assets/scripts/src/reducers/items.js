@@ -32,7 +32,6 @@ const items = (state = [], action) => {
                 if(item.id === action.id) {
                     item.highlighted = action.highlighted;
                 }
-
                 return item;
             });
 

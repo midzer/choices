@@ -8,7 +8,7 @@ const groups = (state = [], action) => {
                 value: action.value,
                 active: action.active,
                 disabled: action.disabled,
-            }].sort(sortByAlpha);;
+            }];
 
         default:
             return state;

@@ -80,6 +80,7 @@ export class Store {
      */
     getChoices() {
         const state = this.store.getState();
+        
         return state.choices;
     }
 
@@ -104,7 +105,7 @@ export class Store {
     getChoicesFiltedBySelectable() {
         const choices = this.getChoices();
         const values = choices.filter((choice) => {
-            return choice.selected === false && choice.disabled !== true;
+            return choice.disabled !== true;
         },[]);
 
         return values;

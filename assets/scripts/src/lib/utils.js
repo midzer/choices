@@ -473,3 +473,7 @@ export const sortByAlpha = (a, b) => {
     if (labelA > labelB) return 1;
     return 0;
 };
+
+export const sortByScore = (a, b) => {
+    return a.score - b.score;
+};

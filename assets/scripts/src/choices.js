@@ -2,7 +2,7 @@
 
 import './lib/polyfills.js';
 import { addItem, removeItem, highlightItem, addChoice, filterChoices, activateChoices, addGroup, clearAll } from './actions/index';
-import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, isElement, strToEl, extend, getWidthOfInput, debounce } from './lib/utils.js';
+import { isScrolledIntoView, getAdjacentEl, findAncestor, wrap, isType, isElement, strToEl, extend, getWidthOfInput, debounce, sortByAlpha, sortByScore } from './lib/utils.js';
 import Fuse from 'fuse.js';
 import Store from './store/index.js';
 
@@ -38,6 +38,7 @@ export class Choices {
             search: true, 
             flip: true,
             regexFilter: null,
+            sortFilter: sortByAlpha,
             sortFields: ['label', 'value'],
             placeholder: true,
             placeholderValue: null,
@@ -488,17 +489,11 @@ export class Choices {
                 if(choices && choices.length) {
                     this.containerOuter.classList.remove(this.config.classNames.loadingState);
                     choices.forEach((result, index) => {
-                        if(isType('Object', result)) {
+                        if(result.choices) {
                             const isFirst = index === 0 ? true : false;
                             this._addGroup(result, index, isFirst);
-                            this.setChoices(result.choices, value, label);
                         } else {
-                            // Select first choice in list if single select input
-                            if(index === 0 && this.passedElement.type === 'select-one') { 
-                                this._addChoice(true, result.disabled ? result.disabled : false, result[value], result[label]);
-                            } else {
-                                this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);    
-                            }
+                            this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);    
                         }
                     });
                 }
@@ -885,6 +880,7 @@ export class Choices {
                         if(newValue.length >= 1 && newValue !== currentValue + ' ') {
                             const haystack = this.store.getChoicesFiltedBySelectable();
                             const needle   = newValue;
+
                             const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
                             const fuse = new Fuse(haystack, { 
                                 keys: keys,
@@ -1315,12 +1311,25 @@ export class Choices {
     _addGroup(group, id, isFirst) {
         const groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
         const groupId      = id;
+        const isDisabled   = group.disabled ? group.disabled : false;
 
         if(groupChoices) {
-            this.store.dispatch(addGroup(group.label, groupId, true, group.disabled));
-            groupChoices.forEach((option) => {
+            this.store.dispatch(addGroup(group.label, groupId, true, isDisabled));
+
+
+            groupChoices.forEach((option, index) => {
                 const isDisabled = (option.disabled || option.parentNode && option.parentNode.disabled) || false;
-                this._addChoice(option.selected, isDisabled, option.value, option.innerHTML, groupId);   
+                const isSelected = option.selected ? option.selected : false;
+                let label;
+
+                if(isType('Object', option)) {
+                    label = option.label || option.value;
+                } else {
+                    label = option.innerHTML;
+                }
+
+                this._addChoice(isSelected, isDisabled, option.value, label, groupId);
+
             });
         } else {
             this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
@@ -1539,8 +1548,11 @@ export class Choices {
      */
     renderGroups(groups, choices, fragment) {
         const groupFragment = fragment || document.createDocumentFragment();
+        const filter = this.config.sortFilter;
 
-        groups.forEach((group, i) => {
+        groups
+            .sort(filter)
+            .forEach((group, i) => {
             // Grab options that are children of this group
             const groupChoices = choices.filter((choice) => {
                 if(this.passedElement.type === 'select-one') {
@@ -1572,16 +1584,19 @@ export class Choices {
     renderChoices(choices, fragment) {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
         const choicesFragment = fragment || document.createDocumentFragment();
+        const filter = this.isSearching ? sortByScore : this.config.sortFilter;
 
-        choices.forEach((choice, i) => {
-            const dropdownItem = this._getTemplate('choice', choice);
+        choices
+            .sort(filter)
+            .forEach((choice, i) => {
+                const dropdownItem = this._getTemplate('choice', choice);
 
-            if(this.passedElement.type === 'select-one') {
-                choicesFragment.appendChild(dropdownItem);    
-            } else if(!choice.selected) {
-                choicesFragment.appendChild(dropdownItem);   
-            }
-        });
+                if(this.passedElement.type === 'select-one') {
+                    choicesFragment.appendChild(dropdownItem);    
+                } else if(!choice.selected) {
+                    choicesFragment.appendChild(dropdownItem);   
+                }
+            });
 
         return choicesFragment;
     }
