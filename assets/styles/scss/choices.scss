@@ -1,9 +1,9 @@
 /*===============================
 =            Choices            =
 ===============================*/
-$choices-guttering: 2.4rem;
-$choices-border-radius: .25rem;
-$choices-border-radius-item: 2rem;
+$choices-guttering: 24px;
+$choices-border-radius: 2.5px;
+$choices-border-radius-item: 20px;
 $choices-bg-color: #f9f9f9;
 $choices-bg-color-dropdown: #FFFFFF;
 $choices-text-color: #333333;
@@ -13,6 +13,7 @@ $choices-disabled-color: #eaeaea;
 $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices {
+    font-size: 16px;
     position: relative;
     margin-bottom: $choices-guttering;
     &:last-child { margin-bottom: 0; }
@@ -30,12 +31,12 @@ $choices-button-icon-path: '../../icons/cross.svg';
 .choices[data-type*="select-one"] {
     .choices__inner { 
         cursor: pointer;
-        padding-bottom: .75rem; 
+        padding-bottom: 7.5px; 
     }
     .choices__input { 
         display: block;
         width: 100%;
-        padding: 1rem;
+        padding: 10px;
         border-bottom: 1px solid $choices-keyline-color;
         background-color: #FFFFFF;
         margin: 0;
@@ -52,7 +53,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
         border-color: $choices-text-color transparent transparent transparent;
         border-width: 5px;
         position: absolute;
-        right: .75rem + .4rem;
+        right: 7.5px + 4px;
         top: 50%;
         margin-top: -2.5px;  
         pointer-events: none;
@@ -65,10 +66,10 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices__inner {
     background-color: $choices-bg-color;
-    padding: .75rem .75rem .375rem;
+    padding: 7.5px 7.5px 3.75px;
     border: 1px solid $choices-keyline-color;
     border-radius: $choices-border-radius;
-    font-size: 1.4rem;
+    font-size: 14px;
     overflow: hidden;
     .is-focused &, .is-open & { border-color: darken($choices-keyline-color, 15%); }
     .is-open & { border-radius: $choices-border-radius $choices-border-radius 0 0; }
@@ -83,7 +84,7 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices__list--single {
     display: inline-block;
-    padding: .4rem;
+    padding: 4px;
     pointer-events: none;
 }
 
@@ -93,16 +94,16 @@ $choices-button-icon-path: '../../icons/cross.svg';
         display: inline-block;
         vertical-align: middle;
         border-radius: $choices-border-radius-item;
-        padding: .4rem 1rem;
-        font-size: 1.2rem;
+        padding: 4px 10px;
+        font-size: 12px;
         font-weight: 500;
-        margin-right: .375rem;
-        margin-bottom: .375rem;
+        margin-right: 3.75px;
+        margin-bottom: 3.75px;
         background-color: $choices-primary-color;
         border: 1px solid darken($choices-primary-color, 5%);
         color: #FFFFFF;
         word-break: break-all;
-        &[data-deletable] { padding-right: .5rem; }
+        &[data-deletable] { padding-right: 5px; }
         &.is-highlighted { 
             background-color: darken($choices-primary-color, 5%); 
             border: 1px solid darken($choices-primary-color, 10%);
@@ -143,8 +144,8 @@ $choices-button-icon-path: '../../icons/cross.svg';
         will-change: scroll-position;
     }
     .choices__item {
-        padding: 1rem;
-        font-size: 1.4rem;
+        padding: 10px;
+        font-size: 14px;
     }
     .choices__item--selectable {
         &:after {
@@ -171,8 +172,8 @@ $choices-button-icon-path: '../../icons/cross.svg';
 .choices__group {
     .choices__heading { 
         font-weight: 600;
-        font-size: 1.2rem;
-        padding: 1rem;
+        font-size: 12px;
+        padding: 10px;
         border-bottom: 1px solid lighten($choices-keyline-color, 10%);
         color: lighten(#333, 30%); 
     }
@@ -199,15 +200,15 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices__input {
     background-color: mix(#000000, #FFFFFF, 2.5%);
-    font-size: 1.4rem;
+    font-size: 14px;
     padding: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 5px;
     display: inline-block;
     vertical-align: baseline;
     border: 0;
     border-radius: 0;
     max-width: 100%;
-    padding: .4rem 0 .4rem .2rem;
+    padding: 4px 0 4px 2px;
     &:focus { outline: 0; }
 }
 

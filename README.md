@@ -41,6 +41,7 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
         search: true,
         flip: true,
         regexFilter: null,
+        sortFilter: sortByAlpha,
         sortFields: ['label', 'value'],
         placeholder: true,
         placeholderValue: null,
@@ -221,6 +222,13 @@ Pass an array of objects:
 <strong>Input types affected:</strong> `text`
 
 <strong>Usage:</strong> A filter that will need to pass for a user to successfully add an item.
+
+### sortFilter
+<strong>Type:</strong> `Function` <strong>Default:</strong>sortByAlpha
+
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+<strong>Usage:</strong> The function that will sort choices before they are displayed (unless a user is searching). By default choices are sorted by alphabetical order.
 
 ### sortFields
 <strong>Type:</strong> `Array/String` <strong>Default:</strong>`['label', 'value']`

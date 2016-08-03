@@ -8,9 +8,6 @@
 *, *:before, *:after {
   box-sizing: border-box; }
 
-html {
-  font-size: 62.5%; }
-
 html, body {
   position: relative;
   margin: 0;
@@ -19,7 +16,7 @@ html, body {
 
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  font-size: 1.6rem;
+  font-size: 16px;
   line-height: 1.4;
   color: #FFFFFF;
   background-color: #333;
@@ -27,20 +24,20 @@ body {
 
 label {
   display: block;
-  margin-bottom: .8rem;
-  font-size: 1.4rem;
+  margin-bottom: 8px;
+  font-size: 14px;
   font-weight: 500; }
 
 hr {
   display: block;
-  margin: 3.6rem 0;
+  margin: 36px 0;
   border: 0;
   border-bottom: 1px solid #eaeaea;
   height: 1px; }
 
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
-  margin-bottom: 1.2rem;
+  margin-bottom: 12px;
   font-weight: 400;
   line-height: 1.2; }
 
@@ -50,35 +47,35 @@ a, a:visited, a:focus {
   font-weight: 600; }
 
 h1, .h1 {
-  font-size: 3.2rem; }
+  font-size: 32px; }
 
 h2, .h2 {
-  font-size: 2.4rem; }
+  font-size: 24px; }
 
 h3, .h3 {
-  font-size: 2rem; }
+  font-size: 20px; }
 
 h4, .h4 {
-  font-size: 1.8rem; }
+  font-size: 18px; }
 
 h5, .h5 {
-  font-size: 1.6rem; }
+  font-size: 16px; }
 
 h6, .h6 {
-  font-size: 1.4rem; }
+  font-size: 14px; }
 
 .container {
   display: block;
   margin: auto;
   max-width: 40em;
-  padding: 4.8rem; }
+  padding: 48px; }
   @media (max-width: 620px) {
     .container {
       padding: 0; } }
 
 .section {
   background-color: #FFFFFF;
-  padding: 2.4rem;
+  padding: 24px;
   color: #333; }
   .section a, .section a:visited, .section a:focus {
     color: #00bcd4; }
