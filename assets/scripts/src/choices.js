@@ -38,6 +38,7 @@ export class Choices {
             search: true, 
             flip: true,
             regexFilter: null,
+            sortFields: ['label', 'value'],
             placeholder: true,
             placeholderValue: null,
             prependValue: null,
@@ -884,8 +885,9 @@ export class Choices {
                         if(newValue.length >= 1 && newValue !== currentValue + ' ') {
                             const haystack = this.store.getChoicesFiltedBySelectable();
                             const needle   = newValue;
+                            const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
                             const fuse = new Fuse(haystack, { 
-                                keys: ['label', 'value'],
+                                keys: keys,
                                 shouldSort: true,
                                 include: 'score',
                             });
