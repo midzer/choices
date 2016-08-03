@@ -230,6 +230,17 @@ Pass an array of objects:
 
 <strong>Usage:</strong> The function that will sort choices before they are displayed (unless a user is searching). By default choices are sorted by alphabetical order.
 
+<strong>Example:</strong>
+
+```js
+// Sorting via length of label from largest to smallest
+const example = new Choices(element, {
+    sortFilter: function(a, b) {
+        return b.label.length - a.label.length;
+    },
+};
+```
+
 ### sortFields
 <strong>Type:</strong> `Array/String` <strong>Default:</strong>`['label', 'value']`
 

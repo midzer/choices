@@ -520,9 +520,11 @@ export class Choices {
     disable() {
         this.passedElement.disabled = true;
         if(this.initialised) {
-            this.input.disabled = true;
-            this.containerOuter.classList.add(this.config.classNames.disabledState);
-            this.containerOuter.setAttribute('aria-disabled', 'true');
+            if(!this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
+                this.input.disabled = true;
+                this.containerOuter.classList.add(this.config.classNames.disabledState);
+                this.containerOuter.setAttribute('aria-disabled', 'true');
+            }
         }
         return this;
     }
@@ -534,9 +536,11 @@ export class Choices {
     enable() {
         this.passedElement.disabled = false;
         if(this.initialised) {
-            this.input.disabled = false;
-            this.containerOuter.classList.remove(this.config.classNames.disabledState);
-            this.containerOuter.removeAttribute('aria-disabled');
+            if(this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
+                this.input.disabled = false;
+                this.containerOuter.classList.remove(this.config.classNames.disabledState);
+                this.containerOuter.removeAttribute('aria-disabled');
+            }
         }
         return this;
     }
@@ -561,6 +565,8 @@ export class Choices {
 
                     if(results && results.length) {
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
+                        const filter = this.config.sortFilter;
+
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 

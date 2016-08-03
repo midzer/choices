@@ -55,7 +55,10 @@ describe('Choices', function() {
             expect(this.choices.config.delimiter).toEqual(jasmine.any(String));
             expect(this.choices.config.paste).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.search).toEqual(jasmine.any(Boolean));
+            expect(this.choices.config.flip).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.regexFilter).toEqual(null);
+            expect(this.choices.config.sortFilter).toEqual(jasmine.any(Function));
+            expect(this.choices.config.sortFields).toEqual(jasmine.any(Array) || jasmine.any(String));
             expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.placeholderValue).toEqual(null);
             expect(this.choices.config.prependValue).toEqual(null);
@@ -82,8 +85,11 @@ describe('Choices', function() {
             expect(this.choices.hideDropdown).toEqual(jasmine.any(Function));
             expect(this.choices.toggleDropdown).toEqual(jasmine.any(Function));
             expect(this.choices.setValue).toEqual(jasmine.any(Function));
+            expect(this.choices.setValueByChoice).toEqual(jasmine.any(Function));
+            expect(this.choices.setChoices).toEqual(jasmine.any(Function));
             expect(this.choices.clearValue).toEqual(jasmine.any(Function));
             expect(this.choices.disable).toEqual(jasmine.any(Function));
+            expect(this.choices.enable).toEqual(jasmine.any(Function));
             expect(this.choices.ajax).toEqual(jasmine.any(Function));
             expect(this.choices.clearInput).toEqual(jasmine.any(Function));
             expect(this.choices.clearInput).toEqual(jasmine.any(Function));
