@@ -873,11 +873,11 @@ export class Choices {
                 const isUnique = !activeItems.some((item) => item.value === this.input.value);
 
                 if (this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-                    dropdownItem = this._getTemplate('notice', `Only ${ this.config.maxItemCount } options can be added.`);
+                    dropdownItem = this._getTemplate('notice', `Only ${ this.config.maxItemCount } values can be added.`);
                 } else if(!this.config.duplicateItems && !isUnique) {
                     dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
                 } else {
-                    dropdownItem = this._getTemplate('notice', `Add "${ this.input.value }"`);
+                    dropdownItem = this._getTemplate('notice', `Press Enter to add "${ this.input.value }"`);
                 }
                 
                 if((this.config.regexFilter && this._regexFilter(this.input.value)) || !this.config.regexFilter) {
