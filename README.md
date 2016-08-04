@@ -595,3 +595,6 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 MIT License 
+
+## Misc
+Thanks to @mikefrancis for [sending me on a hunt](https://twitter.com/_mikefrancis/status/701797835826667520) for a non-jQuery solution for select boxes that eventually led to this being built!
