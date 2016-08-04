@@ -164,6 +164,12 @@
                 editItems: true,
                 maxItemCount: 5,
                 removeItemButton: true,
+                callbackOnHighlightItem: function(id, value, passedInput) {
+                    console.log(value);
+                },
+                callbackOnUnhighlightItem: function(id, value, passedInput) {
+                    console.log(value);
+                },
             });
 
             console.log(example1.getValue());
