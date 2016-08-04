@@ -87,4 +87,15 @@ h6, .h6 { font-size: $global-font-size-h6; }
     a, a:visited, a:focus { color: #00bcd4; }
 }
 
+.logo {
+    width: auto;
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    padding: $global-guttering/4 0;
+}
+
+.hidden-ie { display: block; }
+.visible-ie { display: none; }
+
 /*=====  End of Section comment block  ======*/

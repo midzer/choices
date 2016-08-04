@@ -13,12 +13,18 @@
     <!-- Choices includes -->
     <link rel="stylesheet" href="assets/styles/css/choices.min.css">
     <script src="assets/scripts/dist/choices.min.js"></script>
+
+    <!--[if lt IE 9]>
+        .hidden-ie { display: none; }
+        .visible-ie { display: none; }
+    <![endif]-->
 </head>
 <body>
     <div class="container">
         <div class="section">
-            <h1>Choices.js</h1>
-            <p>A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
+            <img src="assets/images/logo.svg" alt="Choices.js logo" class="logo hidden-ie">
+            <h1 class="visible-ie">Choices.js</h1>
+            <p>Choices.js is a lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
             <p>For all config options, visit the <a href="https://github.com/jshjohnson/Choices">GitHub repo</a>.</p>
             <hr>
             <h2>Text inputs</h2>

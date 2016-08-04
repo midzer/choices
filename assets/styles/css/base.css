@@ -80,4 +80,17 @@ h6, .h6 {
   .section a, .section a:visited, .section a:focus {
     color: #00bcd4; }
 
+.logo {
+  width: auto;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  padding: 6px 0; }
+
+.hidden-ie {
+  display: block; }
+
+.visible-ie {
+  display: none; }
+
 /*=====  End of Section comment block  ======*/
