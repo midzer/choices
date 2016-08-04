@@ -76,8 +76,9 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
         callbackOnInit: () => {},
         callbackOnAddItem: (id, value, passedInput) => {},
         callbackOnRemoveItem: (id, value, passedInput) => {},
+        callbackOnHighlightItem: (id, value, passedInput) => {},
+        callbackOnUnhighlightItem: (id, value, passedInput) => {},
         callbackOnChange: (value, passedInput) => {},
-        callbackOnRender: () => {},
     });
 </script>
 ```
@@ -339,6 +340,20 @@ classNames: {
 <strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Function to run each time an item is removed (programmatically or by the user).
+
+### callbackOnHighlightItem
+<strong>Type:</strong> `Function` <strong>Default:</strong>`(id, value, passedInput) => {}`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
+<strong>Usage:</strong> Function to run each time an item is highlighted.
+
+### callbackOnUnhighlightItem
+<strong>Type:</strong> `Function` <strong>Default:</strong>`(id, value, passedInput) => {}`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
+<strong>Usage:</strong> Function to run each time an item is unhighlighted.
 
 ### callbackOnChange
 <strong>Type:</strong> `Function` <strong>Default:</strong>`(value, passedInput) => {}`

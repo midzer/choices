@@ -73,6 +73,8 @@ export class Choices {
             callbackOnInit: () => {},
             callbackOnAddItem: (id, value, passedInput) => {},
             callbackOnRemoveItem: (id, value, passedInput) => {},
+            callbackOnHighlightItem: (id, value, passedInput) => {},
+            callbackOnUnhighlightItem: (id, value, passedInput) => {},
             callbackOnChange: (value, passedInput) => {},
         };
 
@@ -209,6 +211,16 @@ export class Choices {
         const id = item.id;
         this.store.dispatch(highlightItem(id, true));
 
+        // Run callback if it is a function
+        if(this.config.callbackOnHighlightItem){
+            const callback = this.config.callbackOnHighlightItem;
+            if(isType('Function', callback)) {
+                callback(id, item.value, this.passedElement);
+            } else {
+                console.error('callbackOnHighlightItem: Callback is not a function');
+            }
+        }
+
         return this;
     }
 
@@ -222,6 +234,16 @@ export class Choices {
         if(!item) return;
         const id = item.id;
         this.store.dispatch(highlightItem(id, false));
+
+        // Run callback if it is a function
+        if(this.config.callbackOnUnhighlightItem){
+            const callback = this.config.callbackOnUnhighlightItem;
+            if(isType('Function', callback)) {
+                callback(id, item.value, this.passedElement);
+            } else {
+                console.error('callbackOnUnhighlightItem: Callback is not a function');
+            }
+        }
 
         return this;
     }
@@ -562,7 +584,6 @@ export class Choices {
                 }
                 const callback = (results, value, label) => {
                     if(!isType('Array', results) || !value) return;
-
                     if(results && results.length) {
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
                         const filter = this.config.sortFilter;
@@ -576,7 +597,6 @@ export class Choices {
                             }
                         });
                     }
-
                     this.containerOuter.removeAttribute('aria-busy');
                 };
                 fn(callback);
@@ -982,7 +1002,9 @@ export class Choices {
                         if(item.id === parseInt(passedId) && !item.highlighted) {
                             this.highlightItem(item);
                         } else if(!hasShiftKey) {
-                            this.unhighlightItem(item);
+                            if(item.highlighted) {
+                                this.unhighlightItem(item);
+                            }
                         }
                     });
                 }
