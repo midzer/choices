@@ -1375,21 +1375,19 @@ export class Choices {
         const classNames = this.config.classNames;
         const templates = {
             containerOuter: () => {
-                if(this.passedElement.type === 'select-one') {
-                    return strToEl(`
-                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" tabindex="0" aria-haspopup="true" aria-expanded="false"></div>
-                    `);
-                } else {
-                    return strToEl(`
-                        <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" aria-haspopup="true" aria-expanded="false"></div>
-                    `);
-                }
+                return strToEl(`
+                    <div class="${ classNames.containerOuter }" data-type="${ this.passedElement.type }" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false"></div>
+                `);
             },
             containerInner: () => {
-                return strToEl(`<div class="${ classNames.containerInner }"></div>`);
+                return strToEl(`
+                    <div class="${ classNames.containerInner }"></div>
+                `);
             },
             itemList: () => {
-                return strToEl(`<div class="${ classNames.list } ${ this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems }"></div>`);
+                return strToEl(`
+                    <div class="${ classNames.list } ${ this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems }"></div>
+                `);
             },
             item: (data) => {
                 if(this.config.removeItemButton && this.passedElement.type !== 'select-one') {
@@ -1408,7 +1406,9 @@ export class Choices {
                 }   
             },
             choiceList: () => {
-                return strToEl(`<div class="${ classNames.list }" dir="ltr"></div>`);
+                return strToEl(`
+                    <div class="${ classNames.list }" dir="ltr"></div>
+                `);
             },
             choiceGroup: (data) => {
                 return strToEl(`
@@ -1418,36 +1418,34 @@ export class Choices {
                 `);
             },
             choice: (data) => {
-                if(data.groupId > 0) {
-                   return strToEl(`
-                       <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="treeitem">
-                           ${ data.label }
-                       </div>
-                   `); 
-               } else {
-                    return strToEl(`
-                        <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" role="option">
-                            ${ data.label }
-                        </div>
-                    `);
-               }
-
+                return strToEl(`
+                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" ${data.groupId > 0 ? 'role="treeitem"' :  'role="option"'}>
+                        ${ data.label }
+                    </div>
+                `); 
             },
             input: () => {
-                return strToEl(`<input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox">`);
+                return strToEl(`
+                    <input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox">
+                `);
             },
             dropdown: () => {
-                return strToEl(`<div class="${ classNames.list } ${ classNames.listDropdown }" aria-expanded="false"></div>`);
+                return strToEl(`
+                    <div class="${ classNames.list } ${ classNames.listDropdown }" aria-expanded="false"></div>
+                `);
             },
             notice: (label, clickable) => {
-                return strToEl(`<div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>`);
+                return strToEl(`
+                    <div class="${ classNames.item } ${ classNames.itemChoice }">${ label }</div>
+                `);
             },
             option: (data) => {
-                return strToEl(`<option value="${ data.value }" selected>${ data.label }</option>`);    
+                return strToEl(`
+                    <option value="${ data.value }" selected>${ data.label }</option>`); 
+
             },
         };
 
-        // this.config.templates = extend(this.config.templates, templates);
         this.config.templates = templates;
     }
 
