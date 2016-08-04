@@ -155,6 +155,25 @@
 
             <label for="choices-17">Option selected via config</label>
             <select name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
+            
+            <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
+            <label for="cities">States</label>
+            <select name="cities" id="cities" placeholder="Choose a state">
+                <option value="Texas">Texas</option>
+                <option value="Chicago">Chicago</option>
+                <option value="New York">New York</option>
+                <option value="Washington">Washington</option>
+                <option value="Michigan">Michigan</option>
+            </select>
+
+            <label for="boroughs">Boroughs</label>
+            <select name="boroughs" id="boroughs" placeholder="Choose a borough">
+                <option value="The Bronx">The Bronx</option>
+                <option value="Brooklyn">Brooklyn</option>
+                <option value="Manhatten">Manhatten</option>
+                <option value="Queens">Queens</option>
+                <option value="Staten Island">Staten Island</option>
+            </select>
         </div>
     </div>
     <script>
@@ -298,6 +317,18 @@
                     {value: 'Three', label: 'Label Three'},
                 ],
             }).setValueByChoice('Two');
+
+            var cities = new Choices(document.getElementById('cities'), {
+                callbackOnChange: function(value) {
+                    if(value === 'New York') {
+                        boroughs.enable();
+                    } else {
+                        boroughs.disable();
+                    }
+                }
+            });
+
+            var boroughs = new Choices(document.getElementById('boroughs')).disable();
         });
     </script>
 
