@@ -124,7 +124,7 @@ describe('Choices', function() {
         });
     });
 
-    describe('should handle text inputs', function() {
+    describe('should accept text inputs', function() {
         beforeEach(function() {
             this.input = document.createElement('input');
             this.input.type = "text";
@@ -134,11 +134,6 @@ describe('Choices', function() {
             document.body.appendChild(this.input);
             
             this.choices = new Choices(this.input);
-        });
-
-        it('should set value via using setValue()', function() {
-            this.choices.setValue(['test1', 'test2']);
-            expect(this.choices.currentState.items.length).toEqual(2);
         });
 
         it('should accept a user inputted value', function() {
@@ -159,7 +154,7 @@ describe('Choices', function() {
         });
     });
 
-    describe('should handle single select inputs', function() {
+    describe('should accept single select inputs', function() {
         beforeEach(function() {
             this.input = document.createElement('select');
             this.input.className = 'js-choices';
@@ -264,7 +259,7 @@ describe('Choices', function() {
         });
     });
 
-    describe('should handle multiple select inputs', function() {
+    describe('should accept multiple select inputs', function() {
         beforeEach(function() {
             this.input = document.createElement('select');
             this.input.className = 'js-choices';
