@@ -871,22 +871,33 @@ export class Choices {
             if(this.input.value) {
                 const activeItems = this.store.getItemsFilteredByActive();
                 const isUnique = !activeItems.some((item) => item.value === this.input.value);
+                let canAddItem = true;
 
-                if (this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+                // If a user has supplied a regular expression filter
+                if(this.config.regexFilter) {
+                    // Determine whether we can update based on whether 
+                    // our regular expression passes 
+                    canAddItem = this._regexFilter(this.input.value);
+                }
+                
+                if(this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
                     dropdownItem = this._getTemplate('notice', `Only ${ this.config.maxItemCount } values can be added.`);
                 } else if(!this.config.duplicateItems && !isUnique) {
                     dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
-                } else {
+                } else if(canAddItem) {
                     dropdownItem = this._getTemplate('notice', `Press Enter to add "${ this.input.value }"`);
                 }
                 
-                if((this.config.regexFilter && this._regexFilter(this.input.value)) || !this.config.regexFilter) {
+                if(canAddItem !== false) {
                     this.dropdown.innerHTML = dropdownItem.outerHTML;
                     if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
                         this.showDropdown();    
                     }
+                } else {
+                    if(hasActiveDropdown) {
+                        this.hideDropdown();  
+                    }
                 }
-
             } else {
                 if(hasActiveDropdown) {
                     this.hideDropdown();  

@@ -15,8 +15,10 @@
     <script src="assets/scripts/dist/choices.min.js"></script>
 
     <!--[if lt IE 9]>
-        .hidden-ie { display: none; }
-        .visible-ie { display: none; }
+        <style>
+            .hidden-ie { display: none; }
+            .visible-ie { display: block; }
+        </style>
     <![endif]-->
 </head>
 <body>
@@ -218,7 +220,7 @@
 
             var example5 = new Choices('#choices-5', {
                 prependValue: 'item-',
-                appendValue: `-${Date.now()}`,
+                appendValue: '-' + Date.now(),
             }).removeActiveItems();
 
             var example7 = new Choices('#choices-6', {

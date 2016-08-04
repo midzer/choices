@@ -81,14 +81,12 @@ h6, .h6 {
     color: #00bcd4; }
 
 .logo {
-  width: auto;
+  width: 100%;
+  height: auto;
   display: inline-block;
   max-width: 100%;
   vertical-align: top;
   padding: 6px 0; }
-
-.hidden-ie {
-  display: block; }
 
 .visible-ie {
   display: none; }
