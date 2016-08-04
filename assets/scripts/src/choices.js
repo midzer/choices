@@ -543,7 +543,9 @@ export class Choices {
         this.passedElement.disabled = true;
         if(this.initialised) {
             if(!this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
-                this.input.disabled = true;
+                this._removeEventListeners();
+                this.passedElement.setAttribute('disabled', '');
+                this.input.setAttribute('disabled', '');
                 this.containerOuter.classList.add(this.config.classNames.disabledState);
                 this.containerOuter.setAttribute('aria-disabled', 'true');
             }
@@ -559,7 +561,9 @@ export class Choices {
         this.passedElement.disabled = false;
         if(this.initialised) {
             if(this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
-                this.input.disabled = false;
+                this._addEventListeners();
+                this.passedElement.removeAttribute('disabled');
+                this.input.removeAttribute('disabled');
                 this.containerOuter.classList.remove(this.config.classNames.disabledState);
                 this.containerOuter.removeAttribute('aria-disabled');
             }

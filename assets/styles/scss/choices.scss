@@ -29,10 +29,8 @@ $choices-button-icon-path: '../../icons/cross.svg';
 }
 
 .choices[data-type*="select-one"] {
-    .choices__inner { 
-        cursor: pointer;
-        padding-bottom: 7.5px; 
-    }
+    cursor: pointer;
+    .choices__inner { padding-bottom: 7.5px; }
     .choices__input { 
         display: block;
         width: 100%;
