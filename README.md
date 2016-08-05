@@ -94,6 +94,7 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
 | Group  | A group is a collection of choices. A group should be seen as equivalent to a `<optgroup></optgroup>` element within a select input.|
 | Item   | An item is an inputted value (text input) or a selected choice (select element). In the context of a select element, an item is equivelent to a selected option element: `<option value="Hello" selected></option>` whereas in the context of a text input an item is equivelant to `<input type="text" value="Hello">`|
 
+
 ## Configuration options
 ### items
 <strong>Type:</strong> `Array`  <strong>Default:</strong> `[]`
@@ -382,6 +383,18 @@ const choices = new Choices(element, {
 choices.setValue(['Set value 1', 'Set value 2'])
 choices.disable();
 ```
+
+### destroy();
+<strong>Input types affected:</strong> `text`, `select-multiple`, `select-one`
+
+<strong>Usage:</strong> Kills the instance of Choices, removes all event listeners and returns passed input to its initial state.
+
+### init();
+<strong>Input types affected:</strong> `text`, `select-multiple`, `select-one`
+
+<strong>Usage:</strong> Creates a new instance of Choices, adds event listeners, creates templates and renders a Choices element to the DOM.
+
+<strong>Note:</strong> This is called implicitly when a new instance of Choices is created. This would be used after a Choices instance had already been destroyed (using `destroy()`). 
 
 ### highlightAll();
 <strong>Input types affected:</strong> `text`, `select-multiple`
