@@ -116,6 +116,9 @@
             <label for="choices-12">Options from remote source (Fetch API)</label>
             <select name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
 
+            <label for="choices-14">Options from remote source (XHR)</label>
+            <select name="choices-14" id="choices-14" placeholder="Pick a Smiths record"></select>
+
             <label for="choices-13">Option groups</label>
             <select data-choice name="choices-13" id="choices-13" placeholder="This is a placeholder">
                 <optgroup label="UK">
@@ -149,9 +152,6 @@
                     <option value="Vancouver">Vancouver</option>
                 </optgroup>
             </select>
-
-            <label for="choices-14">Countries from remote source (XHR)</label>
-            <select name="choices-14" id="choices-14" placeholder="Pick a country"></select>
 
             <label for="choices-15">Options added via config with no search</label>
             <select name="choices-15" id="choices-15" placeholder="This is a placeholder">
@@ -260,7 +260,7 @@
 
             var example10 = new Choices('#choices-14').ajax(function(callback) {
                 var request = new XMLHttpRequest();
-                request.open('get', 'https://restcountries.eu/rest/v1/all', true);
+                request.open('get', 'https://api.discogs.com/artists/83080/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW', true);
                 request.onreadystatechange = function() {
                     var status;
                     var data;
@@ -268,7 +268,8 @@
                         status = request.status;
                         if (status == 200) {
                             data = JSON.parse(request.responseText);
-                            callback(data, 'alpha2Code', 'name');
+                            callback(data.releases, 'title', 'title');
+                            example10.setValueByChoice('How Soon Is Now?');
                         } else {
                             console.error(status);
                         }
