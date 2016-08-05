@@ -36,7 +36,7 @@ export class Choices {
             delimiter: ',',
             paste: true,
             search: true, 
-            flip: false,
+            flip: true,
             regexFilter: null,
             sortFilter: sortByAlpha,
             sortFields: ['label', 'value'],
@@ -114,15 +114,15 @@ export class Choices {
         this.disable = this.disable.bind(this);
         
         // Bind event handlers
-        this._onFocus     = this._onFocus.bind(this);
-        this._onBlur      = this._onBlur.bind(this);
-        this._onKeyUp     = this._onKeyUp.bind(this);
-        this._onKeyDown   = this._onKeyDown.bind(this);
+        this._onFocus      = this._onFocus.bind(this);
+        this._onBlur       = this._onBlur.bind(this);
+        this._onKeyUp      = this._onKeyUp.bind(this);
+        this._onKeyDown    = this._onKeyDown.bind(this);
         this._onTouchStart = this._onTouchStart.bind(this);
-        this._onMouseDown = this._onMouseDown.bind(this);
-        this._onMouseOver = this._onMouseOver.bind(this);
-        this._onPaste     = this._onPaste.bind(this);
-        this._onInput     = this._onInput.bind(this);
+        this._onMouseDown  = this._onMouseDown.bind(this);
+        this._onMouseOver  = this._onMouseOver.bind(this);
+        this._onPaste      = this._onPaste.bind(this);
+        this._onInput      = this._onInput.bind(this);
         
         // Focus containerOuter but not show dropdown if true
         this._focusAndHideDropdown = false;
@@ -968,17 +968,28 @@ export class Choices {
      */
     _onTouchStart(e) {
         const target = e.touches[0].target;
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         if(this.passedElement.type !== 'select-one') {
             // If click is within this element
             if(this.containerOuter.contains(target)) {
-                if(this.config.search && document.activeElement !== this.input) {
-                    // If search and we aren't already focused, focus the input
-                    this.input.focus();
+                // Show dropdown if focus
+                if(!hasActiveDropdown){
+                    if(this.passedElement.type === 'text') {
+                        if(document.activeElement !== this.input) {
+                            this.input.focus();
+                        }
+                    } else {
+                        this.showDropdown();  
+                    }
+    
+                    if(this.config.search) {
+                        if(document.activeElement !== this.input) {
+                            this.input.focus();
+                        }
+                    }
+
                     e.preventDefault();
-                } else if(this.passedElement.type === 'select-multiple') {
-                    // Otherwise just show the dropdown
-                    this.showDropdown();
                 }
             } else {
                 this.input.blur();
@@ -1560,6 +1571,7 @@ export class Choices {
         containerOuter.appendChild(containerInner);
         containerOuter.appendChild(dropdown);
         containerInner.appendChild(itemList);
+
         dropdown.appendChild(choiceList);
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
