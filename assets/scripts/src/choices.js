@@ -976,7 +976,7 @@ export class Choices {
                     // If search and we aren't already focused, focus the input
                     this.input.focus();
                     e.preventDefault();
-                } else {
+                } else if(this.passedElement.type === 'select-multiple') {
                     // Otherwise just show the dropdown
                     this.showDropdown();
                 }
