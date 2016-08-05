@@ -36,7 +36,7 @@ export class Choices {
             delimiter: ',',
             paste: true,
             search: true, 
-            flip: true,
+            flip: false,
             regexFilter: null,
             sortFilter: sortByAlpha,
             sortFields: ['label', 'value'],
@@ -118,6 +118,7 @@ export class Choices {
         this._onBlur      = this._onBlur.bind(this);
         this._onKeyUp     = this._onKeyUp.bind(this);
         this._onKeyDown   = this._onKeyDown.bind(this);
+        this._onTouchStart = this._onTouchStart.bind(this);
         this._onMouseDown = this._onMouseDown.bind(this);
         this._onMouseOver = this._onMouseOver.bind(this);
         this._onPaste     = this._onPaste.bind(this);
@@ -960,6 +961,32 @@ export class Choices {
     }
 
     /**
+     * Touch event
+     * @param  {Object} e Event
+     * @return
+     * @private
+     */
+    _onTouchStart(e) {
+        const target = e.touches[0].target;
+
+        if(this.passedElement.type !== 'select-one') {
+            // If click is within this element
+            if(this.containerOuter.contains(target)) {
+                if(this.config.search && document.activeElement !== this.input) {
+                    // If search and we aren't already focused, focus the input
+                    this.input.focus();
+                    e.preventDefault();
+                } else {
+                    // Otherwise just show the dropdown
+                    this.showDropdown();
+                }
+            } else {
+                this.input.blur();
+            }
+        }
+    }
+
+    /**
      * Click event
      * @param  {Object} e Event
      * @return
@@ -967,7 +994,7 @@ export class Choices {
      */
     _onMouseDown(e) {
         const activeItems = this.store.getItemsFilteredByActive();
-        const target = e.target || e.touches[0].target;
+        const target = e.target;
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(target)) {
@@ -1773,6 +1800,7 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('touchstart', this._onTouchStart);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
 
@@ -1795,6 +1823,7 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('touchstart', this._onTouchStart);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
 

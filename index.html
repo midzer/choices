@@ -270,7 +270,7 @@
                             data = JSON.parse(request.responseText);
                             callback(data, 'alpha2Code', 'name');
                         } else {
-                            console.log(status);
+                            console.error(status);
                         }
                     }
                 }
