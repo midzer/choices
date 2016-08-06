@@ -99,9 +99,9 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
 ### items
 <strong>Type:</strong> `Array`  <strong>Default:</strong> `[]`
 
-<strong>Usage:</strong> Add pre-selected items (see terminology) to text input. 
-
 <strong>Input types affected:</strong> `text`
+
+<strong>Usage:</strong> Add pre-selected items (see terminology) to text input. 
 
 Pass an array of strings: 
 
@@ -125,9 +125,9 @@ Pass an array of objects:
 ### choices
 <strong>Type:</strong> `Array`  <strong>Default:</strong> `[]`
 
-<strong>Usage:</strong> Add choices (see terminology) to select input. 
-
 <strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+<strong>Usage:</strong> Add choices (see terminology) to select input. 
 
 Pass an array of objects:
 
