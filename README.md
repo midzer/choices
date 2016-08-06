@@ -181,14 +181,12 @@ Pass an array of objects:
 
 <strong>Usage:</strong> Whether a user can edit selected items (only affects text input types).
 
-<strong>Usage:</strong> Optionally set an item limit (`-1` indicates no limit).
-
 ### delimiter
 <strong>Type:</strong> `String` <strong>Default:</strong>`,`
 
 <strong>Input types affected:</strong> `text`
 
-<strong>Usage:</strong> What divides each value.
+<strong>Usage:</strong> What divides each value. By default the delimited value would be `"Value 1, Value 2, Value 3"`.
 
 ### duplicates
 <strong>Type:</strong> `Boolean` <strong>Default:</strong>`true`
