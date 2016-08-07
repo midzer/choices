@@ -251,6 +251,7 @@
                     .then(function(response) {
                         response.json().then(function(data) {
                             callback(data.releases, 'title', 'title');
+                            example9.setValueByChoice('Fake Tales Of San Francisco');
                         });
                     })
                     .catch(function(error) {
@@ -258,7 +259,9 @@
                     });
             });
 
-            var example10 = new Choices('#choices-14').ajax(function(callback) {
+            var example10 = new Choices('#choices-14', {
+                removeItemButton: true,
+            }).ajax(function(callback) {
                 var request = new XMLHttpRequest();
                 request.open('get', 'https://api.discogs.com/artists/83080/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW', true);
                 request.onreadystatechange = function() {

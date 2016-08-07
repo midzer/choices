@@ -10,7 +10,7 @@ $choices-text-color: #333333;
 $choices-keyline-color: #DDDDDD;
 $choices-primary-color: #00BCD4;
 $choices-disabled-color: #eaeaea;
-$choices-button-icon-path: '../../icons/cross.svg';
+$choices-button-icon-path: '../../icons/';
 
 .choices {
     font-size: 16px;
@@ -39,6 +39,19 @@ $choices-button-icon-path: '../../icons/cross.svg';
         background-color: #FFFFFF;
         margin: 0;
     }
+    .choices__button {
+        background-image: url($choices-button-icon-path + '/cross-inverse.svg');
+        padding: 0;
+        background-size: 8px;
+        height: 100%;
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        margin-top: -10px;
+        margin-right: 25px;
+        height: 20px;
+        width: 20px;
+    }
     &.is-open:after { 
         border-color: transparent transparent $choices-text-color transparent; 
         margin-top: -7.5px;
@@ -60,6 +73,15 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices[data-type*="select-multiple"], .choices[data-type*="text"]  {
     .choices__inner { cursor: text; }
+    .choices__button {
+        position: relative;
+        margin: -2px -4px -2px 4px;
+        padding: 4px 6px;    
+        border-left: 1px solid darken($choices-primary-color, 10%);
+        background-image: url($choices-button-icon-path + '/cross.svg');
+        background-size: 8px;
+        line-height: 1;
+    }
 }
 
 .choices__inner {
@@ -82,8 +104,9 @@ $choices-button-icon-path: '../../icons/cross.svg';
 
 .choices__list--single {
     display: inline-block;
-    padding: 4px;
-    pointer-events: none;
+    padding: 4px 16px 4px 4px;
+    width: 100%;
+    .choices__item { width: 100%; }
 }
 
 .choices__list--multiple {
@@ -142,15 +165,22 @@ $choices-button-icon-path: '../../icons/cross.svg';
         will-change: scroll-position;
     }
     .choices__item {
+        position: relative;
         padding: 10px;
         font-size: 14px;
     }
     .choices__item--selectable {
-        &:after {
-            content: "Press to select";
-            font-size: 12px;
-            opacity: 0;
-            float: right;
+        @media (min-width: 640px) {
+            padding-right: 100px;
+            &:after {
+                content: "Press to select";
+                font-size: 12px;
+                opacity: 0;
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
         }
         &.is-highlighted { 
             background-color: mix(#000000, #FFFFFF, 5%); 
@@ -178,20 +208,13 @@ $choices-button-icon-path: '../../icons/cross.svg';
 }
 
 .choices__button {
-    position: relative;
-    margin: -2px -4px -2px 4px;
-    padding: 4px 6px;    
     text-indent: -9999px;
     -webkit-appearance: none;
     appearance: none;
     border: 0;
-    border-left: 1px solid darken($choices-primary-color, 10%);
     background-color: transparent;
-    background-image: url($choices-button-icon-path);
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 8px;
-    line-height: 1;
     cursor: pointer;
 }
 

@@ -90,7 +90,7 @@ export class Choices {
         this.prevState    = {};
         this.currentValue = '';
 
-        // Retrieve triggering element (i.e. element with 'data-option' trigger)
+        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
         this.highlightPosition = 0;
@@ -343,15 +343,19 @@ export class Choices {
      * @public
      */
     showDropdown() { 
+        const body = document.body;
+        const html = document.documentElement;
+        const winHeight  = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
         this.containerOuter.classList.add(this.config.classNames.openState);
         this.containerOuter.setAttribute('aria-expanded', 'true');
-
         this.dropdown.classList.add(this.config.classNames.activeState);
         
         const dimensions = this.dropdown.getBoundingClientRect();
-        const shouldFlip = this.config.flip ? dimensions.top + dimensions.height >= document.body.offsetHeight : false;
+        const dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+        // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
+        const shouldFlip = this.config.flip ? dropdownPos >= winHeight : false;
 
-        // Whether or not the dropdown should appear above or below input
         if(shouldFlip) {
             this.containerOuter.classList.add(this.config.classNames.flippedState);
         } else {
@@ -367,7 +371,7 @@ export class Choices {
      * @public
      */
     hideDropdown() {
-        // A dropdown flips if it does not have space below the input
+        // A dropdown flips if it does not have space within the page
         const isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
 
         this.containerOuter.classList.remove(this.config.classNames.openState);
@@ -631,6 +635,7 @@ export class Choices {
      */
     _triggerChange(value) {
         if(!value) return;
+
         // Run callback if it is a function
         if(this.config.callbackOnChange){
             const callback = this.config.callbackOnChange;
@@ -820,9 +825,9 @@ export class Choices {
                     this.canSearch = false;
 
                     if(currentEl) {
-                        nextEl = getAdjacentEl(currentEl, '[data-option-selectable]', directionInt);
+                        nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
                     } else {
-                        nextEl = this.dropdown.querySelector('[data-option-selectable]');
+                        nextEl = this.dropdown.querySelector('[data-choice-selectable]');
                     }
                 
                     if(nextEl) {
@@ -967,7 +972,7 @@ export class Choices {
      * @private
      */
     _onTouchStart(e) {
-        const target = e.target || e.touches[0].target;
+        const target = e.touches[0].target;
         // If we are touching the inner/outer container and we aren't dealing with a single select box
         if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
 
@@ -983,7 +988,7 @@ export class Choices {
             const end = document.addEventListener('touchend', () => {
                 // If there was no scrolling, open/focus element
                 if(wasTap) {
-                    const target = e.target || e.touches[0].target;
+                    const target = e.touches[0].target;
                     const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
                     // If click is within this element
@@ -998,16 +1003,16 @@ export class Choices {
                                 this.showDropdown();  
                             }
                     
-                            if(this.config.search) {
-                                if(document.activeElement !== this.input) {
-                                    this.input.focus();
-                                }
+                            if(this.config.search && document.activeElement !== this.input) {
+                                this.input.focus();
                             }
 
                             e.preventDefault();
                         }
                     } else {
-                        this.input.blur();
+                        if(this.config.search && document.activeElement === this.input) {
+                            this.input.blur();
+                        }
                     }
                 }
 
@@ -1025,6 +1030,7 @@ export class Choices {
     _onMouseDown(e) {
         const activeItems = this.store.getItemsFilteredByActive();
         const target = e.target;
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(target)) {
@@ -1035,7 +1041,9 @@ export class Choices {
 
             const hasShiftKey = e.shiftKey ? true : false;
 
-            if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+            // If dropdown is not active...
+            if(!hasActiveDropdown) {
+                // And the input isn't a text input
                 if(this.passedElement.type !== 'text') {
                     // For select inputs we always want to show the dropdown if it isn't already showing
                     this.showDropdown();
@@ -1048,8 +1056,11 @@ export class Choices {
                         this.input.focus();
                     }
                 }
-            } else if(this.passedElement.type !== 'text' && this.dropdown.classList.contains(this.config.classNames.activeState) && e.target === this.containerInner) {
+            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
                 this.hideDropdown();
+                if(this.config.search) {
+                    this.input.blur();    
+                }
             }
 
             if(target.hasAttribute('data-button')) {
@@ -1064,7 +1075,7 @@ export class Choices {
                 }
             } else if(target.hasAttribute('data-item')) {
                 // If we are clicking on an item
-                if(this.config.removeItems) {
+                if(this.config.removeItems && this.passedElement.type !== 'select-one') {
                     const passedId = target.getAttribute('data-id');
 
                     // We only want to select one item with a click
@@ -1080,7 +1091,7 @@ export class Choices {
                         }
                     });
                 }
-            } else if(target.hasAttribute('data-option')) {
+            } else if(target.hasAttribute('data-choice')) {
                 // If we are clicking on an option
                 const id = target.getAttribute('data-id');
                 const choices = this.store.getChoicesFilteredByActive();
@@ -1090,17 +1101,18 @@ export class Choices {
                     this._addItem(choice.value, choice.label, choice.id);
                     this._triggerChange(choice.value);
                     if(this.passedElement.type === 'select-one') {
-                        this.input.value = "";
+                        if(this.config.search) {
+                            this.input.value = "";    
+                        }
                         this.isSearching = false;
                         this.store.dispatch(activateChoices(true));
-                        this.toggleDropdown();
+                        this.hideDropdown();
                     }
                 }
             }
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
             const hasHighlightedItems  = activeItems.some((item) => item.highlighted === true);
 
             // De-select any highlighted items
@@ -1127,7 +1139,7 @@ export class Choices {
     _onMouseOver(e) {
         // If the dropdown is either the target or one of its children is the target
         if((e.target === this.dropdown || findAncestor(e.target, this.config.classNames.listDropdown))) {
-            if(e.target.hasAttribute('data-option')) this._highlightChoice(e.target);
+            if(e.target.hasAttribute('data-choice')) this._highlightChoice(e.target);
         }
     }
 
@@ -1274,7 +1286,7 @@ export class Choices {
      */
     _highlightChoice(el) {
         // Highlight first element in dropdown
-        const choices = Array.from(this.dropdown.querySelectorAll('[data-option-selectable]'));
+        const choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
 
         if(choices && choices.length) {
             const highlightedChoices = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
@@ -1513,7 +1525,7 @@ export class Choices {
             },
             choice: (data) => {
                 return strToEl(`
-                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-option ${ data.disabled ? 'data-option-disabled aria-disabled="true"' : 'data-option-selectable' } data-id="${ data.id }" data-value="${ data.value }" ${data.groupId > 0 ? 'role="treeitem"' :  'role="option"'}>
+                    <div class="${ classNames.item } ${ classNames.itemChoice } ${ data.disabled ? classNames.itemDisabled : classNames.itemSelectable }" data-choice ${ data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable' } data-id="${ data.id }" data-value="${ data.value }" ${data.groupId > 0 ? 'role="treeitem"' :  'role="option"'}>
                         ${ data.label }
                     </div>
                 `); 
@@ -1535,8 +1547,8 @@ export class Choices {
             },
             option: (data) => {
                 return strToEl(`
-                    <option value="${ data.value }" selected>${ data.label }</option>`); 
-
+                    <option value="${ data.value }" selected>${ data.label }</option>
+                `); 
             },
         };
 
