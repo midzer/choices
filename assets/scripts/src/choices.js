@@ -118,14 +118,18 @@ export class Choices {
         this._onBlur       = this._onBlur.bind(this);
         this._onKeyUp      = this._onKeyUp.bind(this);
         this._onKeyDown    = this._onKeyDown.bind(this);
-        this._onTouchStart = this._onTouchStart.bind(this);
+        this._onTouchMove  = this._onTouchMove.bind(this);
+        this._onTouchEnd   = this._onTouchEnd.bind(this);
         this._onMouseDown  = this._onMouseDown.bind(this);
         this._onMouseOver  = this._onMouseOver.bind(this);
         this._onPaste      = this._onPaste.bind(this);
         this._onInput      = this._onInput.bind(this);
         
         // Focus containerOuter but not show dropdown if true
-        this._focusAndHideDropdown = false;
+        this.focusAndHideDropdown = false;
+
+        // Monitor touch taps/scrolls
+        this.wasTap = true;
 
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement("div");
@@ -648,7 +652,7 @@ export class Choices {
         
         // Keep focus on select-one element
         if(this.passedElement.type === 'select-one'){
-            this._focusAndHideDropdown = true;
+            this.focusAndHideDropdown = true;
             this.containerOuter.focus();
         }
     }
@@ -966,59 +970,42 @@ export class Choices {
     }
 
     /**
-     * Touch event
+     * Touch move event
      * @param  {Object} e Event
      * @return
      * @private
      */
-    _onTouchStart(e) {
-        const target = e.touches[0].target;
-        // If we are touching the inner/outer container and we aren't dealing with a single select box
-        if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
+    _onTouchMove(e) {
+        this.wasTap = false;
+    }
 
-            let wasTap = true;
 
-            // If the tap turned into a scroll, we don't want to do anything
-            const move = document.addEventListener('touchmove', () => {
-                wasTap = false;
-                document.removeEventListener('touchmove', move);
-                document.removeEventListener('touchend', end);
-            });
+    /**
+     * Touch end event
+     * @param  {Object} e Event
+     * @return
+     * @private
+     */
+    _onTouchEnd(e) {
+        const target = e.target || e.touches[0].target;
+        if(this.wasTap && this.containerOuter.contains(target)) {
 
-            const end = document.addEventListener('touchend', () => {
-                // If there was no scrolling, open/focus element
-                if(wasTap) {
-                    const target = e.touches[0].target;
-                    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-                    // If click is within this element
-                    if(this.containerOuter.contains(target)) {
-                        // Show dropdown if focus
-                        if(!hasActiveDropdown){
-                            if(this.passedElement.type === 'text') {
-                                if(document.activeElement !== this.input) {
-                                    this.input.focus();
-                                }
-                            } else {
-                                this.showDropdown();  
-                            }
-                    
-                            if(this.config.search && document.activeElement !== this.input) {
-                                this.input.focus();
-                            }
-
-                            e.preventDefault();
-                        }
-                    } else {
-                        if(this.config.search && document.activeElement === this.input) {
-                            this.input.blur();
-                        }
+            // If there was no scrolling, open/focus element
+            if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
+                if(this.passedElement.type === 'text') {
+                    if(document.activeElement !== this.input) {
+                        this.input.focus();
                     }
+                } else {
+                    this.showDropdown();
+                    if(this.config.search && document.activeElement !== this.input) {
+                        this.input.focus();
+                    }  
                 }
-
-                document.removeEventListener('touchmove', end);
-            });
+            }
         }
+
+        this.wasTap = true;
     }
 
     /**
@@ -1165,21 +1152,29 @@ export class Choices {
      * @private
      */
     _onFocus(e) {
+        const target = e.target || e.touches[0].target;
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-        if(e.target === this.input && !hasActiveDropdown) {
+    
+        if(target === this.input && !hasActiveDropdown) {
             this.containerOuter.classList.add(this.config.classNames.focusState);
             if(this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple'){
                 this.showDropdown();  
             }
-        } else if(this.passedElement.type === 'select-one' && e.target === this.containerOuter && !hasActiveDropdown) {            
+        } else if(this.passedElement.type !== 'text' && (target === this.containerOuter || target === this.containerInner) && !hasActiveDropdown) {            
             this.containerOuter.classList.add(this.config.classNames.focusState);
             this.showDropdown();
-            
-            if(!this._focusAndHideDropdown){
-                this.input.focus();
-            }
 
-            this._focusAndHideDropdown = false;
+            if(this.passedElement.type === 'select-one') {
+                if(!this.focusAndHideDropdown){
+                    this.input.focus();
+                }
+                this.focusAndHideDropdown = false;
+            } else {
+                if(this.config.search) {
+                    this.input.focus();    
+                }
+            }
+            
         }
     }
 
@@ -1193,17 +1188,14 @@ export class Choices {
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         // If the blurred element is this input or the outer container
-        if(e.target === this.input || e.target === this.containerOuter) {
+        if(e.target === this.input || (e.target === this.containerOuter && this.passedElement.type === 'select-one')) {
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
 
             // Close the dropdown if there is one
             if(hasActiveDropdown) {
-                if(e.target === this.input || e.target === this.containerOuter && !this.config.search) {
-                    this.hideDropdown();    
-                }
+                this.hideDropdown();
             }
-
         }
     }
 
@@ -1843,7 +1835,8 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
-        document.addEventListener('touchstart', this._onTouchStart);
+        document.addEventListener('touchmove', this._onTouchMove);
+        document.addEventListener('touchend', this._onTouchEnd);
         document.addEventListener('mousedown', this._onMouseDown);
         document.addEventListener('mouseover', this._onMouseOver);
 
@@ -1866,7 +1859,8 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
-        document.removeEventListener('touchstart', this._onTouchStart);
+        document.removeEventListener('touchmove', this._onTouchMove);
+        document.removeEventListener('touchend', this._onTouchEnd);
         document.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mouseover', this._onMouseOver);
 
