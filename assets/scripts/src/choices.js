@@ -967,33 +967,52 @@ export class Choices {
      * @private
      */
     _onTouchStart(e) {
-        const target = e.touches[0].target;
-        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+        const target = e.target || e.touches[0].target;
+        // If we are touching the inner/outer container and we aren't dealing with a single select box
+        if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
 
-        if(this.passedElement.type !== 'select-one') {
-            // If click is within this element
-            if(this.containerOuter.contains(target)) {
-                // Show dropdown if focus
-                if(!hasActiveDropdown){
-                    if(this.passedElement.type === 'text') {
-                        if(document.activeElement !== this.input) {
-                            this.input.focus();
+            let wasTap = true;
+
+            // If the tap turned into a scroll, we don't want to do anything
+            const move = document.addEventListener('touchmove', () => {
+                wasTap = false;
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('touchend', end);
+            });
+
+            const end = document.addEventListener('touchend', () => {
+                // If there was no scrolling, open/focus element
+                if(wasTap) {
+                    const target = e.target || e.touches[0].target;
+                    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+                    // If click is within this element
+                    if(this.containerOuter.contains(target)) {
+                        // Show dropdown if focus
+                        if(!hasActiveDropdown){
+                            if(this.passedElement.type === 'text') {
+                                if(document.activeElement !== this.input) {
+                                    this.input.focus();
+                                }
+                            } else {
+                                this.showDropdown();  
+                            }
+                    
+                            if(this.config.search) {
+                                if(document.activeElement !== this.input) {
+                                    this.input.focus();
+                                }
+                            }
+
+                            e.preventDefault();
                         }
                     } else {
-                        this.showDropdown();  
+                        this.input.blur();
                     }
-    
-                    if(this.config.search) {
-                        if(document.activeElement !== this.input) {
-                            this.input.focus();
-                        }
-                    }
-
-                    e.preventDefault();
                 }
-            } else {
-                this.input.blur();
-            }
+
+                document.removeEventListener('touchmove', end);
+            });
         }
     }
 

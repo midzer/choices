@@ -160,21 +160,20 @@
   color: gray; }
 
 .choices__button {
+  position: relative;
+  margin: -2px -4px -2px 4px;
+  padding: 4px 6px;
   text-indent: -9999px;
   -webkit-appearance: none;
   -moz-appearance: none;
        appearance: none;
   border: 0;
+  border-left: 1px solid #008fa1;
   background-color: transparent;
   background-image: url("../../icons/cross.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 8px;
-  border-left: 1px solid #008fa1;
-  margin-left: 4px;
-  margin-right: -4px;
-  padding-left: 6px;
-  padding-right: 6px;
   line-height: 1;
   cursor: pointer; }
 
