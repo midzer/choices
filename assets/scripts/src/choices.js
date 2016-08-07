@@ -976,9 +976,10 @@ export class Choices {
      * @private
      */
     _onTouchMove(e) {
-        this.wasTap = false;
+        if(this.wasTap === true) {
+            this.wasTap = false; 
+        }
     }
-
 
     /**
      * Touch end event
@@ -988,7 +989,7 @@ export class Choices {
      */
     _onTouchEnd(e) {
         const target = e.target || e.touches[0].target;
-        if(this.wasTap && this.containerOuter.contains(target)) {
+        if(this.wasTap === true && this.containerOuter.contains(target)) {
 
             // If there was no scrolling, open/focus element
             if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
