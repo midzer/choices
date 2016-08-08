@@ -975,12 +975,12 @@ export class Choices {
                     this.hideDropdown();  
                 }
             }
+        } else {
+            // If we have enabled text search
+            if(this.canSearch) {
+                this._searchChoices(this.input.value);
+            } 
         }
-
-        // If we have enabled text search
-        if(this.canSearch) {
-            this._searchChoices(this.input.value);
-        } 
     }
 
     /**
