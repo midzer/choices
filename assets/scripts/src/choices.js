@@ -1223,8 +1223,9 @@ export class Choices {
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
 
-            // Close the dropdown if there is one
-            if(hasActiveDropdown && e.target === this.input) {
+            // Close the dropdown if it is active, the input is the target (select-multiple, text, select-one (with search)) 
+            // or the outer container is the target with no search (select-one)
+            if(hasActiveDropdown && (e.target === this.input || e.target === this.containerOuter && !this.canSearch)) {
                 this.hideDropdown();
             }
         }
