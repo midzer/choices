@@ -42,6 +42,7 @@ label {
     margin-bottom: 8px;
     font-size: 14px;
     font-weight: 500;
+    cursor: pointer;
 }
 
 hr {
@@ -63,6 +64,19 @@ a, a:visited, a:focus {
     color: #FFFFFF; 
     text-decoration: none;
     font-weight: 600;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 2.5px;
+    font-size: 14px;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-bottom: $global-guttering;
 }
 
 h1, .h1 { font-size: $global-font-size-h1; }

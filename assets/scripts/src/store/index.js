@@ -102,13 +102,25 @@ export class Store {
      * Get selectable choices from store
      * @return {Array} Option objects
      */
-    getChoicesFiltedBySelectable() {
+    getChoicesFilteredBySelectable() {
         const choices = this.getChoices();
         const values = choices.filter((choice) => {
             return choice.disabled !== true;
         },[]);
 
         return values;
+    }
+
+    /**
+     * Get single choice by it's ID
+     * @return {Object} Found choice
+     */
+    getChoiceById(id) {
+        if(!id) return;
+        const choices = this.getChoicesFilteredByActive();
+        const foundChoice = choices.find((choice) => choice.id === parseInt(id));
+        
+        return foundChoice;
     }
 
     /**

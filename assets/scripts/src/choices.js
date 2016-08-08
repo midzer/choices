@@ -118,6 +118,7 @@ export class Choices {
         this._onBlur       = this._onBlur.bind(this);
         this._onKeyUp      = this._onKeyUp.bind(this);
         this._onKeyDown    = this._onKeyDown.bind(this);
+        this._onClick      = this._onClick.bind(this);
         this._onTouchMove  = this._onTouchMove.bind(this);
         this._onTouchEnd   = this._onTouchEnd.bind(this);
         this._onMouseDown  = this._onMouseDown.bind(this);
@@ -346,7 +347,7 @@ export class Choices {
      * @return {Object} Class instance
      * @public
      */
-    showDropdown() { 
+    showDropdown() {
         const body = document.body;
         const html = document.documentElement;
         const winHeight  = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
@@ -396,7 +397,8 @@ export class Choices {
      * @public
      */
     toggleDropdown() {
-        if(this.dropdown.classList.contains(this.config.classNames.activeState)) {
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+        if(hasActiveDropdown) {
             this.hideDropdown()  
         } else {
             this.showDropdown();  
@@ -743,7 +745,7 @@ export class Choices {
                     const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
 
                     if(newValue.length >= 1 && newValue !== currentValue + ' ') {
-                        const haystack = this.store.getChoicesFiltedBySelectable();
+                        const haystack = this.store.getChoicesFilteredBySelectable();
                         const needle   = newValue;
 
                         const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
@@ -981,16 +983,17 @@ export class Choices {
         } else {
             // If user has removed value...
             if((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
-                // ...and it is a multiple select input, activate choices
-                if(this.passedElement.type === 'select-multiple') {
+                // ...and it is a multiple select input, activate choices (if searching)
+                if(this.passedElement.type !== 'text' && this.isSearching) {
                     this.isSearching = false;
                     this.store.dispatch(activateChoices(true));
                 }
+            } else {
+                // If we have enabled text search
+                if(this.canSearch) {
+                    this._searchChoices(this.input.value);
+                } 
             }
-            // If we have enabled text search
-            if(this.canSearch) {
-                this._searchChoices(this.input.value);
-            } 
         }
     }
 
@@ -1004,9 +1007,9 @@ export class Choices {
         if(this.passedElement.type !== 'select-one') {
             if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
                 // If there is a placeholder, we only want to set the width of the input when it is a greater 
-                // length than the placeholder. This stops the input jumping around.
+                // length than 75% of the placeholder. This stops the input jumping around.
                 const placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');
-                if(this.input.value && this.input.value.length > placeholder.length) {
+                if(this.input.value && this.input.value.length >= (placeholder.length / 1.25)) {
                     this.input.style.width = getWidthOfInput(this.input);        
                 }
             } else {
@@ -1064,37 +1067,21 @@ export class Choices {
     }
 
     /**
-     * Click event
+     * Mouse down event
      * @param  {Object} e Event
      * @return
      * @private
      */
     _onMouseDown(e) {
-        const activeItems = this.store.getItemsFilteredByActive();
         const target = e.target;
-        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
-        // If click is affecting a child node of our element
-        if(this.containerOuter.contains(target)) {
+        if(this.containerOuter.contains(target) && target !== this.input) {
 
+            const activeItems = this.store.getItemsFilteredByActive();
             const hasShiftKey = e.shiftKey ? true : false;
 
-            e.preventDefault();
-
-            // If dropdown is not active...
-            if(!hasActiveDropdown) {
-                if(this.passedElement.type === 'text') {
-                    if(document.activeElement !== this.input) {
-                        this.input.focus();
-                    }
-                } else {
-                    this.showDropdown();
-                    if(this.canSearch && document.activeElement !== this.input) {
-                        this.input.focus();
-                    }  
-                }
-            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
-                this.hideDropdown();
+            if(target !== this.input) {
+                e.preventDefault();
             }
 
             if(target.hasAttribute('data-button')) {
@@ -1106,8 +1093,6 @@ export class Choices {
                     // Remove item associated with button
                     this._removeItem(itemToRemove);
                     this._triggerChange(itemToRemove.value);
-
-                    e.preventDefault();
                 }
             } else if(target.hasAttribute('data-item')) {
                 // If we are clicking on an item
@@ -1126,16 +1111,13 @@ export class Choices {
                             }
                         }
                     });
-
-                    e.preventDefault();
-                }
+                }      
             } else if(target.hasAttribute('data-choice')) {
                 // If we are clicking on an option
                 const id = target.getAttribute('data-id');
-                const choices = this.store.getChoicesFilteredByActive();
-                const choice = choices.find((choice) => choice.id === parseInt(id));
+                const choice = this.store.getChoiceById(id);
 
-                if(!choice.selected && !choice.disabled) {
+                if(choice && !choice.selected && !choice.disabled) {
                     this._addItem(choice.value, choice.label, choice.id);
                     this._triggerChange(choice.value);
                     if(this.passedElement.type === 'select-one') {
@@ -1146,14 +1128,52 @@ export class Choices {
                         this.store.dispatch(activateChoices(true));
                         this.hideDropdown();
                     }
+                }
+            }
+        }
+    }
 
-                    e.preventDefault();
+
+    /**
+     * Click event
+     * @param  {Object} e Event
+     * @return
+     * @private
+     */
+    _onClick(e) {
+        const target = e.target;
+        const activeItems = this.store.getItemsFilteredByActive();
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+        if(this.containerOuter.contains(target)) {
+            // If click is affecting a child node of our element
+            
+            const hasShiftKey = e.shiftKey ? true : false;
+
+            // If dropdown is not active...
+            if(!hasActiveDropdown) {
+                if(this.passedElement.type === 'text') {
+                    if(document.activeElement !== this.input) {
+                        this.input.focus();
+                    }
+                } else {
+                    this.showDropdown();
+                    if(this.canSearch && document.activeElement !== this.input) {
+                        this.input.focus();
+                    } 
+                }
+            } else {
+                if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
+                    if(target !== this.input) {
+                        this.hideDropdown();
+                    }
                 }
             }
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            const hasHighlightedItems  = activeItems.some((item) => item.highlighted === true);
+            
+            const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
             // De-select any highlighted items
             if(hasHighlightedItems) {
@@ -1229,7 +1249,6 @@ export class Choices {
                     this.input.focus();    
                 }
             }
-            
         }
     }
 
@@ -1893,6 +1912,7 @@ export class Choices {
     _addEventListeners() {
         document.addEventListener('keyup', this._onKeyUp);
         document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('click', this._onClick);
         document.addEventListener('touchmove', this._onTouchMove);
         document.addEventListener('touchend', this._onTouchEnd);
         document.addEventListener('mousedown', this._onMouseDown);
@@ -1917,6 +1937,7 @@ export class Choices {
     _removeEventListeners() {
         document.removeEventListener('keyup', this._onKeyUp);
         document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('click', this._onClick);
         document.removeEventListener('touchmove', this._onTouchMove);
         document.removeEventListener('touchend', this._onTouchEnd);
         document.removeEventListener('mousedown', this._onMouseDown);

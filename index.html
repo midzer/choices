@@ -31,28 +31,28 @@
             <hr>
             <h2>Text inputs</h2>
             <label for="choices-1">Limited to 5 values</label>
-            <input id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
+            <input class="form-control" id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
 
             <label for="choices-2">Unique values only, no pasting</label>
-            <input id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+            <input class="form-control" id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
 
             <label for="choices-3">Email addresses only</label>
-            <input id="choices-3" type="text" placeholder="This is a placeholder">
+            <input class="form-control" id="choices-3" type="text" placeholder="This is a placeholder">
 
             <label for="choices-4">Disabled</label>
-            <input id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
+            <input class="form-control" id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
             <label for="choices-5">Prepends and appends a value to each items return value</label>
-            <input id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
+            <input class="form-control" id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
             <label for="choices-6">Preset values passed through options</label>
-            <input id="choices-6" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
+            <input class="form-control" id="choices-6" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
 
             <hr>
 
             <h2>Multiple select input</h2>
             <label for="choices-7">Default</label>
-            <select data-choice name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
+            <select class="form-control" data-choice name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3" selected>Dropdown item 3</option>
@@ -60,14 +60,14 @@
             </select>
 
             <label for="choices-8">With pre-selected option</label>
-            <select data-choice name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
+            <select class="form-control" data-choice name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2" selected>Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
             
             <label for="choices-9">Option groups</label>
-            <select data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
+            <select class="form-control" data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -101,26 +101,26 @@
             </select>
 
             <label for="choices-10">Options from remote source (Fetch API)</label>
-            <select name="choices-10" id="choices-10" placeholder="Pick an Arctic Monkeys record" multiple></select>
+            <select class="form-control" name="choices-10" id="choices-10" placeholder="Pick an Arctic Monkeys record" multiple></select>
 
             <hr>
 
             <h2>Single select input</h2>
             <label for="choices-11">Default</label>
-            <select data-choice name="choices-11" id="choices-11" placeholder="This is a placeholder">
+            <select class="form-control" data-choice name="choices-11" id="choices-11" placeholder="This is a placeholder">
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
 
             <label for="choices-12">Options from remote source (Fetch API)</label>
-            <select name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
+            <select class="form-control" name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
 
             <label for="choices-14">Options from remote source (XHR)</label>
-            <select name="choices-14" id="choices-14" placeholder="Pick a Smiths record"></select>
+            <select class="form-control" name="choices-14" id="choices-14" placeholder="Pick a Smiths record"></select>
 
             <label for="choices-13">Option groups</label>
-            <select data-choice name="choices-13" id="choices-13" placeholder="This is a placeholder">
+            <select class="form-control" data-choice name="choices-13" id="choices-13" placeholder="This is a placeholder">
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -154,19 +154,19 @@
             </select>
 
             <label for="choices-15">Options added via config with no search</label>
-            <select name="choices-15" id="choices-15" placeholder="This is a placeholder">
+            <select class="form-control" name="choices-15" id="choices-15" placeholder="This is a placeholder">
                 <option value="0">Zero</option>
             </select>
 
             <label for="choices-16">Option and option groups added via config</label>
-            <select name="choices-16" id="choices-16" placeholder="This is a placeholder"></select>
+            <select class="form-control" name="choices-16" id="choices-16" placeholder="This is a placeholder"></select>
 
             <label for="choices-17">Option selected via config</label>
-            <select name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
+            <select class="form-control" name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
             
             <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
             <label for="cities">States</label>
-            <select name="cities" id="cities" placeholder="Choose a state">
+            <select class="form-control" name="cities" id="cities" placeholder="Choose a state">
                 <option value="Texas">Texas</option>
                 <option value="Chicago">Chicago</option>
                 <option value="New York">New York</option>
@@ -175,7 +175,7 @@
             </select>
 
             <label for="boroughs">Boroughs</label>
-            <select name="boroughs" id="boroughs" placeholder="Choose a borough">
+            <select class="form-control" name="boroughs" id="boroughs" placeholder="Choose a borough">
                 <option value="The Bronx">The Bronx</option>
                 <option value="Brooklyn">Brooklyn</option>
                 <option value="Manhatten">Manhatten</option>
