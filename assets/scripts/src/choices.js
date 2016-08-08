@@ -1015,15 +1015,19 @@ export class Choices {
      */
     _onTouchEnd(e) {
         const target = e.target || e.touches[0].target;
+
+        // If a user tapped within our container...
         if(this.wasTap === true && this.containerOuter.contains(target)) {
 
-            // If there was no scrolling, open/focus element
-            if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') { 
+            // ...and we aren't dealing with a single select box, show dropdown/focus input
+            if((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') {
                 if(this.passedElement.type === 'text') {
+                    // If text element, we only want to focus the input (if it isn't already)
                     if(document.activeElement !== this.input) {
                         this.input.focus();
                     }
                 } else {
+                    // If a select box, we want to show the dropdown 
                     this.showDropdown();
                     if(this.canSearch && document.activeElement !== this.input) {
                         this.input.focus();
@@ -1031,6 +1035,7 @@ export class Choices {
                 }
             }
 
+            // Prevents focus event firing
             e.stopPropagation();
         }
 
@@ -1057,19 +1062,17 @@ export class Choices {
 
             // If dropdown is not active...
             if(!hasActiveDropdown) {
-                if(this.passedElement.type !== 'text') {
-                    // For select inputs we always want to show the dropdown if it isn't already showing
-                    this.showDropdown();
-                    if(this.canSearch) {
+                if(this.passedElement.type === 'text') {
+                    if(document.activeElement !== this.input) {
                         this.input.focus();
                     }
                 } else {
-                    // If input is not in focus, it ought to be 
-                    if(this.input !== document.activeElement) {
+                    this.showDropdown();
+                    if(this.canSearch && document.activeElement !== this.input) {
                         this.input.focus();
-                    }
+                    }  
                 }
-            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown && target === this.containerInner) {
+            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
                 this.hideDropdown();
             }
 
