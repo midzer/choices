@@ -725,12 +725,60 @@ export class Choices {
     };
 
     /**
+     * Filter choices based on search value
+     * @param  {String} value Value to filter by
+     * @return
+     * @private
+     */
+    _searchChoices(value) {
+        if(!value) return;
+        if(this.input === document.activeElement) {
+            const choices            = this.store.getChoices();
+            const hasUnactiveChoices = choices.some((option) => option.active !== true);
+
+            // Check that we have a value to search and the input was an alphanumeric character
+            if(value && value.length > 1) {
+                const handleFilter = () => {
+                    const newValue = isType('String', value) ? value.trim() : value;
+                    const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+
+                    if(newValue.length >= 1 && newValue !== currentValue + ' ') {
+                        const haystack = this.store.getChoicesFiltedBySelectable();
+                        const needle   = newValue;
+
+                        const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+                        const fuse = new Fuse(haystack, { 
+                            keys: keys,
+                            shouldSort: true,
+                            include: 'score',
+                        });
+                        const results = fuse.search(needle);
+
+                        this.currentValue = newValue;
+                        this.highlightPosition = 0;
+                        this.isSearching = true;
+                        this.store.dispatch(filterChoices(results));
+                    }
+                };
+        
+                handleFilter();
+            } else if(hasUnactiveChoices) {
+                // Otherwise reset choices to active
+                this.isSearching = false;
+                this.store.dispatch(activateChoices(true));
+            }
+        }
+    }
+
+    /**
      * Key down event
      * @param  {Object} e Event
      * @return
      */
     _onKeyDown(e) {
-        if(e.target !== this.input && e.target !== this.containerOuter) return;
+        if(e.target !== this.input && !this.containerOuter.contains(e.target)) return;
+
+        const target = e.target;
 
         const ctrlDownKey = e.ctrlKey || e.metaKey;
         const backKey     = 46;
@@ -770,17 +818,31 @@ export class Choices {
 
             case enterKey:
                 // If enter key is pressed and the input has a value
-                if(e.target.value && this.passedElement.type === 'text') {
+                if(target.value && this.passedElement.type === 'text') {
                     const value = this.input.value;
                     this._handleEnter(activeItems, value);                    
                 }
 
                 // Show dropdown if focus
-                if(!hasActiveDropdown && this.passedElement.type === 'select-one'){
+                if(!hasActiveDropdown && this.passedElement.type === 'select-one') {
                     e.preventDefault();
                     this.showDropdown();
                     if(this.canSearch) {
                         this.input.focus();
+                    }
+                }
+
+                if(target.hasAttribute('data-button')) {
+                    // If we are clicking on a button
+                    if(this.config.removeItems && this.config.removeItemButton) {
+                        const itemId       = target.parentNode.getAttribute('data-id');
+                        const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
+
+                        // Remove item associated with button
+                        this._removeItem(itemToRemove);
+                        this._triggerChange(itemToRemove.value);
+
+                        e.preventDefault();
                     }
                 }
 
@@ -917,43 +979,7 @@ export class Choices {
 
         // If we have enabled text search
         if(this.canSearch) {
-            // .. and our input is in focus
-            if(this.input === document.activeElement) {
-                const choices            = this.store.getChoices();
-                const hasUnactiveChoices = choices.some((option) => option.active !== true);
-
-                // Check that we have a value to search and the input was an alphanumeric character
-                if(this.input.value && this.input.value.length > 1) {
-                    const handleFilter = () => {
-                        const newValue = isType('String', this.input.value) ? this.input.value.trim() : this.input.value;
-                        const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
-
-                        if(newValue.length >= 1 && newValue !== currentValue + ' ') {
-                            const haystack = this.store.getChoicesFiltedBySelectable();
-                            const needle   = newValue;
-
-                            const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-                            const fuse = new Fuse(haystack, { 
-                                keys: keys,
-                                shouldSort: true,
-                                include: 'score',
-                            });
-                            const results = fuse.search(needle);
-
-                            this.currentValue = newValue;
-                            this.highlightPosition = 0;
-                            this.isSearching = true;
-                            this.store.dispatch(filterChoices(results));
-                        }
-                    };
-    
-                    handleFilter();
-                } else if(hasUnactiveChoices) {
-                    // Otherwise reset choices to active
-                    this.isSearching = false;
-                    this.store.dispatch(activateChoices(true));
-                }
-            }
+            this._searchChoices(this.input.value);
         } 
     }
 
@@ -999,11 +1025,13 @@ export class Choices {
                     }
                 } else {
                     this.showDropdown();
-                    if(this.config.search && document.activeElement !== this.input) {
+                    if(this.canSearch && document.activeElement !== this.input) {
                         this.input.focus();
                     }  
                 }
             }
+
+            e.stopPropagation();
         }
 
         this.wasTap = true;
@@ -1023,19 +1051,16 @@ export class Choices {
         // If click is affecting a child node of our element
         if(this.containerOuter.contains(target)) {
 
-            // Prevent blur event triggering causing dropdown to close
-            // in a race condition
-            e.preventDefault();
-
             const hasShiftKey = e.shiftKey ? true : false;
+
+            e.preventDefault();
 
             // If dropdown is not active...
             if(!hasActiveDropdown) {
-                // And the input isn't a text input
                 if(this.passedElement.type !== 'text') {
                     // For select inputs we always want to show the dropdown if it isn't already showing
                     this.showDropdown();
-                    if(this.passedElement.type === 'select-multiple' || this.canSearch) {
+                    if(this.canSearch) {
                         this.input.focus();
                     }
                 } else {
@@ -1044,11 +1069,8 @@ export class Choices {
                         this.input.focus();
                     }
                 }
-            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
+            } else if(this.passedElement.type === 'select-one' && hasActiveDropdown && target === this.containerInner) {
                 this.hideDropdown();
-                if(this.config.search) {
-                    this.input.blur();    
-                }
             }
 
             if(target.hasAttribute('data-button')) {
@@ -1060,6 +1082,8 @@ export class Choices {
                     // Remove item associated with button
                     this._removeItem(itemToRemove);
                     this._triggerChange(itemToRemove.value);
+
+                    e.preventDefault();
                 }
             } else if(target.hasAttribute('data-item')) {
                 // If we are clicking on an item
@@ -1078,6 +1102,8 @@ export class Choices {
                             }
                         }
                     });
+
+                    e.preventDefault();
                 }
             } else if(target.hasAttribute('data-choice')) {
                 // If we are clicking on an option
@@ -1089,13 +1115,15 @@ export class Choices {
                     this._addItem(choice.value, choice.label, choice.id);
                     this._triggerChange(choice.value);
                     if(this.passedElement.type === 'select-one') {
-                        if(this.config.search) {
+                        if(this.canSearch) {
                             this.input.value = "";    
                         }
                         this.isSearching = false;
                         this.store.dispatch(activateChoices(true));
                         this.hideDropdown();
                     }
+
+                    e.preventDefault();
                 }
             }
 
@@ -1162,16 +1190,18 @@ export class Choices {
                 this.showDropdown();  
             }
         } else if(this.passedElement.type !== 'text' && (target === this.containerOuter || target === this.containerInner) && !hasActiveDropdown) {            
+            // If element is a select box, the focussed element is the container and the dropdown
+            // isn't already open, focus and show dropdown
             this.containerOuter.classList.add(this.config.classNames.focusState);
             this.showDropdown();
 
-            if(this.passedElement.type === 'select-one') {
+            if(this.passedElement.type === 'select-one' && target === this.containerOuter) {
                 if(!this.focusAndHideDropdown){
                     this.input.focus();
                 }
                 this.focusAndHideDropdown = false;
             } else {
-                if(this.config.search) {
+                if(this.canSearch) {
                     this.input.focus();    
                 }
             }
@@ -1194,7 +1224,7 @@ export class Choices {
             this.containerOuter.classList.remove(this.config.classNames.focusState);
 
             // Close the dropdown if there is one
-            if(hasActiveDropdown) {
+            if(hasActiveDropdown && e.target === this.input) {
                 this.hideDropdown();
             }
         }
@@ -1600,7 +1630,7 @@ export class Choices {
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             containerInner.appendChild(input);
-        } else if(this.config.search) {
+        } else if(this.canSearch) {
             dropdown.insertBefore(input, dropdown.firstChild);
         }
 
