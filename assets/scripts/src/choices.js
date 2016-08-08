@@ -1546,14 +1546,14 @@ export class Choices {
             item: (data) => {
                 if(this.config.removeItemButton && this.passedElement.type !== 'select-one') {
                     return strToEl(`
-                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" data-deletable>
+                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : ''} ${ !data.disabled ? classNames.itemSelectable : '' }" data-item data-id="${ data.id }" data-value="${ data.value }" ${ data.active ? 'aria-selected="true"' : '' } ${ data.disabled ? 'aria-disabled="true"' : '' } data-deletable>
                             ${ data.label }
                             <button class="${ classNames.button }" data-button>Remove item</button>
                         </div>
                     `);
                 } else {
                     return strToEl(`
-                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : classNames.itemSelectable }" data-item data-id="${ data.id }" data-value="${ data.value }">
+                        <div class="${ classNames.item } ${ data.highlighted ? classNames.highlightedState : classNames.itemSelectable }"  data-item data-id="${ data.id }" data-value="${ data.value }" ${ data.active ? 'aria-selected="true"' : '' } ${ data.disabled ? 'aria-disabled="true"' : '' }>
                             ${ data.label }
                         </div>
                     `);
@@ -1561,7 +1561,7 @@ export class Choices {
             },
             choiceList: () => {
                 return strToEl(`
-                    <div class="${ classNames.list }" dir="ltr"></div>
+                    <div class="${ classNames.list }" dir="ltr" role="listbox" ${ this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}></div>
                 `);
             },
             choiceGroup: (data) => {
@@ -1580,7 +1580,7 @@ export class Choices {
             },
             input: () => {
                 return strToEl(`
-                    <input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox">
+                    <input type="text" class="${ classNames.input } ${ classNames.inputCloned }" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">
                 `);
             },
             dropdown: () => {
