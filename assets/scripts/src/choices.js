@@ -936,9 +936,6 @@ export class Choices {
      */
     _onKeyUp(e) {
         if(e.target !== this.input) return;
-        const keyString = String.fromCharCode(e.keyCode);
-        const backKey     = 46;
-        const deleteKey   = 8;
 
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
@@ -981,6 +978,9 @@ export class Choices {
                 }
             }
         } else {
+            const backKey     = 46;
+            const deleteKey   = 8;
+
             // If user has removed value...
             if((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
                 // ...and it is a multiple select input, activate choices (if searching)
@@ -1078,8 +1078,8 @@ export class Choices {
         if(this.containerOuter.contains(target) && target !== this.input) {
 
             const activeItems = this.store.getItemsFilteredByActive();
-            const hasShiftKey = e.shiftKey ? true : false;
 
+            // Prevent input mouse down triggering focus event
             if(target !== this.input) {
                 e.preventDefault();
             }
@@ -1098,6 +1098,7 @@ export class Choices {
                 // If we are clicking on an item
                 if(this.config.removeItems && this.passedElement.type !== 'select-one') {
                     const passedId = target.getAttribute('data-id');
+                    const hasShiftKey = e.shiftKey ? true : false;
 
                     // We only want to select one item with a click
                     // so we deselect any items that aren't the target
@@ -1142,7 +1143,6 @@ export class Choices {
      */
     _onClick(e) {
         const target = e.target;
-        const activeItems = this.store.getItemsFilteredByActive();
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         if(this.containerOuter.contains(target)) {
@@ -1173,6 +1173,7 @@ export class Choices {
         } else {
             // Click is outside of our element so close dropdown and de-select items
             
+            const activeItems = this.store.getItemsFilteredByActive();
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
             // De-select any highlighted items
