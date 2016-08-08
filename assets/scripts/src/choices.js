@@ -1651,7 +1651,9 @@ export class Choices {
         containerOuter.appendChild(dropdown);
         containerInner.appendChild(itemList);
 
-        dropdown.appendChild(choiceList);
+        if(this.passedElement.type !== 'text') {
+            dropdown.appendChild(choiceList);        
+        }
 
         if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             containerInner.appendChild(input);
