@@ -917,7 +917,8 @@ export class Choices {
                 if(hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
                     this._handleBackspace(activeItems);
                     e.preventDefault();
-                }
+                };
+
                 break;
 
             default:
@@ -934,6 +935,8 @@ export class Choices {
     _onKeyUp(e) {
         if(e.target !== this.input) return;
         const keyString = String.fromCharCode(e.keyCode);
+        const backKey     = 46;
+        const deleteKey   = 8;
 
         // We are typing into a text input and have a value, we want to show a dropdown
         // notice. Otherwise hide the dropdown
@@ -976,6 +979,14 @@ export class Choices {
                 }
             }
         } else {
+            // If user has removed value...
+            if((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
+                // ...and it is a multiple select input, activate choices
+                if(this.passedElement.type === 'select-multiple') {
+                    this.isSearching = false;
+                    this.store.dispatch(activateChoices(true));
+                }
+            }
             // If we have enabled text search
             if(this.canSearch) {
                 this._searchChoices(this.input.value);
@@ -991,7 +1002,17 @@ export class Choices {
      */
     _onInput(e) {
         if(this.passedElement.type !== 'select-one') {
-            this.input.style.width = getWidthOfInput(this.input);
+            if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+                // If there is a placeholder, we only want to set the width of the input when it is a greater 
+                // length than the placeholder. This stops the input jumping around.
+                const placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');
+                if(this.input.value && this.input.value.length > placeholder.length) {
+                    this.input.style.width = getWidthOfInput(this.input);        
+                }
+            } else {
+                // If there is no placeholder, resize input to contents
+                this.input.style.width = getWidthOfInput(this.input);    
+            }
         }
     }
 
