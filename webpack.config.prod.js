@@ -1,5 +1,8 @@
 var path = require('path');
+var package = require('./package.json');
 var webpack = require('webpack');
+var wrapperPlugin = require('wrapper-webpack-plugin');
+var banner = `/*! ${ package.name } v${ package.version } | (c) ${ new Date().getFullYear() } ${ package.author } | ${ package.homepage } */ \n`
 
 module.exports = {
     devtool: 'cheap-module-source-map',
@@ -28,6 +31,9 @@ module.exports = {
                 // This has effect on the react lib size
                 'NODE_ENV': JSON.stringify('production'),
             }
+        }),
+        new wrapperPlugin({
+            header: banner,
         }),
     ],
     module: {
