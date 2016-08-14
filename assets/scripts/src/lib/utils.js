@@ -1,9 +1,7 @@
-export const hasClass = (elem, className) => {
-    return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
-}
+/* eslint-disable */
 
 /**
- * Capitalises the first letter of each word in a string 
+ * Capitalises the first letter of each word in a string
  * @param  {String} str String to capitalise
  * @return {String}     Capitalised string
  */
@@ -31,7 +29,7 @@ export const isType = function(type, obj) {
  */
 export const isNode = (o) => {
     return (
-        typeof Node === "object" ? o instanceof Node : 
+        typeof Node === "object" ? o instanceof Node :
         o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
     );
 };
@@ -46,7 +44,7 @@ export const isElement = (o) => {
         typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
         o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
     );
-}
+};
 
 /**
  * Merges unspecified amount of objects into new object
@@ -111,7 +109,7 @@ export const whichTransitionEvent = function(){
             return transitions[t];
         }
     }
-}
+};
 
 /**
  * CSS animation end event listener
@@ -136,7 +134,7 @@ export const whichAnimationEvent = function() {
 };
 
 /**
- *  Get the ancestors of each element in the current set of matched elements, 
+ *  Get the ancestors of each element in the current set of matched elements,
  *  up to but not including the element matched by the selector
  * @param  {NodeElement} elem     Element to begin search from
  * @param  {NodeElement} parent   Parent to find
@@ -243,9 +241,9 @@ export const getSiblings = function (elem) {
     return siblings;
 };
 
-/** 
+/**
  * Find ancestor in DOM tree
- * @param  {NodeElement} el  Element to start search from 
+ * @param  {NodeElement} el  Element to start search from
  * @param  {[type]} cls Class of parent
  * @return {NodeElement}     Found parent element
  */
@@ -258,7 +256,7 @@ export const findAncestor = function(el, cls) {
  * Debounce an event handler.
  * @param  {Function} func      Function to run after wait
  * @param  {Number} wait      The delay before the function is executed
- * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing. 
+ * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing.
  * @return {Function}           A function will be called after it stops being called for a given delay
  */
 export const debounce = function(func, wait, immediate) {
@@ -309,21 +307,21 @@ export const getElementOffset = function(el, offset) {
 };
 
 /**
- * Get the next or previous element from a given start point 
+ * Get the next or previous element from a given start point
  * @param  {HTMLElement} startEl    Element to start position from
- * @param  {String}      className  The class we will look through 
+ * @param  {String}      className  The class we will look through
  * @param  {Number}      direction  Positive next element, negative previous element
  * @return {[HTMLElement}           Found element
  */
 export const getAdjacentEl = (startEl, className, direction = 1) => {
-    if(!startEl || !className) return; 
+    if(!startEl || !className) return;
 
     const parent = startEl.parentNode.parentNode;
     const children = Array.from(parent.querySelectorAll(className));
 
     const startPos = children.indexOf(startEl);
     const operatorDirection = direction > 0 ? 1 : -1;
-    
+
     return children[startPos + operatorDirection];
 };
 
@@ -354,10 +352,10 @@ export const isInView = function(el, position, offset) {
 };
 
 /**
- * Determine whether an element is within 
+ * Determine whether an element is within
  * @param  {HTMLElement} el        Element to test
  * @param  {HTMLElement} parent    Scrolling parent
- * @param  {Number} direction      Whether element is visible from above or below 
+ * @param  {Number} direction      Whether element is visible from above or below
  * @return {Boolean}
  */
 export const isScrolledIntoView = (el, parent, direction = 1) => {
@@ -372,9 +370,9 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
         // In view from top
         isVisible = el.offsetTop >= parent.scrollTop;
     }
-    
+
     return isVisible;
-}
+};
 
 /**
  * Remove html tags from a string
@@ -387,7 +385,7 @@ export const stripHTML = function(html) {
    return el.textContent || el.innerText || "";
 };
 
-/** 
+/**
  * Adds animation to an element and removes it upon animation completion
  * @param  {Element} el        Element to add animation to
  * @param  {String} animation Animation class to add to element
@@ -414,7 +412,7 @@ export const addAnimation = (el, animation) => {
  */
 export const getRandomNumber = function(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
-}
+};
 
 /**
  * Turn a string into a node
@@ -436,7 +434,7 @@ export const strToEl = (function() {
     };
 }());
 
-/** 
+/**
  * Sets the width of a passed input based on its value
  * @return {Number} Width of input
  */
@@ -456,13 +454,13 @@ export const getWidthOfInput = (input) => {
         document.body.appendChild(testEl);
 
         if(value && testEl.offsetWidth !== input.offsetWidth) {
-            width = testEl.offsetWidth + 4;    
+            width = testEl.offsetWidth + 4;
         }
 
         document.body.removeChild(testEl);
     }
 
-    return `${width}px`;    
+    return `${width}px`;
 };
 
 export const sortByAlpha = (a, b) => {

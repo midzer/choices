@@ -1,17 +1,14 @@
-'use strict';
-
 import { createStore } from 'redux';
 import rootReducer from './../reducers/index.js';
 
-
-export class Store {
+export default class Store {
     constructor() {
         this.store = createStore(
-            rootReducer, 
+            rootReducer,
             window.devToolsExtension ? window.devToolsExtension() : undefined
         );
     }
-    
+
     /**
      * Get store object (wrapping Redux method)
      * @return {Object} State
@@ -53,7 +50,6 @@ export class Store {
      */
     getItemsFilteredByActive() {
         const items = this.getItems();
-
         const values = items.filter((item) => {
             return item.active === true;
         }, []);
@@ -75,12 +71,11 @@ export class Store {
     }
 
     /**
-     * Get choices from store 
+     * Get choices from store
      * @return {Array} Option objects
      */
     getChoices() {
         const state = this.store.getState();
-        
         return state.choices;
     }
 
@@ -90,10 +85,9 @@ export class Store {
      */
     getChoicesFilteredByActive() {
         const choices = this.getChoices();
-
         const values = choices.filter((choice) => {
             return choice.active === true;
-        },[]);
+        }, []);
 
         return values;
     }
@@ -106,7 +100,7 @@ export class Store {
         const choices = this.getChoices();
         const values = choices.filter((choice) => {
             return choice.disabled !== true;
-        },[]);
+        }, []);
 
         return values;
     }
@@ -116,11 +110,12 @@ export class Store {
      * @return {Object} Found choice
      */
     getChoiceById(id) {
-        if(!id) return;
-        const choices = this.getChoicesFilteredByActive();
-        const foundChoice = choices.find((choice) => choice.id === parseInt(id));
-        
-        return foundChoice;
+        if (id) {
+            const choices = this.getChoicesFilteredByActive();
+            const foundChoice = choices.find((choice) => choice.id === parseInt(id, 10));
+            return foundChoice;
+        }
+        return false;
     }
 
     /**
@@ -145,11 +140,11 @@ export class Store {
             const hasActiveOptions = choices.some((choice) => {
                 return choice.active === true && choice.disabled === false;
             });
-            return isActive && hasActiveOptions ? true : false;
-        },[]);
+            return isActive && hasActiveOptions;
+        }, []);
 
         return values;
     }
-};
+}
 
 module.exports = Store;

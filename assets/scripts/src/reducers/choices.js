@@ -1,22 +1,28 @@
 const choices = (state = [], action) => {
     switch (action.type) {
-        case 'ADD_CHOICE':
+        case 'ADD_CHOICE': {
+            /*
+                A disabled choice appears in the choice dropdown but cannot be selected
+                A selected choice has been added to the passed input's value (added as an item)
+                An active choice appears within the choice dropdown
+             */
             return [...state, {
                 id: action.id,
                 groupId: action.groupId,
                 value: action.value,
                 label: action.label,
-                disabled: action.disabled, // A disabled choice appears in the choice dropdown but cannot be selected
-                selected: false, // A selected choice has been added to the passed input's value (added as an item)
-                active: true, // An active choice appears within the choice dropdown
+                disabled: action.disabled,
+                selected: false,
+                active: true,
                 score: 9999,
             }];
+        }
 
-        case 'ADD_ITEM':
+        case 'ADD_ITEM': {
             let newState = state;
 
             // If all choices need to be activated
-            if(action.activateOptions) {
+            if (action.activateOptions) {
                 newState = state.map((choice) => {
                     choice.active = action.active;
                     return choice;
@@ -24,9 +30,9 @@ const choices = (state = [], action) => {
             }
             // When an item is added and it has an associated choice,
             // we want to disable it so it can't be chosen again
-            if(action.choiceId > -1) {
+            if (action.choiceId > -1) {
                 newState = state.map((choice) => {
-                    if(choice.id === parseInt(action.choiceId)) {
+                    if (choice.id === parseInt(action.choiceId, 10)) {
                         choice.selected = true;
                     }
                     return choice;
@@ -34,48 +40,54 @@ const choices = (state = [], action) => {
             }
 
             return newState;
+        }
 
-        case 'REMOVE_ITEM':
+        case 'REMOVE_ITEM': {
             // When an item is removed and it has an associated choice,
             // we want to re-enable it so it can be chosen again
-            if(action.choiceId > -1) {
+            if (action.choiceId > -1) {
                 return state.map((choice) => {
-                    if(choice.id === parseInt(action.choiceId)) {
+                    if (choice.id === parseInt(action.choiceId, 10)) {
                         choice.selected = false;
                     }
                     return choice;
                 });
-            } else {
-                return state;
             }
 
-        case 'FILTER_CHOICES':
+            return state;
+        }
+
+        case 'FILTER_CHOICES': {
             const filteredResults = action.results;
-            const filteredState = state.map((choice, index) => {
-                // Set active state based on whether choice is 
+            const filteredState = state.map((choice) => {
+                // Set active state based on whether choice is
                 // within filtered results
-        
+
                 choice.active = filteredResults.some((result) => {
-                    if(result.item.id === choice.id) {
+                    if (result.item.id === choice.id) {
                         choice.score = result.score;
                         return true;
                     }
+                    return false;
                 });
 
                 return choice;
             });
 
             return filteredState;
+        }
 
-        case 'ACTIVATE_CHOICES':
+        case 'ACTIVATE_CHOICES': {
             return state.map((choice) => {
                 choice.active = action.active;
                 return choice;
-            });            
+            });
+        }
 
-        default:
+        default: {
             return state;
+        }
     }
-}
+};
 
 export default choices;

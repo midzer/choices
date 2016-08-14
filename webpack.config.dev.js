@@ -12,6 +12,9 @@ module.exports = {
         filename: 'choices.min.js',
         publicPath: '/assets/scripts/dist/'
     },
+    eslint: {
+        configFile: '.eslintrc'
+    },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
@@ -24,7 +27,7 @@ module.exports = {
         loaders: [{
             test: /\.js$/,
             exclude: /(node_modules|bower_components)/,
-            loaders: ['babel'],
+            loaders: ['babel', 'eslint-loader'],
             include: path.join(__dirname, 'assets/scripts/src')
         }]
     }
