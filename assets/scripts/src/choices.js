@@ -45,6 +45,8 @@ export class Choices {
             prependValue: null,
             appendValue: null,
             loadingText: 'Loading...',
+            noResultsText: 'No results round',
+            noChoicesText: 'No choices to choose from',
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
@@ -1877,7 +1879,7 @@ export class Choices {
                         this._highlightChoice();
                     } else {
                         // Otherwise show a notice
-                        const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No choices to choose from');
+                        const dropdownItem = this.isSearching ? this._getTemplate('notice', this.config.noResultsText) : this._getTemplate('notice', this.config.noChoicesText);
                         this.choiceList.appendChild(dropdownItem);
                     }
                 }
