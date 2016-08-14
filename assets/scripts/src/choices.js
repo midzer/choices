@@ -668,48 +668,6 @@ export class Choices {
         }
     }
 
-    /** 
-     * Process enter key event
-     * @param  {Array} activeItems Items that are currently active
-     * @return
-     * @private
-     */
-    _handleEnter(activeItems, value) {
-        let canUpdate = true;
-
-        if(this.config.addItems) {
-            if (this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-                // If there is a max entry limit and we have reached that limit
-                // don't update
-                canUpdate = false;
-            } else if(this.config.duplicateItems === false && this.passedElement.value) {
-                // If no duplicates are allowed, and the value already exists
-                // in the array, don't update
-                canUpdate = !activeItems.some((item) => item.value === value);
-            }   
-        } else {
-            canUpdate = false;
-        }
-
-        if (canUpdate) {
-            let canAddItem = true;
-
-            // If a user has supplied a regular expression filter
-            if(this.config.regexFilter) {
-                // Determine whether we can update based on whether 
-                // our regular expression passes 
-                canAddItem = this._regexFilter(value);
-            }
-            
-            // All is good, add
-            if(canAddItem) {
-                this.toggleDropdown();
-                this._addItem(value);
-                this._triggerChange(value);
-                this.clearInput(this.passedElement);
-            }
-        }
-    };
 
     /**
      * Process enter/click of an item button 
@@ -780,6 +738,7 @@ export class Choices {
 
         if(choice && !choice.selected && !choice.disabled) {
 
+            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
             let canAddItem = true;
 
             if(this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
@@ -828,6 +787,50 @@ export class Choices {
     };
 
     /**
+     * Validates whether an item can be added by a user
+     * @param {Array} activeItems The currently active items 
+     * @param  {String} value     Value of item to add
+     * @return {Object}           Response: Whether user can add item
+     *                            Notice: Notice show in dropdown
+     */
+    _canAddItem(activeItems, value) {
+        let canAddItem = true;
+        let notice = `Press Enter to add "${ value }"`;
+
+        if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
+            if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+                // If there is a max entry limit and we have reached that limit
+                // don't update
+                canAddItem = false;
+                notice = `Only ${ this.config.maxItemCount } values can be added.`;
+            }
+        }
+        
+        if(this.passedElement.type === 'text' && this.config.addItems) {
+            const isUnique = !activeItems.some((item) => item.value === value);
+
+            // If a user has supplied a regular expression filter
+            if(this.config.regexFilter) {
+                // Determine whether we can update based on whether 
+                // our regular expression passes 
+                canAddItem = this._regexFilter(value);
+            }
+
+            // If no duplicates are allowed, and the value already exists
+            // in the array
+            if(this.config.duplicateItems === false && !isUnique) {
+                canAddItem = false;
+                notice = `Only unique values can be added.`;
+            }
+        }  
+
+        return {
+            response: canAddItem,
+            notice: notice,
+        };
+    }
+
+    /**
      * Filter choices based on search value
      * @param  {String} value Value to filter by
      * @return
@@ -848,14 +851,13 @@ export class Choices {
                     if(newValue.length >= 1 && newValue !== currentValue + ' ') {
                         const haystack = this.store.getChoicesFilteredBySelectable();
                         const needle   = newValue;
-
-                        const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-                        const fuse = new Fuse(haystack, { 
+                        const keys     = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+                        const fuse     = new Fuse(haystack, { 
                             keys: keys,
                             shouldSort: true,
                             include: 'score',
                         });
-                        const results = fuse.search(needle);
+                        const results  = fuse.search(needle);
 
                         this.currentValue = newValue;
                         this.highlightPosition = 0;
@@ -921,9 +923,17 @@ export class Choices {
 
             case enterKey:
                 // If enter key is pressed and the input has a value
-                if(target.value && this.passedElement.type === 'text') {
+                if(this.passedElement.type === 'text' && target.value) {
                     const value = this.input.value;
-                    this._handleEnter(activeItems, value);                    
+                    const canAddItem = this._canAddItem(activeItems, value);  
+
+                    // All is good, add
+                    if(canAddItem.response) {
+                        this.toggleDropdown();
+                        this._addItem(value);
+                        this._triggerChange(value);
+                        this.clearInput(this.passedElement);
+                    }
                 }
 
                 if(target.hasAttribute('data-button')) {
@@ -934,17 +944,12 @@ export class Choices {
                     const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
             
                     if(highlighted) {
-                        let canAddItem = true;
+                        const value       = highlighted.getAttribute('data-value');
+                        const label       = highlighted.innerHTML;
+                        const id          = highlighted.getAttribute('data-id');
+                        const canAddItem  = this._canAddItem(activeItems, value); 
 
-                        if(this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
-                            canAddItem = false;
-                        }
-
-                        if(canAddItem) {
-                            const value = highlighted.getAttribute('data-value');
-                            const label = highlighted.innerHTML;
-                            const id    = highlighted.getAttribute('data-id');
-
+                        if(canAddItem.response) {
                             this._addItem(value, label, id);
                             this._triggerChange(value);
                             this.clearInput(this.passedElement);
@@ -1039,34 +1044,25 @@ export class Choices {
         // notice. Otherwise hide the dropdown
         if(this.passedElement.type === 'text') {
             const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-            let dropdownItem;
-            if(this.input.value) {
-                const activeItems = this.store.getItemsFilteredByActive();
-                const isUnique = !activeItems.some((item) => item.value === this.input.value);
-                let canAddItem = true;
+            const value = this.input.value;
 
-                // If a user has supplied a regular expression filter
-                if(this.config.regexFilter) {
-                    // Determine whether we can update based on whether 
-                    // our regular expression passes 
-                    canAddItem = this._regexFilter(this.input.value);
-                }
-                
-                if(this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-                    dropdownItem = this._getTemplate('notice', `Only ${ this.config.maxItemCount } values can be added.`);
-                } else if(!this.config.duplicateItems && !isUnique) {
-                    dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
-                } else if(canAddItem) {
-                    dropdownItem = this._getTemplate('notice', `Press Enter to add "${ this.input.value }"`);
-                }
-                
-                if(canAddItem !== false) {
+            let dropdownItem;
+
+            if(value) {
+                const activeItems = this.store.getItemsFilteredByActive();
+                const canAddItem = this._canAddItem(activeItems, value); 
+
+                if(canAddItem.notice) {
+                    const dropdownItem = this._getTemplate('notice', canAddItem.notice);
                     this.dropdown.innerHTML = dropdownItem.outerHTML;
-                    if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                }
+
+                if(canAddItem.response === true) {
+                    if(!hasActiveDropdown) {
                         this.showDropdown();    
                     }
                 } else {
-                    if(hasActiveDropdown) {
+                    if(!canAddItem.notice && hasActiveDropdown) {
                         this.hideDropdown();  
                     }
                 }
@@ -1075,6 +1071,7 @@ export class Choices {
                     this.hideDropdown();  
                 }
             }
+
         } else {
             const backKey     = 46;
             const deleteKey   = 8;
@@ -1092,6 +1089,7 @@ export class Choices {
                     this._searchChoices(this.input.value);
                 } 
             }
+            
         }
     }
 

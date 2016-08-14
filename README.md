@@ -183,19 +183,19 @@ Pass an array of objects:
 
 <strong>Usage:</strong> Whether a user can edit items. An items value can be edited by pressing the backspace.
 
+### duplicateItems
+<strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
+<strong>Usage:</strong> Whether a user can input/choose a duplicate item.
+
 ### delimiter
 <strong>Type:</strong> `String` <strong>Default:</strong> `,`
 
 <strong>Input types affected:</strong> `text`
 
 <strong>Usage:</strong> What divides each value. By default the delimited value would be `"Value 1, Value 2, Value 3"`.
-
-### duplicates
-<strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
-
-<strong>Input types affected:</strong> `text`
-
-<strong>Usage:</strong> Whether a user can input a duplicate item.
 
 ### paste
 <strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
