@@ -598,13 +598,20 @@ export class Choices {
                 if(this.passedElement.type === 'select-one') { 
                     const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
                     this.itemList.appendChild(placeholderItem);
+                } else {
+                    this.input.placeholder = this.config.loadingText;
                 }
+
                 const callback = (results, value, label) => {
                     if(!isType('Array', results) || !value) return;
                     if(results && results.length) {
+                        // Remove loading states/text
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                        const filter = this.config.sortFilter;
-
+                        if(this.passedElement.type === 'select-multiple') {
+                            this.input.placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');    
+                        }
+                        
+                        // Add each result as a choice
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 
@@ -1213,7 +1220,7 @@ export class Choices {
                     } 
                 }
             } else {
-                if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
+                if(this.passedElement.type === 'select-one') {
                     if(target !== this.input) {
                         this.hideDropdown();
                     }
