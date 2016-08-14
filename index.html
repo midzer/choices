@@ -58,13 +58,6 @@
                 <option value="Dropdown item 3" selected>Dropdown item 3</option>
                 <option value="Dropdown item 4" disabled>Dropdown item 4</option>
             </select>
-
-            <label for="choices-8">With pre-selected option</label>
-            <select class="form-control" data-choice name="choices-8" id="choices-8" placeholder="Choose an option" multiple>
-                <option value="Dropdown item 1">Dropdown item 1</option>
-                <option value="Dropdown item 2" selected>Dropdown item 2</option>
-                <option value="Dropdown item 3">Dropdown item 3</option>
-            </select>
             
             <label for="choices-9">Option groups</label>
             <select class="form-control" data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
@@ -100,8 +93,8 @@
                 </optgroup>
             </select>
 
-            <label for="choices-10">Options from remote source (Fetch API)</label>
-            <select class="form-control" name="choices-10" id="choices-10" placeholder="Pick an Arctic Monkeys record" multiple></select>
+            <label for="choices-10">Options from remote source (Fetch API) &amp; limited to 5</label>
+            <select class="form-control" name="choices-10" id="choices-10" multiple></select>
 
             <hr>
 
@@ -199,8 +192,6 @@
                 },
             });
 
-            console.log(example1.getValue());
-
             var example2 = new Choices('#choices-2', {
                 paste: false,
                 duplicateItems: false,
@@ -208,7 +199,6 @@
             });
 
             var example3 = new Choices('#choices-3', {
-                duplicates: false,
                 editItems: true,
                 regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             });
@@ -227,9 +217,10 @@
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
              
-            var example8 = new Choices('#choices-10', { 
+            var example9 = new Choices('#choices-10', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Strokes record',
+                maxItemCount: 5,
                 callbackOnChange: function(value, passedInput) { console.log(value) }
             }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
@@ -243,7 +234,7 @@
                     });
             });
             
-            var example9 = new Choices('#choices-12', { 
+            var example10 = new Choices('#choices-12', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Arctic Monkeys record'
             }).ajax(function(callback) {
@@ -251,7 +242,7 @@
                     .then(function(response) {
                         response.json().then(function(data) {
                             callback(data.releases, 'title', 'title');
-                            example9.setValueByChoice('Fake Tales Of San Francisco');
+                            example10.setValueByChoice('Fake Tales Of San Francisco');
                         });
                     })
                     .catch(function(error) {
@@ -259,7 +250,7 @@
                     });
             });
 
-            var example10 = new Choices('#choices-14', {
+            var example11 = new Choices('#choices-14', {
                 removeItemButton: true,
             }).ajax(function(callback) {
                 var request = new XMLHttpRequest();
@@ -272,7 +263,7 @@
                         if (status == 200) {
                             data = JSON.parse(request.responseText);
                             callback(data.releases, 'title', 'title');
-                            example10.setValueByChoice('How Soon Is Now?');
+                            example11.setValueByChoice('How Soon Is Now?');
                         } else {
                             console.error(status);
                         }
@@ -281,12 +272,12 @@
                 request.send();
             });
 
-            var example11 = new Choices('[data-choice]', {
+            var example12 = new Choices('[data-choice]', {
                 placeholderValue: 'This is a placeholder set in the config',
                 removeButton: true,
             });
 
-            var example12 = new Choices('#choices-15', {
+            var example13 = new Choices('#choices-15', {
                 search: false,
                 choices: [
                     {value: 'One', label: 'Label One'},
@@ -299,7 +290,7 @@
                 {value: 'Six', label: 'Label Six', selected: true},
             ], 'value', 'label');
 
-            var example13 = new Choices('#choices-16', {
+            var example14 = new Choices('#choices-16', {
                 placeholder: true, 
             }).setChoices([{
                 label: 'Group one',
@@ -322,7 +313,7 @@
                 ]
             }], 'value', 'label');
 
-            var example14 = new Choices('#choices-17', {
+            var example15 = new Choices('#choices-17', {
                 choices: [
                     {value: 'One', label: 'Label One'},
                     {value: 'Two', label: 'Label Two', disabled: true},

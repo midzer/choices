@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./assets/scripts/dist/choices.min.js",
   "scripts": {
@@ -48,7 +48,8 @@
     "postcss-cli": "^2.5.1",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",
-    "whatwg-fetch": "^1.0.0"
+    "whatwg-fetch": "^1.0.0",
+    "wrapper-webpack-plugin": "^0.1.7"
   },
   "dependencies": {
     "redux": "^3.3.1"

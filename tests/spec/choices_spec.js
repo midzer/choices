@@ -242,6 +242,35 @@ describe('Choices', function() {
             expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(HTMLElement));
         });
 
+        it('should open the dropdown on click', function() {
+            const container = this.choices.containerOuter;
+            this.choices._onClick({
+                target: container,
+                ctrlKey: false,
+                preventDefault: () => {}
+            });
+
+            expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(true);
+        });
+
+        it('should open the dropdown on click', function() {
+            const container = this.choices.containerOuter;
+
+            this.choices._onClick({
+                target: container,
+                ctrlKey: false,
+                preventDefault: () => {}
+            });
+
+            this.choices._onClick({
+                target: container,
+                ctrlKey: false,
+                preventDefault: () => {}
+            });
+
+            expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(false);
+        });
+
         it('should filter choices when searching', function() {
             this.choices.input.focus();
             this.choices.input.value = 'Value 3';

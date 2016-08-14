@@ -45,6 +45,8 @@ export class Choices {
             prependValue: null,
             appendValue: null,
             loadingText: 'Loading...',
+            noResultsText: 'No results round',
+            noChoicesText: 'No choices to choose from',
             classNames: {
                 containerOuter: 'choices',
                 containerInner: 'choices__inner',
@@ -407,7 +409,6 @@ export class Choices {
         return this;
     }
 
-
     /**
      * Get value(s) of input (i.e. inputted items (text) or selected choices (select))
      * @param {Boolean} valueOnly Get only values of selected items, otherwise return selected items
@@ -508,8 +509,8 @@ export class Choices {
     /**
     * Direct populate choices
     * @param  {Array} choices - Choices to insert 
-    * @param  {string} value - Name of 'value' property
-    * @param  {string} label - Name of 'label' property
+    * @param  {String} value - Name of 'value' property
+    * @param  {String} label - Name of 'label' property
     * @return {Object} Class instance
     * @public
     */
@@ -542,6 +543,19 @@ export class Choices {
      */
     clearStore() {
         this.store.dispatch(clearAll());
+        return this;
+    }
+
+    /** 
+     * Set value of input to blank
+     * @return {Object} Class instance
+     * @public
+     */
+    clearInput() {
+        if (this.input.value) this.input.value = '';
+        if(this.passedElement.type !== 'select-one') {
+            this.input.style.width = getWidthOfInput(this.input);
+        }
         return this;
     }
 
@@ -596,13 +610,20 @@ export class Choices {
                 if(this.passedElement.type === 'select-one') { 
                     const placeholderItem = this._getTemplate('item', { id: -1, value: 'Loading', label: this.config.loadingText, active: true});
                     this.itemList.appendChild(placeholderItem);
+                } else {
+                    this.input.placeholder = this.config.loadingText;
                 }
+
                 const callback = (results, value, label) => {
                     if(!isType('Array', results) || !value) return;
                     if(results && results.length) {
+                        // Remove loading states/text
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                        const filter = this.config.sortFilter;
-
+                        if(this.passedElement.type === 'select-multiple') {
+                            this.input.placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');    
+                        }
+                        
+                        // Add each result as a choice
                         results.forEach((result, index) => {
                             // Select first choice in list if single select input
                             if(index === 0 && this.passedElement.type === 'select-one') { 
@@ -621,21 +642,8 @@ export class Choices {
     }
 
     /** 
-     * Set value of input to blank
-     * @return {Object} Class instance
-     * @public
-     */
-    clearInput() {
-        if (this.input.value) this.input.value = '';
-        if(this.passedElement.type !== 'select-one') {
-            this.input.style.width = getWidthOfInput(this.input);
-        }
-        return this;
-    }
-
-    /** 
      * Call change callback
-     * @param  {string} value - last added/deleted/selected value
+     * @param  {String} value - last added/deleted/selected value
      * @return
      * @private
      */
@@ -659,48 +667,99 @@ export class Choices {
         }
     }
 
-    /** 
-     * Process enter key event
-     * @param  {Array} activeItems Items that are currently active
+
+    /**
+     * Process enter/click of an item button 
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Button being interacted with
      * @return
      * @private
      */
-    _handleEnter(activeItems, value) {
-        let canUpdate = true;
+    _handleButtonAction(activeItems, element) {
+        if(!activeItems || !element) return;
+        // If we are clicking on a button
+        if(this.config.removeItems && this.config.removeItemButton) {
+            const itemId       = element.parentNode.getAttribute('data-id');
+            const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
 
-        if(this.config.addItems) {
-            if (this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-                // If there is a max entry limit and we have reached that limit
-                // don't update
-                canUpdate = false;
-            } else if(this.config.duplicateItems === false && this.passedElement.value) {
-                // If no duplicates are allowed, and the value already exists
-                // in the array, don't update
-                canUpdate = !activeItems.some((item) => item.value === value);
-            }   
-        } else {
-            canUpdate = false;
+            // Remove item associated with button
+            this._removeItem(itemToRemove);
+            this._triggerChange(itemToRemove.value);
         }
+    }
 
-        if (canUpdate) {
+    /**
+     * Process click of an item
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Item being interacted with
+     * @param  {Boolean} hasShiftKey Whether the user has the shift key active
+     * @return
+     * @private
+     */
+    _handleItemAction(activeItems, element, hasShiftKey = false) {
+        if(!activeItems || !element) return;
+
+        // If we are clicking on an item
+        if(this.config.removeItems && this.passedElement.type !== 'select-one') {
+            const passedId = element.getAttribute('data-id');
+
+            // We only want to select one item with a click
+            // so we deselect any items that aren't the target
+            // unless shift is being pressed
+            activeItems.forEach((item) => {
+                if(item.id === parseInt(passedId) && !item.highlighted) {
+                    this.highlightItem(item);
+                } else if(!hasShiftKey) {
+                    if(item.highlighted) {
+                        this.unhighlightItem(item);
+                    }
+                }
+            });
+
+            // Focus input as without focus, a user cannot do anything with a 
+            // highlighted item
+            if(document.activeElement !== this.input) this.input.focus();
+        } 
+    }
+    
+    /**
+     * Process click of a choice
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Choice being interacted with
+     * @return {[type]}             [description]
+     */
+    _handleChoiceAction(activeItems, element) {
+        if(!activeItems || !element) return;
+
+        // If we are clicking on an option
+        const id = element.getAttribute('data-id');
+        const choice = this.store.getChoiceById(id);
+
+        if(choice && !choice.selected && !choice.disabled) {
+
+            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
             let canAddItem = true;
 
-            // If a user has supplied a regular expression filter
-            if(this.config.regexFilter) {
-                // Determine whether we can update based on whether 
-                // our regular expression passes 
-                canAddItem = this._regexFilter(value);
+            if(this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
+                canAddItem = false;
             }
-            
-            // All is good, add
+
             if(canAddItem) {
-                this.toggleDropdown();
-                this._addItem(value);
-                this._triggerChange(value);
-                this.clearInput(this.passedElement);
+                this._addItem(choice.value, choice.label, choice.id);
+                this._triggerChange(choice.value);
+            }
+
+            if(this.passedElement.type === 'select-one') {
+                if(this.canSearch) {
+                    this.input.value = "";    
+                }
+                this.isSearching = false;
+                this.store.dispatch(activateChoices(true));
+                this.hideDropdown();
             }
         }
-    };
+
+    }
 
     /**
      * Process back space event
@@ -727,6 +786,50 @@ export class Choices {
     };
 
     /**
+     * Validates whether an item can be added by a user
+     * @param {Array} activeItems The currently active items 
+     * @param  {String} value     Value of item to add
+     * @return {Object}           Response: Whether user can add item
+     *                            Notice: Notice show in dropdown
+     */
+    _canAddItem(activeItems, value) {
+        let canAddItem = true;
+        let notice = `Press Enter to add "${ value }"`;
+
+        if(this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
+            if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+                // If there is a max entry limit and we have reached that limit
+                // don't update
+                canAddItem = false;
+                notice = `Only ${ this.config.maxItemCount } values can be added.`;
+            }
+        }
+        
+        if(this.passedElement.type === 'text' && this.config.addItems) {
+            const isUnique = !activeItems.some((item) => item.value === value);
+
+            // If a user has supplied a regular expression filter
+            if(this.config.regexFilter) {
+                // Determine whether we can update based on whether 
+                // our regular expression passes 
+                canAddItem = this._regexFilter(value);
+            }
+
+            // If no duplicates are allowed, and the value already exists
+            // in the array
+            if(this.config.duplicateItems === false && !isUnique) {
+                canAddItem = false;
+                notice = `Only unique values can be added.`;
+            }
+        }  
+
+        return {
+            response: canAddItem,
+            notice: notice,
+        };
+    }
+
+    /**
      * Filter choices based on search value
      * @param  {String} value Value to filter by
      * @return
@@ -747,14 +850,13 @@ export class Choices {
                     if(newValue.length >= 1 && newValue !== currentValue + ' ') {
                         const haystack = this.store.getChoicesFilteredBySelectable();
                         const needle   = newValue;
-
-                        const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-                        const fuse = new Fuse(haystack, { 
+                        const keys     = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+                        const fuse     = new Fuse(haystack, { 
                             keys: keys,
                             shouldSort: true,
                             include: 'score',
                         });
-                        const results = fuse.search(needle);
+                        const results  = fuse.search(needle);
 
                         this.currentValue = newValue;
                         this.highlightPosition = 0;
@@ -770,6 +872,56 @@ export class Choices {
                 this.store.dispatch(activateChoices(true));
             }
         }
+    }
+
+    /**
+     * Trigger event listeners
+     * @return
+     * @private
+     */
+    _addEventListeners() {
+        document.addEventListener('keyup', this._onKeyUp);
+        document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('click', this._onClick);
+        document.addEventListener('touchmove', this._onTouchMove);
+        document.addEventListener('touchend', this._onTouchEnd);
+        document.addEventListener('mousedown', this._onMouseDown);
+        document.addEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.addEventListener('focus', this._onFocus);
+            this.containerOuter.addEventListener('blur', this._onBlur);
+        }
+
+        this.input.addEventListener('input', this._onInput);
+        this.input.addEventListener('paste', this._onPaste);
+        this.input.addEventListener('focus', this._onFocus);
+        this.input.addEventListener('blur', this._onBlur);
+    }
+
+    /**
+     * Destroy event listeners
+     * @return
+     * @private
+     */
+    _removeEventListeners() {
+        document.removeEventListener('keyup', this._onKeyUp);
+        document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('click', this._onClick);
+        document.removeEventListener('touchmove', this._onTouchMove);
+        document.removeEventListener('touchend', this._onTouchEnd);
+        document.removeEventListener('mousedown', this._onMouseDown);
+        document.removeEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.removeEventListener('focus', this._onFocus);
+            this.containerOuter.removeEventListener('blur', this._onBlur);
+        }
+        
+        this.input.removeEventListener('input', this._onInput);
+        this.input.removeEventListener('paste', this._onPaste);
+        this.input.removeEventListener('focus', this._onFocus);
+        this.input.removeEventListener('blur', this._onBlur);
     }
 
     /**
@@ -820,50 +972,50 @@ export class Choices {
 
             case enterKey:
                 // If enter key is pressed and the input has a value
-                if(target.value && this.passedElement.type === 'text') {
+                if(this.passedElement.type === 'text' && target.value) {
                     const value = this.input.value;
-                    this._handleEnter(activeItems, value);                    
-                }
+                    const canAddItem = this._canAddItem(activeItems, value);  
 
-                // Show dropdown if focus
-                if(!hasActiveDropdown && this.passedElement.type === 'select-one') {
-                    e.preventDefault();
-                    this.showDropdown();
-                    if(this.canSearch) {
-                        this.input.focus();
+                    // All is good, add
+                    if(canAddItem.response) {
+                        this.toggleDropdown();
+                        this._addItem(value);
+                        this._triggerChange(value);
+                        this.clearInput(this.passedElement);
                     }
                 }
 
                 if(target.hasAttribute('data-button')) {
-                    // If we are clicking on a button
-                    if(this.config.removeItems && this.config.removeItemButton) {
-                        const itemId       = target.parentNode.getAttribute('data-id');
-                        const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
-
-                        // Remove item associated with button
-                        this._removeItem(itemToRemove);
-                        this._triggerChange(itemToRemove.value);
-
-                        e.preventDefault();
-                    }
+                    this._handleButtonAction(activeItems, target);
                 }
 
                 if(hasActiveDropdown) {
                     const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
             
                     if(highlighted) {
-                        const value = highlighted.getAttribute('data-value');
-                        const label = highlighted.innerHTML;
-                        const id    = highlighted.getAttribute('data-id');
-                        this._addItem(value, label, id);
-                        this._triggerChange(value);
-                        this.clearInput(this.passedElement);
+                        const value       = highlighted.getAttribute('data-value');
+                        const label       = highlighted.innerHTML;
+                        const id          = highlighted.getAttribute('data-id');
+                        const canAddItem  = this._canAddItem(activeItems, value); 
+
+                        if(canAddItem.response) {
+                            this._addItem(value, label, id);
+                            this._triggerChange(value);
+                            this.clearInput(this.passedElement);
+                        }
 
                         if(this.passedElement.type === 'select-one') {
                             this.isSearching = false;
                             this.store.dispatch(activateChoices());
                             this.toggleDropdown();
                         }
+                    }
+                } else if(this.passedElement.type === 'select-one') {
+                    // Show dropdown if focus
+                    e.preventDefault();
+                    this.showDropdown();
+                    if(this.canSearch) {
+                        this.input.focus();
                     }
                 }
 
@@ -941,34 +1093,25 @@ export class Choices {
         // notice. Otherwise hide the dropdown
         if(this.passedElement.type === 'text') {
             const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-            let dropdownItem;
-            if(this.input.value) {
-                const activeItems = this.store.getItemsFilteredByActive();
-                const isUnique = !activeItems.some((item) => item.value === this.input.value);
-                let canAddItem = true;
+            const value = this.input.value;
 
-                // If a user has supplied a regular expression filter
-                if(this.config.regexFilter) {
-                    // Determine whether we can update based on whether 
-                    // our regular expression passes 
-                    canAddItem = this._regexFilter(this.input.value);
-                }
-                
-                if(this.config.maxItemCount && this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
-                    dropdownItem = this._getTemplate('notice', `Only ${ this.config.maxItemCount } values can be added.`);
-                } else if(!this.config.duplicateItems && !isUnique) {
-                    dropdownItem = this._getTemplate('notice', `Only unique values can be added.`);
-                } else if(canAddItem) {
-                    dropdownItem = this._getTemplate('notice', `Press Enter to add "${ this.input.value }"`);
-                }
-                
-                if(canAddItem !== false) {
+            let dropdownItem;
+
+            if(value) {
+                const activeItems = this.store.getItemsFilteredByActive();
+                const canAddItem = this._canAddItem(activeItems, value); 
+
+                if(canAddItem.notice) {
+                    const dropdownItem = this._getTemplate('notice', canAddItem.notice);
                     this.dropdown.innerHTML = dropdownItem.outerHTML;
-                    if(!this.dropdown.classList.contains(this.config.classNames.activeState)) {
+                }
+
+                if(canAddItem.response === true) {
+                    if(!hasActiveDropdown) {
                         this.showDropdown();    
                     }
                 } else {
-                    if(hasActiveDropdown) {
+                    if(!canAddItem.notice && hasActiveDropdown) {
                         this.hideDropdown();  
                     }
                 }
@@ -977,6 +1120,7 @@ export class Choices {
                     this.hideDropdown();  
                 }
             }
+
         } else {
             const backKey     = 46;
             const deleteKey   = 8;
@@ -994,6 +1138,7 @@ export class Choices {
                     this._searchChoices(this.input.value);
                 } 
             }
+
         }
     }
 
@@ -1078,62 +1223,20 @@ export class Choices {
         if(this.containerOuter.contains(target) && target !== this.input) {
 
             const activeItems = this.store.getItemsFilteredByActive();
+            const hasShiftKey = e.shiftKey ? true : false;
 
             // Prevent input mouse down triggering focus event
-            if(target !== this.input) {
-                e.preventDefault();
-            }
+            if(target !== this.input) e.preventDefault();
 
             if(target.hasAttribute('data-button')) {
-                // If we are clicking on a button
-                if(this.config.removeItems && this.config.removeItemButton) {
-                    const itemId       = target.parentNode.getAttribute('data-id');
-                    const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
-
-                    // Remove item associated with button
-                    this._removeItem(itemToRemove);
-                    this._triggerChange(itemToRemove.value);
-                }
+                this._handleButtonAction(activeItems, target);
             } else if(target.hasAttribute('data-item')) {
-                // If we are clicking on an item
-                if(this.config.removeItems && this.passedElement.type !== 'select-one') {
-                    const passedId = target.getAttribute('data-id');
-                    const hasShiftKey = e.shiftKey ? true : false;
-
-                    // We only want to select one item with a click
-                    // so we deselect any items that aren't the target
-                    // unless shift is being pressed
-                    activeItems.forEach((item) => {
-                        if(item.id === parseInt(passedId) && !item.highlighted) {
-                            this.highlightItem(item);
-                        } else if(!hasShiftKey) {
-                            if(item.highlighted) {
-                                this.unhighlightItem(item);
-                            }
-                        }
-                    });
-                }      
+                this._handleItemAction(activeItems, target, hasShiftKey);     
             } else if(target.hasAttribute('data-choice')) {
-                // If we are clicking on an option
-                const id = target.getAttribute('data-id');
-                const choice = this.store.getChoiceById(id);
-
-                if(choice && !choice.selected && !choice.disabled) {
-                    this._addItem(choice.value, choice.label, choice.id);
-                    this._triggerChange(choice.value);
-                    if(this.passedElement.type === 'select-one') {
-                        if(this.canSearch) {
-                            this.input.value = "";    
-                        }
-                        this.isSearching = false;
-                        this.store.dispatch(activateChoices(true));
-                        this.hideDropdown();
-                    }
-                }
+                this._handleChoiceAction(activeItems, target);
             }
         }
     }
-
 
     /**
      * Click event
@@ -1163,7 +1266,7 @@ export class Choices {
                     } 
                 }
             } else {
-                if(this.passedElement.type === 'select-one' && hasActiveDropdown) {
+                if(this.passedElement.type === 'select-one') {
                     if(target !== this.input) {
                         this.hideDropdown();
                     }
@@ -1172,7 +1275,7 @@ export class Choices {
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            
+
             const activeItems = this.store.getItemsFilteredByActive();
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
@@ -1218,7 +1321,6 @@ export class Choices {
         }
     }
 
-
     /**
      * Focus event
      * @param  {Object} e Event
@@ -1260,10 +1362,12 @@ export class Choices {
      * @private
      */
     _onBlur(e) {
-        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
         // If the blurred element is this input or the outer container
         if(e.target === this.input || (e.target === this.containerOuter && this.passedElement.type === 'select-one')) {
+            const activeItems = this.store.getItemsFilteredByActive();
+            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+            const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
 
@@ -1272,9 +1376,13 @@ export class Choices {
             if(hasActiveDropdown && (e.target === this.input || e.target === this.containerOuter && !this.canSearch)) {
                 this.hideDropdown();
             }
+
+            // De-select any highlighted items
+            if(hasHighlightedItems) {
+                this.unhighlightAll();
+            }
         }
     }
-
 
     /**
      * Tests value against a regular expression
@@ -1387,7 +1495,6 @@ export class Choices {
             }        
         }
     }
-
 
     /**
      * Add item to store with correct value
@@ -1877,7 +1984,7 @@ export class Choices {
                         this._highlightChoice();
                     } else {
                         // Otherwise show a notice
-                        const dropdownItem = this.isSearching ? this._getTemplate('notice', 'No results found') : this._getTemplate('notice', 'No choices to choose from');
+                        const dropdownItem = this.isSearching ? this._getTemplate('notice', this.config.noResultsText) : this._getTemplate('notice', this.config.noChoicesText);
                         this.choiceList.appendChild(dropdownItem);
                     }
                 }
@@ -1903,56 +2010,6 @@ export class Choices {
 
             this.prevState = this.currentState;
         }
-    }
-
-    /**
-     * Trigger event listeners
-     * @return
-     * @private
-     */
-    _addEventListeners() {
-        document.addEventListener('keyup', this._onKeyUp);
-        document.addEventListener('keydown', this._onKeyDown);
-        document.addEventListener('click', this._onClick);
-        document.addEventListener('touchmove', this._onTouchMove);
-        document.addEventListener('touchend', this._onTouchEnd);
-        document.addEventListener('mousedown', this._onMouseDown);
-        document.addEventListener('mouseover', this._onMouseOver);
-
-        if(this.passedElement.type && this.passedElement.type === 'select-one') {
-            this.containerOuter.addEventListener('focus', this._onFocus);
-            this.containerOuter.addEventListener('blur', this._onBlur);
-        }
-
-        this.input.addEventListener('input', this._onInput);
-        this.input.addEventListener('paste', this._onPaste);
-        this.input.addEventListener('focus', this._onFocus);
-        this.input.addEventListener('blur', this._onBlur);
-    }
-
-    /**
-     * Destroy event listeners
-     * @return
-     * @private
-     */
-    _removeEventListeners() {
-        document.removeEventListener('keyup', this._onKeyUp);
-        document.removeEventListener('keydown', this._onKeyDown);
-        document.removeEventListener('click', this._onClick);
-        document.removeEventListener('touchmove', this._onTouchMove);
-        document.removeEventListener('touchend', this._onTouchEnd);
-        document.removeEventListener('mousedown', this._onMouseDown);
-        document.removeEventListener('mouseover', this._onMouseOver);
-
-        if(this.passedElement.type && this.passedElement.type === 'select-one') {
-            this.containerOuter.removeEventListener('focus', this._onFocus);
-            this.containerOuter.removeEventListener('blur', this._onBlur);
-        }
-        
-        this.input.removeEventListener('input', this._onInput);
-        this.input.removeEventListener('paste', this._onPaste);
-        this.input.removeEventListener('focus', this._onFocus);
-        this.input.removeEventListener('blur', this._onBlur);
     }
 };
 

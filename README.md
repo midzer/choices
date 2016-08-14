@@ -1,5 +1,5 @@
 # Choices.js [![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)](https://travis-ci.org/jshjohnson/Choices) 
-A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
+A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
@@ -48,6 +48,8 @@ A lightweight, configurable select box/text input plugin. Similar to Select2 and
         prependValue: null,
         appendValue: null,
         loadingText: 'Loading...',
+        noResultsText: 'No results round',
+        noChoicesText: 'No choices to choose from',
         classNames: {
             containerOuter: 'choices',
             containerInner: 'choices__inner',
@@ -181,19 +183,19 @@ Pass an array of objects:
 
 <strong>Usage:</strong> Whether a user can edit items. An items value can be edited by pressing the backspace.
 
+### duplicateItems
+<strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
+
+<strong>Input types affected:</strong> `text`, `select-multiple`
+
+<strong>Usage:</strong> Whether a user can input/choose a duplicate item.
+
 ### delimiter
 <strong>Type:</strong> `String` <strong>Default:</strong> `,`
 
 <strong>Input types affected:</strong> `text`
 
 <strong>Usage:</strong> What divides each value. By default the delimited value would be `"Value 1, Value 2, Value 3"`.
-
-### duplicates
-<strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
-
-<strong>Input types affected:</strong> `text`
-
-<strong>Usage:</strong> Whether a user can input a duplicate item.
 
 ### paste
 <strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
@@ -274,14 +276,28 @@ const example = new Choices(element, {
 
 <strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
-<strong>Usage:</strong> Append a value to each item added/selected
+<strong>Usage:</strong> Append a value to each item added/selected.
 
 ### loadingText
 <strong>Type:</strong> `String` <strong>Default:</strong> `Loading...`
 
 <strong>Input types affected:</strong> `select-one`, `select-multiple`
 
-<strong>Usage:</strong> The loading text that is shown when options are populated via an AJAX callback.
+<strong>Usage:</strong> The text that is shown whilst choices are being populated via AJAX.
+
+### noResultsText
+<strong>Type:</strong> `String` <strong>Default:</strong> `No results round`
+
+<strong>Input types affected:</strong> `select-one`, `select-multiple`
+
+<strong>Usage:</strong> The text that is shown when a user's search has returned no results.
+
+### noChoicesText
+<strong>Type:</strong> `String` <strong>Default:</strong> `No choices to choose from`
+
+<strong>Input types affected:</strong> `select-multiple`
+
+<strong>Usage:</strong> The text that is shown when a user has selected all possible choices.
 
 ### classNames
 <strong>Type:</strong> `Object` <strong>Default:</strong> 
