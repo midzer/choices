@@ -207,9 +207,9 @@ Pass an array of objects:
 ### search
 <strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
 
-<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
+<strong>Input types affected:</strong> `select-one`
 
-<strong>Usage:</strong> Whether a search input should display allowing a user to filter choices.
+<strong>Usage:</strong> Whether a user should be allowed to search avaiable choices. Note that multiple select boxes will always show search inputs.
 
 ### flip
 <strong>Type:</strong> `Boolean` <strong>Default:</strong> `true`
