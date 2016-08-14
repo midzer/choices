@@ -409,7 +409,6 @@ export class Choices {
         return this;
     }
 
-
     /**
      * Get value(s) of input (i.e. inputted items (text) or selected choices (select))
      * @param {Boolean} valueOnly Get only values of selected items, otherwise return selected items
@@ -547,6 +546,19 @@ export class Choices {
         return this;
     }
 
+    /** 
+     * Set value of input to blank
+     * @return {Object} Class instance
+     * @public
+     */
+    clearInput() {
+        if (this.input.value) this.input.value = '';
+        if(this.passedElement.type !== 'select-one') {
+            this.input.style.width = getWidthOfInput(this.input);
+        }
+        return this;
+    }
+
     /**
      * Disable interaction with Choices 
      * @return {Object} Class instance
@@ -625,19 +637,6 @@ export class Choices {
                 };
                 fn(callback);
             }
-        }
-        return this;
-    }
-
-    /** 
-     * Set value of input to blank
-     * @return {Object} Class instance
-     * @public
-     */
-    clearInput() {
-        if (this.input.value) this.input.value = '';
-        if(this.passedElement.type !== 'select-one') {
-            this.input.style.width = getWidthOfInput(this.input);
         }
         return this;
     }
@@ -876,6 +875,56 @@ export class Choices {
     }
 
     /**
+     * Trigger event listeners
+     * @return
+     * @private
+     */
+    _addEventListeners() {
+        document.addEventListener('keyup', this._onKeyUp);
+        document.addEventListener('keydown', this._onKeyDown);
+        document.addEventListener('click', this._onClick);
+        document.addEventListener('touchmove', this._onTouchMove);
+        document.addEventListener('touchend', this._onTouchEnd);
+        document.addEventListener('mousedown', this._onMouseDown);
+        document.addEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.addEventListener('focus', this._onFocus);
+            this.containerOuter.addEventListener('blur', this._onBlur);
+        }
+
+        this.input.addEventListener('input', this._onInput);
+        this.input.addEventListener('paste', this._onPaste);
+        this.input.addEventListener('focus', this._onFocus);
+        this.input.addEventListener('blur', this._onBlur);
+    }
+
+    /**
+     * Destroy event listeners
+     * @return
+     * @private
+     */
+    _removeEventListeners() {
+        document.removeEventListener('keyup', this._onKeyUp);
+        document.removeEventListener('keydown', this._onKeyDown);
+        document.removeEventListener('click', this._onClick);
+        document.removeEventListener('touchmove', this._onTouchMove);
+        document.removeEventListener('touchend', this._onTouchEnd);
+        document.removeEventListener('mousedown', this._onMouseDown);
+        document.removeEventListener('mouseover', this._onMouseOver);
+
+        if(this.passedElement.type && this.passedElement.type === 'select-one') {
+            this.containerOuter.removeEventListener('focus', this._onFocus);
+            this.containerOuter.removeEventListener('blur', this._onBlur);
+        }
+        
+        this.input.removeEventListener('input', this._onInput);
+        this.input.removeEventListener('paste', this._onPaste);
+        this.input.removeEventListener('focus', this._onFocus);
+        this.input.removeEventListener('blur', this._onBlur);
+    }
+
+    /**
      * Key down event
      * @param  {Object} e Event
      * @return
@@ -1089,7 +1138,7 @@ export class Choices {
                     this._searchChoices(this.input.value);
                 } 
             }
-            
+
         }
     }
 
@@ -1189,7 +1238,6 @@ export class Choices {
         }
     }
 
-
     /**
      * Click event
      * @param  {Object} e Event
@@ -1273,7 +1321,6 @@ export class Choices {
         }
     }
 
-
     /**
      * Focus event
      * @param  {Object} e Event
@@ -1336,7 +1383,6 @@ export class Choices {
             }
         }
     }
-
 
     /**
      * Tests value against a regular expression
@@ -1449,7 +1495,6 @@ export class Choices {
             }        
         }
     }
-
 
     /**
      * Add item to store with correct value
@@ -1965,56 +2010,6 @@ export class Choices {
 
             this.prevState = this.currentState;
         }
-    }
-
-    /**
-     * Trigger event listeners
-     * @return
-     * @private
-     */
-    _addEventListeners() {
-        document.addEventListener('keyup', this._onKeyUp);
-        document.addEventListener('keydown', this._onKeyDown);
-        document.addEventListener('click', this._onClick);
-        document.addEventListener('touchmove', this._onTouchMove);
-        document.addEventListener('touchend', this._onTouchEnd);
-        document.addEventListener('mousedown', this._onMouseDown);
-        document.addEventListener('mouseover', this._onMouseOver);
-
-        if(this.passedElement.type && this.passedElement.type === 'select-one') {
-            this.containerOuter.addEventListener('focus', this._onFocus);
-            this.containerOuter.addEventListener('blur', this._onBlur);
-        }
-
-        this.input.addEventListener('input', this._onInput);
-        this.input.addEventListener('paste', this._onPaste);
-        this.input.addEventListener('focus', this._onFocus);
-        this.input.addEventListener('blur', this._onBlur);
-    }
-
-    /**
-     * Destroy event listeners
-     * @return
-     * @private
-     */
-    _removeEventListeners() {
-        document.removeEventListener('keyup', this._onKeyUp);
-        document.removeEventListener('keydown', this._onKeyDown);
-        document.removeEventListener('click', this._onClick);
-        document.removeEventListener('touchmove', this._onTouchMove);
-        document.removeEventListener('touchend', this._onTouchEnd);
-        document.removeEventListener('mousedown', this._onMouseDown);
-        document.removeEventListener('mouseover', this._onMouseOver);
-
-        if(this.passedElement.type && this.passedElement.type === 'select-one') {
-            this.containerOuter.removeEventListener('focus', this._onFocus);
-            this.containerOuter.removeEventListener('blur', this._onBlur);
-        }
-        
-        this.input.removeEventListener('input', this._onInput);
-        this.input.removeEventListener('paste', this._onPaste);
-        this.input.removeEventListener('focus', this._onFocus);
-        this.input.removeEventListener('blur', this._onBlur);
     }
 };
 
