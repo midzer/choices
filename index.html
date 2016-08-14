@@ -230,6 +230,7 @@
             var example8 = new Choices('#choices-10', { 
                 placeholder: true, 
                 placeholderValue: 'Pick an Strokes record',
+                maxItemCount: 5,
                 callbackOnChange: function(value, passedInput) { console.log(value) }
             }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')

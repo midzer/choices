@@ -510,8 +510,8 @@ export class Choices {
     /**
     * Direct populate choices
     * @param  {Array} choices - Choices to insert 
-    * @param  {string} value - Name of 'value' property
-    * @param  {string} label - Name of 'label' property
+    * @param  {String} value - Name of 'value' property
+    * @param  {String} label - Name of 'label' property
     * @return {Object} Class instance
     * @public
     */
@@ -637,7 +637,7 @@ export class Choices {
 
     /** 
      * Call change callback
-     * @param  {string} value - last added/deleted/selected value
+     * @param  {String} value - last added/deleted/selected value
      * @return
      * @private
      */
@@ -703,6 +703,98 @@ export class Choices {
             }
         }
     };
+
+    /**
+     * Process enter/click of an item button 
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Button being interacted with
+     * @return
+     * @private
+     */
+    _handleButtonAction(activeItems, element) {
+        if(!activeItems || !element) return;
+        // If we are clicking on a button
+        if(this.config.removeItems && this.config.removeItemButton) {
+            const itemId       = element.parentNode.getAttribute('data-id');
+            const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
+
+            // Remove item associated with button
+            this._removeItem(itemToRemove);
+            this._triggerChange(itemToRemove.value);
+        }
+    }
+
+    /**
+     * Process click of an item
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Item being interacted with
+     * @param  {Boolean} hasShiftKey Whether the user has the shift key active
+     * @return
+     * @private
+     */
+    _handleItemAction(activeItems, element, hasShiftKey = false) {
+        if(!activeItems || !element) return;
+
+        // If we are clicking on an item
+        if(this.config.removeItems && this.passedElement.type !== 'select-one') {
+            const passedId = element.getAttribute('data-id');
+
+            // We only want to select one item with a click
+            // so we deselect any items that aren't the target
+            // unless shift is being pressed
+            activeItems.forEach((item) => {
+                if(item.id === parseInt(passedId) && !item.highlighted) {
+                    this.highlightItem(item);
+                } else if(!hasShiftKey) {
+                    if(item.highlighted) {
+                        this.unhighlightItem(item);
+                    }
+                }
+            });
+
+            // Focus input as without focus, a user cannot do anything with a 
+            // highlighted item
+            if(document.activeElement !== this.input) this.input.focus();
+        } 
+    }
+    
+    /**
+     * Process click of a choice
+     * @param {Array} activeItems The currently active items 
+     * @param  {Element} element Choice being interacted with
+     * @return {[type]}             [description]
+     */
+    _handleChoiceAction(activeItems, element) {
+        if(!activeItems || !element) return;
+
+        // If we are clicking on an option
+        const id = element.getAttribute('data-id');
+        const choice = this.store.getChoiceById(id);
+
+        if(choice && !choice.selected && !choice.disabled) {
+
+            let canAddItem = true;
+
+            if(this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
+                canAddItem = false;
+            }
+
+            if(canAddItem) {
+                this._addItem(choice.value, choice.label, choice.id);
+                this._triggerChange(choice.value);
+            }
+
+            if(this.passedElement.type === 'select-one') {
+                if(this.canSearch) {
+                    this.input.value = "";    
+                }
+                this.isSearching = false;
+                this.store.dispatch(activateChoices(true));
+                this.hideDropdown();
+            }
+        }
+
+    }
 
     /**
      * Process back space event
@@ -827,45 +919,42 @@ export class Choices {
                     this._handleEnter(activeItems, value);                    
                 }
 
-                // Show dropdown if focus
-                if(!hasActiveDropdown && this.passedElement.type === 'select-one') {
-                    e.preventDefault();
-                    this.showDropdown();
-                    if(this.canSearch) {
-                        this.input.focus();
-                    }
-                }
-
                 if(target.hasAttribute('data-button')) {
-                    // If we are clicking on a button
-                    if(this.config.removeItems && this.config.removeItemButton) {
-                        const itemId       = target.parentNode.getAttribute('data-id');
-                        const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
-
-                        // Remove item associated with button
-                        this._removeItem(itemToRemove);
-                        this._triggerChange(itemToRemove.value);
-
-                        e.preventDefault();
-                    }
+                    this._handleButtonAction(activeItems, target);
                 }
 
                 if(hasActiveDropdown) {
                     const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
             
                     if(highlighted) {
-                        const value = highlighted.getAttribute('data-value');
-                        const label = highlighted.innerHTML;
-                        const id    = highlighted.getAttribute('data-id');
-                        this._addItem(value, label, id);
-                        this._triggerChange(value);
-                        this.clearInput(this.passedElement);
+                        let canAddItem = true;
+
+                        if(this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
+                            canAddItem = false;
+                        }
+
+                        if(canAddItem) {
+                            const value = highlighted.getAttribute('data-value');
+                            const label = highlighted.innerHTML;
+                            const id    = highlighted.getAttribute('data-id');
+
+                            this._addItem(value, label, id);
+                            this._triggerChange(value);
+                            this.clearInput(this.passedElement);
+                        }
 
                         if(this.passedElement.type === 'select-one') {
                             this.isSearching = false;
                             this.store.dispatch(activateChoices());
                             this.toggleDropdown();
                         }
+                    }
+                } else if(this.passedElement.type === 'select-one') {
+                    // Show dropdown if focus
+                    e.preventDefault();
+                    this.showDropdown();
+                    if(this.canSearch) {
+                        this.input.focus();
                     }
                 }
 
@@ -1080,58 +1169,17 @@ export class Choices {
         if(this.containerOuter.contains(target) && target !== this.input) {
 
             const activeItems = this.store.getItemsFilteredByActive();
+            const hasShiftKey = e.shiftKey ? true : false;
 
             // Prevent input mouse down triggering focus event
-            if(target !== this.input) {
-                e.preventDefault();
-            }
+            if(target !== this.input) e.preventDefault();
 
             if(target.hasAttribute('data-button')) {
-                // If we are clicking on a button
-                if(this.config.removeItems && this.config.removeItemButton) {
-                    const itemId       = target.parentNode.getAttribute('data-id');
-                    const itemToRemove = activeItems.find((item) => item.id === parseInt(itemId));
-
-                    // Remove item associated with button
-                    this._removeItem(itemToRemove);
-                    this._triggerChange(itemToRemove.value);
-                }
+                this._handleButtonAction(activeItems, target);
             } else if(target.hasAttribute('data-item')) {
-                // If we are clicking on an item
-                if(this.config.removeItems && this.passedElement.type !== 'select-one') {
-                    const passedId = target.getAttribute('data-id');
-                    const hasShiftKey = e.shiftKey ? true : false;
-
-                    // We only want to select one item with a click
-                    // so we deselect any items that aren't the target
-                    // unless shift is being pressed
-                    activeItems.forEach((item) => {
-                        if(item.id === parseInt(passedId) && !item.highlighted) {
-                            this.highlightItem(item);
-                        } else if(!hasShiftKey) {
-                            if(item.highlighted) {
-                                this.unhighlightItem(item);
-                            }
-                        }
-                    });
-                }      
+                this._handleItemAction(activeItems, target, hasShiftKey);     
             } else if(target.hasAttribute('data-choice')) {
-                // If we are clicking on an option
-                const id = target.getAttribute('data-id');
-                const choice = this.store.getChoiceById(id);
-
-                if(choice && !choice.selected && !choice.disabled) {
-                    this._addItem(choice.value, choice.label, choice.id);
-                    this._triggerChange(choice.value);
-                    if(this.passedElement.type === 'select-one') {
-                        if(this.canSearch) {
-                            this.input.value = "";    
-                        }
-                        this.isSearching = false;
-                        this.store.dispatch(activateChoices(true));
-                        this.hideDropdown();
-                    }
-                }
+                this._handleChoiceAction(activeItems, target);
             }
         }
     }
@@ -1174,7 +1222,7 @@ export class Choices {
 
         } else {
             // Click is outside of our element so close dropdown and de-select items
-            
+
             const activeItems = this.store.getItemsFilteredByActive();
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
@@ -1262,10 +1310,12 @@ export class Choices {
      * @private
      */
     _onBlur(e) {
-        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
         // If the blurred element is this input or the outer container
         if(e.target === this.input || (e.target === this.containerOuter && this.passedElement.type === 'select-one')) {
+            const activeItems = this.store.getItemsFilteredByActive();
+            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+            const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
 
@@ -1273,6 +1323,11 @@ export class Choices {
             // or the outer container is the target with no search (select-one)
             if(hasActiveDropdown && (e.target === this.input || e.target === this.containerOuter && !this.canSearch)) {
                 this.hideDropdown();
+            }
+
+            // De-select any highlighted items
+            if(hasHighlightedItems) {
+                this.unhighlightAll();
             }
         }
     }
