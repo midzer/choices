@@ -11,6 +11,8 @@ $choices-keyline-color: #DDDDDD;
 $choices-primary-color: #00BCD4;
 $choices-disabled-color: #eaeaea;
 $choices-button-icon-path: '../../icons/';
+$choices-button-dimension: 8px;
+$choices-button-offset: 8px;
 
 .choices {
     font-size: 16px;
@@ -18,9 +20,9 @@ $choices-button-icon-path: '../../icons/';
     margin-bottom: $choices-guttering;
     &:last-child { margin-bottom: 0; }
     &.is-disabled {
-        .choices__inner, .choices__input { 
+        .choices__inner, .choices__input {
             background-color: lighten(#DDDDDD, 5%);
-            cursor: not-allowed; 
+            cursor: not-allowed;
             user-select: none;
         }
         .choices__item { cursor: not-allowed; }
@@ -31,7 +33,7 @@ $choices-button-icon-path: '../../icons/';
 .choices[data-type*="select-one"] {
     cursor: pointer;
     .choices__inner { padding-bottom: 7.5px; }
-    .choices__input { 
+    .choices__input {
         display: block;
         width: 100%;
         padding: 10px;
@@ -52,8 +54,8 @@ $choices-button-icon-path: '../../icons/';
         height: 20px;
         width: 20px;
     }
-    &.is-open:after { 
-        border-color: transparent transparent $choices-text-color transparent; 
+    &.is-open:after {
+        border-color: transparent transparent $choices-text-color transparent;
         margin-top: -7.5px;
     }
     &:after {
@@ -66,20 +68,23 @@ $choices-button-icon-path: '../../icons/';
         position: absolute;
         right: 7.5px + 4px;
         top: 50%;
-        margin-top: -2.5px;  
+        margin-top: -2.5px;
         pointer-events: none;
-    } 
+    }
 }
 
 .choices[data-type*="select-multiple"], .choices[data-type*="text"]  {
     .choices__inner { cursor: text; }
     .choices__button {
         position: relative;
-        margin: -2px -4px -2px 4px;
-        padding: 4px 6px;    
+        display: inline-block;
+        margin-left: $choices-button-offset;
+        margin-right: -$choices-button-offset/2;
+        padding-left: $choices-button-offset*2;
         border-left: 1px solid darken($choices-primary-color, 10%);
         background-image: url($choices-button-icon-path + '/cross.svg');
-        background-size: 8px;
+        background-size: $choices-button-dimension;
+        width: $choices-button-dimension;
         line-height: 1;
     }
 }
@@ -125,8 +130,8 @@ $choices-button-icon-path: '../../icons/';
         color: #FFFFFF;
         word-break: break-all;
         &[data-deletable] { padding-right: 5px; }
-        &.is-highlighted { 
-            background-color: darken($choices-primary-color, 5%); 
+        &.is-highlighted {
+            background-color: darken($choices-primary-color, 5%);
             border: 1px solid darken($choices-primary-color, 10%);
         }
         .is-disabled & {
@@ -182,8 +187,8 @@ $choices-button-icon-path: '../../icons/';
                 transform: translateY(-50%);
             }
         }
-        &.is-highlighted { 
-            background-color: mix(#000000, #FFFFFF, 5%); 
+        &.is-highlighted {
+            background-color: mix(#000000, #FFFFFF, 5%);
             &:after { opacity: .5; }
         }
     }
@@ -191,19 +196,19 @@ $choices-button-icon-path: '../../icons/';
 
 .choices__item { cursor: default; }
 .choices__item--selectable { cursor: pointer; }
-.choices__item--disabled { 
-    cursor: not-allowed; 
+.choices__item--disabled {
+    cursor: not-allowed;
     user-select: none;
     opacity: .5;
 }
 
 .choices__group {
-    .choices__heading { 
+    .choices__heading {
         font-weight: 600;
         font-size: 12px;
         padding: 10px;
         border-bottom: 1px solid lighten($choices-keyline-color, 10%);
-        color: lighten(#333, 30%); 
+        color: lighten(#333, 30%);
     }
 }
 

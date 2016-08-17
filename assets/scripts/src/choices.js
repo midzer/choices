@@ -1656,8 +1656,7 @@ export default class Choices {
                 if (this.config.removeItemButton && this.passedElement.type !== 'select-one') {
                     return strToEl(`
                         <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
-                            ${data.label}
-                            <button class="${classNames.button}" data-button>Remove item</button>
+                            ${data.label}<button class="${classNames.button}" data-button>Remove item</button>
                         </div>
                     `);
                 }

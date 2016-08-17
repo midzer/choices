@@ -63,11 +63,14 @@
 
 .choices[data-type*="select-multiple"] .choices__button, .choices[data-type*="text"] .choices__button {
   position: relative;
-  margin: -2px -4px -2px 4px;
-  padding: 4px 6px;
+  display: inline-block;
+  margin-left: 8px;
+  margin-right: -4px;
+  padding-left: 16px;
   border-left: 1px solid #008fa1;
   background-image: url("../../icons//cross.svg");
   background-size: 8px;
+  width: 8px;
   line-height: 1; }
 
 .choices__inner {
