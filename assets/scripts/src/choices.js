@@ -10,7 +10,6 @@ import {
     addGroup,
     clearAll,
 } from './actions/index';
-
 import {
     isScrolledIntoView,
     getAdjacentEl,
@@ -1917,7 +1916,6 @@ export default class Choices {
         items.forEach((item) => {
             // Create new list element
             const listItem = this._getTemplate('item', item);
-
             // Append it to list
             itemListFragment.appendChild(listItem);
         });
@@ -1936,7 +1934,7 @@ export default class Choices {
         // Only render if our state has actually changed
         if (this.currentState !== this.prevState) {
             // Choices
-            if ((this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups)) {
+            if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups) {
                 if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
                     // Get active groups/choices
                     const activeGroups = this.store.getGroupsFilteredByActive();
@@ -1981,7 +1979,7 @@ export default class Choices {
                     this.itemList.innerHTML = '';
 
                     // If we have items to add
-                    if (itemListFragment.children && itemListFragment.children.length) {
+                    if (itemListFragment.childNodes) {
                         // Update list
                         this.itemList.appendChild(itemListFragment);
                     }
