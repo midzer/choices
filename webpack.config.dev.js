@@ -1,5 +1,8 @@
 var path = require('path');
 var webpack = require('webpack');
+var Dashboard = require('webpack-dashboard');
+var DashboardPlugin = require('webpack-dashboard/plugin');
+var dashboard = new Dashboard();
 
 module.exports = {
     devtool: 'eval',
@@ -10,12 +13,13 @@ module.exports = {
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'choices.min.js',
-        publicPath: '/assets/scripts/dist/'
+        publicPath: '/assets/scripts/dist/',
     },
     eslint: {
         configFile: '.eslintrc'
     },
     plugins: [
+        new DashboardPlugin(dashboard.setData),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
             'process.env': {
