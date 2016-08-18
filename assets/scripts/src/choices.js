@@ -367,7 +367,7 @@ export default class Choices {
      * @return {Object} Class instance
      * @public
      */
-    showDropdown(focusInput) {
+    showDropdown(focusInput = false) {
         const body = document.body;
         const html = document.documentElement;
         const winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
@@ -387,6 +387,7 @@ export default class Choices {
             this.containerOuter.classList.remove(this.config.classNames.flippedState);
         }
 
+        // Optionally focus the input if we have a search input
         if (focusInput && this.canSearch && document.activeElement !== this.input) {
             this.input.focus();
         }
