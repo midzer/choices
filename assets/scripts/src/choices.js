@@ -387,7 +387,7 @@ export default class Choices {
             this.containerOuter.classList.remove(this.config.classNames.flippedState);
         }
 
-        if (focusInput && this.canSearch) {
+        if (focusInput && this.canSearch && document.activeElement !== this.input) {
             this.input.focus();
         }
 
@@ -1011,30 +1011,12 @@ export default class Choices {
                     const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
 
                     if (highlighted) {
-                        const value = highlighted.getAttribute('data-value');
-                        const label = highlighted.innerHTML;
-                        const id = highlighted.getAttribute('data-id');
-                        const canAddItem = this._canAddItem(activeItems, value);
-
-                        if (canAddItem.response) {
-                            this._addItem(value, label, id);
-                            this._triggerChange(value);
-                            this.clearInput(this.passedElement);
-                        }
-
-                        if (this.passedElement.type === 'select-one') {
-                            this.isSearching = false;
-                            this.store.dispatch(activateChoices());
-                            this.toggleDropdown();
-                        }
+                        this._handleChoiceAction(activeItems, highlighted);
                     }
                 } else if (this.passedElement.type === 'select-one') {
                     // Show dropdown if focus
                     e.preventDefault();
-                    this.showDropdown();
-                    if (this.canSearch) {
-                        this.input.focus();
-                    }
+                    this.showDropdown(true);
                 }
 
                 break;
@@ -1049,10 +1031,7 @@ export default class Choices {
                 if (hasActiveDropdown || this.passedElement.type === 'select-one') {
                     // Show dropdown if focus
                     if (!hasActiveDropdown) {
-                        this.showDropdown();
-                        if (this.canSearch) {
-                            this.input.focus();
-                        }
+                        this.showDropdown(true);
                     }
 
                     const currentEl = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
@@ -1202,10 +1181,7 @@ export default class Choices {
                     }
                 } else {
                     // If a select box, we want to show the dropdown
-                    this.showDropdown();
-                    if (this.canSearch && document.activeElement !== this.input) {
-                        this.input.focus();
-                    }
+                    this.showDropdown(true);
                 }
             }
             // Prevents focus event firing
@@ -1258,10 +1234,7 @@ export default class Choices {
                         this.input.focus();
                     }
                 } else {
-                    this.showDropdown();
-                    if (this.canSearch && document.activeElement !== this.input) {
-                        this.input.focus();
-                    }
+                    this.showDropdown(true);
                 }
             } else if (this.passedElement.type === 'select-one' && target !== this.input) {
                 this.hideDropdown();
