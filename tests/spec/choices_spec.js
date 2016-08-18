@@ -16,7 +16,7 @@ describe('Choices', function() {
             this.input.className = 'js-choices';
 
             document.body.appendChild(this.input);
-            
+
             this.choices = new Choices(this.input);
         });
 
@@ -30,7 +30,7 @@ describe('Choices', function() {
 
         it('should not re-initialise if passed element again', function() {
             const reinitialise = new Choices(this.choices.passedElement);
-            spyOn(reinitialise, '_createTemplates'); 
+            spyOn(reinitialise, '_createTemplates');
             expect(reinitialise._createTemplates).not.toHaveBeenCalled();
         })
 
@@ -132,7 +132,7 @@ describe('Choices', function() {
             this.input.placeholder = 'Placeholder text';
 
             document.body.appendChild(this.input);
-            
+
             this.choices = new Choices(this.input);
         });
 
@@ -165,12 +165,12 @@ describe('Choices', function() {
 
                 option.value = `Value ${i}`;
                 option.innerHTML = `Value ${i}`;
-                
+
                 this.input.appendChild(option);
             }
 
             document.body.appendChild(this.input);
-            
+
             this.choices = new Choices(this.input);
         });
 
@@ -179,7 +179,7 @@ describe('Choices', function() {
             expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
         });
 
-        it('should select the first choice', function() {            
+        it('should select the first choice', function() {
             expect(this.choices.currentState.items[0].value).toContain('Value 1');
         });
 
@@ -209,7 +209,7 @@ describe('Choices', function() {
                 ctrlKey: false,
                 preventDefault: () => {}
             });
-    
+
             // Key down to select choice
             this.choices._onKeyDown({
                 target: this.choices.input,
@@ -221,7 +221,7 @@ describe('Choices', function() {
         });
 
         it('should trigger a change callback on selection', function() {
-            spyOn(this.choices.config, 'callbackOnChange'); 
+            spyOn(this.choices.config, 'callbackOnChange');
             this.choices.input.focus();
 
             // Key down to second choice
@@ -231,7 +231,7 @@ describe('Choices', function() {
                 ctrlKey: false,
                 preventDefault: () => {}
             });
-            
+
             // Key down to select choice
             this.choices._onKeyDown({
                 target: this.choices.input,
@@ -300,15 +300,15 @@ describe('Choices', function() {
                 option.value = `Value ${i}`;
                 option.innerHTML = `Value ${i}`;
 
-                if(i % 2) { 
+                if(i % 2) {
                     option.selected = true;
                 }
-                
+
                 this.input.appendChild(option);
             }
 
             document.body.appendChild(this.input);
-            
+
             this.choices = new Choices(this.input, {
                 placeholderValue: 'Placeholder text',
                 choices: [
@@ -345,10 +345,10 @@ describe('Choices', function() {
                 option.value = `Value ${i}`;
                 option.innerHTML = `Value ${i}`;
 
-                if(i % 2) { 
+                if(i % 2) {
                     option.selected = true;
                 }
-                
+
                 this.input.appendChild(option);
             }
 
@@ -423,7 +423,7 @@ describe('Choices', function() {
         });
 
         it('should handle toggleDropdown()', function() {
-            spyOn(this.choices, 'hideDropdown'); 
+            spyOn(this.choices, 'hideDropdown');
             this.choices.showDropdown();
             this.choices.toggleDropdown();
             expect(this.choices.hideDropdown).toHaveBeenCalled();
@@ -476,7 +476,7 @@ describe('Choices', function() {
                     {value: 'Child Two', label: 'Child Two',  disabled: true},
                     {value: 'Child Three', label: 'Child Three'},
                 ]
-            }, 
+            },
             {
                 label: 'Group two',
                 id: 2,
@@ -487,8 +487,8 @@ describe('Choices', function() {
                     {value: 'Child Six', label: 'Child Six'},
                 ]
             }], 'value', 'label');
-            
-    
+
+
             const groups = this.choices.currentState.groups;
             const choices = this.choices.currentState.choices;
 
@@ -523,7 +523,7 @@ describe('Choices', function() {
         });
 
         it('should handle ajax()', function() {
-            spyOn(this.choices, 'ajax'); 
+            spyOn(this.choices, 'ajax');
 
             this.choices.ajax((callback) => {
                 fetch('https://restcountries.eu/rest/v1/all')
@@ -536,7 +536,7 @@ describe('Choices', function() {
                         console.log(error);
                     });
             });
-            
+
             expect(this.choices.ajax).toHaveBeenCalledWith(jasmine.any(Function));
         });
     });
@@ -562,7 +562,7 @@ describe('Choices', function() {
             const randomItem = items[Math.floor(Math.random()*items.length)];
 
             this.choices.removeItemsByValue(randomItem.value);
-            
+
             expect(randomItem.active).toBe(false);
 
         });

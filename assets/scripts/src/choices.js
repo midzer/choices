@@ -367,7 +367,7 @@ export default class Choices {
      * @return {Object} Class instance
      * @public
      */
-    showDropdown() {
+    showDropdown(focusInput) {
         const body = document.body;
         const html = document.documentElement;
         const winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
@@ -385,6 +385,10 @@ export default class Choices {
             this.containerOuter.classList.add(this.config.classNames.flippedState);
         } else {
             this.containerOuter.classList.remove(this.config.classNames.flippedState);
+        }
+
+        if (focusInput && this.canSearch) {
+            this.input.focus();
         }
 
         return this;
@@ -1315,27 +1319,54 @@ export default class Choices {
      * @private
      */
     _onFocus(e) {
-        const target = e.target || e.touches[0].target;
+        const target = e.target;
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
-        if (target === this.input && !hasActiveDropdown) {
-            this.containerOuter.classList.add(this.config.classNames.focusState);
-            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-                this.showDropdown();
-            }
-        } else if (this.passedElement.type !== 'text' && (target === this.containerOuter || target === this.containerInner) && !hasActiveDropdown) {
-            // If element is a select box, the focussed element is the container and the dropdown
-            // isn't already open, focus and show dropdown
-            this.containerOuter.classList.add(this.config.classNames.focusState);
-            this.showDropdown();
+        if (!hasActiveDropdown) {
+            switch (this.passedElement.type) {
+                case 'text': {
+                    if (target === this.input) {
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+                    }
 
-            if (this.passedElement.type === 'select-one' && target === this.containerOuter) {
-                if (!this.focusAndHideDropdown) {
-                    this.input.focus();
+                    break;
                 }
-                this.focusAndHideDropdown = false;
-            } else if (this.canSearch) {
-                this.input.focus();
+                case 'select-one': {
+                    if (target === this.containerOuter) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+                        this.showDropdown();
+
+                        if (!this.focusAndHideDropdown && this.canSearch) {
+                            this.input.focus();
+                        }
+
+                        this.focusAndHideDropdown = false;
+                    }
+
+                    if (target === this.input) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+                        this.showDropdown();
+                    }
+
+                    break;
+                }
+                case 'select-multiple': {
+                    if (target === this.input) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+                        this.showDropdown(true);
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
     }
@@ -1347,25 +1378,60 @@ export default class Choices {
      * @private
      */
     _onBlur(e) {
-        // If the blurred element is this input or the outer container
-        if (e.target === this.input || (e.target === this.containerOuter && this.passedElement.type === 'select-one')) {
-            const activeItems = this.store.getItemsFilteredByActive();
-            const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-            const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+        const target = e.target;
+        const activeItems = this.store.getItemsFilteredByActive();
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+        const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
-            // Remove the focus state
-            this.containerOuter.classList.remove(this.config.classNames.focusState);
+        switch (this.passedElement.type) {
+            case 'text': {
+                if (target === this.input) {
+                    // Remove the focus state
+                    this.containerOuter.classList.remove(this.config.classNames.focusState);
+                    // De-select any highlighted items
+                    if (hasHighlightedItems) {
+                        this.unhighlightAll();
+                    }
+                    if (hasActiveDropdown) {
+                        this.hideDropdown();
+                    }
+                }
 
-            // Close the dropdown if it is active, the input is the target (select-multiple, text, select-one (with search))
-            // or the outer container is the target with no search (select-one)
-            if (hasActiveDropdown && (e.target === this.input || (e.target === this.containerOuter && !this.canSearch))) {
-                this.hideDropdown();
+                break;
+            }
+            case 'select-one': {
+                if (target === this.containerOuter) {
+                    if (hasActiveDropdown && (this.focusAndHideDropdown || !this.config.search)) {
+                        this.hideDropdown();
+                    }
+                    this.containerOuter.classList.remove(this.config.classNames.focusState);
+                }
+
+                if (target === this.input) {
+                    this.hideDropdown();
+                    this.containerOuter.classList.remove(this.config.classNames.focusState);
+                }
+
+                break;
+            }
+            case 'select-multiple': {
+                if (target === this.input) {
+                    // Remove the focus state
+                    this.containerOuter.classList.remove(this.config.classNames.focusState);
+                    if (hasActiveDropdown) {
+                        this.hideDropdown();
+                    }
+                    // De-select any highlighted items
+                    if (hasHighlightedItems) {
+                        this.unhighlightAll();
+                    }
+                }
+
+                break;
             }
 
-            // De-select any highlighted items
-            if (hasHighlightedItems) {
-                this.unhighlightAll();
-            }
+            default:
+                break;
         }
     }
 
