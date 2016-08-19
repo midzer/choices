@@ -760,23 +760,17 @@ export default class Choices {
         const choice = this.store.getChoiceById(id);
 
         if (choice && !choice.selected && !choice.disabled) {
-            let canAddItem = true;
+            const canAddItem = this._canAddItem(activeItems, choice.value);
 
-            if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length && this.passedElement.type === 'select-multiple') {
-                canAddItem = false;
-            }
-
-            if (canAddItem) {
+            if (canAddItem.response) {
                 this._addItem(choice.value, choice.label, choice.id);
                 this._triggerChange(choice.value);
+                this.clearInput(this.passedElement);
+                this.isSearching = false;
+                this.store.dispatch(activateChoices(true));
             }
 
             if (this.passedElement.type === 'select-one') {
-                if (this.canSearch) {
-                    this.input.value = '';
-                }
-                this.isSearching = false;
-                this.store.dispatch(activateChoices(true));
                 this.hideDropdown();
             }
         }
