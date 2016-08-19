@@ -171,7 +171,9 @@ describe('Choices', function() {
 
             document.body.appendChild(this.input);
 
-            this.choices = new Choices(this.input);
+            this.choices = new Choices(this.input, {
+                removeItemButton: true
+            });
         });
 
         it('should open the choice list on focussing', function() {
@@ -253,7 +255,7 @@ describe('Choices', function() {
             expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(true);
         });
 
-        it('should open the dropdown on click', function() {
+        it('should close the dropdown on double click', function() {
             const container = this.choices.containerOuter;
 
             this.choices._onClick({

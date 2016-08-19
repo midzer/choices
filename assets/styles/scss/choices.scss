@@ -48,11 +48,13 @@ $choices-button-offset: 8px;
         height: 100%;
         position: absolute;
         top: 50%;
-        right: 15px;
+        right: 0;
         margin-top: -10px;
         margin-right: 25px;
         height: 20px;
         width: 20px;
+        opacity: .5;
+        &:hover { opacity: 1; }
     }
     &.is-open:after {
         border-color: transparent transparent $choices-text-color transparent;
@@ -90,11 +92,15 @@ $choices-button-offset: 8px;
 }
 
 .choices__inner {
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
     background-color: $choices-bg-color;
     padding: 7.5px 7.5px 3.75px;
     border: 1px solid $choices-keyline-color;
     border-radius: $choices-border-radius;
     font-size: 14px;
+    min-height: 44px;
     overflow: hidden;
     .is-focused &, .is-open & { border-color: darken($choices-keyline-color, 15%); }
     .is-open & { border-radius: $choices-border-radius $choices-border-radius 0 0; }
@@ -237,5 +243,6 @@ $choices-button-offset: 8px;
     &:focus { outline: 0; }
 }
 
+.choices__placeholder { opacity: .5; }
 
 /*=====  End of Choices  ======*/

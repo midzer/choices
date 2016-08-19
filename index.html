@@ -68,7 +68,7 @@
                 <option value="Dropdown item 3" selected>Dropdown item 3</option>
                 <option value="Dropdown item 4" disabled>Dropdown item 4</option>
             </select>
-            
+
             <label for="choices-9">Option groups</label>
             <select class="form-control" data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
@@ -166,7 +166,7 @@
 
             <label for="choices-17">Option selected via config</label>
             <select class="form-control" name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
-            
+
             <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
             <label for="cities">States</label>
             <select class="form-control" name="cities" id="cities" placeholder="Choose a state">
@@ -226,9 +226,9 @@
             var example7 = new Choices('#choices-6', {
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
-             
-            var example9 = new Choices('#choices-10', { 
-                placeholder: true, 
+
+            var example9 = new Choices('#choices-10', {
+                placeholder: true,
                 placeholderValue: 'Pick an Strokes record',
                 maxItemCount: 5,
                 callbackOnChange: function(value, passedInput) { console.log(value) }
@@ -243,9 +243,9 @@
                         console.log(error);
                     });
             });
-            
-            var example10 = new Choices('#choices-12', { 
-                placeholder: true, 
+
+            var example10 = new Choices('#choices-12', {
+                placeholder: true,
                 placeholderValue: 'Pick an Arctic Monkeys record'
             }).ajax(function(callback) {
                 fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
@@ -289,6 +289,7 @@
 
             var example13 = new Choices('#choices-15', {
                 search: false,
+                removeItemButton: true,
                 choices: [
                     {value: 'One', label: 'Label One'},
                     {value: 'Two', label: 'Label Two', disabled: true},
@@ -301,7 +302,7 @@
             ], 'value', 'label');
 
             var example14 = new Choices('#choices-16', {
-                placeholder: true, 
+                placeholder: true,
             }).setChoices([{
                 label: 'Group one',
                 id: 1,
@@ -311,7 +312,7 @@
                     {value: 'Child Two', label: 'Child Two',  disabled: true},
                     {value: 'Child Three', label: 'Child Three'},
                 ]
-            }, 
+            },
             {
                 label: 'Group two',
                 id: 2,

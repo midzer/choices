@@ -19,6 +19,7 @@
     "no-console": "off",
     "consistent-return": "off",
     "no-param-reassign": ["error", { "props": false }],
-    "no-unused-vars": ["error", { "args": "none" }]
+    "no-unused-vars": ["error", { "args": "none" }],
+    "no-lonely-if": "off"
   },
 }
