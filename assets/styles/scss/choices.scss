@@ -10,6 +10,7 @@ $choices-text-color: #333333;
 $choices-keyline-color: #DDDDDD;
 $choices-primary-color: #00BCD4;
 $choices-disabled-color: #eaeaea;
+$choices-highlight-color: $choices-primary-color;
 $choices-button-icon-path: '../../icons/';
 $choices-button-dimension: 8px;
 $choices-button-offset: 8px;
@@ -54,7 +55,12 @@ $choices-button-offset: 8px;
         height: 20px;
         width: 20px;
         opacity: .5;
-        &:hover { opacity: 1; }
+        border-radius: 10em;
+        &:hover, &:focus { opacity: 1; }
+        &:focus {
+            outline: none;
+            box-shadow: 0px 0px 0px 2px $choices-highlight-color;
+        }
     }
     &.is-open:after {
         border-color: transparent transparent $choices-text-color transparent;

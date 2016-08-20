@@ -42,9 +42,13 @@
     margin-right: 25px;
     height: 20px;
     width: 20px;
-    opacity: .5; }
-    .choices[data-type*="select-one"] .choices__button:hover {
+    opacity: .5;
+    border-radius: 10em; }
+    .choices[data-type*="select-one"] .choices__button:hover, .choices[data-type*="select-one"] .choices__button:focus {
       opacity: 1; }
+    .choices[data-type*="select-one"] .choices__button:focus {
+      outline: none;
+      box-shadow: 0px 0px 0px 2px #00BCD4; }
   .choices[data-type*="select-one"].is-open:after {
     border-color: transparent transparent #333333 transparent;
     margin-top: -7.5px; }

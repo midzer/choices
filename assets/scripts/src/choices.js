@@ -1016,7 +1016,6 @@ export default class Choices {
                 } else if (this.passedElement.type === 'select-one') {
                     // Show dropdown if focus
                     e.preventDefault();
-                    console.log('Show 1');
                     this.showDropdown(true);
                 }
 
@@ -1103,7 +1102,6 @@ export default class Choices {
 
                 if (canAddItem.response === true) {
                     if (!hasActiveDropdown) {
-                        console.log('Show 3');
                         this.showDropdown();
                     }
                 } else if (!canAddItem.notice && hasActiveDropdown) {
@@ -1320,7 +1318,7 @@ export default class Choices {
                             this.containerOuter.classList.add(this.config.classNames.focusState);
 
                             if (!this.focusAndHideDropdown && this.canSearch && document.activeElement !== this.input) {
-                                this.input.focus();
+                                this.showDropdown(true);
                             } else {
                                 this.showDropdown();
                             }
@@ -1369,6 +1367,7 @@ export default class Choices {
             const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
+
             switch (this.passedElement.type) {
                 case 'text': {
                     if (target === this.input) {
@@ -1382,27 +1381,23 @@ export default class Choices {
                         if (hasActiveDropdown) {
                             this.hideDropdown();
                         }
-
-                        return;
                     }
 
                     break;
                 }
                 case 'select-one': {
                     if (target === this.containerOuter) {
-                        if (hasActiveDropdown && this.focusAndHideDropdown && !this.canSearch) {
+                        this.containerOuter.classList.remove(this.config.classNames.focusState);
+                        if (hasActiveDropdown && !this.canSearch) {
                             this.hideDropdown();
                         }
-                        this.containerOuter.classList.remove(this.config.classNames.focusState);
-                        return;
                     }
 
                     if (target === this.input) {
+                        this.containerOuter.classList.remove(this.config.classNames.focusState);
                         if (hasActiveDropdown) {
                             this.hideDropdown();
                         }
-                        this.containerOuter.classList.remove(this.config.classNames.focusState);
-                        return;
                     }
 
                     break;
@@ -1418,7 +1413,6 @@ export default class Choices {
                         if (hasHighlightedItems) {
                             this.unhighlightAll();
                         }
-                        return;
                     }
 
                     break;
