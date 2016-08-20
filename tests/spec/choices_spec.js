@@ -400,7 +400,7 @@ describe('Choices', function() {
             expect(this.choices.currentState.choices.length).toEqual(6);
         });
 
-        it('should add a placeholder (set in config) to the search input', function() {
+        it('should add a placeholder defined in the config to the search input', function() {
             expect(this.choices.input.placeholder).toEqual('Placeholder text');
         });
     });
