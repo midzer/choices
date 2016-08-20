@@ -133,10 +133,11 @@ describe('Choices', function() {
 
             document.body.appendChild(this.input);
 
-            this.choices = new Choices(this.input);
         });
 
         it('should accept a user inputted value', function() {
+            this.choices = new Choices(this.input);
+
             this.choices.input.focus();
             this.choices.input.value = 'test';
 
@@ -150,7 +151,56 @@ describe('Choices', function() {
         });
 
         it('should copy the passed placeholder to the cloned input', function() {
+            this.choices = new Choices(this.input);
+
             expect(this.choices.input.placeholder).toEqual(this.input.placeholder);
+        });
+
+        it('should not allow duplicates if duplicateItems is false', function() {
+            this.choices = new Choices(this.input, {
+                duplicateItems: false,
+                items: ['test 1'],
+            });
+
+            this.choices.input.focus();
+            this.choices.input.value = 'test 1';
+
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.value);
+        });
+
+        it('should filter input if regexFilter is passed', function() {
+            this.choices = new Choices(this.input, {
+                regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            });
+
+            this.choices.input.focus();
+            this.choices.input.value = 'josh@joshuajohnson.co.uk';
+
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            this.choices.input.focus();
+            this.choices.input.value = 'not an email address';
+
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
+
+            expect(lastItem.value).toEqual('josh@joshuajohnson.co.uk');
+            expect(lastItem.value).not.toEqual('not an email address');
         });
     });
 
