@@ -202,6 +202,27 @@ describe('Choices', function() {
             expect(lastItem.value).toEqual('josh@joshuajohnson.co.uk');
             expect(lastItem.value).not.toEqual('not an email address');
         });
+
+        it('should prepend and append values if passed', function() {
+            this.choices = new Choices(this.input, {
+                prependValue: 'item-',
+                appendValue: '-value',
+            });
+
+            this.choices.input.focus();
+            this.choices.input.value = 'test';
+
+            this.choices._onKeyDown({
+                target: this.choices.input,
+                keyCode: 13,
+                ctrlKey: false
+            });
+
+            const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
+
+            expect(lastItem.value).not.toEqual('test');
+            expect(lastItem.value).toEqual('item-test-value');
+        });
     });
 
     describe('should accept single select inputs', function() {

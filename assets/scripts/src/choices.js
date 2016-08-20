@@ -639,7 +639,8 @@ export default class Choices {
                         // Remove loading states/text
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
                         if (this.passedElement.type === 'select-multiple') {
-                            this.input.placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');
+                            const placeholder = this.config.placeholderValue || this.passedElement.getAttribute('placeholder');
+                            this.input.placeholder = placeholder;
                         }
 
                         // Add each result as a choice
