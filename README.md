@@ -134,15 +134,15 @@ Pass an array of objects:
 Pass an array of objects:
 
 ```
-[{ 
+[{
 	value: 'Option 1',
-	label: 'Option 1', 
+	label: 'Option 1',
 	selected: true,
 	disabled: false,
 },
-{ 
+{
 	value: 'Option 2',
-	label: 'Option 2', 
+	label: 'Option 2',
 	selected: false,
 	disabled: true,
 }]
@@ -169,10 +169,10 @@ Pass an array of objects:
 
 <strong>Usage:</strong> Whether a user can remove items.
 
-### removeButton
+### removeItemButton
 <strong>Type:</strong> `Boolean` <strong>Default:</strong> `false`
 
-<strong>Input types affected:</strong> `text`, `select-multiple`
+<strong>Input types affected:</strong> `text`, `select-one`, `select-multiple`
 
 <strong>Usage:</strong> Whether a button should show that, when clicked, will remove an item.
 
@@ -300,7 +300,7 @@ const example = new Choices(element, {
 <strong>Usage:</strong> The text that is shown when a user has selected all possible choices.
 
 ### classNames
-<strong>Type:</strong> `Object` <strong>Default:</strong> 
+<strong>Type:</strong> `Object` <strong>Default:</strong>
 
 ```
 classNames: {
