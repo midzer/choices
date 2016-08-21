@@ -401,7 +401,7 @@ export default class Choices {
      * @return {Object} Class instance
      * @public
      */
-    hideDropdown() {
+    hideDropdown(blurInput = false) {
         // A dropdown flips if it does not have space within the page
         const isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
 
@@ -412,6 +412,11 @@ export default class Choices {
 
         if (isFlipped) {
             this.containerOuter.classList.remove(this.config.classNames.flippedState);
+        }
+
+        // Optionally blur the input if we have a search input
+        if (blurInput && this.canSearch && document.activeElement === this.input) {
+            this.input.blur();
         }
 
         return this;
@@ -425,7 +430,7 @@ export default class Choices {
     toggleDropdown() {
         const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
         if (hasActiveDropdown) {
-            this.hideDropdown(true);
+            this.hideDropdown();
         } else {
             this.showDropdown(true);
         }
@@ -765,6 +770,7 @@ export default class Choices {
         // If we are clicking on an option
         const id = element.getAttribute('data-id');
         const choice = this.store.getChoiceById(id);
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         if (choice && !choice.selected && !choice.disabled) {
             const canAddItem = this._canAddItem(activeItems, choice.value);
@@ -776,7 +782,7 @@ export default class Choices {
                 this.isSearching = false;
                 this.store.dispatch(activateChoices(true));
 
-                if (this.passedElement.type === 'select-one') {
+                if (this.passedElement.type === 'select-one' && hasActiveDropdown) {
                     this.hideDropdown();
                 }
             }
@@ -1006,8 +1012,8 @@ export default class Choices {
                 }
 
                 if (target.hasAttribute('data-button')) {
-                    e.preventDefault();
                     this._handleButtonAction(activeItems, target);
+                    e.preventDefault();
                 }
 
                 if (hasActiveDropdown) {
@@ -1017,9 +1023,11 @@ export default class Choices {
                         this._handleChoiceAction(activeItems, highlighted);
                     }
                 } else if (this.passedElement.type === 'select-one') {
-                    // Show dropdown if focus
-                    e.preventDefault();
-                    this.showDropdown(true);
+                    if (!hasActiveDropdown) {
+                        // Show dropdown if focus
+                        this.showDropdown(true);
+                        e.preventDefault();
+                    }
                 }
 
                 break;
@@ -1172,6 +1180,7 @@ export default class Choices {
      */
     _onTouchEnd(e) {
         const target = e.target || e.touches[0].target;
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         // If a user tapped within our container...
         if (this.wasTap === true && this.containerOuter.contains(target)) {
@@ -1183,8 +1192,10 @@ export default class Choices {
                         this.input.focus();
                     }
                 } else {
-                    // If a select box, we want to show the dropdown
-                    this.showDropdown(true);
+                    if (!hasActiveDropdown) {
+                        // If a select box, we want to show the dropdown
+                        this.showDropdown(true);
+                    }
                 }
             }
             // Prevents focus event firing
@@ -1230,6 +1241,7 @@ export default class Choices {
 
         // If target is something that concerns us
         if (this.containerOuter.contains(target)) {
+            // Handle button delete
             if (target.hasAttribute('data-button')) {
                 this._handleButtonAction(activeItems, target);
             }
@@ -1244,10 +1256,11 @@ export default class Choices {
                         this.showDropdown(true);
                     } else {
                         this.showDropdown();
+                        this.containerOuter.focus();
                     }
                 }
             } else if (this.passedElement.type === 'select-one' && target !== this.input && !this.dropdown.contains(target)) {
-                this.hideDropdown();
+                this.hideDropdown(true);
             }
         } else {
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
@@ -1305,53 +1318,61 @@ export default class Choices {
         if (this.containerOuter.contains(target)) {
             const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
-            if (!hasActiveDropdown) {
-                switch (this.passedElement.type) {
-                    case 'text': {
-                        if (target === this.input) {
-                            this.containerOuter.classList.add(this.config.classNames.focusState);
-                        }
-
-                        break;
+            switch (this.passedElement.type) {
+                case 'text': {
+                    if (target === this.input) {
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
                     }
-                    case 'select-one': {
-                        if (target === this.containerOuter) {
-                            // If element is a select box, the focussed element is the container and the dropdown
-                            // isn't already open, focus and show dropdown
-                            this.containerOuter.classList.add(this.config.classNames.focusState);
 
+                    break;
+                }
+                case 'select-one': {
+                    if (target === this.containerOuter) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+
+                        // Show dropdown if it isn't already showing
+                        if (!hasActiveDropdown) {
                             if (!this.focusAndHideDropdown && this.canSearch && document.activeElement !== this.input) {
                                 this.showDropdown(true);
                             } else {
                                 this.showDropdown();
                             }
-
-                            this.focusAndHideDropdown = false;
                         }
 
-                        if (target === this.input) {
-                            // If element is a select box, the focussed element is the container and the dropdown
-                            // isn't already open, focus and show dropdown
-                            this.containerOuter.classList.add(this.config.classNames.focusState);
+                        this.focusAndHideDropdown = false;
+                    }
+
+                    if (target === this.input) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+
+                        // Show dropdown if it isn't already showing
+                        if (!hasActiveDropdown) {
                             this.showDropdown();
                         }
-
-                        break;
                     }
-                    case 'select-multiple': {
-                        if (target === this.input) {
-                            // If element is a select box, the focussed element is the container and the dropdown
-                            // isn't already open, focus and show dropdown
-                            this.containerOuter.classList.add(this.config.classNames.focusState);
+
+                    break;
+                }
+                case 'select-multiple': {
+                    if (target === this.input) {
+                        // If element is a select box, the focussed element is the container and the dropdown
+                        // isn't already open, focus and show dropdown
+                        this.containerOuter.classList.add(this.config.classNames.focusState);
+
+                        if (!hasActiveDropdown) {
                             this.showDropdown(true);
                         }
-
-                        break;
                     }
 
-                    default:
-                        break;
+                    break;
                 }
+
+                default:
+                    break;
             }
         }
     }
@@ -1370,7 +1391,6 @@ export default class Choices {
             const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
             const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
 
-
             switch (this.passedElement.type) {
                 case 'text': {
                     if (target === this.input) {
@@ -1380,7 +1400,7 @@ export default class Choices {
                         if (hasHighlightedItems) {
                             this.unhighlightAll();
                         }
-                        // Hide dropdown if it's open
+                        // Hide dropdown if it is showing
                         if (hasActiveDropdown) {
                             this.hideDropdown();
                         }
@@ -1391,6 +1411,8 @@ export default class Choices {
                 case 'select-one': {
                     if (target === this.containerOuter) {
                         this.containerOuter.classList.remove(this.config.classNames.focusState);
+
+                        // Hide dropdown if it is showing
                         if (hasActiveDropdown && !this.canSearch) {
                             this.hideDropdown();
                         }
@@ -1398,6 +1420,8 @@ export default class Choices {
 
                     if (target === this.input) {
                         this.containerOuter.classList.remove(this.config.classNames.focusState);
+
+                        // Hide dropdown if it is showing
                         if (hasActiveDropdown) {
                             this.hideDropdown();
                         }
