@@ -2,30 +2,20 @@ var path = require('path');
 var package = require('./package.json');
 var webpack = require('webpack');
 var wrapperPlugin = require('wrapper-webpack-plugin');
-var banner = `/*! ${ package.name } v${ package.version } | (c) ${ new Date().getFullYear() } ${ package.author } | ${ package.homepage } */ \n`
+var banner = `/*! ${ package.name } v${ package.version } | (c) ${ new Date().getFullYear() } ${ package.author } | ${ package.homepage } */ \n`;
+var minimize = process.argv.indexOf('--minimize') !== -1;
 
-module.exports = {
+var config = {
     devtool: 'cheap-module-source-map',
     entry: [
         './assets/scripts/src/choices'
     ],
     output: {
         path: path.join(__dirname, '/assets/scripts/dist'),
-        filename: 'choices.min.js',
+        filename: minimize ? 'choices.min.js' : 'choices.js',
         publicPath: '/assets/scripts/dist/'
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: false,
-            mangle: true,
-            output: {
-                comments: false
-            },
-            compress: {
-                warnings: false,
-                screw_ie8: true
-            }
-        }),
         new webpack.DefinePlugin({
             'process.env': {
                 // This has effect on the react lib size
@@ -45,3 +35,19 @@ module.exports = {
         }]
     }
 };
+
+if (minimize) {
+    config.plugins.unshift(new webpack.optimize.UglifyJsPlugin({
+        sourceMap: false,
+        mangle: true,
+        output: {
+            comments: false
+        },
+        compress: {
+            warnings: false,
+            screw_ie8: true
+        }
+    }));
+}
+
+module.exports = config;
