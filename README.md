@@ -618,6 +618,7 @@ Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES
 * Array.prototype.reduce
 * Array.prototype.indexOf
 * Element.prototype.classList
+* window.requestAnimationFrame
 
 ## Development
 To setup a local environment: clone this repo, navigate into it's directory in a terminal window and run the following command:

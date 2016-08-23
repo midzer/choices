@@ -782,6 +782,7 @@ export default class Choices {
                 this.isSearching = false;
                 this.store.dispatch(activateChoices(true));
 
+                // We only hide the dropdown on a choice selection for single select boxes
                 if (this.passedElement.type === 'select-one' && hasActiveDropdown) {
                     this.hideDropdown();
                 }
@@ -1004,7 +1005,9 @@ export default class Choices {
 
                     // All is good, add
                     if (canAddItem.response) {
-                        this.toggleDropdown();
+                        if (hasActiveDropdown) {
+                            this.hideDropdown();
+                        }
                         this._addItem(value);
                         this._triggerChange(value);
                         this.clearInput(this.passedElement);
@@ -1022,9 +1025,15 @@ export default class Choices {
                     if (highlighted) {
                         this._handleChoiceAction(activeItems, highlighted);
                     }
+
+                    // We always want to hide the dropdown for single selects
+                    // regardless of whether an item was added
+                    if (hasActiveDropdown && this.passedElement.type === 'select-one') {
+                        this.hideDropdown();
+                    }
                 } else if (this.passedElement.type === 'select-one') {
+                    // Open single select dropdown if it's not active
                     if (!hasActiveDropdown) {
-                        // Show dropdown if focus
                         this.showDropdown(true);
                         e.preventDefault();
                     }
@@ -1885,7 +1894,7 @@ export default class Choices {
                 allChoices
                     .concat(this.presetChoices)
                     .forEach((o, index) => {
-                        if (index === 0) {
+                        if (index === 0 && this.passedElement.type === 'select-one') {
                             this._addChoice(true, o.disabled ? o.disabled : false, o.value, o.label);
                         } else {
                             this._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
