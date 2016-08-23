@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./assets/scripts/dist/choices.min.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "css:sass": "node-sass --include-path scss assets/styles/scss/base.scss assets/styles/css/base.css && node-sass --include-path scss assets/styles/scss/choices.scss assets/styles/css/choices.css",
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' assets/styles/css/*.css -d assets/styles/css/",
     "css:min": "csso assets/styles/css/base.css assets/styles/css/base.min.css && csso assets/styles/css/choices.css assets/styles/css/choices.min.css",
-    "js:build": "webpack --config webpack.config.prod.js",
+    "js:build": "webpack --minimize --config webpack.config.prod.js && webpack --config webpack.config.prod.js",
     "js:test": "./node_modules/karma/bin/karma start --single-run --no-auto-watch tests/karma.config.js",
     "js:test_watch": "./node_modules/karma/bin/karma start --auto-watch --no-single-run tests/karma.config.js"
   },
