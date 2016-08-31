@@ -41,7 +41,9 @@
             <h1 class="visible-ie">Choices.js</h1>
             <p>Choices.js is a lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
             <p>For all config options, visit the <a href="https://github.com/jshjohnson/Choices">GitHub repo</a>.</p>
+
             <hr>
+
             <h2>Text inputs</h2>
             <label for="choices-1">Limited to 5 values with remove button</label>
             <input class="form-control" id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
@@ -169,6 +171,28 @@
 
             <label for="choices-17">Option selected via config</label>
             <select class="form-control" name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
+
+            <label for="choices-18">Options without sorting</label>
+            <select class="form-control" name="choices-18" id="choices-18" placeholder="This is a placeholder">
+                <option value="Madrid">Madrid</option>
+                <option value="Toronto">Toronto</option>
+                <option value="Vancouver">Vancouver</option>
+                <option value="London">London</option>
+                <option value="Manchester">Manchester</option>
+                <option value="Liverpool">Liverpool</option>
+                <option value="Paris">Paris</option>
+                <option value="Malaga">Malaga</option>
+                <option value="Washington" disabled>Washington</option>
+                <option value="Lyon">Lyon</option>
+                <option value="Marseille">Marseille</option>
+                <option value="Hamburg">Hamburg</option>
+                <option value="Munich">Munich</option>
+                <option value="Barcelona">Barcelona</option>
+                <option value="Berlin">Berlin</option>
+                <option value="Montreal">Montreal</option>
+                <option value="New York">New York</option>
+                <option value="Michigan">Michigan</option>
+            </select>
 
             <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
             <label for="cities">States</label>
@@ -334,6 +358,10 @@
                     {value: 'Three', label: 'Label Three'},
                 ],
             }).setValueByChoice('Two');
+
+            var example16 = new Choices('#choices-18', {
+                shouldSort: false,
+            });
 
             var cities = new Choices(document.getElementById('cities'), {
                 callbackOnChange: function(value) {

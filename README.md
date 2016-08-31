@@ -41,6 +41,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
         search: true,
         flip: true,
         regexFilter: null,
+        shouldSort: true,
         sortFilter: sortByAlpha,
         sortFields: ['label', 'value'],
         placeholder: true,
@@ -224,6 +225,13 @@ Pass an array of objects:
 **Input types affected:** `text`
 
 **Usage:** A filter that will need to pass for a user to successfully add an item.
+
+### shouldSort
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Whether choices should be sorted. If false, choices will appear in the order they were given. 
 
 ### sortFilter
 **Type:** `Function` **Default:** sortByAlpha

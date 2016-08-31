@@ -104,6 +104,12 @@
 	            }
 	        }
 
+	        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+	        this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
+
+	        // If element has already been initalised with Choices, return it silently
+	        if (this.passedElement.getAttribute('data-choice') === 'active') return;
+
 	        var defaultConfig = {
 	            items: [],
 	            choices: [],
@@ -118,6 +124,7 @@
 	            search: true,
 	            flip: true,
 	            regexFilter: null,
+	            shouldSort: true,
 	            sortFilter: _utils.sortByAlpha,
 	            sortFields: ['label', 'value'],
 	            placeholder: true,
@@ -172,12 +179,14 @@
 	        this.currentState = {};
 	        this.prevState = {};
 	        this.currentValue = '';
-
-	        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-	        this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-
 	        this.highlightPosition = 0;
+
+	        // Track searching
 	        this.canSearch = this.config.search;
+	        // Track tapping
+	        this.wasTap = true;
+	        // Focus containerOuter but not show dropdown if true
+	        this.focusAndHideDropdown = false;
 
 	        // Assing preset choices from passed object
 	        this.presetChoices = this.config.choices;
@@ -209,25 +218,17 @@
 	        this._onPaste = this._onPaste.bind(this);
 	        this._onInput = this._onInput.bind(this);
 
-	        // Focus containerOuter but not show dropdown if true
-	        this.focusAndHideDropdown = false;
-
-	        // Monitor touch taps/scrolls
-	        this.wasTap = true;
-
 	        // Cutting the mustard
 	        var cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement('div');
 	        if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
 	        // Input type check
-	        var canInit = this.passedElement && (0, _utils.isElement)(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(function (type) {
+	        var isValidElement = this.passedElement && (0, _utils.isElement)(this.passedElement);
+	        var isValidType = ['select-one', 'select-multiple', 'text'].some(function (type) {
 	            return type === _this.passedElement.type;
 	        });
 
-	        if (canInit) {
-	            // If element has already been initalised with Choices
-	            if (this.passedElement.getAttribute('data-choice') === 'active') return;
-
+	        if (isValidElement && isValidType) {
 	            // Let's go
 	            this.init();
 	        } else {
@@ -247,31 +248,31 @@
 	        value: function init() {
 	            var callback = arguments.length <= 0 || arguments[0] === undefined ? this.config.callbackOnInit : arguments[0];
 
-	            if (this.initialised !== true) {
-	                // Set initialise flag
-	                this.initialised = true;
+	            if (this.initialised === true) return;
 
-	                // Create required elements
-	                this._createTemplates();
+	            // Set initialise flag
+	            this.initialised = true;
 
-	                // Generate input markup
-	                this._createInput();
+	            // Create required elements
+	            this._createTemplates();
 
-	                this.store.subscribe(this.render);
+	            // Generate input markup
+	            this._createInput();
 
-	                // Render any items
-	                this.render();
+	            this.store.subscribe(this.render);
 
-	                // Trigger event listeners
-	                this._addEventListeners();
+	            // Render any items
+	            this.render();
 
-	                // Run callback if it is a function
-	                if (callback) {
-	                    if ((0, _utils.isType)('Function', callback)) {
-	                        callback();
-	                    } else {
-	                        console.error('callbackOnInit: Callback is not a function');
-	                    }
+	            // Trigger event listeners
+	            this._addEventListeners();
+
+	            // Run callback if it is a function
+	            if (callback) {
+	                if ((0, _utils.isType)('Function', callback)) {
+	                    callback();
+	                } else {
+	                    console.error('callbackOnInit: Callback is not a function');
 	                }
 	            }
 	        }
@@ -285,6 +286,8 @@
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
+	            if (this.initialised !== true) return;
+
 	            this._removeEventListeners();
 
 	            this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
@@ -600,29 +603,29 @@
 	        value: function setValue(args) {
 	            var _this8 = this;
 
-	            if (this.initialised === true) {
-	                // Convert args to an itterable array
-	                var values = [].concat(_toConsumableArray(args));
+	            if (this.initialised !== true) return;
 
-	                values.forEach(function (item) {
-	                    if ((0, _utils.isType)('Object', item)) {
-	                        if (!item.value) return;
-	                        // If we are dealing with a select input, we need to create an option first
-	                        // that is then selected. For text inputs we can just add items normally.
-	                        if (_this8.passedElement.type !== 'text') {
-	                            _this8._addChoice(true, false, item.value, item.label, -1);
-	                        } else {
-	                            _this8._addItem(item.value, item.label, item.id);
-	                        }
-	                    } else if ((0, _utils.isType)('String', item)) {
-	                        if (_this8.passedElement.type !== 'text') {
-	                            _this8._addChoice(true, false, item, item, -1);
-	                        } else {
-	                            _this8._addItem(item);
-	                        }
+	            // Convert args to an itterable array
+	            var values = [].concat(_toConsumableArray(args));
+
+	            values.forEach(function (item) {
+	                if ((0, _utils.isType)('Object', item)) {
+	                    if (!item.value) return;
+	                    // If we are dealing with a select input, we need to create an option first
+	                    // that is then selected. For text inputs we can just add items normally.
+	                    if (_this8.passedElement.type !== 'text') {
+	                        _this8._addChoice(true, false, item.value, item.label, -1);
+	                    } else {
+	                        _this8._addItem(item.value, item.label, item.id);
 	                    }
-	                });
-	            }
+	                } else if ((0, _utils.isType)('String', item)) {
+	                    if (_this8.passedElement.type !== 'text') {
+	                        _this8._addChoice(true, false, item, item, -1);
+	                    } else {
+	                        _this8._addItem(item);
+	                    }
+	                }
+	            });
 
 	            return this;
 	        }
@@ -639,31 +642,29 @@
 	        value: function setValueByChoice(value) {
 	            var _this9 = this;
 
-	            if (this.passedElement.type !== 'text') {
-	                (function () {
-	                    var choices = _this9.store.getChoices();
-	                    // If only one value has been passed, convert to array
-	                    var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
+	            if (this.passedElement.type === 'text') return;
 
-	                    // Loop through each value and
-	                    choiceValue.forEach(function (val) {
-	                        var foundChoice = choices.find(function (choice) {
-	                            // Check 'value' property exists and the choice isn't already selected
-	                            return choice.value === val;
-	                        });
+	            var choices = this.store.getChoices();
+	            // If only one value has been passed, convert to array
+	            var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
 
-	                        if (foundChoice) {
-	                            if (!foundChoice.selected) {
-	                                _this9._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
-	                            } else {
-	                                console.warn('Attempting to select choice already selected');
-	                            }
-	                        } else {
-	                            console.warn('Attempting to select choice that does not exist');
-	                        }
-	                    });
-	                })();
-	            }
+	            // Loop through each value and
+	            choiceValue.forEach(function (val) {
+	                var foundChoice = choices.find(function (choice) {
+	                    // Check 'value' property exists and the choice isn't already selected
+	                    return choice.value === val;
+	                });
+
+	                if (foundChoice) {
+	                    if (!foundChoice.selected) {
+	                        _this9._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+	                    } else {
+	                        console.warn('Attempting to select choice already selected');
+	                    }
+	                } else {
+	                    console.warn('Attempting to select choice that does not exist');
+	                }
+	            });
 	            return this;
 	        }
 
@@ -681,20 +682,20 @@
 	        value: function setChoices(choices, value, label) {
 	            var _this10 = this;
 
-	            if (this.initialised === true) {
-	                if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-	                    if (!(0, _utils.isType)('Array', choices) || !value) return;
+	            if (this.initialised !== true) return;
 
-	                    if (choices && choices.length) {
-	                        this.containerOuter.classList.remove(this.config.classNames.loadingState);
-	                        choices.forEach(function (result, index) {
-	                            if (result.choices) {
-	                                _this10._addGroup(result, index);
-	                            } else {
-	                                _this10._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
-	                            }
-	                        });
-	                    }
+	            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+	                if (!(0, _utils.isType)('Array', choices) || !value) return;
+
+	                if (choices && choices.length) {
+	                    this.containerOuter.classList.remove(this.config.classNames.loadingState);
+	                    choices.forEach(function (result, index) {
+	                        if (result.choices) {
+	                            _this10._addGroup(result, index);
+	                        } else {
+	                            _this10._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
+	                        }
+	                    });
 	                }
 	            }
 	            return this;
@@ -785,43 +786,40 @@
 	        value: function ajax(fn) {
 	            var _this11 = this;
 
-	            if (this.initialised === true) {
-	                if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-	                    this.containerOuter.classList.add(this.config.classNames.loadingState);
-	                    this.containerOuter.setAttribute('aria-busy', 'true');
-	                    if (this.passedElement.type === 'select-one') {
-	                        var placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-	                        this.itemList.appendChild(placeholderItem);
-	                    } else {
-	                        this.input.placeholder = this.config.loadingText;
-	                    }
+	            if (this.initialised !== true) return;
 
-	                    var callback = function callback(results, value, label) {
-	                        if (!(0, _utils.isType)('Array', results) || !value) return;
-	                        if (results && results.length) {
-	                            // Remove loading states/text
-	                            _this11.containerOuter.classList.remove(_this11.config.classNames.loadingState);
-	                            if (_this11.passedElement.type === 'select-multiple') {
-	                                var placeholder = _this11.config.placeholder ? _this11.config.placeholderValue || _this11.passedElement.getAttribute('placeholder') : false;
-	                                if (placeholder) {
-	                                    _this11.input.placeholder = placeholder;
-	                                }
-	                            }
-
-	                            // Add each result as a choice
-	                            results.forEach(function (result, index) {
-	                                // Select first choice in list if single select input
-	                                if (index === 0 && _this11.passedElement.type === 'select-one') {
-	                                    _this11._addChoice(true, false, result[value], result[label]);
-	                                } else {
-	                                    _this11._addChoice(false, false, result[value], result[label]);
-	                                }
-	                            });
-	                        }
-	                        _this11.containerOuter.removeAttribute('aria-busy');
-	                    };
-	                    fn(callback);
+	            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+	                this.containerOuter.classList.add(this.config.classNames.loadingState);
+	                this.containerOuter.setAttribute('aria-busy', 'true');
+	                if (this.passedElement.type === 'select-one') {
+	                    var placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+	                    this.itemList.appendChild(placeholderItem);
+	                } else {
+	                    this.input.placeholder = this.config.loadingText;
 	                }
+
+	                var callback = function callback(results, value, label) {
+	                    if (!(0, _utils.isType)('Array', results) || !value) return;
+	                    if (results && results.length) {
+	                        // Remove loading states/text
+	                        _this11.containerOuter.classList.remove(_this11.config.classNames.loadingState);
+
+	                        if (_this11.passedElement.type === 'select-multiple') {
+	                            var placeholder = _this11.config.placeholder ? _this11.config.placeholderValue || _this11.passedElement.getAttribute('placeholder') : false;
+	                            if (placeholder) {
+	                                _this11.input.placeholder = placeholder;
+	                            }
+	                        }
+
+	                        // Add each result as a choice
+	                        results.forEach(function (result, index) {
+	                            _this11._addChoice(false, false, result[value], result[label]);
+	                        });
+	                    }
+	                    _this11.containerOuter.removeAttribute('aria-busy');
+	                };
+
+	                fn(callback);
 	            }
 	            return this;
 	        }
@@ -1064,6 +1062,7 @@
 	            var _this14 = this;
 
 	            if (!value) return;
+
 	            if (this.input === document.activeElement) {
 	                var choices = this.store.getChoices();
 	                var hasUnactiveChoices = choices.some(function (option) {
@@ -1086,7 +1085,6 @@
 	                                include: 'score'
 	                            });
 	                            var results = fuse.search(needle);
-
 	                            _this14.currentValue = newValue;
 	                            _this14.highlightPosition = 0;
 	                            _this14.isSearching = true;
@@ -2157,6 +2155,7 @@
 
 	                        // Join choices with preset choices and add them
 	                        allChoices.concat(_this19.presetChoices).forEach(function (o, index) {
+	                            // Pre-select first choice if it's a single select
 	                            if (index === 0 && _this19.passedElement.type === 'select-one') {
 	                                _this19._addChoice(true, o.disabled ? o.disabled : false, o.value, o.label);
 	                            } else {
@@ -2195,7 +2194,12 @@
 	            var groupFragment = fragment || document.createDocumentFragment();
 	            var filter = this.config.sortFilter;
 
-	            groups.sort(filter).forEach(function (group) {
+	            // If sorting is enabled, filter groups
+	            if (this.config.shouldSort) {
+	                groups.sort(filter);
+	            }
+
+	            groups.forEach(function (group) {
 	                // Grab options that are children of this group
 	                var groupChoices = choices.filter(function (choice) {
 	                    if (_this20.passedElement.type === 'select-one') {
@@ -2233,11 +2237,15 @@
 	            var choicesFragment = fragment || document.createDocumentFragment();
 	            var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
 
-	            choices.sort(filter).forEach(function (choice) {
+	            // If sorting is enabled or the user is searching, filter choices
+	            if (this.config.shouldSort || this.isSearching) {
+	                choices.sort(filter);
+	            }
+
+	            choices.forEach(function (choice) {
 	                var dropdownItem = _this21._getTemplate('choice', choice);
-	                if (_this21.passedElement.type === 'select-one') {
-	                    choicesFragment.appendChild(dropdownItem);
-	                } else if (!choice.selected) {
+	                var shouldRender = _this21.passedElement.type === 'select-one' || !choice.selected;
+	                if (shouldRender) {
 	                    choicesFragment.appendChild(dropdownItem);
 	                }
 	            });
