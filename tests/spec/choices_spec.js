@@ -59,6 +59,7 @@ describe('Choices', function() {
             expect(this.choices.config.regexFilter).toEqual(null);
             expect(this.choices.config.sortFilter).toEqual(jasmine.any(Function));
             expect(this.choices.config.sortFields).toEqual(jasmine.any(Array) || jasmine.any(String));
+            expect(this.choices.config.shouldSort).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
             expect(this.choices.config.placeholderValue).toEqual(null);
             expect(this.choices.config.prependValue).toEqual(null);
