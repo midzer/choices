@@ -56,6 +56,7 @@ export default class Choices {
             search: true,
             flip: true,
             regexFilter: null,
+            shouldSort: true,
             sortFilter: sortByAlpha,
             sortFields: ['label', 'value'],
             placeholder: true,
@@ -886,7 +887,6 @@ export default class Choices {
                             include: 'score',
                         });
                         const results = fuse.search(needle);
-
                         this.currentValue = newValue;
                         this.highlightPosition = 0;
                         this.isSearching = true;
@@ -1880,6 +1880,7 @@ export default class Choices {
                 const passedOptions = Array.from(this.passedElement.options);
                 const allChoices = [];
 
+
                 // Create array of options from option elements
                 passedOptions.forEach((o) => {
                     allChoices.push({
@@ -1959,10 +1960,12 @@ export default class Choices {
     renderChoices(choices, fragment) {
         // Create a fragment to store our list items (so we don't have to update the DOM for each item)
         const choicesFragment = fragment || document.createDocumentFragment();
-        const filter = this.isSearching ? sortByScore : this.config.sortFilter;
 
+        if (this.config.shouldSort || this.isSearching) {
+            const filter = this.isSearching ? sortByScore : this.config.sortFilter;
+            choices.sort(filter);
+        }
         choices
-            .sort(filter)
             .forEach((choice) => {
                 const dropdownItem = this._getTemplate('choice', choice);
                 if (this.passedElement.type === 'select-one') {
