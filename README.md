@@ -256,7 +256,7 @@ const example = new Choices(element, {
 
 **Input types affected:**`select-one`, `select-multiple`
 
-**Usage:** Specify which fields should be used for sorting. 
+**Usage:** Specify which fields should be used for sorting when a user is searching. If a user is not searching and sorting is enabled, only the choice's label will be sorted.  
 
 ### placeholder
 **Type:** `Boolean` **Default:** `true`
