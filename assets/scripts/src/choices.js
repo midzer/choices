@@ -228,6 +228,7 @@ export default class Choices {
             this.userConfig = null;
             this.config = null;
             this.store = null;
+            this.initialised = false;
         }
         return this;
     }
