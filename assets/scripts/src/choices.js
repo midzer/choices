@@ -178,7 +178,7 @@ export default class Choices {
      * @public
      */
     init(callback = this.config.callbackOnInit) {
-        if (this.initialised !== true) {
+        if (this.initialised === false) {
             // Set initialise flag
             this.initialised = true;
 
@@ -213,19 +213,23 @@ export default class Choices {
      * @public
      */
     destroy() {
-        this._removeEventListeners();
+        if (this.initialised === true) {
+            this._removeEventListeners();
 
-        this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-        this.passedElement.tabIndex = '';
-        this.passedElement.removeAttribute('style', 'display:none;');
-        this.passedElement.removeAttribute('aria-hidden');
+            this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+            this.passedElement.tabIndex = '';
+            this.passedElement.removeAttribute('style', 'display:none;');
+            this.passedElement.removeAttribute('aria-hidden');
 
-        this.containerOuter.outerHTML = this.passedElement.outerHTML;
+            this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
-        this.passedElement = null;
-        this.userConfig = null;
-        this.config = null;
-        this.store = null;
+            this.passedElement = null;
+            this.userConfig = null;
+            this.config = null;
+            this.store = null;
+
+            this.initialised = false;
+        }
     }
 
     /**

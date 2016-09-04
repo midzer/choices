@@ -35,12 +35,9 @@ describe('Choices', function() {
         })
 
         it('should have a blank state', function() {
-            const blankState = {
-                items: [],
-                groups: [],
-                choices: [],
-            };
-            expect(this.choices.currentState).toEqual(blankState);
+            expect(this.choices.currentState.items.length).toEqual(0);
+            expect(this.choices.currentState.groups.length).toEqual(0);
+            expect(this.choices.currentState.choices.length).toEqual(0);
         });
 
         it('should have config options', function() {
