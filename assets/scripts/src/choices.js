@@ -115,6 +115,11 @@ export default class Choices {
         // Retrieve triggering element (i.e. element with 'data-choice' trigger)
         this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
+        if (!this.passedElement) {
+            console.error('Passed element not found');
+            return;
+        }
+
         this.highlightPosition = 0;
         this.canSearch = this.config.search;
 
@@ -582,6 +587,10 @@ export default class Choices {
         if (this.passedElement.type !== 'select-one') {
             this.input.style.width = getWidthOfInput(this.input);
         }
+        if (this.passedElement.type !== 'text' && this.config.search) {
+            this.isSearching = false;
+            this.store.dispatch(activateChoices(true));
+        }
         return this;
     }
 
@@ -766,7 +775,6 @@ export default class Choices {
         // If we are clicking on an option
         const id = element.getAttribute('data-id');
         const choice = this.store.getChoiceById(id);
-        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         if (choice && !choice.selected && !choice.disabled) {
             const canAddItem = this._canAddItem(activeItems, choice.value);
@@ -775,13 +783,6 @@ export default class Choices {
                 this._addItem(choice.value, choice.label, choice.id);
                 this._triggerChange(choice.value);
                 this.clearInput(this.passedElement);
-                this.isSearching = false;
-                this.store.dispatch(activateChoices(true));
-
-                // We only hide the dropdown on a choice selection for single select boxes
-                if (this.passedElement.type === 'select-one' && hasActiveDropdown) {
-                    this.hideDropdown();
-                }
             }
         }
     }
@@ -819,7 +820,7 @@ export default class Choices {
      */
     _canAddItem(activeItems, value) {
         let canAddItem = true;
-        let notice = `Press Enter to add "${value}"`;
+        let notice = `Press Enter to add <b>"${value}"</b>`;
 
         if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
             if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
@@ -1026,6 +1027,8 @@ export default class Choices {
                 // regardless of whether an item was added
                 if (hasActiveDropdown && this.passedElement.type === 'select-one') {
                     this.hideDropdown();
+                    this.clearInput();
+                    this.containerOuter.focus();
                 }
             } else if (this.passedElement.type === 'select-one') {
                 // Open single select dropdown if it's not active
@@ -1695,9 +1698,9 @@ export default class Choices {
     _createTemplates() {
         const classNames = this.config.classNames;
         const templates = {
-            containerOuter: () => {
+            containerOuter: (direction) => {
                 return strToEl(`
-                    <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false"></div>
+                    <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
                 `);
             },
             containerInner: () => {
@@ -1781,12 +1784,14 @@ export default class Choices {
      * @private
      */
     _createInput() {
-        const containerOuter = this._getTemplate('containerOuter');
+        const direction = this.passedElement.getAttribute('dir') || 'ltr';
+        const containerOuter = this._getTemplate('containerOuter', direction);
         const containerInner = this._getTemplate('containerInner');
         const itemList = this._getTemplate('itemList');
         const choiceList = this._getTemplate('choiceList');
         const input = this._getTemplate('input');
         const dropdown = this._getTemplate('dropdown');
+        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
 
         this.containerOuter = containerOuter;
         this.containerInner = containerInner;
@@ -1809,7 +1814,6 @@ export default class Choices {
         wrap(containerInner, containerOuter);
 
         // If placeholder has been enabled and we have a value
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
         if (placeholder) {
             input.placeholder = placeholder;
             if (this.passedElement.type !== 'select-one') {

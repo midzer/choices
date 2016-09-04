@@ -19,7 +19,7 @@
     <!-- End ignore these -->
 
     <!-- Optional includes -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild"></script>
+    <!-- <script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild"></script> -->
     <!-- End optional includes -->
 
     <!-- Choices includes -->
@@ -45,37 +45,40 @@
             <hr>
 
             <h2>Text inputs</h2>
-            <label for="choices-1">Limited to 5 values with remove button</label>
-            <input class="form-control" id="choices-1" type="text" value="preset-1,preset-2" placeholder="Enter something">
+            <label for="choices-text-remove-button">Limited to 5 values with remove button</label>
+            <input class="form-control" id="choices-text-remove-button" type="text" value="preset-1,preset-2" placeholder="Enter something">
 
-            <label for="choices-2">Unique values only, no pasting</label>
-            <input class="form-control" id="choices-2" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+            <label for="choices-text-unique-values">Unique values only, no pasting</label>
+            <input class="form-control" id="choices-text-unique-values" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
 
-            <label for="choices-3">Email addresses only</label>
-            <input class="form-control" id="choices-3" type="text" placeholder="This is a placeholder">
+            <label for="choices-text-email-filter">Email addresses only</label>
+            <input class="form-control" id="choices-text-email-filter" type="text" placeholder="This is a placeholder">
 
-            <label for="choices-4">Disabled</label>
-            <input class="form-control" id="choices-4" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
+            <label for="choices-text-disabled">Disabled</label>
+            <input class="form-control" id="choices-text-disabled" type="text" value="josh@joshuajohnson.co.uk, joe@bloggs.co.uk" placeholder="This is a placeholder">
 
-            <label for="choices-5">Prepends and appends a value to each items return value</label>
-            <input class="form-control" id="choices-5" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
+            <label for="choices-text-prepend-append-value">Prepends and appends a value to each items return value</label>
+            <input class="form-control" id="choices-text-prepend-append-value" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
-            <label for="choices-6">Preset values passed through options</label>
-            <input class="form-control" id="choices-6" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
+            <label for="choices-text-preset-values">Preset values passed through options</label>
+            <input class="form-control" id="choices-text-preset-values" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
+
+            <label for="choices-text-preset-values">Right-to-left</label>
+            <input class="form-control" data-choice id="choices-text-rtl" type="text" value="Value 1, Value 2" dir="rtl">
 
             <hr>
 
             <h2>Multiple select input</h2>
-            <label for="choices-7">Default</label>
-            <select class="form-control" data-choice name="choices-7" id="choices-7" placeholder="This is a placeholder" multiple>
+            <label for="choices-multiple-default">Default</label>
+            <select class="form-control" data-choice name="choices-multiple-default" id="choices-multiple-default" placeholder="This is a placeholder" multiple>
                 <option value="Dropdown item 1" selected>Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
                 <option value="Dropdown item 4" disabled>Dropdown item 4</option>
             </select>
 
-            <label for="choices-9">Option groups</label>
-            <select class="form-control" data-choice name="choices-9" id="choices-9" placeholder="This is a placeholder" multiple>
+            <label for="choices-multiple-groups">Option groups</label>
+            <select class="form-control" data-choice name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -108,27 +111,35 @@
                 </optgroup>
             </select>
 
-            <label for="choices-10">Options from remote source (Fetch API) &amp; limited to 5</label>
-            <select class="form-control" name="choices-10" id="choices-10" multiple></select>
+            <label for="choices-multiple-remote-fetch">Options from remote source (Fetch API) &amp; limited to 5</label>
+            <select class="form-control" name="choices-multiple-remote-fetch" id="choices-multiple-remote-fetch" multiple></select>
+
+            <label for="choices-multiple-rtl">Right-to-left</label>
+            <select class="form-control" data-choice name="choices-multiple-rtl" id="choices-multiple-rtl" placeholder="This is a placeholder" multiple dir="rtl">
+                <option value="Dropdown item 1" selected>Dropdown item 1</option>
+                <option value="Dropdown item 2">Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+                <option value="Dropdown item 4" disabled>Dropdown item 4</option>
+            </select>
 
             <hr>
 
             <h2>Single select input</h2>
-            <label for="choices-11">Default</label>
-            <select class="form-control" data-choice name="choices-11" id="choices-11" placeholder="This is a placeholder">
+            <label for="choices-single-default">Default</label>
+            <select class="form-control" data-choice name="choices-single-default" id="choices-single-default" placeholder="This is a placeholder">
                 <option value="Dropdown item 1">Dropdown item 1</option>
                 <option value="Dropdown item 2">Dropdown item 2</option>
                 <option value="Dropdown item 3">Dropdown item 3</option>
             </select>
 
-            <label for="choices-12">Options from remote source (Fetch API)</label>
-            <select class="form-control" name="choices-12" id="choices-12" placeholder="Pick an Arctic Monkeys record"></select>
+            <label for="choices-single-remote-fetch">Options from remote source (Fetch API)</label>
+            <select class="form-control" name="choices-single-remote-fetch" id="choices-single-remote-fetch" placeholder="Pick an Arctic Monkeys record"></select>
 
-            <label for="choices-14">Options from remote source (XHR) &amp; remove button</label>
-            <select class="form-control" name="choices-14" id="choices-14" placeholder="Pick a Smiths record"></select>
+            <label for="choices-single-remove-xhr">Options from remote source (XHR) &amp; remove button</label>
+            <select class="form-control" name="choices-single-remove-xhr" id="choices-single-remove-xhr" placeholder="Pick a Smiths record"></select>
 
-            <label for="choices-13">Option groups</label>
-            <select class="form-control" data-choice name="choices-13" id="choices-13" placeholder="This is a placeholder">
+            <label for="choices-single-groups">Option groups</label>
+            <select class="form-control" data-choice name="choices-single-groups" id="choices-single-groups" placeholder="This is a placeholder">
                 <optgroup label="UK">
                     <option value="London">London</option>
                     <option value="Manchester">Manchester</option>
@@ -161,19 +172,26 @@
                 </optgroup>
             </select>
 
-            <label for="choices-15">Options added via config with no search</label>
-            <select class="form-control" name="choices-15" id="choices-15">
+            <label for="choices-single-rtl">Right-to-left</label>
+            <select class="form-control" data-choice name="choices-single-rtl" id="choices-single-rtl" placeholder="This is a placeholder" dir="rtl">
+                <option value="Dropdown item 1">Dropdown item 1</option>
+                <option value="Dropdown item 2">Dropdown item 2</option>
+                <option value="Dropdown item 3">Dropdown item 3</option>
+            </select>
+
+            <label for="choices-single-no-search">Options added via config with no search</label>
+            <select class="form-control" name="choices-single-no-search" id="choices-single-no-search">
                 <option value="0">Zero</option>
             </select>
 
-            <label for="choices-16">Option and option groups added via config</label>
-            <select class="form-control" name="choices-16" id="choices-16" placeholder="This is a placeholder"></select>
+            <label for="choices-single-preset-options">Option and option groups added via config</label>
+            <select class="form-control" name="choices-single-preset-options" id="choices-single-preset-options" placeholder="This is a placeholder"></select>
 
-            <label for="choices-17">Option selected via config</label>
-            <select class="form-control" name="choices-17" id="choices-17" placeholder="This is a placeholder"></select>
+            <label for="choices-single-selected-option">Option selected via config</label>
+            <select class="form-control" name="choices-single-selected-option" id="choices-single-selected-option" placeholder="This is a placeholder"></select>
 
-            <label for="choices-18">Options without sorting</label>
-            <select class="form-control" name="choices-18" id="choices-18" placeholder="This is a placeholder">
+            <label for="choices-single-no-sorting">Options without sorting</label>
+            <select class="form-control" name="choices-single-no-sorting" id="choices-single-no-sorting" placeholder="This is a placeholder">
                 <option value="Madrid">Madrid</option>
                 <option value="Toronto">Toronto</option>
                 <option value="Vancouver">Vancouver</option>
@@ -216,7 +234,7 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var example1 = new Choices(document.getElementById('choices-1'), {
+            var example1 = new Choices(document.getElementById('choices-text-remove-button'), {
                 delimiter: ',',
                 editItems: true,
                 maxItemCount: 5,
@@ -229,32 +247,32 @@
                 },
             });
 
-            var example2 = new Choices('#choices-2', {
+            var example2 = new Choices('#choices-text-unique-values', {
                 paste: false,
                 duplicateItems: false,
                 editItems: true,
             });
 
-            var example3 = new Choices('#choices-3', {
+            var example3 = new Choices('#choices-text-email-filter', {
                 editItems: true,
                 regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             });
 
-            var example4 = new Choices('#choices-4', {
+            var example4 = new Choices('#choices-text-disabled', {
                 addItems: false,
                 removeItems: false,
             }).disable();
 
-            var example5 = new Choices('#choices-5', {
+            var example5 = new Choices('#choices-text-prepend-append-value', {
                 prependValue: 'item-',
                 appendValue: '-' + Date.now(),
             }).removeActiveItems();
 
-            var example7 = new Choices('#choices-6', {
+            var example7 = new Choices('#choices-text-preset-values', {
                 items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
             });
 
-            var example9 = new Choices('#choices-10', {
+            var example9 = new Choices('#choices-multiple-remote-fetch', {
                 placeholder: true,
                 placeholderValue: 'Pick an Strokes record',
                 maxItemCount: 5,
@@ -271,7 +289,7 @@
                     });
             });
 
-            var example10 = new Choices('#choices-12', {
+            var example10 = new Choices('#choices-single-remote-fetch', {
                 placeholder: true,
                 placeholderValue: 'Pick an Arctic Monkeys record'
             }).ajax(function(callback) {
@@ -287,7 +305,7 @@
                     });
             });
 
-            var example11 = new Choices('#choices-14', {
+            var example11 = new Choices('#choices-single-remove-xhr', {
                 removeItemButton: true,
             }).ajax(function(callback) {
                 var request = new XMLHttpRequest();
@@ -295,9 +313,9 @@
                 request.onreadystatechange = function() {
                     var status;
                     var data;
-                    if (request.readyState == 4) {
+                    if (request.readyState === 4) {
                         status = request.status;
-                        if (status == 200) {
+                        if (status === 200) {
                             data = JSON.parse(request.responseText);
                             callback(data.releases, 'title', 'title');
                             example11.setValueByChoice('How Soon Is Now?');
@@ -314,7 +332,7 @@
                 removeButton: true,
             });
 
-            var example13 = new Choices('#choices-15', {
+            var example13 = new Choices('#choices-single-no-search', {
                 search: false,
                 removeItemButton: true,
                 choices: [
@@ -328,7 +346,7 @@
                 {value: 'Six', label: 'Label Six', selected: true},
             ], 'value', 'label');
 
-            var example14 = new Choices('#choices-16', {
+            var example14 = new Choices('#choices-single-preset-options', {
                 placeholder: true,
             }).setChoices([{
                 label: 'Group one',
@@ -351,7 +369,7 @@
                 ]
             }], 'value', 'label');
 
-            var example15 = new Choices('#choices-17', {
+            var example15 = new Choices('#choices-single-selected-option', {
                 choices: [
                     {value: 'One', label: 'Label One', selected: true},
                     {value: 'Two', label: 'Label Two', disabled: true},
@@ -359,7 +377,7 @@
                 ],
             }).setValueByChoice('Two');
 
-            var example16 = new Choices('#choices-18', {
+            var example16 = new Choices('#choices-single-no-sorting', {
                 shouldSort: false,
             });
 

@@ -1,4 +1,4 @@
-/*! choices.js v1.1.9 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.0.0 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -178,6 +178,11 @@
 
 	        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
 	        this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
+
+	        if (!this.passedElement) {
+	            console.error('Passed element not found');
+	            return;
+	        }
 
 	        this.highlightPosition = 0;
 	        this.canSearch = this.config.search;
@@ -731,6 +736,10 @@
 	            if (this.passedElement.type !== 'select-one') {
 	                this.input.style.width = (0, _utils.getWidthOfInput)(this.input);
 	            }
+	            if (this.passedElement.type !== 'text' && this.config.search) {
+	                this.isSearching = false;
+	                this.store.dispatch((0, _index3.activateChoices)(true));
+	            }
 	            return this;
 	        }
 
@@ -949,7 +958,6 @@
 	            // If we are clicking on an option
 	            var id = element.getAttribute('data-id');
 	            var choice = this.store.getChoiceById(id);
-	            var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
 	            if (choice && !choice.selected && !choice.disabled) {
 	                var canAddItem = this._canAddItem(activeItems, choice.value);
@@ -958,13 +966,6 @@
 	                    this._addItem(choice.value, choice.label, choice.id);
 	                    this._triggerChange(choice.value);
 	                    this.clearInput(this.passedElement);
-	                    this.isSearching = false;
-	                    this.store.dispatch((0, _index3.activateChoices)(true));
-
-	                    // We only hide the dropdown on a choice selection for single select boxes
-	                    if (this.passedElement.type === 'select-one' && hasActiveDropdown) {
-	                        this.hideDropdown();
-	                    }
 	                }
 	            }
 	        }
@@ -1012,7 +1013,7 @@
 	        key: '_canAddItem',
 	        value: function _canAddItem(activeItems, value) {
 	            var canAddItem = true;
-	            var notice = 'Press Enter to add "' + value + '"';
+	            var notice = 'Press Enter to add <b>"' + value + '"</b>';
 
 	            if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
 	                if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
@@ -1240,6 +1241,8 @@
 	                    // regardless of whether an item was added
 	                    if (hasActiveDropdown && _this15.passedElement.type === 'select-one') {
 	                        _this15.hideDropdown();
+	                        _this15.clearInput();
+	                        _this15.containerOuter.focus();
 	                    }
 	                } else if (_this15.passedElement.type === 'select-one') {
 	                    // Open single select dropdown if it's not active
@@ -1989,8 +1992,8 @@
 
 	            var classNames = this.config.classNames;
 	            var templates = {
-	                containerOuter: function containerOuter() {
-	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerOuter + '" data-type="' + _this21.passedElement.type + '" ' + (_this21.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false"></div>\n                ');
+	                containerOuter: function containerOuter(direction) {
+	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerOuter + '" data-type="' + _this21.passedElement.type + '" ' + (_this21.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n                ');
 	                },
 	                containerInner: function containerInner() {
 	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerInner + '"></div>\n                ');
@@ -2044,12 +2047,14 @@
 	        value: function _createInput() {
 	            var _this22 = this;
 
-	            var containerOuter = this._getTemplate('containerOuter');
+	            var direction = this.passedElement.getAttribute('dir') || 'ltr';
+	            var containerOuter = this._getTemplate('containerOuter', direction);
 	            var containerInner = this._getTemplate('containerInner');
 	            var itemList = this._getTemplate('itemList');
 	            var choiceList = this._getTemplate('choiceList');
 	            var input = this._getTemplate('input');
 	            var dropdown = this._getTemplate('dropdown');
+	            var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
 
 	            this.containerOuter = containerOuter;
 	            this.containerInner = containerInner;
@@ -2072,7 +2077,6 @@
 	            (0, _utils.wrap)(containerInner, containerOuter);
 
 	            // If placeholder has been enabled and we have a value
-	            var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
 	            if (placeholder) {
 	                input.placeholder = placeholder;
 	                if (this.passedElement.type !== 'select-one') {

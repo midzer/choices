@@ -10,6 +10,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Flexible styling
 * Fast search/filtering
 * Clean API
+* Right-to-left support
 
 ## Setup
 

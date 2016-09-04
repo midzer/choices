@@ -74,7 +74,7 @@ $choices-press-to-select-text: 'Press to select' !default;
         border-color: $choices-text-color transparent transparent transparent;
         border-width: 5px;
         position: absolute;
-        right: 7.5px + 4px;
+        right: 11.5px;
         top: 50%;
         margin-top: -2.5px;
         pointer-events: none;
@@ -82,6 +82,18 @@ $choices-press-to-select-text: 'Press to select' !default;
     &.is-open:after {
         border-color: transparent transparent $choices-text-color transparent;
         margin-top: -7.5px;
+    }
+    &[dir="rtl"] {
+        &:after {
+            left: 11.5px;
+            right: auto;
+        }
+        .#{$choices-selector}__button {
+            right: auto;
+            left: 0;
+            margin-left: 25px;
+            margin-right: 0;
+        }
     }
 }
 
@@ -131,6 +143,10 @@ $choices-press-to-select-text: 'Press to select' !default;
     display: inline-block;
     padding: 4px 16px 4px 4px;
     width: 100%;
+    [dir="rtl"] & {
+        padding-right: 4px;
+        padding-left: 16px;
+    }
     .#{$choices-selector}__item { width: 100%; }
 }
 
@@ -150,6 +166,10 @@ $choices-press-to-select-text: 'Press to select' !default;
         color: #FFFFFF;
         word-break: break-all;
         &[data-deletable] { padding-right: 5px; }
+        [dir="rtl"] & {
+            margin-right: 0;
+            margin-left: 3.75px;
+        }
         &.is-highlighted {
             background-color: darken($choices-primary-color, 5%);
             border: 1px solid darken($choices-primary-color, 10%);
@@ -193,6 +213,7 @@ $choices-press-to-select-text: 'Press to select' !default;
         position: relative;
         padding: 10px;
         font-size: $choices-font-size-md;
+        [dir="rtl"] & { text-align: right; }
     }
     .#{$choices-selector}__item--selectable {
         @media (min-width: 640px) {
@@ -205,6 +226,15 @@ $choices-press-to-select-text: 'Press to select' !default;
                 right: 10px;
                 top: 50%;
                 transform: translateY(-50%);
+            }
+            [dir="rtl"] & {
+                text-align: right;
+                padding-left: 100px;
+                padding-right: 10px;
+                &:after {
+                    right: auto;
+                    left: 10px;
+                }
             }
         }
         &.is-highlighted {
@@ -255,6 +285,10 @@ $choices-press-to-select-text: 'Press to select' !default;
     max-width: 100%;
     padding: 4px 0 4px 2px;
     &:focus { outline: 0; }
+    [dir="rtl"] & {
+        padding-right: 2px;
+        padding-left: 0;
+    }
 }
 
 .#{$choices-selector}__placeholder { opacity: .5; }
