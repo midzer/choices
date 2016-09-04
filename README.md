@@ -4,16 +4,12 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
 ## TL;DR 
-✔ Lightweight
-
-✔ No jQuery dependency
-
-✔ Configurable sorting
-
-✔ Flexible styling
-
-✔ Fast search/filtering
-✔ Clean API
+* Lightweight
+* No jQuery dependency
+* Configurable sorting
+* Flexible styling
+* Fast search/filtering
+* Clean API
 
 ## Setup
 
