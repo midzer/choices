@@ -42,6 +42,12 @@ export default class Choices {
             }
         }
 
+        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+
+        // If element has already been initalised with Choices, return it silently
+        if (this.passedElement.getAttribute('data-choice') === 'active') return;
+
         const defaultConfig = {
             items: [],
             choices: [],
@@ -126,9 +132,6 @@ export default class Choices {
         // Assign preset items from passed object first
         this.presetItems = this.config.items;
 
-        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
-
         // Then add any values passed from attribute
         if (this.passedElement.value) {
             this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
@@ -162,8 +165,6 @@ export default class Choices {
         const isValidType = ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
 
         if (isValidElement && isValidType) {
-            // If element has already been initalised with Choices, return it silently
-            if (this.passedElement.getAttribute('data-choice') === 'active') return;
             // Let's go
             this.init();
         } else {
@@ -173,60 +174,62 @@ export default class Choices {
 
     /**
      * Initialise Choices
-     * @return
+     * @return {Object} Class instance
      * @public
      */
     init(callback = this.config.callbackOnInit) {
-        if (this.initialised === true) return;
+        if (this.initialised === false) {
+            // Set initialise flag
+            this.initialised = true;
 
-        // Set initialise flag
-        this.initialised = true;
+            // Create required elements
+            this._createTemplates();
 
-        // Create required elements
-        this._createTemplates();
+            // Generate input markup
+            this._createInput();
 
-        // Generate input markup
-        this._createInput();
+            this.store.subscribe(this.render);
 
-        this.store.subscribe(this.render);
+            // Render any items
+            this.render();
 
-        // Render any items
-        this.render();
+            // Trigger event listeners
+            this._addEventListeners();
 
-        // Trigger event listeners
-        this._addEventListeners();
-
-        // Run callback if it is a function
-        if (callback) {
-            if (isType('Function', callback)) {
-                callback();
-            } else {
-                console.error('callbackOnInit: Callback is not a function');
+            // Run callback if it is a function
+            if (callback) {
+                if (isType('Function', callback)) {
+                    callback();
+                } else {
+                    console.error('callbackOnInit: Callback is not a function');
+                }
             }
         }
+        return this;
     }
 
     /**
      * Destroy Choices and nullify values
-     * @return
+     * @return {Object} Class instance
      * @public
      */
     destroy() {
-        if (this.initialised !== true) return;
+        if (this.initialised === true) {
+            this._removeEventListeners();
 
-        this._removeEventListeners();
+            this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+            this.passedElement.tabIndex = '';
+            this.passedElement.removeAttribute('style', 'display:none;');
+            this.passedElement.removeAttribute('aria-hidden');
 
-        this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-        this.passedElement.tabIndex = '';
-        this.passedElement.removeAttribute('style', 'display:none;');
-        this.passedElement.removeAttribute('aria-hidden');
+            this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
-        this.containerOuter.outerHTML = this.passedElement.outerHTML;
-
-        this.passedElement = null;
-        this.userConfig = null;
-        this.config = null;
-        this.store = null;
+            this.passedElement = null;
+            this.userConfig = null;
+            this.config = null;
+            this.store = null;
+        }
+        return this;
     }
 
     /**
@@ -473,30 +476,29 @@ export default class Choices {
      * @public
      */
     setValue(args) {
-        if (this.initialised !== true) return;
+        if (this.initialised === true) {
+            // Convert args to an itterable array
+            const values = [...args];
 
-        // Convert args to an itterable array
-        const values = [...args];
-
-        values.forEach((item) => {
-            if (isType('Object', item)) {
-                if (!item.value) return;
-                // If we are dealing with a select input, we need to create an option first
-                // that is then selected. For text inputs we can just add items normally.
-                if (this.passedElement.type !== 'text') {
-                    this._addChoice(true, false, item.value, item.label, -1);
-                } else {
-                    this._addItem(item.value, item.label, item.id);
+            values.forEach((item) => {
+                if (isType('Object', item)) {
+                    if (!item.value) return;
+                    // If we are dealing with a select input, we need to create an option first
+                    // that is then selected. For text inputs we can just add items normally.
+                    if (this.passedElement.type !== 'text') {
+                        this._addChoice(true, false, item.value, item.label, -1);
+                    } else {
+                        this._addItem(item.value, item.label, item.id);
+                    }
+                } else if (isType('String', item)) {
+                    if (this.passedElement.type !== 'text') {
+                        this._addChoice(true, false, item, item, -1);
+                    } else {
+                        this._addItem(item);
+                    }
                 }
-            } else if (isType('String', item)) {
-                if (this.passedElement.type !== 'text') {
-                    this._addChoice(true, false, item, item, -1);
-                } else {
-                    this._addItem(item);
-                }
-            }
-        });
-
+            });
+        }
         return this;
     }
 
@@ -542,20 +544,20 @@ export default class Choices {
     * @public
     */
     setChoices(choices, value, label) {
-        if (this.initialised !== true) return;
+        if (this.initialised === true) {
+            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+                if (!isType('Array', choices) || !value) return;
 
-        if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-            if (!isType('Array', choices) || !value) return;
-
-            if (choices && choices.length) {
-                this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                choices.forEach((result, index) => {
-                    if (result.choices) {
-                        this._addGroup(result, index);
-                    } else {
-                        this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
-                    }
-                });
+                if (choices && choices.length) {
+                    this.containerOuter.classList.remove(this.config.classNames.loadingState);
+                    choices.forEach((result, index) => {
+                        if (result.choices) {
+                            this._addGroup(result, index);
+                        } else {
+                            this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
+                        }
+                    });
+                }
             }
         }
         return this;
@@ -592,7 +594,7 @@ export default class Choices {
      */
     disable() {
         this.passedElement.disabled = true;
-        if (this.initialised) {
+        if (this.initialised === true) {
             if (!this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
                 this._removeEventListeners();
                 this.passedElement.setAttribute('disabled', '');
@@ -610,7 +612,7 @@ export default class Choices {
      */
     enable() {
         this.passedElement.disabled = false;
-        if (this.initialised) {
+        if (this.initialised === true) {
             if (this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
                 this._addEventListeners();
                 this.passedElement.removeAttribute('disabled');
@@ -629,40 +631,39 @@ export default class Choices {
      * @public
      */
     ajax(fn) {
-        if (this.initialised !== true) return;
-
-        if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-            this.containerOuter.classList.add(this.config.classNames.loadingState);
-            this.containerOuter.setAttribute('aria-busy', 'true');
-            if (this.passedElement.type === 'select-one') {
-                const placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-                this.itemList.appendChild(placeholderItem);
-            } else {
-                this.input.placeholder = this.config.loadingText;
-            }
-
-            const callback = (results, value, label) => {
-                if (!isType('Array', results) || !value) return;
-                if (results && results.length) {
-                    // Remove loading states/text
-                    this.containerOuter.classList.remove(this.config.classNames.loadingState);
-
-                    if (this.passedElement.type === 'select-multiple') {
-                        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
-                        if (placeholder) {
-                            this.input.placeholder = placeholder;
-                        }
-                    }
-
-                    // Add each result as a choice
-                    results.forEach((result, index) => {
-                        this._addChoice(false, false, result[value], result[label]);
-                    });
+        if (this.initialised === true) {
+            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+                this.containerOuter.classList.add(this.config.classNames.loadingState);
+                this.containerOuter.setAttribute('aria-busy', 'true');
+                if (this.passedElement.type === 'select-one') {
+                    const placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+                    this.itemList.appendChild(placeholderItem);
+                } else {
+                    this.input.placeholder = this.config.loadingText;
                 }
-                this.containerOuter.removeAttribute('aria-busy');
-            };
 
-            fn(callback);
+                const callback = (results, value, label) => {
+                    if (!isType('Array', results) || !value) return;
+                    if (results && results.length) {
+                        // Remove loading states/text
+                        this.containerOuter.classList.remove(this.config.classNames.loadingState);
+
+                        if (this.passedElement.type === 'select-multiple') {
+                            const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+                            if (placeholder) {
+                                this.input.placeholder = placeholder;
+                            }
+                        }
+
+                        // Add each result as a choice
+                        results.forEach((result, index) => {
+                            this._addChoice(false, false, result[value], result[label]);
+                        });
+                    }
+                    this.containerOuter.removeAttribute('aria-busy');
+                };
+                fn(callback);
+            }
         }
         return this;
     }
