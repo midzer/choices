@@ -1,4 +1,4 @@
-/*! choices.js v1.1.7 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v1.1.9 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,6 +76,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -103,12 +105,6 @@
 	                }
 	            }
 	        }
-
-	        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-	        this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-
-	        // If element has already been initalised with Choices, return it silently
-	        if (this.passedElement.getAttribute('data-choice') === 'active') return;
 
 	        var defaultConfig = {
 	            items: [],
@@ -179,14 +175,12 @@
 	        this.currentState = {};
 	        this.prevState = {};
 	        this.currentValue = '';
-	        this.highlightPosition = 0;
 
-	        // Track searching
+	        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+	        this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
+
+	        this.highlightPosition = 0;
 	        this.canSearch = this.config.search;
-	        // Track tapping
-	        this.wasTap = true;
-	        // Focus containerOuter but not show dropdown if true
-	        this.focusAndHideDropdown = false;
 
 	        // Assing preset choices from passed object
 	        this.presetChoices = this.config.choices;
@@ -218,17 +212,22 @@
 	        this._onPaste = this._onPaste.bind(this);
 	        this._onInput = this._onInput.bind(this);
 
+	        // Monitor touch taps/scrolls
+	        this.wasTap = true;
+
 	        // Cutting the mustard
 	        var cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement('div');
 	        if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
 	        // Input type check
-	        var isValidElement = this.passedElement && (0, _utils.isElement)(this.passedElement);
-	        var isValidType = ['select-one', 'select-multiple', 'text'].some(function (type) {
+	        var canInit = this.passedElement && (0, _utils.isElement)(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(function (type) {
 	            return type === _this.passedElement.type;
 	        });
 
-	        if (isValidElement && isValidType) {
+	        if (canInit) {
+	            // If element has already been initalised with Choices
+	            if (this.passedElement.getAttribute('data-choice') === 'active') return;
+
 	            // Let's go
 	            this.init();
 	        } else {
@@ -248,31 +247,31 @@
 	        value: function init() {
 	            var callback = arguments.length <= 0 || arguments[0] === undefined ? this.config.callbackOnInit : arguments[0];
 
-	            if (this.initialised === true) return;
+	            if (this.initialised === false) {
+	                // Set initialise flag
+	                this.initialised = true;
 
-	            // Set initialise flag
-	            this.initialised = true;
+	                // Create required elements
+	                this._createTemplates();
 
-	            // Create required elements
-	            this._createTemplates();
+	                // Generate input markup
+	                this._createInput();
 
-	            // Generate input markup
-	            this._createInput();
+	                this.store.subscribe(this.render);
 
-	            this.store.subscribe(this.render);
+	                // Render any items
+	                this.render();
 
-	            // Render any items
-	            this.render();
+	                // Trigger event listeners
+	                this._addEventListeners();
 
-	            // Trigger event listeners
-	            this._addEventListeners();
-
-	            // Run callback if it is a function
-	            if (callback) {
-	                if ((0, _utils.isType)('Function', callback)) {
-	                    callback();
-	                } else {
-	                    console.error('callbackOnInit: Callback is not a function');
+	                // Run callback if it is a function
+	                if (callback) {
+	                    if ((0, _utils.isType)('Function', callback)) {
+	                        callback();
+	                    } else {
+	                        console.error('callbackOnInit: Callback is not a function');
+	                    }
 	                }
 	            }
 	        }
@@ -286,21 +285,23 @@
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            if (this.initialised !== true) return;
+	            if (this.initialised === true) {
+	                this._removeEventListeners();
 
-	            this._removeEventListeners();
+	                this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+	                this.passedElement.tabIndex = '';
+	                this.passedElement.removeAttribute('style', 'display:none;');
+	                this.passedElement.removeAttribute('aria-hidden');
 
-	            this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-	            this.passedElement.tabIndex = '';
-	            this.passedElement.removeAttribute('style', 'display:none;');
-	            this.passedElement.removeAttribute('aria-hidden');
+	                this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
-	            this.containerOuter.outerHTML = this.passedElement.outerHTML;
+	                this.passedElement = null;
+	                this.userConfig = null;
+	                this.config = null;
+	                this.store = null;
 
-	            this.passedElement = null;
-	            this.userConfig = null;
-	            this.config = null;
-	            this.store = null;
+	                this.initialised = false;
+	            }
 	        }
 
 	        /**
@@ -603,29 +604,29 @@
 	        value: function setValue(args) {
 	            var _this8 = this;
 
-	            if (this.initialised !== true) return;
+	            if (this.initialised === true) {
+	                // Convert args to an itterable array
+	                var values = [].concat(_toConsumableArray(args));
 
-	            // Convert args to an itterable array
-	            var values = [].concat(_toConsumableArray(args));
-
-	            values.forEach(function (item) {
-	                if ((0, _utils.isType)('Object', item)) {
-	                    if (!item.value) return;
-	                    // If we are dealing with a select input, we need to create an option first
-	                    // that is then selected. For text inputs we can just add items normally.
-	                    if (_this8.passedElement.type !== 'text') {
-	                        _this8._addChoice(true, false, item.value, item.label, -1);
-	                    } else {
-	                        _this8._addItem(item.value, item.label, item.id);
+	                values.forEach(function (item) {
+	                    if ((0, _utils.isType)('Object', item)) {
+	                        if (!item.value) return;
+	                        // If we are dealing with a select input, we need to create an option first
+	                        // that is then selected. For text inputs we can just add items normally.
+	                        if (_this8.passedElement.type !== 'text') {
+	                            _this8._addChoice(true, false, item.value, item.label, -1);
+	                        } else {
+	                            _this8._addItem(item.value, item.label, item.id);
+	                        }
+	                    } else if ((0, _utils.isType)('String', item)) {
+	                        if (_this8.passedElement.type !== 'text') {
+	                            _this8._addChoice(true, false, item, item, -1);
+	                        } else {
+	                            _this8._addItem(item);
+	                        }
 	                    }
-	                } else if ((0, _utils.isType)('String', item)) {
-	                    if (_this8.passedElement.type !== 'text') {
-	                        _this8._addChoice(true, false, item, item, -1);
-	                    } else {
-	                        _this8._addItem(item);
-	                    }
-	                }
-	            });
+	                });
+	            }
 
 	            return this;
 	        }
@@ -642,29 +643,31 @@
 	        value: function setValueByChoice(value) {
 	            var _this9 = this;
 
-	            if (this.passedElement.type === 'text') return;
+	            if (this.passedElement.type !== 'text') {
+	                (function () {
+	                    var choices = _this9.store.getChoices();
+	                    // If only one value has been passed, convert to array
+	                    var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
 
-	            var choices = this.store.getChoices();
-	            // If only one value has been passed, convert to array
-	            var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
+	                    // Loop through each value and
+	                    choiceValue.forEach(function (val) {
+	                        var foundChoice = choices.find(function (choice) {
+	                            // Check 'value' property exists and the choice isn't already selected
+	                            return choice.value === val;
+	                        });
 
-	            // Loop through each value and
-	            choiceValue.forEach(function (val) {
-	                var foundChoice = choices.find(function (choice) {
-	                    // Check 'value' property exists and the choice isn't already selected
-	                    return choice.value === val;
-	                });
-
-	                if (foundChoice) {
-	                    if (!foundChoice.selected) {
-	                        _this9._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
-	                    } else {
-	                        console.warn('Attempting to select choice already selected');
-	                    }
-	                } else {
-	                    console.warn('Attempting to select choice that does not exist');
-	                }
-	            });
+	                        if (foundChoice) {
+	                            if (!foundChoice.selected) {
+	                                _this9._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+	                            } else {
+	                                console.warn('Attempting to select choice already selected');
+	                            }
+	                        } else {
+	                            console.warn('Attempting to select choice that does not exist');
+	                        }
+	                    });
+	                })();
+	            }
 	            return this;
 	        }
 
@@ -682,20 +685,20 @@
 	        value: function setChoices(choices, value, label) {
 	            var _this10 = this;
 
-	            if (this.initialised !== true) return;
+	            if (this.initialised === true) {
+	                if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+	                    if (!(0, _utils.isType)('Array', choices) || !value) return;
 
-	            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-	                if (!(0, _utils.isType)('Array', choices) || !value) return;
-
-	                if (choices && choices.length) {
-	                    this.containerOuter.classList.remove(this.config.classNames.loadingState);
-	                    choices.forEach(function (result, index) {
-	                        if (result.choices) {
-	                            _this10._addGroup(result, index);
-	                        } else {
-	                            _this10._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
-	                        }
-	                    });
+	                    if (choices && choices.length) {
+	                        this.containerOuter.classList.remove(this.config.classNames.loadingState);
+	                        choices.forEach(function (result, index) {
+	                            if (result.choices) {
+	                                _this10._addGroup(result, index);
+	                            } else {
+	                                _this10._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
+	                            }
+	                        });
+	                    }
 	                }
 	            }
 	            return this;
@@ -786,40 +789,38 @@
 	        value: function ajax(fn) {
 	            var _this11 = this;
 
-	            if (this.initialised !== true) return;
-
-	            if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-	                this.containerOuter.classList.add(this.config.classNames.loadingState);
-	                this.containerOuter.setAttribute('aria-busy', 'true');
-	                if (this.passedElement.type === 'select-one') {
-	                    var placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-	                    this.itemList.appendChild(placeholderItem);
-	                } else {
-	                    this.input.placeholder = this.config.loadingText;
-	                }
-
-	                var callback = function callback(results, value, label) {
-	                    if (!(0, _utils.isType)('Array', results) || !value) return;
-	                    if (results && results.length) {
-	                        // Remove loading states/text
-	                        _this11.containerOuter.classList.remove(_this11.config.classNames.loadingState);
-
-	                        if (_this11.passedElement.type === 'select-multiple') {
-	                            var placeholder = _this11.config.placeholder ? _this11.config.placeholderValue || _this11.passedElement.getAttribute('placeholder') : false;
-	                            if (placeholder) {
-	                                _this11.input.placeholder = placeholder;
-	                            }
-	                        }
-
-	                        // Add each result as a choice
-	                        results.forEach(function (result, index) {
-	                            _this11._addChoice(false, false, result[value], result[label]);
-	                        });
+	            if (this.initialised === true) {
+	                if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+	                    this.containerOuter.classList.add(this.config.classNames.loadingState);
+	                    this.containerOuter.setAttribute('aria-busy', 'true');
+	                    if (this.passedElement.type === 'select-one') {
+	                        var placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+	                        this.itemList.appendChild(placeholderItem);
+	                    } else {
+	                        this.input.placeholder = this.config.loadingText;
 	                    }
-	                    _this11.containerOuter.removeAttribute('aria-busy');
-	                };
 
-	                fn(callback);
+	                    var callback = function callback(results, value, label) {
+	                        if (!(0, _utils.isType)('Array', results) || !value) return;
+	                        if (results && results.length) {
+	                            // Remove loading states/text
+	                            _this11.containerOuter.classList.remove(_this11.config.classNames.loadingState);
+	                            if (_this11.passedElement.type === 'select-multiple') {
+	                                var placeholder = _this11.config.placeholder ? _this11.config.placeholderValue || _this11.passedElement.getAttribute('placeholder') : false;
+	                                if (placeholder) {
+	                                    _this11.input.placeholder = placeholder;
+	                                }
+	                            }
+
+	                            // Add each result as a choice
+	                            results.forEach(function (result, index) {
+	                                _this11._addChoice(false, false, result[value], result[label]);
+	                            });
+	                        }
+	                        _this11.containerOuter.removeAttribute('aria-busy');
+	                    };
+	                    fn(callback);
+	                }
 	            }
 	            return this;
 	        }
@@ -848,7 +849,6 @@
 
 	            // Keep focus on select-one element
 	            if (this.passedElement.type === 'select-one') {
-	                this.focusAndHideDropdown = true;
 	                this.containerOuter.focus();
 	            }
 	        }
@@ -1062,7 +1062,6 @@
 	            var _this14 = this;
 
 	            if (!value) return;
-
 	            if (this.input === document.activeElement) {
 	                var choices = this.store.getChoices();
 	                var hasUnactiveChoices = choices.some(function (option) {
@@ -1085,6 +1084,7 @@
 	                                include: 'score'
 	                            });
 	                            var results = fuse.search(needle);
+
 	                            _this14.currentValue = newValue;
 	                            _this14.highlightPosition = 0;
 	                            _this14.isSearching = true;
@@ -1166,18 +1166,12 @@
 	    }, {
 	        key: '_onKeyDown',
 	        value: function _onKeyDown(e) {
+	            var _this15 = this,
+	                _keyDownActions;
+
 	            if (e.target !== this.input && !this.containerOuter.contains(e.target)) return;
 
 	            var target = e.target;
-
-	            var ctrlDownKey = e.ctrlKey || e.metaKey;
-	            var backKey = 46;
-	            var deleteKey = 8;
-	            var enterKey = 13;
-	            var aKey = 65;
-	            var escapeKey = 27;
-	            var upKey = 38;
-	            var downKey = 40;
 
 	            var activeItems = this.store.getItemsFilteredByActive();
 	            var hasFocusedInput = this.input === document.activeElement;
@@ -1185,121 +1179,132 @@
 	            var hasItems = this.itemList && this.itemList.children;
 	            var keyString = String.fromCharCode(e.keyCode);
 
+	            var backKey = 46;
+	            var deleteKey = 8;
+	            var enterKey = 13;
+	            var aKey = 65;
+	            var escapeKey = 27;
+	            var upKey = 38;
+	            var downKey = 40;
+	            var ctrlDownKey = e.ctrlKey || e.metaKey;
+
 	            // If a user is typing and the dropdown is not active
 	            if (this.passedElement.type !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
-	                this.showDropdown();
+	                this.showDropdown(true);
 	            }
 
 	            this.canSearch = this.config.search;
 
-	            switch (e.keyCode) {
-	                case aKey:
-	                    // If CTRL + A or CMD + A have been pressed and there are items to select
-	                    if (ctrlDownKey && hasItems) {
-	                        this.canSearch = false;
-	                        if (this.config.removeItems && !this.input.value && this.input === document.activeElement) {
-	                            // Highlight items
-	                            this.highlightAll(this.itemList.children);
-	                        }
+	            var onAKey = function onAKey() {
+	                // If CTRL + A or CMD + A have been pressed and there are items to select
+	                if (ctrlDownKey && hasItems) {
+	                    _this15.canSearch = false;
+	                    if (_this15.config.removeItems && !_this15.input.value && _this15.input === document.activeElement) {
+	                        // Highlight items
+	                        _this15.highlightAll(_this15.itemList.children);
 	                    }
-	                    break;
+	                }
+	            };
 
-	                case enterKey:
-	                    // If enter key is pressed and the input has a value
-	                    if (this.passedElement.type === 'text' && target.value) {
-	                        var value = this.input.value;
-	                        var canAddItem = this._canAddItem(activeItems, value);
+	            var onEnterKey = function onEnterKey() {
+	                // If enter key is pressed and the input has a value
+	                if (_this15.passedElement.type === 'text' && target.value) {
+	                    var value = _this15.input.value;
+	                    var canAddItem = _this15._canAddItem(activeItems, value);
 
-	                        // All is good, add
-	                        if (canAddItem.response) {
-	                            if (hasActiveDropdown) {
-	                                this.hideDropdown();
-	                            }
-	                            this._addItem(value);
-	                            this._triggerChange(value);
-	                            this.clearInput(this.passedElement);
+	                    // All is good, add
+	                    if (canAddItem.response) {
+	                        if (hasActiveDropdown) {
+	                            _this15.hideDropdown();
 	                        }
+	                        _this15._addItem(value);
+	                        _this15._triggerChange(value);
+	                        _this15.clearInput(_this15.passedElement);
+	                    }
+	                }
+
+	                if (target.hasAttribute('data-button')) {
+	                    _this15._handleButtonAction(activeItems, target);
+	                    e.preventDefault();
+	                }
+
+	                if (hasActiveDropdown) {
+	                    var highlighted = _this15.dropdown.querySelector('.' + _this15.config.classNames.highlightedState);
+
+	                    // If we have a highlighted choice
+	                    if (highlighted) {
+	                        _this15._handleChoiceAction(activeItems, highlighted);
 	                    }
 
-	                    if (target.hasAttribute('data-button')) {
-	                        this._handleButtonAction(activeItems, target);
+	                    // We always want to hide the dropdown for single selects
+	                    // regardless of whether an item was added
+	                    if (hasActiveDropdown && _this15.passedElement.type === 'select-one') {
+	                        _this15.hideDropdown();
+	                    }
+	                } else if (_this15.passedElement.type === 'select-one') {
+	                    // Open single select dropdown if it's not active
+	                    if (!hasActiveDropdown) {
+	                        _this15.showDropdown(true);
 	                        e.preventDefault();
 	                    }
+	                }
+	            };
 
-	                    if (hasActiveDropdown) {
-	                        var highlighted = this.dropdown.querySelector('.' + this.config.classNames.highlightedState);
+	            var onEscapeKey = function onEscapeKey() {
+	                if (hasActiveDropdown) {
+	                    _this15.toggleDropdown();
+	                }
+	            };
 
-	                        if (highlighted) {
-	                            this._handleChoiceAction(activeItems, highlighted);
-	                        }
-
-	                        // We always want to hide the dropdown for single selects
-	                        // regardless of whether an item was added
-	                        if (hasActiveDropdown && this.passedElement.type === 'select-one') {
-	                            this.hideDropdown();
-	                        }
-	                    } else if (this.passedElement.type === 'select-one') {
-	                        // Open single select dropdown if it's not active
-	                        if (!hasActiveDropdown) {
-	                            this.showDropdown(true);
-	                            e.preventDefault();
-	                        }
+	            var onDirectionKey = function onDirectionKey() {
+	                // If up or down key is pressed, traverse through options
+	                if (hasActiveDropdown || _this15.passedElement.type === 'select-one') {
+	                    // Show dropdown if focus
+	                    if (!hasActiveDropdown) {
+	                        _this15.showDropdown(true);
 	                    }
 
-	                    break;
+	                    var currentEl = _this15.dropdown.querySelector('.' + _this15.config.classNames.highlightedState);
+	                    var directionInt = e.keyCode === downKey ? 1 : -1;
+	                    var nextEl = void 0;
 
-	                case escapeKey:
-	                    if (hasActiveDropdown) this.toggleDropdown();
-	                    break;
+	                    _this15.canSearch = false;
 
-	                case downKey:
-	                case upKey:
-	                    // If up or down key is pressed, traverse through options
-	                    if (hasActiveDropdown || this.passedElement.type === 'select-one') {
-	                        // Show dropdown if focus
-	                        if (!hasActiveDropdown) {
-	                            this.showDropdown(true);
-	                        }
-
-	                        var currentEl = this.dropdown.querySelector('.' + this.config.classNames.highlightedState);
-	                        var directionInt = e.keyCode === downKey ? 1 : -1;
-	                        var nextEl = void 0;
-
-	                        this.canSearch = false;
-
-	                        if (currentEl) {
-	                            nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
-	                        } else {
-	                            nextEl = this.dropdown.querySelector('[data-choice-selectable]');
-	                        }
-
-	                        if (nextEl) {
-	                            // We prevent default to stop the cursor moving
-	                            // when pressing the arrow
-	                            if (!(0, _utils.isScrolledIntoView)(nextEl, this.choiceList, directionInt)) {
-	                                this._scrollToChoice(nextEl, directionInt);
-	                            }
-	                            this._highlightChoice(nextEl);
-	                        }
-
-	                        // Prevent default to maintain cursor position whilst
-	                        // traversing dropdown options
-	                        e.preventDefault();
-	                    }
-	                    break;
-
-	                case backKey:
-	                case deleteKey:
-	                    // If backspace or delete key is pressed and the input has no value
-	                    if (hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
-	                        this._handleBackspace(activeItems);
-	                        e.preventDefault();
+	                    if (currentEl) {
+	                        nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
+	                    } else {
+	                        nextEl = _this15.dropdown.querySelector('[data-choice-selectable]');
 	                    }
 
-	                    break;
+	                    if (nextEl) {
+	                        // We prevent default to stop the cursor moving
+	                        // when pressing the arrow
+	                        if (!(0, _utils.isScrolledIntoView)(nextEl, _this15.choiceList, directionInt)) {
+	                            _this15._scrollToChoice(nextEl, directionInt);
+	                        }
+	                        _this15._highlightChoice(nextEl);
+	                    }
 
-	                default:
-	                    break;
+	                    // Prevent default to maintain cursor position whilst
+	                    // traversing dropdown options
+	                    e.preventDefault();
+	                }
+	            };
+
+	            var onDeleteKey = function onDeleteKey() {
+	                // If backspace or delete key is pressed and the input has no value
+	                if (hasFocusedInput && !e.target.value && _this15.passedElement.type !== 'select-one') {
+	                    _this15._handleBackspace(activeItems);
+	                    e.preventDefault();
+	                }
+	            };
+
+	            // Map keys to key actions
+	            var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, aKey, onAKey), _defineProperty(_keyDownActions, enterKey, onEnterKey), _defineProperty(_keyDownActions, escapeKey, onEscapeKey), _defineProperty(_keyDownActions, upKey, onDirectionKey), _defineProperty(_keyDownActions, downKey, onDirectionKey), _defineProperty(_keyDownActions, deleteKey, onDeleteKey), _defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
+
+	            // If keycode has a function, run it
+	            if (keyDownActions[e.keyCode]) {
+	                keyDownActions[e.keyCode]();
 	            }
 	        }
 
@@ -1558,70 +1563,43 @@
 	    }, {
 	        key: '_onFocus',
 	        value: function _onFocus(e) {
+	            var _this16 = this;
+
 	            var target = e.target;
 	            // If target is something that concerns us
 	            if (this.containerOuter.contains(target)) {
-	                var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-	                switch (this.passedElement.type) {
-	                    case 'text':
-	                        {
-	                            if (target === this.input) {
-	                                this.containerOuter.classList.add(this.config.classNames.focusState);
+	                (function () {
+	                    var hasActiveDropdown = _this16.dropdown.classList.contains(_this16.config.classNames.activeState);
+	                    var focusActions = {
+	                        text: function text() {
+	                            if (target === _this16.input) {
+	                                _this16.containerOuter.classList.add(_this16.config.classNames.focusState);
 	                            }
-
-	                            break;
-	                        }
-	                    case 'select-one':
-	                        {
-	                            if (target === this.containerOuter) {
-	                                // If element is a select box, the focussed element is the container and the dropdown
-	                                // isn't already open, focus and show dropdown
-	                                this.containerOuter.classList.add(this.config.classNames.focusState);
-
+	                        },
+	                        'select-one': function selectOne() {
+	                            _this16.containerOuter.classList.add(_this16.config.classNames.focusState);
+	                            if (target === _this16.input) {
 	                                // Show dropdown if it isn't already showing
 	                                if (!hasActiveDropdown) {
-	                                    if (!this.focusAndHideDropdown && this.canSearch && document.activeElement !== this.input) {
-	                                        this.showDropdown(true);
-	                                    } else {
-	                                        this.showDropdown();
-	                                    }
+	                                    _this16.showDropdown();
 	                                }
-
-	                                this.focusAndHideDropdown = false;
 	                            }
-
-	                            if (target === this.input) {
+	                        },
+	                        'select-multiple': function selectMultiple() {
+	                            if (target === _this16.input) {
 	                                // If element is a select box, the focussed element is the container and the dropdown
 	                                // isn't already open, focus and show dropdown
-	                                this.containerOuter.classList.add(this.config.classNames.focusState);
-
-	                                // Show dropdown if it isn't already showing
-	                                if (!hasActiveDropdown) {
-	                                    this.showDropdown();
-	                                }
-	                            }
-
-	                            break;
-	                        }
-	                    case 'select-multiple':
-	                        {
-	                            if (target === this.input) {
-	                                // If element is a select box, the focussed element is the container and the dropdown
-	                                // isn't already open, focus and show dropdown
-	                                this.containerOuter.classList.add(this.config.classNames.focusState);
+	                                _this16.containerOuter.classList.add(_this16.config.classNames.focusState);
 
 	                                if (!hasActiveDropdown) {
-	                                    this.showDropdown(true);
+	                                    _this16.showDropdown(true);
 	                                }
 	                            }
-
-	                            break;
 	                        }
+	                    };
 
-	                    default:
-	                        break;
-	                }
+	                    focusActions[_this16.passedElement.type]();
+	                })();
 	            }
 	        }
 
@@ -1635,75 +1613,65 @@
 	    }, {
 	        key: '_onBlur',
 	        value: function _onBlur(e) {
+	            var _this17 = this;
+
 	            var target = e.target;
 	            // If target is something that concerns us
 	            if (this.containerOuter.contains(target)) {
-	                var activeItems = this.store.getItemsFilteredByActive();
-	                var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	                var hasHighlightedItems = activeItems.some(function (item) {
-	                    return item.highlighted === true;
-	                });
-
-	                switch (this.passedElement.type) {
-	                    case 'text':
-	                        {
-	                            if (target === this.input) {
+	                (function () {
+	                    var activeItems = _this17.store.getItemsFilteredByActive();
+	                    var hasActiveDropdown = _this17.dropdown.classList.contains(_this17.config.classNames.activeState);
+	                    var hasHighlightedItems = activeItems.some(function (item) {
+	                        return item.highlighted === true;
+	                    });
+	                    var blurActions = {
+	                        text: function text() {
+	                            if (target === _this17.input) {
 	                                // Remove the focus state
-	                                this.containerOuter.classList.remove(this.config.classNames.focusState);
+	                                _this17.containerOuter.classList.remove(_this17.config.classNames.focusState);
 	                                // De-select any highlighted items
 	                                if (hasHighlightedItems) {
-	                                    this.unhighlightAll();
+	                                    _this17.unhighlightAll();
 	                                }
 	                                // Hide dropdown if it is showing
 	                                if (hasActiveDropdown) {
-	                                    this.hideDropdown();
+	                                    _this17.hideDropdown();
 	                                }
 	                            }
-
-	                            break;
-	                        }
-	                    case 'select-one':
-	                        {
-	                            if (target === this.containerOuter) {
-	                                this.containerOuter.classList.remove(this.config.classNames.focusState);
-
+	                        },
+	                        'select-one': function selectOne() {
+	                            _this17.containerOuter.classList.remove(_this17.config.classNames.focusState);
+	                            if (target === _this17.containerOuter) {
 	                                // Hide dropdown if it is showing
-	                                if (hasActiveDropdown && !this.canSearch) {
-	                                    this.hideDropdown();
+	                                if (hasActiveDropdown && !_this17.canSearch) {
+	                                    _this17.hideDropdown();
 	                                }
 	                            }
 
-	                            if (target === this.input) {
-	                                this.containerOuter.classList.remove(this.config.classNames.focusState);
-
+	                            if (target === _this17.input) {
 	                                // Hide dropdown if it is showing
 	                                if (hasActiveDropdown) {
-	                                    this.hideDropdown();
+	                                    _this17.hideDropdown();
 	                                }
 	                            }
-
-	                            break;
-	                        }
-	                    case 'select-multiple':
-	                        {
-	                            if (target === this.input) {
+	                        },
+	                        'select-multiple': function selectMultiple() {
+	                            if (target === _this17.input) {
 	                                // Remove the focus state
-	                                this.containerOuter.classList.remove(this.config.classNames.focusState);
+	                                _this17.containerOuter.classList.remove(_this17.config.classNames.focusState);
 	                                if (hasActiveDropdown) {
-	                                    this.hideDropdown();
+	                                    _this17.hideDropdown();
 	                                }
 	                                // De-select any highlighted items
 	                                if (hasHighlightedItems) {
-	                                    this.unhighlightAll();
+	                                    _this17.unhighlightAll();
 	                                }
 	                            }
-
-	                            break;
 	                        }
+	                    };
 
-	                    default:
-	                        break;
-	                }
+	                    blurActions[_this17.passedElement.type]();
+	                })();
 	            }
 	        }
 
@@ -1734,7 +1702,7 @@
 	    }, {
 	        key: '_scrollToChoice',
 	        value: function _scrollToChoice(choice, direction) {
-	            var _this15 = this;
+	            var _this18 = this;
 
 	            if (!choice) return;
 
@@ -1757,19 +1725,19 @@
 	                var distance = void 0;
 
 	                if (direction > 0) {
-	                    easing = (endPoint - _this15.choiceList.scrollTop) / strength;
+	                    easing = (endPoint - _this18.choiceList.scrollTop) / strength;
 	                    distance = easing > 1 ? easing : 1;
 
-	                    _this15.choiceList.scrollTop = _this15.choiceList.scrollTop + distance;
-	                    if (_this15.choiceList.scrollTop < endPoint) {
+	                    _this18.choiceList.scrollTop = _this18.choiceList.scrollTop + distance;
+	                    if (_this18.choiceList.scrollTop < endPoint) {
 	                        continueAnimation = true;
 	                    }
 	                } else {
-	                    easing = (_this15.choiceList.scrollTop - endPoint) / strength;
+	                    easing = (_this18.choiceList.scrollTop - endPoint) / strength;
 	                    distance = easing > 1 ? easing : 1;
 
-	                    _this15.choiceList.scrollTop = _this15.choiceList.scrollTop - distance;
-	                    if (_this15.choiceList.scrollTop > endPoint) {
+	                    _this18.choiceList.scrollTop = _this18.choiceList.scrollTop - distance;
+	                    if (_this18.choiceList.scrollTop > endPoint) {
 	                        continueAnimation = true;
 	                    }
 	                }
@@ -1796,7 +1764,7 @@
 	    }, {
 	        key: '_highlightChoice',
 	        value: function _highlightChoice(el) {
-	            var _this16 = this;
+	            var _this19 = this;
 
 	            // Highlight first element in dropdown
 	            var choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
@@ -1806,7 +1774,7 @@
 
 	                // Remove any highlighted choices
 	                highlightedChoices.forEach(function (choice) {
-	                    choice.classList.remove(_this16.config.classNames.highlightedState);
+	                    choice.classList.remove(_this19.config.classNames.highlightedState);
 	                    choice.setAttribute('aria-selected', 'false');
 	                });
 
@@ -1960,7 +1928,7 @@
 	    }, {
 	        key: '_addGroup',
 	        value: function _addGroup(group, id) {
-	            var _this17 = this;
+	            var _this20 = this;
 
 	            var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
 	            var groupId = id;
@@ -1980,7 +1948,7 @@
 	                        label = option.innerHTML;
 	                    }
 
-	                    _this17._addChoice(isOptSelected, isOptDisabled, option.value, label, groupId);
+	                    _this20._addChoice(isOptSelected, isOptDisabled, option.value, label, groupId);
 	                });
 	            } else {
 	                this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -2017,30 +1985,30 @@
 	    }, {
 	        key: '_createTemplates',
 	        value: function _createTemplates() {
-	            var _this18 = this;
+	            var _this21 = this;
 
 	            var classNames = this.config.classNames;
 	            var templates = {
 	                containerOuter: function containerOuter() {
-	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerOuter + '" data-type="' + _this18.passedElement.type + '" ' + (_this18.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false"></div>\n                ');
+	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerOuter + '" data-type="' + _this21.passedElement.type + '" ' + (_this21.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false"></div>\n                ');
 	                },
 	                containerInner: function containerInner() {
 	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerInner + '"></div>\n                ');
 	                },
 	                itemList: function itemList() {
-	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + ' ' + (_this18.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n                ');
+	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + ' ' + (_this21.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n                ');
 	                },
 	                placeholder: function placeholder(value) {
 	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.placeholder + '">\n                        ' + value + '\n                    </div>\n                ');
 	                },
 	                item: function item(data) {
-	                    if (_this18.config.removeItemButton) {
+	                    if (_this21.config.removeItemButton) {
 	                        return (0, _utils.strToEl)('\n                        <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n                            ' + data.label + '<button class="' + classNames.button + '" data-button>Remove item</button>\n                        </div>\n                    ');
 	                    }
 	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n                        ' + data.label + '\n                    </div>\n                ');
 	                },
 	                choiceList: function choiceList() {
-	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this18.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n                ');
+	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this21.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n                ');
 	                },
 	                choiceGroup: function choiceGroup(data) {
 	                    return (0, _utils.strToEl)('\n                    <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n                        <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n                    </div>\n                ');
@@ -2074,7 +2042,7 @@
 	    }, {
 	        key: '_createInput',
 	        value: function _createInput() {
-	            var _this19 = this;
+	            var _this22 = this;
 
 	            var containerOuter = this._getTemplate('containerOuter');
 	            var containerInner = this._getTemplate('containerInner');
@@ -2136,12 +2104,13 @@
 
 	                if (passedGroups && passedGroups.length) {
 	                    passedGroups.forEach(function (group, index) {
-	                        _this19._addGroup(group, index);
+	                        _this22._addGroup(group, index);
 	                    });
 	                } else {
 	                    (function () {
-	                        var passedOptions = Array.from(_this19.passedElement.options);
-	                        var allChoices = [];
+	                        var passedOptions = Array.from(_this22.passedElement.options);
+	                        var filter = _this22.config.sortFilter;
+	                        var allChoices = _this22.presetChoices;
 
 	                        // Create array of options from option elements
 	                        passedOptions.forEach(function (o) {
@@ -2153,13 +2122,32 @@
 	                            });
 	                        });
 
-	                        // Join choices with preset choices and add them
-	                        allChoices.concat(_this19.presetChoices).forEach(function (o, index) {
+	                        // If sorting is enabled or the user is searching, filter choices
+	                        if (_this22.config.shouldSort) {
+	                            allChoices.sort(filter);
+	                        }
+
+	                        // Determine whether there is a selected choice
+	                        var hasSelectedChoice = allChoices.some(function (choice) {
+	                            return choice.selected === true;
+	                        });
+
+	                        // Add each choice
+	                        allChoices.forEach(function (choice, index) {
+	                            var isDisabled = choice.disabled ? choice.disabled : false;
+	                            var isSelected = choice.selected ? choice.selected : false;
 	                            // Pre-select first choice if it's a single select
-	                            if (index === 0 && _this19.passedElement.type === 'select-one') {
-	                                _this19._addChoice(true, o.disabled ? o.disabled : false, o.value, o.label);
+	                            if (_this22.passedElement.type === 'select-one') {
+	                                if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
+	                                    // If there is a selected choice already or the choice is not
+	                                    // the first in the array, add each choice normally
+	                                    _this22._addChoice(isSelected, isDisabled, choice.value, choice.label);
+	                                } else {
+	                                    // Otherwise pre-select the first choice in the array
+	                                    _this22._addChoice(true, false, choice.value, choice.label);
+	                                }
 	                            } else {
-	                                _this19._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
+	                                _this22._addChoice(isSelected, isDisabled, choice.value, choice.label);
 	                            }
 	                        });
 	                    })();
@@ -2169,9 +2157,9 @@
 	                this.presetItems.forEach(function (item) {
 	                    if ((0, _utils.isType)('Object', item)) {
 	                        if (!item.value) return;
-	                        _this19._addItem(item.value, item.label, item.id);
+	                        _this22._addItem(item.value, item.label, item.id);
 	                    } else if ((0, _utils.isType)('String', item)) {
-	                        _this19._addItem(item);
+	                        _this22._addItem(item);
 	                    }
 	                });
 	            }
@@ -2189,7 +2177,7 @@
 	    }, {
 	        key: 'renderGroups',
 	        value: function renderGroups(groups, choices, fragment) {
-	            var _this20 = this;
+	            var _this23 = this;
 
 	            var groupFragment = fragment || document.createDocumentFragment();
 	            var filter = this.config.sortFilter;
@@ -2202,7 +2190,7 @@
 	            groups.forEach(function (group) {
 	                // Grab options that are children of this group
 	                var groupChoices = choices.filter(function (choice) {
-	                    if (_this20.passedElement.type === 'select-one') {
+	                    if (_this23.passedElement.type === 'select-one') {
 	                        return choice.groupId === group.id;
 	                    }
 
@@ -2210,10 +2198,9 @@
 	                });
 
 	                if (groupChoices.length >= 1) {
-	                    var dropdownGroup = _this20._getTemplate('choiceGroup', group);
+	                    var dropdownGroup = _this23._getTemplate('choiceGroup', group);
 	                    groupFragment.appendChild(dropdownGroup);
-
-	                    _this20.renderChoices(groupChoices, groupFragment);
+	                    _this23.renderChoices(groupChoices, groupFragment);
 	                }
 	            });
 
@@ -2231,7 +2218,7 @@
 	    }, {
 	        key: 'renderChoices',
 	        value: function renderChoices(choices, fragment) {
-	            var _this21 = this;
+	            var _this24 = this;
 
 	            // Create a fragment to store our list items (so we don't have to update the DOM for each item)
 	            var choicesFragment = fragment || document.createDocumentFragment();
@@ -2243,8 +2230,8 @@
 	            }
 
 	            choices.forEach(function (choice) {
-	                var dropdownItem = _this21._getTemplate('choice', choice);
-	                var shouldRender = _this21.passedElement.type === 'select-one' || !choice.selected;
+	                var dropdownItem = _this24._getTemplate('choice', choice);
+	                var shouldRender = _this24.passedElement.type === 'select-one' || !choice.selected;
 	                if (shouldRender) {
 	                    choicesFragment.appendChild(dropdownItem);
 	                }
@@ -2264,7 +2251,7 @@
 	    }, {
 	        key: 'renderItems',
 	        value: function renderItems(items, fragment) {
-	            var _this22 = this;
+	            var _this25 = this;
 
 	            // Create fragment to add elements to
 	            var itemListFragment = fragment || document.createDocumentFragment();
@@ -2281,22 +2268,21 @@
 	                    // Add each list item to list
 	                    items.forEach(function (item) {
 	                        // Create a standard select option
-	                        var option = _this22._getTemplate('option', item);
-
+	                        var option = _this25._getTemplate('option', item);
 	                        // Append it to fragment
 	                        selectedOptionsFragment.appendChild(option);
 	                    });
 
 	                    // Update selected choices
-	                    _this22.passedElement.innerHTML = '';
-	                    _this22.passedElement.appendChild(selectedOptionsFragment);
+	                    _this25.passedElement.innerHTML = '';
+	                    _this25.passedElement.appendChild(selectedOptionsFragment);
 	                })();
 	            }
 
 	            // Add each list item to list
 	            items.forEach(function (item) {
 	                // Create new list element
-	                var listItem = _this22._getTemplate('item', item);
+	                var listItem = _this25._getTemplate('item', item);
 	                // Append it to list
 	                itemListFragment.appendChild(listItem);
 	            });
@@ -2464,6 +2450,10 @@
 	    // the `threshold`, `distance`, and `location` are inconsequential for individual tokens.
 	    tokenize: false,
 
+	    // When true, the result set will only include records that match all tokens. Will only work
+	    // if `tokenize` is also true.
+	    matchAllTokens: false,
+
 	    // Regex used to separate words when searching. Only applicable when `tokenize` is `true`.
 	    tokenSeparator: / +/g
 	  }
@@ -2489,7 +2479,7 @@
 	    }
 	  }
 
-	  Fuse.VERSION = '2.4.1'
+	  Fuse.VERSION = '2.5.0'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
@@ -2600,6 +2590,8 @@
 	    var termScores
 	    var word
 	    var tokenSearchResult
+	    var hasMatchInText
+	    var checkTextMatches
 	    var i
 	    var j
 
@@ -2609,6 +2601,8 @@
 	    }
 
 	    scores = []
+
+	    var numTextMatches = 0
 
 	    if (typeof text === 'string') {
 	      words = text.split(options.tokenSeparator)
@@ -2622,6 +2616,8 @@
 	          if (options.verbose) log('Pattern:', tokenSearcher.pattern)
 
 	          termScores = []
+	          hasMatchInText = false
+
 	          for (j = 0; j < words.length; j++) {
 	            word = words[j]
 	            tokenSearchResult = tokenSearcher.search(word)
@@ -2629,13 +2625,21 @@
 	            if (tokenSearchResult.isMatch) {
 	              obj[word] = tokenSearchResult.score
 	              exists = true
+	              hasMatchInText = true
 	              scores.push(tokenSearchResult.score)
 	            } else {
 	              obj[word] = 1
-	              scores.push(1)
+	              if (!this.options.matchAllTokens) {
+	                scores.push(1)
+	              }
 	            }
 	            termScores.push(obj)
 	          }
+
+	          if (hasMatchInText) {
+	            numTextMatches++
+	          }
+
 	          if (options.verbose) log('Token scores:', termScores)
 	        }
 
@@ -2659,8 +2663,12 @@
 
 	      if (options.verbose) log('Score average:', finalScore)
 
+	      checkTextMatches = (this.options.tokenize && this.options.matchAllTokens) ? numTextMatches >= this.tokenSearchers.length : true
+
+	      if (options.verbose) log('Check Matches', checkTextMatches)
+
 	      // If a match is found, add the item to <rawResults>, including its score
-	      if (exists || mainSearchResult.isMatch) {
+	      if ((exists || mainSearchResult.isMatch) && checkTextMatches) {
 	        // Check if the item already exists in our results
 	        existingResult = this.resultMap[index]
 
@@ -3713,10 +3721,11 @@
 	var objectTag = '[object Object]';
 
 	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+	var funcProto = Function.prototype,
+	    objectProto = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
-	var funcToString = Function.prototype.toString;
+	var funcToString = funcProto.toString;
 
 	/** Used to check objects for own properties. */
 	var hasOwnProperty = objectProto.hasOwnProperty;
@@ -3726,7 +3735,7 @@
 
 	/**
 	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
@@ -3740,8 +3749,7 @@
 	 * @since 0.8.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object,
-	 *  else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
 	 * @example
 	 *
 	 * function Foo() {
@@ -3783,17 +3791,8 @@
 
 	var overArg = __webpack_require__(8);
 
-	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeGetPrototype = Object.getPrototypeOf;
-
-	/**
-	 * Gets the `[[Prototype]]` of `value`.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @returns {null|Object} Returns the `[[Prototype]]`.
-	 */
-	var getPrototype = overArg(nativeGetPrototype, Object);
+	/** Built-in value references. */
+	var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 	module.exports = getPrototype;
 
@@ -3803,7 +3802,7 @@
 /***/ function(module, exports) {
 
 	/**
-	 * Creates a function that invokes `func` with its first argument transformed.
+	 * Creates a unary function that invokes `func` with its argument transformed.
 	 *
 	 * @private
 	 * @param {Function} func The function to wrap.
