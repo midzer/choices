@@ -42,12 +42,6 @@ export default class Choices {
             }
         }
 
-        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
-
-        // If element has already been initalised with Choices, return it silently
-        if (this.passedElement.getAttribute('data-choice') === 'active') return;
-
         const defaultConfig = {
             items: [],
             choices: [],
@@ -117,14 +111,12 @@ export default class Choices {
         this.currentState = {};
         this.prevState = {};
         this.currentValue = '';
-        this.highlightPosition = 0;
 
-        // Track searching
+        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+
+        this.highlightPosition = 0;
         this.canSearch = this.config.search;
-        // Track tapping
-        this.wasTap = true;
-        // Focus containerOuter but not show dropdown if true
-        this.focusAndHideDropdown = false;
 
         // Assing preset choices from passed object
         this.presetChoices = this.config.choices;
@@ -156,15 +148,23 @@ export default class Choices {
         this._onPaste = this._onPaste.bind(this);
         this._onInput = this._onInput.bind(this);
 
+        // Focus containerOuter but not show dropdown if true
+        this.focusAndHideDropdown = false;
+
+        // Monitor touch taps/scrolls
+        this.wasTap = true;
+
         // Cutting the mustard
         const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement('div');
         if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
         // Input type check
-        const isValidElement = this.passedElement && isElement(this.passedElement);
-        const isValidType = ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
+        const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
 
-        if (isValidElement && isValidType) {
+        if (canInit) {
+            // If element has already been initalised with Choices
+            if (this.passedElement.getAttribute('data-choice') === 'active') return;
+
             // Let's go
             this.init();
         } else {
@@ -174,11 +174,11 @@ export default class Choices {
 
     /**
      * Initialise Choices
-     * @return {Object} Class instance
+     * @return
      * @public
      */
     init(callback = this.config.callbackOnInit) {
-        if (this.initialised === false) {
+        if (this.initialised !== true) {
             // Set initialise flag
             this.initialised = true;
 
@@ -205,32 +205,27 @@ export default class Choices {
                 }
             }
         }
-        return this;
     }
 
     /**
      * Destroy Choices and nullify values
-     * @return {Object} Class instance
+     * @return
      * @public
      */
     destroy() {
-        if (this.initialised === true) {
-            this._removeEventListeners();
+        this._removeEventListeners();
 
-            this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-            this.passedElement.tabIndex = '';
-            this.passedElement.removeAttribute('style', 'display:none;');
-            this.passedElement.removeAttribute('aria-hidden');
+        this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+        this.passedElement.tabIndex = '';
+        this.passedElement.removeAttribute('style', 'display:none;');
+        this.passedElement.removeAttribute('aria-hidden');
 
-            this.containerOuter.outerHTML = this.passedElement.outerHTML;
+        this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
-            this.passedElement = null;
-            this.userConfig = null;
-            this.config = null;
-            this.store = null;
-            this.initialised = false;
-        }
-        return this;
+        this.passedElement = null;
+        this.userConfig = null;
+        this.config = null;
+        this.store = null;
     }
 
     /**
@@ -500,6 +495,7 @@ export default class Choices {
                 }
             });
         }
+
         return this;
     }
 
@@ -510,29 +506,29 @@ export default class Choices {
      * @public
      */
     setValueByChoice(value) {
-        if (this.passedElement.type === 'text') return;
+        if (this.passedElement.type !== 'text') {
+            const choices = this.store.getChoices();
+            // If only one value has been passed, convert to array
+            const choiceValue = isType('Array', value) ? value : [value];
 
-        const choices = this.store.getChoices();
-        // If only one value has been passed, convert to array
-        const choiceValue = isType('Array', value) ? value : [value];
+            // Loop through each value and
+            choiceValue.forEach((val) => {
+                const foundChoice = choices.find((choice) => {
+                    // Check 'value' property exists and the choice isn't already selected
+                    return choice.value === val;
+                });
 
-        // Loop through each value and
-        choiceValue.forEach((val) => {
-            const foundChoice = choices.find((choice) => {
-                // Check 'value' property exists and the choice isn't already selected
-                return choice.value === val;
-            });
-
-            if (foundChoice) {
-                if (!foundChoice.selected) {
-                    this._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+                if (foundChoice) {
+                    if (!foundChoice.selected) {
+                        this._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+                    } else {
+                        console.warn('Attempting to select choice already selected');
+                    }
                 } else {
-                    console.warn('Attempting to select choice already selected');
+                    console.warn('Attempting to select choice that does not exist');
                 }
-            } else {
-                console.warn('Attempting to select choice that does not exist');
-            }
-        });
+            });
+        }
         return this;
     }
 
@@ -595,7 +591,7 @@ export default class Choices {
      */
     disable() {
         this.passedElement.disabled = true;
-        if (this.initialised === true) {
+        if (this.initialised) {
             if (!this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
                 this._removeEventListeners();
                 this.passedElement.setAttribute('disabled', '');
@@ -613,7 +609,7 @@ export default class Choices {
      */
     enable() {
         this.passedElement.disabled = false;
-        if (this.initialised === true) {
+        if (this.initialised) {
             if (this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
                 this._addEventListeners();
                 this.passedElement.removeAttribute('disabled');
@@ -648,7 +644,6 @@ export default class Choices {
                     if (results && results.length) {
                         // Remove loading states/text
                         this.containerOuter.classList.remove(this.config.classNames.loadingState);
-
                         if (this.passedElement.type === 'select-multiple') {
                             const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
                             if (placeholder) {
@@ -867,7 +862,6 @@ export default class Choices {
      */
     _searchChoices(value) {
         if (!value) return;
-
         if (this.input === document.activeElement) {
             const choices = this.store.getChoices();
             const hasUnactiveChoices = choices.some((option) => option.active !== true);
@@ -888,6 +882,7 @@ export default class Choices {
                             include: 'score',
                         });
                         const results = fuse.search(needle);
+
                         this.currentValue = newValue;
                         this.highlightPosition = 0;
                         this.isSearching = true;
@@ -1879,7 +1874,8 @@ export default class Choices {
                 });
             } else {
                 const passedOptions = Array.from(this.passedElement.options);
-                const allChoices = [];
+                const filter = this.config.sortFilter;
+                const allChoices = this.presetChoices;
 
                 // Create array of options from option elements
                 passedOptions.forEach((o) => {
@@ -1891,17 +1887,34 @@ export default class Choices {
                     });
                 });
 
-                // Join choices with preset choices and add them
-                allChoices
-                    .concat(this.presetChoices)
-                    .forEach((o, index) => {
-                        // Pre-select first choice if it's a single select
-                        if (index === 0 && this.passedElement.type === 'select-one') {
-                            this._addChoice(true, o.disabled ? o.disabled : false, o.value, o.label);
+                // If sorting is enabled or the user is searching, filter choices
+                if (this.config.shouldSort) {
+                    allChoices.sort(filter);
+                }
+
+                // Determine whether there is a selected choice
+                const hasSelectedChoice = allChoices.some((choice) => {
+                    return choice.selected === true;
+                });
+
+                // Add each choice
+                allChoices.forEach((choice, index) => {
+                    const isDisabled = choice.disabled ? choice.disabled : false;
+                    const isSelected = choice.selected ? choice.selected : false;
+                    // Pre-select first choice if it's a single select
+                    if (this.passedElement.type === 'select-one') {
+                        if (hasSelectedChoice || (!hasSelectedChoice && index > 0)) {
+                            // If there is a selected choice already or the choice is not
+                            // the first in the array, add each choice normally
+                            this._addChoice(isSelected, isDisabled, choice.value, choice.label);
                         } else {
-                            this._addChoice(o.selected ? o.selected : false, o.disabled ? o.disabled : false, o.value, o.label);
+                            // Otherwise pre-select the first choice in the array
+                            this._addChoice(true, false, choice.value, choice.label);
                         }
-                    });
+                    } else {
+                        this._addChoice(isSelected, isDisabled, choice.value, choice.label);
+                    }
+                });
             }
         } else if (this.passedElement.type === 'text') {
             // Add any preset values seperated by delimiter
@@ -1946,7 +1959,6 @@ export default class Choices {
             if (groupChoices.length >= 1) {
                 const dropdownGroup = this._getTemplate('choiceGroup', group);
                 groupFragment.appendChild(dropdownGroup);
-
                 this.renderChoices(groupChoices, groupFragment);
             }
         });
@@ -2005,7 +2017,6 @@ export default class Choices {
             items.forEach((item) => {
                 // Create a standard select option
                 const option = this._getTemplate('option', item);
-
                 // Append it to fragment
                 selectedOptionsFragment.appendChild(option);
             });

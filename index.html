@@ -195,13 +195,13 @@
             </select>
 
             <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
-            <label for="cities">States</label>
-            <select class="form-control" name="cities" id="cities" placeholder="Choose a state">
+            <label for="states">States</label>
+            <select class="form-control" name="states" id="states" placeholder="Choose a state">
+                <option value="Michigan">Michigan</option>
                 <option value="Texas">Texas</option>
                 <option value="Chicago">Chicago</option>
                 <option value="New York">New York</option>
                 <option value="Washington">Washington</option>
-                <option value="Michigan">Michigan</option>
             </select>
 
             <label for="boroughs">Boroughs</label>
@@ -353,7 +353,7 @@
 
             var example15 = new Choices('#choices-17', {
                 choices: [
-                    {value: 'One', label: 'Label One'},
+                    {value: 'One', label: 'Label One', selected: true},
                     {value: 'Two', label: 'Label Two', disabled: true},
                     {value: 'Three', label: 'Label Three'},
                 ],
@@ -363,7 +363,7 @@
                 shouldSort: false,
             });
 
-            var cities = new Choices(document.getElementById('cities'), {
+            var states = new Choices(document.getElementById('states'), {
                 callbackOnChange: function(value) {
                     if(value === 'New York') {
                         boroughs.enable();

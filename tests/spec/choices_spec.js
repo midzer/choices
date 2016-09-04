@@ -133,7 +133,6 @@ describe('Choices', function() {
             this.input.placeholder = 'Placeholder text';
 
             document.body.appendChild(this.input);
-
         });
 
         it('should accept a user inputted value', function() {
@@ -236,28 +235,27 @@ describe('Choices', function() {
                 const option = document.createElement('option');
 
                 option.value = `Value ${i}`;
-                option.innerHTML = `Value ${i}`;
+                option.innerHTML = `Label ${i}`;
 
                 this.input.appendChild(option);
             }
 
             document.body.appendChild(this.input);
-
-            this.choices = new Choices(this.input, {
-                removeItemButton: true
-            });
         });
 
         it('should open the choice list on focussing', function() {
+            this.choices = new Choices(this.input);
             this.choices.input.focus();
             expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
         });
 
         it('should select the first choice', function() {
+            this.choices = new Choices(this.input);
             expect(this.choices.currentState.items[0].value).toContain('Value 1');
         });
 
         it('should highlight the choices on keydown', function() {
+            this.choices = new Choices(this.input);
             this.choices.input.focus();
 
             for (var i = 0; i < 2; i++) {
@@ -274,6 +272,7 @@ describe('Choices', function() {
         });
 
         it('should select choice on enter key press', function() {
+            this.choices = new Choices(this.input);
             this.choices.input.focus();
 
             // Key down to second choice
@@ -295,6 +294,7 @@ describe('Choices', function() {
         });
 
         it('should trigger a change callback on selection', function() {
+            this.choices = new Choices(this.input);
             spyOn(this.choices.config, 'callbackOnChange');
             this.choices.input.focus();
 
@@ -317,6 +317,7 @@ describe('Choices', function() {
         });
 
         it('should open the dropdown on click', function() {
+            this.choices = new Choices(this.input);
             const container = this.choices.containerOuter;
             this.choices._onClick({
                 target: container,
@@ -328,6 +329,7 @@ describe('Choices', function() {
         });
 
         it('should close the dropdown on double click', function() {
+            this.choices = new Choices(this.input);
             const container = this.choices.containerOuter;
 
             this.choices._onClick({
@@ -346,6 +348,7 @@ describe('Choices', function() {
         });
 
         it('should filter choices when searching', function() {
+            this.choices = new Choices(this.input);
             this.choices.input.focus();
             this.choices.input.value = 'Value 3';
 
@@ -359,6 +362,32 @@ describe('Choices', function() {
             const mostAccurateResult = this.choices.currentState.choices[0];
 
             expect(this.choices.isSearching && mostAccurateResult.value === 'Value 3').toBeTruthy;
+        });
+
+        it('shouldn\'t sort choices if shouldSort is false', function() {
+            this.choices = new Choices(this.input, {
+                shouldSort: false,
+                choices: [
+                    {value: 'Value 5', label: 'Label Five'},
+                    {value: 'Value 6', label: 'Label Six'},
+                    {value: 'Value 7', label: 'Label Seven'},
+                ],
+            });
+
+            expect(this.choices.currentState.choices[0].value).toEqual('Value 5');
+        });
+
+        it('should sort choices if shouldSort is false', function() {
+            this.choices = new Choices(this.input, {
+                shouldSort: true,
+                choices: [
+                    {value: 'Value 5', label: 'Label Five'},
+                    {value: 'Value 6', label: 'Label Six'},
+                    {value: 'Value 7', label: 'Label Seven'},
+                ],
+            });
+
+            expect(this.choices.currentState.choices[0].value).toEqual('Value 1');
         });
     });
 
