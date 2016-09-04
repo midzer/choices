@@ -42,12 +42,6 @@ export default class Choices {
             }
         }
 
-        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
-
-        // If element has already been initalised with Choices, return it silently
-        if (this.passedElement.getAttribute('data-choice') === 'active') return;
-
         const defaultConfig = {
             items: [],
             choices: [],
@@ -132,6 +126,9 @@ export default class Choices {
         // Assign preset items from passed object first
         this.presetItems = this.config.items;
 
+        // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+        this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+
         // Then add any values passed from attribute
         if (this.passedElement.value) {
             this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
@@ -165,6 +162,8 @@ export default class Choices {
         const isValidType = ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
 
         if (isValidElement && isValidType) {
+            // If element has already been initalised with Choices, return it silently
+            if (this.passedElement.getAttribute('data-choice') === 'active') return;
             // Let's go
             this.init();
         } else {
