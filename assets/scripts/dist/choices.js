@@ -1445,7 +1445,6 @@
 	    key: '_onMouseDown',
 	    value: function _onMouseDown(e) {
 	      var target = e.target;
-
 	      if (this.containerOuter.contains(target) && target !== this.input) {
 	        var activeItems = this.store.getItemsFilteredByActive();
 	        var hasShiftKey = e.shiftKey;
@@ -1986,43 +1985,43 @@
 	      var classNames = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerOuter + '" data-type="' + _this21.passedElement.type + '" ' + (_this21.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.containerOuter + '" data-type="' + _this21.passedElement.type + '" ' + (_this21.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n          ');
 	        },
 	        containerInner: function containerInner() {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.containerInner + '"></div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.containerInner + '"></div>\n          ');
 	        },
 	        itemList: function itemList() {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + ' ' + (_this21.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.list + ' ' + (_this21.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n          ');
 	        },
 	        placeholder: function placeholder(value) {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.placeholder + '">\n                    ' + value + '\n                    </div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.placeholder + '">' + value + '</div>\n          ');
 	        },
 	        item: function item(data) {
 	          if (_this21.config.removeItemButton) {
-	            return (0, _utils.strToEl)('\n                        <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n                        ' + data.label + '<button class="' + classNames.button + '" data-button>Remove item</button>\n                        </div>\n                        ');
+	            return (0, _utils.strToEl)('\n              <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n              ' + data.label + '<button class="' + classNames.button + '" data-button>Remove item</button>\n              </div>\n            ');
 	          }
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n                    ' + data.label + '\n                    </div>\n                    ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            ' + data.label + '\n          </div>\n          ');
 	        },
 	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this21.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this21.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n          ');
 	        },
 	        choiceGroup: function choiceGroup(data) {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n                    <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n                    </div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n              <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n            </div>\n          ');
 	        },
 	        choice: function choice(data) {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n                    ' + data.label + '\n                    </div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n              ' + data.label + '\n            </div>\n          ');
 	        },
 	        input: function input() {
-	          return (0, _utils.strToEl)('\n                    <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n                    ');
+	          return (0, _utils.strToEl)('\n            <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n          ');
 	        },
 	        dropdown: function dropdown() {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.list + ' ' + classNames.listDropdown + '" aria-expanded="false"></div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.list + ' ' + classNames.listDropdown + '" aria-expanded="false"></div>\n          ');
 	        },
 	        notice: function notice(label) {
-	          return (0, _utils.strToEl)('\n                    <div class="' + classNames.item + ' ' + classNames.itemChoice + '">' + label + '</div>\n                    ');
+	          return (0, _utils.strToEl)('\n            <div class="' + classNames.item + ' ' + classNames.itemChoice + '">' + label + '</div>\n          ');
 	        },
 	        option: function option(data) {
-	          return (0, _utils.strToEl)('\n                    <option value="' + data.value + '" selected>' + data.label + '</option>\n                    ');
+	          return (0, _utils.strToEl)('\n            <option value="' + data.value + '" selected>' + data.label + '</option>\n          ');
 	        }
 	      };
 

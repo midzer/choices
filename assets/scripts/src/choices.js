@@ -1230,7 +1230,6 @@ default class Choices {
    */
   _onMouseDown(e) {
     const target = e.target;
-
     if (this.containerOuter.contains(target) && target !== this.input) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
@@ -1699,78 +1698,76 @@ default class Choices {
     const templates = {
       containerOuter: (direction) => {
         return strToEl(`
-                    <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
-                    `);
+            <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
+          `);
       },
       containerInner: () => {
         return strToEl(`
-                    <div class="${classNames.containerInner}"></div>
-                    `);
+            <div class="${classNames.containerInner}"></div>
+          `);
       },
       itemList: () => {
         return strToEl(`
-                    <div class="${classNames.list} ${this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems}"></div>
-                    `);
+            <div class="${classNames.list} ${this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems}"></div>
+          `);
       },
       placeholder: (value) => {
         return strToEl(`
-                    <div class="${classNames.placeholder}">
-                    ${value}
-                    </div>
-                    `);
+            <div class="${classNames.placeholder}">${value}</div>
+          `);
       },
       item: (data) => {
         if (this.config.removeItemButton) {
           return strToEl(`
-                        <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
-                        ${data.label}<button class="${classNames.button}" data-button>Remove item</button>
-                        </div>
-                        `);
+              <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
+              ${data.label}<button class="${classNames.button}" data-button>Remove item</button>
+              </div>
+            `);
         }
         return strToEl(`
-                    <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
-                    ${data.label}
-                    </div>
-                    `);
+          <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+            ${data.label}
+          </div>
+          `);
       },
       choiceList: () => {
         return strToEl(`
-                    <div class="${classNames.list}" dir="ltr" role="listbox" ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}></div>
-                    `);
+            <div class="${classNames.list}" dir="ltr" role="listbox" ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}></div>
+          `);
       },
       choiceGroup: (data) => {
         return strToEl(`
-                    <div class="${classNames.group} ${data.disabled ? classNames.itemDisabled : ''}" data-group data-id="${data.id}" data-value="${data.value}" role="group" ${data.disabled ? 'aria-disabled="true"' : ''}>
-                    <div class="${classNames.groupHeading}">${data.value}</div>
-                    </div>
-                    `);
+            <div class="${classNames.group} ${data.disabled ? classNames.itemDisabled : ''}" data-group data-id="${data.id}" data-value="${data.value}" role="group" ${data.disabled ? 'aria-disabled="true"' : ''}>
+              <div class="${classNames.groupHeading}">${data.value}</div>
+            </div>
+          `);
       },
       choice: (data) => {
         return strToEl(`
-                    <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-                    ${data.label}
-                    </div>
-                    `);
+            <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+              ${data.label}
+            </div>
+          `);
       },
       input: () => {
         return strToEl(`
-                    <input type="text" class="${classNames.input} ${classNames.inputCloned}" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">
-                    `);
+            <input type="text" class="${classNames.input} ${classNames.inputCloned}" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">
+          `);
       },
       dropdown: () => {
         return strToEl(`
-                    <div class="${classNames.list} ${classNames.listDropdown}" aria-expanded="false"></div>
-                    `);
+            <div class="${classNames.list} ${classNames.listDropdown}" aria-expanded="false"></div>
+          `);
       },
       notice: (label) => {
         return strToEl(`
-                    <div class="${classNames.item} ${classNames.itemChoice}">${label}</div>
-                    `);
+            <div class="${classNames.item} ${classNames.itemChoice}">${label}</div>
+          `);
       },
       option: (data) => {
         return strToEl(`
-                    <option value="${data.value}" selected>${data.label}</option>
-                    `);
+            <option value="${data.value}" selected>${data.label}</option>
+          `);
       },
     };
 
