@@ -1,4 +1,4 @@
-/*! choices.js v2.0.0 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.0.1 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -855,11 +855,6 @@
 	                    console.error('callbackOnChange: Callback is not a function');
 	                }
 	            }
-
-	            // Keep focus on select-one element
-	            if (this.passedElement.type === 'select-one') {
-	                this.containerOuter.focus();
-	            }
 	        }
 
 	        /**
@@ -958,6 +953,7 @@
 	            // If we are clicking on an option
 	            var id = element.getAttribute('data-id');
 	            var choice = this.store.getChoiceById(id);
+	            var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
 	            if (choice && !choice.selected && !choice.disabled) {
 	                var canAddItem = this._canAddItem(activeItems, choice.value);
@@ -965,8 +961,15 @@
 	                if (canAddItem.response) {
 	                    this._addItem(choice.value, choice.label, choice.id);
 	                    this._triggerChange(choice.value);
-	                    this.clearInput(this.passedElement);
 	                }
+	            }
+
+	            this.clearInput(this.passedElement);
+
+	            // We wont to close the dropdown if we are dealing with a single select box
+	            if (hasActiveDropdown && this.passedElement.type === 'select-one') {
+	                this.hideDropdown();
+	                this.containerOuter.focus();
 	            }
 	        }
 
@@ -1026,7 +1029,7 @@
 
 	            if (this.passedElement.type === 'text' && this.config.addItems) {
 	                var isUnique = !activeItems.some(function (item) {
-	                    return item.value === value;
+	                    return item.value === value.trim();
 	                });
 
 	                // If a user has supplied a regular expression filter
@@ -1235,14 +1238,6 @@
 	                    // If we have a highlighted choice
 	                    if (highlighted) {
 	                        _this15._handleChoiceAction(activeItems, highlighted);
-	                    }
-
-	                    // We always want to hide the dropdown for single selects
-	                    // regardless of whether an item was added
-	                    if (hasActiveDropdown && _this15.passedElement.type === 'select-one') {
-	                        _this15.hideDropdown();
-	                        _this15.clearInput();
-	                        _this15.containerOuter.focus();
 	                    }
 	                } else if (_this15.passedElement.type === 'select-one') {
 	                    // Open single select dropdown if it's not active

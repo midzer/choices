@@ -692,11 +692,6 @@ export default class Choices {
                 console.error('callbackOnChange: Callback is not a function');
             }
         }
-
-        // Keep focus on select-one element
-        if (this.passedElement.type === 'select-one') {
-            this.containerOuter.focus();
-        }
     }
 
 
@@ -775,6 +770,7 @@ export default class Choices {
         // If we are clicking on an option
         const id = element.getAttribute('data-id');
         const choice = this.store.getChoiceById(id);
+        const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
         if (choice && !choice.selected && !choice.disabled) {
             const canAddItem = this._canAddItem(activeItems, choice.value);
@@ -782,8 +778,15 @@ export default class Choices {
             if (canAddItem.response) {
                 this._addItem(choice.value, choice.label, choice.id);
                 this._triggerChange(choice.value);
-                this.clearInput(this.passedElement);
             }
+        }
+
+        this.clearInput(this.passedElement);
+
+        // We wont to close the dropdown if we are dealing with a single select box
+        if (hasActiveDropdown && this.passedElement.type === 'select-one') {
+            this.hideDropdown();
+            this.containerOuter.focus();
         }
     }
 
@@ -832,7 +835,7 @@ export default class Choices {
         }
 
         if (this.passedElement.type === 'text' && this.config.addItems) {
-            const isUnique = !activeItems.some((item) => item.value === value);
+            const isUnique = !activeItems.some((item) => item.value === value.trim());
 
             // If a user has supplied a regular expression filter
             if (this.config.regexFilter) {
@@ -1021,14 +1024,6 @@ export default class Choices {
                 // If we have a highlighted choice
                 if (highlighted) {
                     this._handleChoiceAction(activeItems, highlighted);
-                }
-
-                // We always want to hide the dropdown for single selects
-                // regardless of whether an item was added
-                if (hasActiveDropdown && this.passedElement.type === 'select-one') {
-                    this.hideDropdown();
-                    this.clearInput();
-                    this.containerOuter.focus();
                 }
             } else if (this.passedElement.type === 'select-one') {
                 // Open single select dropdown if it's not active
