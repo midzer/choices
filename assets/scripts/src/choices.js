@@ -183,31 +183,27 @@ default class Choices {
    * @public
    */
   init(callback = this.config.callbackOnInit) {
-    if (this.initialised === false) {
-      // Set initialise flag
-      this.initialised = true;
+    if (this.initialised === true) return;
 
-      // Create required elements
-      this._createTemplates();
+    // Set initialise flag
+    this.initialised = true;
+    // Create required elements
+    this._createTemplates();
+    // Generate input markup
+    this._createInput();
+    // Subscribe store to render method
+    this.store.subscribe(this.render);
+    // Render any items
+    this.render();
+    // Trigger event listeners
+    this._addEventListeners();
 
-      // Generate input markup
-      this._createInput();
-
-      this.store.subscribe(this.render);
-
-      // Render any items
-      this.render();
-
-      // Trigger event listeners
-      this._addEventListeners();
-
-      // Run callback if it is a function
-      if (callback) {
-        if (isType('Function', callback)) {
-          callback();
-        } else {
-          console.error('callbackOnInit: Callback is not a function');
-        }
+    // Run callback if it is a function
+    if (callback) {
+      if (isType('Function', callback)) {
+        callback();
+      } else {
+        console.error('callbackOnInit: Callback is not a function');
       }
     }
   }
@@ -218,23 +214,27 @@ default class Choices {
    * @public
    */
   destroy() {
-    if (this.initialised === true) {
-      this._removeEventListeners();
+    if (this.initialised === false) return;
 
-      this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-      this.passedElement.tabIndex = '';
-      this.passedElement.removeAttribute('style', 'display:none;');
-      this.passedElement.removeAttribute('aria-hidden');
+    // Remove all event listeners
+    this._removeEventListeners();
 
-      this.containerOuter.outerHTML = this.passedElement.outerHTML;
+    // Reinstate passed element
+    this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+    this.passedElement.tabIndex = '';
+    this.passedElement.removeAttribute('style', 'display:none;');
+    this.passedElement.removeAttribute('aria-hidden');
 
-      this.passedElement = null;
-      this.userConfig = null;
-      this.config = null;
-      this.store = null;
+    this.containerOuter.outerHTML = this.passedElement.outerHTML;
 
-      this.initialised = false;
-    }
+    // Nullify stores
+    this.passedElement = null;
+    this.userConfig = null;
+    this.config = null;
+    this.store = null;
+
+    // Uninitialise
+    this.initialised = false;
   }
 
   /**
@@ -381,7 +381,8 @@ default class Choices {
   showDropdown(focusInput = false) {
     const body = document.body;
     const html = document.documentElement;
-    const winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    const winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight,
+      html.scrollHeight, html.offsetHeight);
 
     this.containerOuter.classList.add(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'true');
@@ -417,7 +418,6 @@ default class Choices {
 
     this.containerOuter.classList.remove(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'false');
-
     this.dropdown.classList.remove(this.config.classNames.activeState);
 
     if (isFlipped) {
@@ -504,7 +504,6 @@ default class Choices {
         }
       });
     }
-
     return this;
   }
 
@@ -557,10 +556,12 @@ default class Choices {
         if (choices && choices.length) {
           this.containerOuter.classList.remove(this.config.classNames.loadingState);
           choices.forEach((result, index) => {
+            const isSelected = result.selected ? result.selected : false;
+            const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
               this._addGroup(result, index);
             } else {
-              this._addChoice(result.selected ? result.selected : false, result.disabled ? result.disabled : false, result[value], result[label]);
+              this._addChoice(isSelected, isDisabled, result[value], result[label]);
             }
           });
         }
@@ -604,14 +605,13 @@ default class Choices {
    */
   disable() {
     this.passedElement.disabled = true;
-    if (this.initialised) {
-      if (!this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
-        this._removeEventListeners();
-        this.passedElement.setAttribute('disabled', '');
-        this.input.setAttribute('disabled', '');
-        this.containerOuter.classList.add(this.config.classNames.disabledState);
-        this.containerOuter.setAttribute('aria-disabled', 'true');
-      }
+    const isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
+    if (this.initialised && isEnabled) {
+      this._removeEventListeners();
+      this.passedElement.setAttribute('disabled', '');
+      this.input.setAttribute('disabled', '');
+      this.containerOuter.classList.add(this.config.classNames.disabledState);
+      this.containerOuter.setAttribute('aria-disabled', 'true');
     }
     return this;
   }
@@ -622,14 +622,13 @@ default class Choices {
    */
   enable() {
     this.passedElement.disabled = false;
-    if (this.initialised) {
-      if (this.containerOuter.classList.contains(this.config.classNames.disabledState)) {
-        this._addEventListeners();
-        this.passedElement.removeAttribute('disabled');
-        this.input.removeAttribute('disabled');
-        this.containerOuter.classList.remove(this.config.classNames.disabledState);
-        this.containerOuter.removeAttribute('aria-disabled');
-      }
+    const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
+    if (this.initialised && isDisabled) {
+      this._addEventListeners();
+      this.passedElement.removeAttribute('disabled');
+      this.input.removeAttribute('disabled');
+      this.containerOuter.classList.remove(this.config.classNames.disabledState);
+      this.containerOuter.removeAttribute('aria-disabled');
     }
     return this;
   }
