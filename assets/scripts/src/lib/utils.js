@@ -1,14 +1,13 @@
 /* eslint-disable */
-
 /**
  * Capitalises the first letter of each word in a string
  * @param  {String} str String to capitalise
  * @return {String}     Capitalised string
  */
 export const capitalise = function(str) {
-    return str.replace(/\w\S*/g, function(txt){
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
+  return str.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
 };
 
 /**
@@ -18,8 +17,8 @@ export const capitalise = function(str) {
  * @return {Boolean}
  */
 export const isType = function(type, obj) {
-    var clas = Object.prototype.toString.call(obj).slice(8, -1);
-    return obj !== undefined && obj !== null && clas === type;
+  var clas = Object.prototype.toString.call(obj).slice(8, -1);
+  return obj !== undefined && obj !== null && clas === type;
 };
 
 /**
@@ -28,10 +27,10 @@ export const isType = function(type, obj) {
  * @return {Boolean}
  */
 export const isNode = (o) => {
-    return (
-        typeof Node === "object" ? o instanceof Node :
-        o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
-    );
+  return (
+    typeof Node === "object" ? o instanceof Node :
+    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
+  );
 };
 
 /**
@@ -40,10 +39,10 @@ export const isNode = (o) => {
  * @return {Boolean}
  */
 export const isElement = (o) => {
-    return (
-        typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-        o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
-    );
+  return (
+    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+    o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
+  );
 };
 
 /**
@@ -52,63 +51,63 @@ export const isElement = (o) => {
  * @return {Object} Merged object of arguments
  */
 export const extend = function() {
-    let extended = {};
-    let deep = false;
-    let length = arguments.length;
+  let extended = {};
+  let deep = false;
+  let length = arguments.length;
 
-    /**
-     * Merge one object into another
-     * @param  {Object} obj  Object to merge into extended object
-     */
-    let merge = function (obj) {
-        for (let prop in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-                // If deep merge and property is an object, merge properties
-                if (deep && isType('Object', obj[prop])) {
-                    extended[prop] = extend( true, extended[prop], obj[prop]);
-                } else {
-                    extended[prop] = obj[prop];
-                }
-            }
-        }
-    };
-
-    // Loop through each passed argument
-    for (let i = 0; i < length; i++) {
-        // store argument at position i
-        let obj = arguments[i];
-
-        // If we are in fact dealing with an object, merge it. Otherwise throw error
-        if (isType('Object', obj)) {
-            merge(obj);
+  /**
+   * Merge one object into another
+   * @param  {Object} obj  Object to merge into extended object
+   */
+  let merge = function(obj) {
+    for (let prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        // If deep merge and property is an object, merge properties
+        if (deep && isType('Object', obj[prop])) {
+          extended[prop] = extend(true, extended[prop], obj[prop]);
         } else {
-            console.error('Custom options must be an object');
+          extended[prop] = obj[prop];
         }
+      }
     }
+  };
 
-    return extended;
+  // Loop through each passed argument
+  for (let i = 0; i < length; i++) {
+    // store argument at position i
+    let obj = arguments[i];
+
+    // If we are in fact dealing with an object, merge it. Otherwise throw error
+    if (isType('Object', obj)) {
+      merge(obj);
+    } else {
+      console.error('Custom options must be an object');
+    }
+  }
+
+  return extended;
 };
 
 /**
  * CSS transition end event listener
  * @return
  */
-export const whichTransitionEvent = function(){
-    var t,
+export const whichTransitionEvent = function() {
+  var t,
     el = document.createElement("fakeelement");
 
-    var transitions = {
-        "transition"      : "transitionend",
-        "OTransition"     : "oTransitionEnd",
-        "MozTransition"   : "transitionend",
-        "WebkitTransition": "webkitTransitionEnd"
-    }
+  var transitions = {
+    "transition": "transitionend",
+    "OTransition": "oTransitionEnd",
+    "MozTransition": "transitionend",
+    "WebkitTransition": "webkitTransitionEnd"
+  }
 
-    for (t in transitions){
-        if (el.style[t] !== undefined){
-            return transitions[t];
-        }
+  for (t in transitions) {
+    if (el.style[t] !== undefined) {
+      return transitions[t];
     }
+  }
 };
 
 /**
@@ -116,21 +115,21 @@ export const whichTransitionEvent = function(){
  * @return
  */
 export const whichAnimationEvent = function() {
-    var t,
-        el = document.createElement('fakeelement');
+  var t,
+    el = document.createElement('fakeelement');
 
-    var animations = {
-        'animation': 'animationend',
-        'OAnimation': 'oAnimationEnd',
-        'MozAnimation': 'animationend',
-        'WebkitAnimation': 'webkitAnimationEnd'
-    };
+  var animations = {
+    'animation': 'animationend',
+    'OAnimation': 'oAnimationEnd',
+    'MozAnimation': 'animationend',
+    'WebkitAnimation': 'webkitAnimationEnd'
+  };
 
-    for (t in animations) {
-        if (el.style[t] !== undefined) {
-            return animations[t];
-        }
+  for (t in animations) {
+    if (el.style[t] !== undefined) {
+      return animations[t];
     }
+  }
 };
 
 /**
@@ -142,103 +141,103 @@ export const whichAnimationEvent = function() {
  * @return {Array}          Array of parent elements
  */
 export const getParentsUntil = function(elem, parent, selector) {
-    var parents = [];
-    // Get matches
-    for (; elem && elem !== document; elem = elem.parentNode) {
+  var parents = [];
+  // Get matches
+  for (; elem && elem !== document; elem = elem.parentNode) {
 
-        // Check if parent has been reached
-        if (parent) {
+    // Check if parent has been reached
+    if (parent) {
 
-            var parentType = parent.charAt(0);
+      var parentType = parent.charAt(0);
 
-            // If parent is a class
-            if (parentType === '.') {
-                if (elem.classList.contains(parent.substr(1))) {
-                    break;
-                }
-            }
-
-            // If parent is an ID
-            if (parentType === '#') {
-                if (elem.id === parent.substr(1)) {
-                    break;
-                }
-            }
-
-            // If parent is a data attribute
-            if (parentType === '[') {
-                if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
-                    break;
-                }
-            }
-
-            // If parent is a tag
-            if (elem.tagName.toLowerCase() === parent) {
-                break;
-            }
-
+      // If parent is a class
+      if (parentType === '.') {
+        if (elem.classList.contains(parent.substr(1))) {
+          break;
         }
-        if (selector) {
-            var selectorType = selector.charAt(0);
+      }
 
-            // If selector is a class
-            if (selectorType === '.') {
-                if (elem.classList.contains(selector.substr(1))) {
-                    parents.push(elem);
-                }
-            }
-
-            // If selector is an ID
-            if (selectorType === '#') {
-                if (elem.id === selector.substr(1)) {
-                    parents.push(elem);
-                }
-            }
-
-            // If selector is a data attribute
-            if (selectorType === '[') {
-                if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
-                    parents.push(elem);
-                }
-            }
-
-            // If selector is a tag
-            if (elem.tagName.toLowerCase() === selector) {
-                parents.push(elem);
-            }
-
-        } else {
-            parents.push(elem);
+      // If parent is an ID
+      if (parentType === '#') {
+        if (elem.id === parent.substr(1)) {
+          break;
         }
+      }
+
+      // If parent is a data attribute
+      if (parentType === '[') {
+        if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
+          break;
+        }
+      }
+
+      // If parent is a tag
+      if (elem.tagName.toLowerCase() === parent) {
+        break;
+      }
+
     }
+    if (selector) {
+      var selectorType = selector.charAt(0);
 
-    // Return parents if any exist
-    if (parents.length === 0) {
-        return null;
+      // If selector is a class
+      if (selectorType === '.') {
+        if (elem.classList.contains(selector.substr(1))) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is an ID
+      if (selectorType === '#') {
+        if (elem.id === selector.substr(1)) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is a data attribute
+      if (selectorType === '[') {
+        if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is a tag
+      if (elem.tagName.toLowerCase() === selector) {
+        parents.push(elem);
+      }
+
     } else {
-        return parents;
+      parents.push(elem);
     }
+  }
+
+  // Return parents if any exist
+  if (parents.length === 0) {
+    return null;
+  } else {
+    return parents;
+  }
 };
 
-export const wrap = function (element, wrapper) {
-    wrapper = wrapper || document.createElement('div');
-    if (element.nextSibling) {
-        element.parentNode.insertBefore(wrapper, element.nextSibling);
-    } else {
-        element.parentNode.appendChild(wrapper);
-    }
-    return wrapper.appendChild(element);
+export const wrap = function(element, wrapper) {
+  wrapper = wrapper || document.createElement('div');
+  if (element.nextSibling) {
+    element.parentNode.insertBefore(wrapper, element.nextSibling);
+  } else {
+    element.parentNode.appendChild(wrapper);
+  }
+  return wrapper.appendChild(element);
 };
 
-export const getSiblings = function (elem) {
-    var siblings = [];
-    var sibling = elem.parentNode.firstChild;
-    for ( ; sibling; sibling = sibling.nextSibling ) {
-        if ( sibling.nodeType === 1 && sibling !== elem ) {
-            siblings.push( sibling );
-        }
+export const getSiblings = function(elem) {
+  var siblings = [];
+  var sibling = elem.parentNode.firstChild;
+  for (; sibling; sibling = sibling.nextSibling) {
+    if (sibling.nodeType === 1 && sibling !== elem) {
+      siblings.push(sibling);
     }
-    return siblings;
+  }
+  return siblings;
 };
 
 /**
@@ -248,8 +247,8 @@ export const getSiblings = function (elem) {
  * @return {NodeElement}     Found parent element
  */
 export const findAncestor = function(el, cls) {
-    while ((el = el.parentElement) && !el.classList.contains(cls));
-    return el;
+  while ((el = el.parentElement) && !el.classList.contains(cls));
+  return el;
 };
 
 /**
@@ -260,19 +259,19 @@ export const findAncestor = function(el, cls) {
  * @return {Function}           A function will be called after it stops being called for a given delay
  */
 export const debounce = function(func, wait, immediate) {
-    var timeout;
-    return function() {
-        var context = this,
-            args = arguments;
-        var later = function() {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
+  var timeout;
+  return function() {
+    var context = this,
+      args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
     };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
 };
 
 /**
@@ -282,14 +281,14 @@ export const debounce = function(func, wait, immediate) {
  * @return {Number} Elements Distance from top of page
  */
 export const getElemDistance = function(el) {
-    var location = 0;
-    if (el.offsetParent) {
-        do {
-            location += el.offsetTop;
-            el = el.offsetParent;
-        } while (el);
-    }
-    return location >= 0 ? location : 0;
+  var location = 0;
+  if (el.offsetParent) {
+    do {
+      location += el.offsetTop;
+      el = el.offsetParent;
+    } while (el);
+  }
+  return location >= 0 ? location : 0;
 };
 
 /**
@@ -299,11 +298,11 @@ export const getElemDistance = function(el) {
  * @return {Number}    Height of element
  */
 export const getElementOffset = function(el, offset) {
-    var elOffset = offset;
-    if(elOffset > 1) elOffset = 1;
-    if(elOffset > 0) elOffset = 0;
+  var elOffset = offset;
+  if (elOffset > 1) elOffset = 1;
+  if (elOffset > 0) elOffset = 0;
 
-    return Math.max(el.offsetHeight*elOffset);
+  return Math.max(el.offsetHeight * elOffset);
 };
 
 /**
@@ -314,15 +313,15 @@ export const getElementOffset = function(el, offset) {
  * @return {[HTMLElement}           Found element
  */
 export const getAdjacentEl = (startEl, className, direction = 1) => {
-    if(!startEl || !className) return;
+  if (!startEl || !className) return;
 
-    const parent = startEl.parentNode.parentNode;
-    const children = Array.from(parent.querySelectorAll(className));
+  const parent = startEl.parentNode.parentNode;
+  const children = Array.from(parent.querySelectorAll(className));
 
-    const startPos = children.indexOf(startEl);
-    const operatorDirection = direction > 0 ? 1 : -1;
+  const startPos = children.indexOf(startEl);
+  const operatorDirection = direction > 0 ? 1 : -1;
 
-    return children[startPos + operatorDirection];
+  return children[startPos + operatorDirection];
 };
 
 /**
@@ -331,13 +330,13 @@ export const getAdjacentEl = (startEl, className, direction = 1) => {
  * @return {String} Position of scroll
  */
 export const getScrollPosition = function(position) {
-    if(position === 'bottom') {
-        // Scroll position from the bottom of the viewport
-        return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
-    } else {
-        // Scroll position from the top of the viewport
-        return (window.scrollY || window.pageYOffset);
-    }
+  if (position === 'bottom') {
+    // Scroll position from the bottom of the viewport
+    return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
+  } else {
+    // Scroll position from the top of the viewport
+    return (window.scrollY || window.pageYOffset);
+  }
 };
 
 /**
@@ -347,8 +346,8 @@ export const getScrollPosition = function(position) {
  * @return {Boolean}
  */
 export const isInView = function(el, position, offset) {
-    // If the user has scrolled further than the distance from the element to the top of its parent
-    return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset)) ? true : false;
+  // If the user has scrolled further than the distance from the element to the top of its parent
+  return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset)) ? true : false;
 };
 
 /**
@@ -359,19 +358,19 @@ export const isInView = function(el, position, offset) {
  * @return {Boolean}
  */
 export const isScrolledIntoView = (el, parent, direction = 1) => {
-    if(!el) return;
+  if (!el) return;
 
-    let isVisible;
+  let isVisible;
 
-    if(direction > 0) {
-        // In view from bottom
-        isVisible = (parent.scrollTop + parent.offsetHeight) >= (el.offsetTop + el.offsetHeight) ;
-    } else {
-        // In view from top
-        isVisible = el.offsetTop >= parent.scrollTop;
-    }
+  if (direction > 0) {
+    // In view from bottom
+    isVisible = (parent.scrollTop + parent.offsetHeight) >= (el.offsetTop + el.offsetHeight);
+  } else {
+    // In view from top
+    isVisible = el.offsetTop >= parent.scrollTop;
+  }
 
-    return isVisible;
+  return isVisible;
 };
 
 /**
@@ -380,9 +379,9 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
  * @return {String}  Sanitised string
  */
 export const stripHTML = function(html) {
-   let el = document.createElement("DIV");
-   el.innerHTML = html;
-   return el.textContent || el.innerText || "";
+  let el = document.createElement("DIV");
+  el.innerHTML = html;
+  return el.textContent || el.innerText || "";
 };
 
 /**
@@ -392,15 +391,15 @@ export const stripHTML = function(html) {
  * @return
  */
 export const addAnimation = (el, animation) => {
-    let animationEvent = whichAnimationEvent();
+  let animationEvent = whichAnimationEvent();
 
-    let removeAnimation = () => {
-        el.classList.remove(animation);
-        el.removeEventListener(animationEvent, removeAnimation, false);
-    };
+  let removeAnimation = () => {
+    el.classList.remove(animation);
+    el.removeEventListener(animationEvent, removeAnimation, false);
+  };
 
-    el.classList.add(animation);
-    el.addEventListener(animationEvent, removeAnimation, false);
+  el.classList.add(animation);
+  el.addEventListener(animationEvent, removeAnimation, false);
 };
 
 
@@ -411,7 +410,7 @@ export const addAnimation = (el, animation) => {
  * @return {Number}     Random number
  */
 export const getRandomNumber = function(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
+  return Math.floor(Math.random() * (max - min) + min);
 };
 
 /**
@@ -420,18 +419,18 @@ export const getRandomNumber = function(min, max) {
  * @return {HTMLElement}   Converted node element
  */
 export const strToEl = (function() {
-    var tmpEl = document.createElement('div');
-    return function(str) {
-        var r;
-        tmpEl.innerHTML = str;
-        r = tmpEl.children[0];
+  var tmpEl = document.createElement('div');
+  return function(str) {
+    var r;
+    tmpEl.innerHTML = str;
+    r = tmpEl.children[0];
 
-        while (tmpEl.firstChild) {
-            tmpEl.removeChild(tmpEl.firstChild);
-        }
+    while (tmpEl.firstChild) {
+      tmpEl.removeChild(tmpEl.firstChild);
+    }
 
-        return r;
-    };
+    return r;
+  };
 }());
 
 /**
@@ -439,39 +438,39 @@ export const strToEl = (function() {
  * @return {Number} Width of input
  */
 export const getWidthOfInput = (input) => {
-    const value = input.value || input.placeholder;
-    let width = input.offsetWidth;
+  const value = input.value || input.placeholder;
+  let width = input.offsetWidth;
 
-    if(value) {
-        const testEl = strToEl(`<span>${ value }</span>`);
-        testEl.style.position = 'absolute';
-        testEl.style.padding = '0';
-        testEl.style.top = '-9999px';
-        testEl.style.left = '-9999px';
-        testEl.style.width = 'auto';
-        testEl.style.whiteSpace = 'pre';
+  if (value) {
+    const testEl = strToEl(`<span>${ value }</span>`);
+    testEl.style.position = 'absolute';
+    testEl.style.padding = '0';
+    testEl.style.top = '-9999px';
+    testEl.style.left = '-9999px';
+    testEl.style.width = 'auto';
+    testEl.style.whiteSpace = 'pre';
 
-        document.body.appendChild(testEl);
+    document.body.appendChild(testEl);
 
-        if(value && testEl.offsetWidth !== input.offsetWidth) {
-            width = testEl.offsetWidth + 4;
-        }
-
-        document.body.removeChild(testEl);
+    if (value && testEl.offsetWidth !== input.offsetWidth) {
+      width = testEl.offsetWidth + 4;
     }
 
-    return `${width}px`;
+    document.body.removeChild(testEl);
+  }
+
+  return `${width}px`;
 };
 
 export const sortByAlpha = (a, b) => {
-    const labelA = (a.label || a.value).toLowerCase();
-    const labelB = (b.label || b.value).toLowerCase();
+  const labelA = (a.label || a.value).toLowerCase();
+  const labelB = (b.label || b.value).toLowerCase();
 
-    if (labelA < labelB) return -1;
-    if (labelA > labelB) return 1;
-    return 0;
+  if (labelA < labelB) return -1;
+  if (labelA > labelB) return 1;
+  return 0;
 };
 
 export const sortByScore = (a, b) => {
-    return a.score - b.score;
+  return a.score - b.score;
 };

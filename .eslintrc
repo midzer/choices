@@ -10,7 +10,7 @@
   "rules": {
     "quotes": [2, "single"],
     "strict": [2, "never"],
-    "indent": ["error", 4, {"SwitchCase": 1}],
+    "indent": ["error", 2, {"SwitchCase": 1}],
     "eol-last": "off",
     "arrow-body-style": "off",
     "no-underscore-dangle": "off",

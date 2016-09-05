@@ -1,67 +1,67 @@
 export const addItem = (value, label, id, choiceId, activateOptions) => {
-    return {
-        type: 'ADD_ITEM',
-        value,
-        label,
-        id,
-        choiceId,
-        activateOptions,
-    };
+  return {
+    type: 'ADD_ITEM',
+    value,
+    label,
+    id,
+    choiceId,
+    activateOptions,
+  };
 };
 
 export const removeItem = (id, choiceId) => {
-    return {
-        type: 'REMOVE_ITEM',
-        id,
-        choiceId,
-    };
+  return {
+    type: 'REMOVE_ITEM',
+    id,
+    choiceId,
+  };
 };
 
 export const highlightItem = (id, highlighted) => {
-    return {
-        type: 'HIGHLIGHT_ITEM',
-        id,
-        highlighted,
-    };
+  return {
+    type: 'HIGHLIGHT_ITEM',
+    id,
+    highlighted,
+  };
 };
 
 export const addChoice = (value, label, id, groupId, disabled) => {
-    return {
-        type: 'ADD_CHOICE',
-        value,
-        label,
-        id,
-        groupId,
-        disabled,
-    };
+  return {
+    type: 'ADD_CHOICE',
+    value,
+    label,
+    id,
+    groupId,
+    disabled,
+  };
 };
 
 export const filterChoices = (results) => {
-    return {
-        type: 'FILTER_CHOICES',
-        results,
-    };
+  return {
+    type: 'FILTER_CHOICES',
+    results,
+  };
 };
 
 export const activateChoices = (active = true) => {
-    return {
-        type: 'ACTIVATE_CHOICES',
-        active,
-    };
+  return {
+    type: 'ACTIVATE_CHOICES',
+    active,
+  };
 };
 
 export const addGroup = (value, id, active, disabled) => {
-    return {
-        type: 'ADD_GROUP',
-        value,
-        id,
-        active,
-        disabled,
-    };
+  return {
+    type: 'ADD_GROUP',
+    value,
+    id,
+    active,
+    disabled,
+  };
 };
 
 export const clearAll = () => {
-    return {
-        type: 'CLEAR_ALL',
-    };
+  return {
+    type: 'CLEAR_ALL',
+  };
 };
