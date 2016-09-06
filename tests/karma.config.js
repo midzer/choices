@@ -1,4 +1,4 @@
-import webpack from 'karma-webpack';
+var webpack = require('karma-webpack');
 
 module.exports = function(config) {
   config.set({
