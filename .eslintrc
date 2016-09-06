@@ -20,6 +20,7 @@
     "consistent-return": "off",
     "no-param-reassign": ["error", { "props": false }],
     "no-unused-vars": ["error", { "args": "none" }],
-    "no-lonely-if": "off"
+    "no-lonely-if": "off",
+    "react/require-extension": "off"
   },
 }
