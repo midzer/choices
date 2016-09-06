@@ -61,5 +61,16 @@
   "dependencies": {
     "redux": "^3.3.1",
     "fuse.js": "^2.2.0"
-  }
+  },
+  "npmName": "choices.js",
+  "npmFileMap": [
+    {
+      "basePath": "assets",
+      "files": [
+        "scripts/dist/*",
+        "styles/css/*",
+        "icons/*"
+      ]
+    }
+  ]
 }
