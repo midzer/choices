@@ -1,0 +1,21 @@
+{
+  "name": "choices.js",
+  "description": "A vanilla JS customisable text input/select box plugin",
+  "main": [
+      "./assets/scripts/dist/choices.js",
+      "./assets/styles/css/base.css"
+  ],
+  "authors": [
+    "Josh Johnson"
+  ],
+  "license": "MIT",
+  "homepage": "https://joshuajohnson.co.uk/Choices/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
+
