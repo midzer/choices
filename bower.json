@@ -3,7 +3,7 @@
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": [
       "./assets/scripts/dist/choices.js",
-      "./assets/styles/css/base.css"
+      "./assets/styles/css/choices.css"
   ],
   "authors": [
     "Josh Johnson"
