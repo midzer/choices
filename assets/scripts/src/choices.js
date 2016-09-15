@@ -163,8 +163,8 @@ export default class Choices {
     if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
     // Input type check
-    const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement
-      .type);
+    const isValidType = ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
+    const canInit = isElement(this.passedElement) && isValidType;
 
     if (canInit) {
       // If element has already been initalised with Choices
