@@ -164,7 +164,8 @@ default class Choices {
     if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
     // Input type check
-    const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
+    const canInit = this.passedElement && isElement(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement
+      .type);
 
     if (canInit) {
       // If element has already been initalised with Choices
@@ -657,7 +658,8 @@ default class Choices {
             // Remove loading states/text
             this.containerOuter.classList.remove(this.config.classNames.loadingState);
             if (this.passedElement.type === 'select-multiple') {
-              const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+              const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
+                false;
               if (placeholder) {
                 this.input.placeholder = placeholder;
               }
@@ -1697,9 +1699,11 @@ default class Choices {
     const classNames = this.config.classNames;
     const templates = {
       containerOuter: (direction) => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
-          `);
+          `
+        );
       },
       containerInner: () => {
         return strToEl(`
@@ -1707,9 +1711,11 @@ default class Choices {
           `);
       },
       itemList: () => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.list} ${this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems}"></div>
-          `);
+          `
+        );
       },
       placeholder: (value) => {
         return strToEl(`
@@ -1718,41 +1724,53 @@ default class Choices {
       },
       item: (data) => {
         if (this.config.removeItemButton) {
-          return strToEl(`
+          return strToEl(
+            `
               <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
               ${data.label}<button class="${classNames.button}" data-button>Remove item</button>
               </div>
-            `);
+            `
+          );
         }
-        return strToEl(`
+        return strToEl(
+          `
           <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
             ${data.label}
           </div>
-          `);
+          `
+        );
       },
       choiceList: () => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.list}" dir="ltr" role="listbox" ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}></div>
-          `);
+          `
+        );
       },
       choiceGroup: (data) => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.group} ${data.disabled ? classNames.itemDisabled : ''}" data-group data-id="${data.id}" data-value="${data.value}" role="group" ${data.disabled ? 'aria-disabled="true"' : ''}>
               <div class="${classNames.groupHeading}">${data.value}</div>
             </div>
-          `);
+          `
+        );
       },
       choice: (data) => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
               ${data.label}
             </div>
-          `);
+          `
+        );
       },
       input: () => {
-        return strToEl(`
+        return strToEl(
+          `
             <input type="text" class="${classNames.input} ${classNames.inputCloned}" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">
-          `);
+          `
+        );
       },
       dropdown: () => {
         return strToEl(`

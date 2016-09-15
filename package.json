@@ -63,14 +63,12 @@
     "fuse.js": "^2.2.0"
   },
   "npmName": "choices.js",
-  "npmFileMap": [
-    {
-      "basePath": "assets",
-      "files": [
-        "scripts/dist/*",
-        "styles/css/*",
-        "icons/*"
-      ]
-    }
-  ]
+  "npmFileMap": [{
+    "basePath": "assets",
+    "files": [
+      "scripts/dist/*",
+      "styles/css/*",
+      "icons/*"
+    ]
+  }]
 }

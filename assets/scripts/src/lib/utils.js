@@ -52,7 +52,6 @@ export const isElement = (o) => {
  */
 export const extend = function() {
   let extended = {};
-  let deep = false;
   let length = arguments.length;
 
   /**
@@ -63,7 +62,7 @@ export const extend = function() {
     for (let prop in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         // If deep merge and property is an object, merge properties
-        if (deep && isType('Object', obj[prop])) {
+        if (isType('Object', obj[prop])) {
           extended[prop] = extend(true, extended[prop], obj[prop]);
         } else {
           extended[prop] = obj[prop];
@@ -77,11 +76,9 @@ export const extend = function() {
     // store argument at position i
     let obj = arguments[i];
 
-    // If we are in fact dealing with an object, merge it. Otherwise throw error
+    // If we are in fact dealing with an object, merge it.
     if (isType('Object', obj)) {
       merge(obj);
-    } else {
-      console.error('Custom options must be an object');
     }
   }
 
