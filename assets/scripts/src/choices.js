@@ -30,8 +30,7 @@ import './lib/polyfills.js';
 /**
  * Choices
  */
-export
-default class Choices {
+export default class Choices {
   constructor(element = '[data-choice]', userConfig = {}) {
     // If there are multiple elements, create a new instance
     // for each element besides the first one (as that already has an instance)
