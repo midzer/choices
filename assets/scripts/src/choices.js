@@ -361,7 +361,7 @@ export default class Choices {
    * @return {Object} Class instance
    * @public
    */
-  removeHighlightedItems(runCallback = true) {
+  removeHighlightedItems(runCallback = false) {
     const items = this.store.getItemsFilteredByActive();
 
     items.forEach((item) => {

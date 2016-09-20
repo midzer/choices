@@ -1,4 +1,4 @@
-/*! choices.js v2.0.3 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.0.4 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -466,7 +466,7 @@
 	    value: function removeHighlightedItems() {
 	      var _this6 = this;
 
-	      var runCallback = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	      var runCallback = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
 	      var items = this.store.getItemsFilteredByActive();
 
