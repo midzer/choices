@@ -361,12 +361,17 @@ export default class Choices {
    * @return {Object} Class instance
    * @public
    */
-  removeHighlightedItems() {
+  removeHighlightedItems(runCallback = true) {
     const items = this.store.getItemsFilteredByActive();
 
     items.forEach((item) => {
       if (item.highlighted && item.active) {
         this._removeItem(item);
+        // If this action was performed by the user
+        // run the callback
+        if (runCallback) {
+          this._triggerChange(item.value);
+        }
       }
     });
 
@@ -814,7 +819,7 @@ export default class Choices {
         if (!hasHighlightedItems) {
           this.highlightItem(lastItem);
         }
-        this.removeHighlightedItems();
+        this.removeHighlightedItems(true);
       }
     }
   }

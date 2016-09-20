@@ -1,4 +1,4 @@
-/*! choices.js v2.0.2 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.0.3 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -225,9 +225,10 @@
 	    if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
 	    // Input type check
-	    var canInit = this.passedElement && (0, _utils.isElement)(this.passedElement) && ['select-one', 'select-multiple', 'text'].some(function (type) {
+	    var isValidType = ['select-one', 'select-multiple', 'text'].some(function (type) {
 	      return type === _this.passedElement.type;
 	    });
+	    var canInit = (0, _utils.isElement)(this.passedElement) && isValidType;
 
 	    if (canInit) {
 	      // If element has already been initalised with Choices
@@ -465,11 +466,18 @@
 	    value: function removeHighlightedItems() {
 	      var _this6 = this;
 
+	      var runCallback = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
 	      var items = this.store.getItemsFilteredByActive();
 
 	      items.forEach(function (item) {
 	        if (item.highlighted && item.active) {
 	          _this6._removeItem(item);
+	          // If this action was performed by the user
+	          // run the callback
+	          if (runCallback) {
+	            _this6._triggerChange(item.value);
+	          }
 	        }
 	      });
 
@@ -997,7 +1005,7 @@
 	          if (!hasHighlightedItems) {
 	            this.highlightItem(lastItem);
 	          }
-	          this.removeHighlightedItems();
+	          this.removeHighlightedItems(true);
 	        }
 	      }
 	    }
@@ -4650,7 +4658,6 @@
 	 */
 	var extend = exports.extend = function extend() {
 	  var extended = {};
-	  var deep = false;
 	  var length = arguments.length;
 
 	  /**
@@ -4661,7 +4668,7 @@
 	    for (var prop in obj) {
 	      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
 	        // If deep merge and property is an object, merge properties
-	        if (deep && isType('Object', obj[prop])) {
+	        if (isType('Object', obj[prop])) {
 	          extended[prop] = extend(true, extended[prop], obj[prop]);
 	        } else {
 	          extended[prop] = obj[prop];
@@ -4675,11 +4682,9 @@
 	    // store argument at position i
 	    var obj = arguments[i];
 
-	    // If we are in fact dealing with an object, merge it. Otherwise throw error
+	    // If we are in fact dealing with an object, merge it.
 	    if (isType('Object', obj)) {
 	      merge(obj);
-	    } else {
-	      console.error('Custom options must be an object');
 	    }
 	  }
 
