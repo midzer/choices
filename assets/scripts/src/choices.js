@@ -1643,7 +1643,7 @@ export default class Choices {
 
     this.store.dispatch(addChoice(value, choiceLabel, choiceId, groupId, isDisabled));
 
-    if (isSelected && !isDisabled) {
+    if (isSelected) {
       this._addItem(value, choiceLabel, choiceId);
     }
   }

@@ -1,4 +1,4 @@
-/*! choices.js v2.0.4 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.0.5 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1915,7 +1915,7 @@
 
 	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled));
 
-	      if (isSelected && !isDisabled) {
+	      if (isSelected) {
 	        this._addItem(value, choiceLabel, choiceId);
 	      }
 	    }
