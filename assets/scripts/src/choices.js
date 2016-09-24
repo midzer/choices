@@ -159,7 +159,8 @@ export default class Choices {
     this.wasTap = true;
 
     // Cutting the mustard
-    const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement('div');
+    const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement(
+      'div');
     if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
     // Input type check
@@ -662,11 +663,9 @@ export default class Choices {
             // Remove loading states/text
             this.containerOuter.classList.remove(this.config.classNames.loadingState);
             if (this.passedElement.type === 'select-multiple') {
-              const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
-                false;
-              if (placeholder) {
-                this.input.placeholder = placeholder;
-              }
+              const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute(
+                'placeholder') : false;
+              this.input.placeholder = placeholder || '';
             }
 
             // Add each result as a choice
@@ -723,7 +722,8 @@ export default class Choices {
       this._triggerChange(itemToRemove.value);
 
       if (this.passedElement.type === 'select-one') {
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
+          false;
         if (placeholder) {
           const placeholderItem = this._getTemplate('placeholder', placeholder);
           this.itemList.appendChild(placeholderItem);
@@ -1172,7 +1172,8 @@ export default class Choices {
       if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
         // If there is a placeholder, we only want to set the width of the input when it is a greater
         // length than 75% of the placeholder. This stops the input jumping around.
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
+          false;
         if (this.input.value && this.input.value.length >= (placeholder.length / 1.25)) {
           this.input.style.width = getWidthOfInput(this.input);
         }
@@ -1777,7 +1778,8 @@ export default class Choices {
         );
       },
       dropdown: () => {
-        return strToEl(`
+        return strToEl(
+          `
             <div class="${classNames.list} ${classNames.listDropdown}" aria-expanded="false"></div>
           `);
       },
