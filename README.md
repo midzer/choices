@@ -60,6 +60,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
         loadingText: 'Loading...',
         noResultsText: 'No results round',
         noChoicesText: 'No choices to choose from',
+        itemSelectText: 'Press to select',
         classNames: {
             containerOuter: 'choices',
             containerInner: 'choices__inner',
@@ -315,6 +316,13 @@ const example = new Choices(element, {
 **Input types affected:** `select-multiple`
 
 **Usage:** The text that is shown when a user has selected all possible choices.
+
+### itemSelectText
+**Type:** `String` **Default:** `Press to select`
+
+**Input types affected:** `select-multiple`, `select-one`
+
+**Usage:** The text that is shown when a user hovers over a selectable choice.
 
 ### classNames
 **Type:** `Object` **Default:**

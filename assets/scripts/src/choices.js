@@ -1703,7 +1703,6 @@ export default class Choices {
    * @private
    */
   _createTemplates() {
-    const config = this.config;
     const classNames = this.config.classNames;
     const templates = {
       containerOuter: (direction) => {
@@ -1767,7 +1766,7 @@ export default class Choices {
       choice: (data) => {
         return strToEl(
           `
-            <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+            <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
               ${data.label}
             </div>
           `
