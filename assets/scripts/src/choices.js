@@ -1702,7 +1702,6 @@ export default class Choices {
    * @private
    */
   _createTemplates() {
-  debugger;
     const config = this.config;
     const classNames = this.config.classNames;
     const templates = {
