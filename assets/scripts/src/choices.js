@@ -813,6 +813,7 @@ export default class Choices {
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
         this.input.value = lastItem.value;
+        this.input.style.width = getWidthOfInput(this.input);
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
       } else {
