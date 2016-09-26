@@ -84,6 +84,10 @@ const choices = (state = [], action) => {
       });
     }
 
+    case 'CLEAR_CHOICES': {
+      return state.choices = [];
+    }
+
     default: {
       return state;
     }

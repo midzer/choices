@@ -9,6 +9,7 @@ import {
   activateChoices,
   addGroup,
   clearAll,
+  clearChoices,
 }
 from './actions/index';
 import {
@@ -101,6 +102,7 @@ export default class Choices {
       callbackOnHighlightItem: (id, value, passedInput) => {},
       callbackOnUnhighlightItem: (id, value, passedInput) => {},
       callbackOnChange: (value, passedInput) => {},
+      callbackOnItemSearch: (value, fn, passedInput) => {},
     };
 
     // Merge options with user options
@@ -665,7 +667,7 @@ export default class Choices {
             this.containerOuter.classList.remove(this.config.classNames.loadingState);
             if (this.passedElement.type === 'select-multiple') {
               const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute(
-                'placeholder') : false;
+                  'placeholder') : false;
               this.input.placeholder = placeholder || '';
             }
 
@@ -1158,7 +1160,35 @@ export default class Choices {
           this.store.dispatch(activateChoices(true));
         }
       } else if (this.canSearch) {
-        this._searchChoices(this.input.value);
+        // Run callback if it is a function
+        if (this.config.callbackOnItemSearch) {
+          const callback = this.config.callbackOnItemSearch;
+          if (isType('Function', callback)) {
+            const choicesCallback = (results, value, label) => {
+              if (!isType('Array', results) || !value) return;
+              if (results && results.length) {
+                // Remove loading states/text
+                this.containerOuter.classList.remove(this.config.classNames.loadingState);
+                if (this.passedElement.type === 'select-multiple') {
+                  const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute(
+                      'placeholder') : false;
+                  this.input.placeholder = placeholder || '';
+                }
+
+                // Add each result as a choice
+                results.forEach((result, index) => {
+                  this._addChoice(false, false, result[value], result[label]);
+                });
+              }
+              this.containerOuter.removeAttribute('aria-busy');
+            };
+            callback(this.input.value, choicesCallback, this.passedElement);
+          } else {
+            console.error('callbackOnOnItemSearch: Callback is not a function');
+          }
+        } else {
+          this._searchChoices(this.input.value);
+        }
       }
     }
   }
@@ -1649,6 +1679,15 @@ export default class Choices {
     if (isSelected) {
       this._addItem(value, choiceLabel, choiceId);
     }
+  }
+
+  /**
+   * Clear all choices added to the store.
+   * @return
+   * @private
+   */
+  _clearChoices() {
+    this.store.dispatch(clearChoices());
   }
 
   /**

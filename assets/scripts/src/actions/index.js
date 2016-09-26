@@ -50,6 +50,12 @@ export const activateChoices = (active = true) => {
   };
 };
 
+export const clearChoices = () => {
+  return {
+    type: 'CLEAR_CHOICES',
+  };
+};
+
 export const addGroup = (value, id, active, disabled) => {
   return {
     type: 'ADD_GROUP',
