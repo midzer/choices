@@ -1989,7 +1989,6 @@
 	    value: function _createTemplates() {
 	      var _this21 = this;
 
-	      debugger;
 	      var config = this.config;
 	      var classNames = this.config.classNames;
 	      var templates = {
