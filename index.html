@@ -122,6 +122,9 @@
         <option value="Dropdown item 4" disabled>Dropdown item 4</option>
       </select>
 
+      <label for="choices-multiple-xhr-search">Search among choices fetched from an URL</label>
+      <select class="form-control" name="choices-multiple-xhr-search" id="choices-multiple-xhr-search" placeholder="Search music" multiple></select>
+
       <hr>
 
       <h2>Single select input</h2>
@@ -328,12 +331,35 @@
         request.send();
       });
 
-      var example12 = new Choices('[data-choice]', {
+      var example12 = new Choices('#choices-multiple-xhr-search', {
+        removeItemButton: true,
+        callbackOnItemSearch: function (value, fn, passedInput) {
+          var request = new XMLHttpRequest();
+          var url = 'https://api.discogs.com/database/search?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW&q=' + value;
+          request.open('get', url, true);
+          request.onreadystatechange = function() {
+            var status;
+            var data;
+            if (request.readyState === 4) {
+              status = request.status;
+              if (status === 200) {
+                data = JSON.parse(request.responseText);
+                fn(data.results, 'id', 'title');
+              } else {
+                console.error(status);
+              }
+            }
+          };
+          request.send();
+        }
+      });
+
+      var example13 = new Choices('[data-choice]', {
         placeholderValue: 'This is a placeholder set in the config',
         removeButton: true,
       });
 
-      var example13 = new Choices('#choices-single-no-search', {
+      var example14 = new Choices('#choices-single-no-search', {
         search: false,
         removeItemButton: true,
         choices: [
@@ -347,7 +373,7 @@
         {value: 'Six', label: 'Label Six', selected: true},
       ], 'value', 'label');
 
-      var example14 = new Choices('#choices-single-preset-options', {
+      var example15 = new Choices('#choices-single-preset-options', {
         placeholder: true,
       }).setChoices([{
         label: 'Group one',
@@ -370,7 +396,7 @@
         ]
       }], 'value', 'label');
 
-      var example15 = new Choices('#choices-single-selected-option', {
+      var example16 = new Choices('#choices-single-selected-option', {
         choices: [
           {value: 'One', label: 'Label One', selected: true},
           {value: 'Two', label: 'Label Two', disabled: true},
@@ -378,7 +404,7 @@
         ],
       }).setValueByChoice('Two');
 
-      var example16 = new Choices('#choices-single-no-sorting', {
+      var example17 = new Choices('#choices-single-no-sorting', {
         shouldSort: false,
       });
 
