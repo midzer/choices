@@ -140,6 +140,7 @@
       <select class="form-control" name="choices-single-remote-fetch" id="choices-single-remote-fetch" placeholder="Pick an Arctic Monkeys record"></select>
 
       <label for="choices-single-remove-xhr">Options from remote source (XHR) &amp; remove button</label>
+      <p><small>If this doesn't work, the Discogs rate limit has probably been reached. Try again later!</small></p>
       <select class="form-control" name="choices-single-remove-xhr" id="choices-single-remove-xhr" placeholder="Pick a Smiths record"></select>
 
       <label for="choices-single-groups">Option groups</label>
@@ -335,7 +336,7 @@
         removeItemButton: true,
         callbackOnItemSearch: function (value, fn, passedInput) {
           var request = new XMLHttpRequest();
-          var url = 'https://api.discogs.com/database/search?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW&q=' + value;
+          var url = 'https://api.discogs.com/database/search?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW&type=artist?q=' + value;
           request.open('get', url, true);
           request.onreadystatechange = function() {
             var status;
