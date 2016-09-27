@@ -102,7 +102,7 @@ export default class Choices {
       callbackOnHighlightItem: (id, value, passedInput) => {},
       callbackOnUnhighlightItem: (id, value, passedInput) => {},
       callbackOnChange: (value, passedInput) => {},
-      callbackOnItemSearch: false,
+      callbackOnItemSearch: null,
     };
 
     // Merge options with user options
