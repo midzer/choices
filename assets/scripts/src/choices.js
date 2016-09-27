@@ -102,7 +102,7 @@ export default class Choices {
       callbackOnHighlightItem: (id, value, passedInput) => {},
       callbackOnUnhighlightItem: (id, value, passedInput) => {},
       callbackOnChange: (value, passedInput) => {},
-      callbackOnItemSearch: (value, fn, passedInput) => {},
+      callbackOnItemSearch: false,
     };
 
     // Merge options with user options
@@ -181,6 +181,10 @@ export default class Choices {
     }
   }
 
+  /*========================================
+  =            Public functions            =
+  ========================================*/
+
   /**
    * Initialise Choices
    * @return
@@ -239,6 +243,183 @@ export default class Choices {
 
     // Uninitialise
     this.initialised = false;
+  }
+
+  /**
+   * Render group choices into a DOM fragment and append to choice list
+   * @param  {Array} groups    Groups to add to list
+   * @param  {Array} choices   Choices to add to groups
+   * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
+   * @return {DocumentFragment} Populated options fragment
+   * @private
+   */
+  renderGroups(groups, choices, fragment) {
+    const groupFragment = fragment || document.createDocumentFragment();
+    const filter = this.config.sortFilter;
+
+    // If sorting is enabled, filter groups
+    if (this.config.shouldSort) {
+      groups.sort(filter);
+    }
+
+    groups.forEach((group) => {
+      // Grab options that are children of this group
+      const groupChoices = choices.filter((choice) => {
+        if (this.passedElement.type === 'select-one') {
+          return choice.groupId === group.id;
+        }
+
+        return choice.groupId === group.id && !choice.selected;
+      });
+
+      if (groupChoices.length >= 1) {
+        const dropdownGroup = this._getTemplate('choiceGroup', group);
+        groupFragment.appendChild(dropdownGroup);
+        this.renderChoices(groupChoices, groupFragment);
+      }
+    });
+
+    return groupFragment;
+  }
+
+  /**
+   * Render choices into a DOM fragment and append to choice list
+   * @param  {Array} choices    Choices to add to list
+   * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
+   * @return {DocumentFragment} Populated choices fragment
+   * @private
+   */
+  renderChoices(choices, fragment) {
+    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+    const choicesFragment = fragment || document.createDocumentFragment();
+    const filter = this.isSearching ? sortByScore : this.config.sortFilter;
+
+    // If sorting is enabled or the user is searching, filter choices
+    if (this.config.shouldSort || this.isSearching) {
+      choices.sort(filter);
+    }
+
+    choices.forEach((choice) => {
+      const dropdownItem = this._getTemplate('choice', choice);
+      const shouldRender = this.passedElement.type === 'select-one' || !choice.selected;
+      if (shouldRender) {
+        choicesFragment.appendChild(dropdownItem);
+      }
+    });
+
+    return choicesFragment;
+  }
+
+  /**
+   * Render items into a DOM fragment and append to items list
+   * @param  {Array} items    Items to add to list
+   * @param  {DocumentFragment} fragment Fragrment to add items to (optional)
+   * @return
+   * @private
+   */
+  renderItems(items, fragment) {
+    // Create fragment to add elements to
+    const itemListFragment = fragment || document.createDocumentFragment();
+    // Simplify store data to just values
+    const itemsFiltered = this.store.getItemsReducedToValues(items);
+
+    if (this.passedElement.type === 'text') {
+      // Assign hidden input array of values
+      this.passedElement.setAttribute('value', itemsFiltered.join(this.config.delimiter));
+    } else {
+      const selectedOptionsFragment = document.createDocumentFragment();
+
+      // Add each list item to list
+      items.forEach((item) => {
+        // Create a standard select option
+        const option = this._getTemplate('option', item);
+        // Append it to fragment
+        selectedOptionsFragment.appendChild(option);
+      });
+
+      // Update selected choices
+      this.passedElement.innerHTML = '';
+      this.passedElement.appendChild(selectedOptionsFragment);
+    }
+
+    // Add each list item to list
+    items.forEach((item) => {
+      // Create new list element
+      const listItem = this._getTemplate('item', item);
+      // Append it to list
+      itemListFragment.appendChild(listItem);
+    });
+
+    return itemListFragment;
+  }
+
+  /**
+   * Render DOM with values
+   * @return
+   * @private
+   */
+  render() {
+    this.currentState = this.store.getState();
+
+    // Only render if our state has actually changed
+    if (this.currentState !== this.prevState) {
+      // Choices
+      if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups) {
+        if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+          // Get active groups/choices
+          const activeGroups = this.store.getGroupsFilteredByActive();
+          const activeChoices = this.store.getChoicesFilteredByActive();
+
+          let choiceListFragment = document.createDocumentFragment();
+
+          // Clear choices
+          this.choiceList.innerHTML = '';
+          // Scroll back to top of choices list
+          this.choiceList.scrollTop = 0;
+
+          // If we have grouped options
+          if (activeGroups.length >= 1 && this.isSearching !== true) {
+            choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+          } else if (activeChoices.length >= 1) {
+            choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
+          }
+
+          if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+            // If we actually have anything to add to our dropdown
+            // append it and highlight the first choice
+            this.choiceList.appendChild(choiceListFragment);
+            this._highlightChoice();
+          } else {
+            // Otherwise show a notice
+            const dropdownItem = this.isSearching ?
+              this._getTemplate('notice', this.config.noResultsText) :
+              this._getTemplate('notice', this.config.noChoicesText);
+            this.choiceList.appendChild(dropdownItem);
+          }
+        }
+      }
+
+      // Items
+      if (this.currentState.items !== this.prevState.items) {
+        const activeItems = this.store.getItemsFilteredByActive();
+        if (activeItems) {
+          // Create a fragment to store our list items
+          // (so we don't have to update the DOM for each item)
+          const itemListFragment = this.renderItems(activeItems);
+
+          // Clear list
+          this.itemList.innerHTML = '';
+
+          // If we have items to add
+          if (itemListFragment.childNodes) {
+            // Update list
+            this.itemList.appendChild(itemListFragment);
+          }
+        }
+      }
+
+      this.prevState = this.currentState;
+    }
   }
 
   /**
@@ -608,6 +789,23 @@ export default class Choices {
   }
 
   /**
+   * Enable interaction with Choices
+   * @return {Object} Class instance
+   */
+  enable() {
+    this.passedElement.disabled = false;
+    const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
+    if (this.initialised && isDisabled) {
+      this._addEventListeners();
+      this.passedElement.removeAttribute('disabled');
+      this.input.removeAttribute('disabled');
+      this.containerOuter.classList.remove(this.config.classNames.disabledState);
+      this.containerOuter.removeAttribute('aria-disabled');
+    }
+    return this;
+  }
+
+  /**
    * Disable interaction with Choices
    * @return {Object} Class instance
    * @public
@@ -621,23 +819,6 @@ export default class Choices {
       this.input.setAttribute('disabled', '');
       this.containerOuter.classList.add(this.config.classNames.disabledState);
       this.containerOuter.setAttribute('aria-disabled', 'true');
-    }
-    return this;
-  }
-
-  /**
-   * Enable interaction with Choices
-   * @return {Object} Class instance
-   */
-  enable() {
-    this.passedElement.disabled = false;
-    const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
-    if (this.initialised && isDisabled) {
-      this._addEventListeners();
-      this.passedElement.removeAttribute('disabled');
-      this.input.removeAttribute('disabled');
-      this.containerOuter.classList.remove(this.config.classNames.disabledState);
-      this.containerOuter.removeAttribute('aria-disabled');
     }
     return this;
   }
@@ -658,6 +839,12 @@ export default class Choices {
     }
     return this;
   }
+
+  /*=====  End of Public functions  ======*/
+
+  /*=============================================
+  =                Private functions            =
+  =============================================*/
 
   /**
    * Call change callback
@@ -853,7 +1040,7 @@ export default class Choices {
    * @private
    */
   _handleLoadingState(isLoading = true) {
-    let placeholderItem = this.itemList.querySelector('.' + this.config.classNames.placeholder);
+    let placeholderItem = this.itemList.querySelector(`.${this.config.classNames.placeholder}`);
     if(isLoading) {
       this.containerOuter.classList.add(this.config.classNames.loadingState);
       this.containerOuter.setAttribute('aria-busy', 'true');
@@ -905,47 +1092,58 @@ export default class Choices {
    * @return
    * @private
    */
-  _searchChoices(value) {
+  _filterChoices(value) {
+    const newValue = isType('String', value) ? value.trim() : value;
+    const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+
+    // If new value matches the desired length and is not the same as the current value with a space
+    if (newValue.length >= 1 && newValue !== `${currentValue} `) {
+      const haystack = this.store.getChoicesFilteredBySelectable();
+      const needle = newValue;
+      const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+      const fuse = new Fuse(haystack, {
+        keys,
+        shouldSort: true,
+        include: 'score',
+      });
+      const results = fuse.search(needle);
+      this.currentValue = newValue;
+      this.highlightPosition = 0;
+      this.isSearching = true;
+      this.store.dispatch(filterChoices(results));
+    }
+  }
+
+  /**
+   * Determine the action when a user is searching
+   * @param  {String} value Value entered by user
+   * @return
+   * @private
+   */
+  _handleSearch(value) {
     if (!value) return;
     // Run callback if it is a function
-    if (this.config.callbackOnItemSearch) {
-      const userCallback = this.config.callbackOnItemSearch;
-      if (isType('Function', userCallback)) {
-        // Reset choices
-        this._clearChoices();
-        // Reset loading state/text
-        this._handleLoadingState();
-        userCallback(value, this._getAjaxCallback(), this.passedElement);
+    if (this.input === document.activeElement) {
+      // If a custom callback has been provided, use it
+      if (this.config.callbackOnItemSearch) {
+        const callback = this.config.callbackOnItemSearch;
+        if (isType('Function', callback)) {
+          // Reset choices
+          this._clearChoices();
+          // Reset loading state/text
+          this._handleLoadingState();
+          // Run callback
+          callback(value, this._getAjaxCallback(), this.passedElement);
+        } else {
+          console.error('callbackOnOnItemSearch: Callback is not a function');
+        }
       } else {
-        console.error('callbackOnOnItemSearch: Callback is not a function');
-      }
-    } else {
-      if (this.input === document.activeElement) {
         const choices = this.store.getChoices();
         const hasUnactiveChoices = choices.some((option) => option.active !== true);
         // Check that we have a value to search and the input was an alphanumeric character
         if (value && value.length > 1) {
-          const handleFilter = () => {
-            const newValue = isType('String', value) ? value.trim() : value;
-            const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
-            if (newValue.length >= 1 && newValue !== `${currentValue} `) {
-              const haystack = this.store.getChoicesFilteredBySelectable();
-              const needle = newValue;
-              const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-              const fuse = new Fuse(
-                  haystack, {
-                    keys,
-                    shouldSort: true,
-                    include: 'score',
-                  });
-              const results = fuse.search(needle);
-              this.currentValue = newValue;
-              this.highlightPosition = 0;
-              this.isSearching = true;
-              this.store.dispatch(filterChoices(results));
-            }
-          };
-          handleFilter();
+          // Filter available choices
+          this._filterChoices(value);
         } else if (hasUnactiveChoices) {
           // Otherwise reset choices to active
           this.isSearching = false;
@@ -1198,12 +1396,10 @@ export default class Choices {
           this.store.dispatch(activateChoices(true));
         }
       } else if (this.canSearch) {
-        this._searchChoices(this.input.value);
+        this._handleSearch(this.input.value);
       }
     }
   }
-
-
 
   /**
    * Input event
@@ -1977,182 +2173,7 @@ export default class Choices {
     }
   }
 
-  /**
-   * Render group choices into a DOM fragment and append to choice list
-   * @param  {Array} groups    Groups to add to list
-   * @param  {Array} choices   Choices to add to groups
-   * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
-   * @return {DocumentFragment} Populated options fragment
-   * @private
-   */
-  renderGroups(groups, choices, fragment) {
-    const groupFragment = fragment || document.createDocumentFragment();
-    const filter = this.config.sortFilter;
-
-    // If sorting is enabled, filter groups
-    if (this.config.shouldSort) {
-      groups.sort(filter);
-    }
-
-    groups.forEach((group) => {
-      // Grab options that are children of this group
-      const groupChoices = choices.filter((choice) => {
-        if (this.passedElement.type === 'select-one') {
-          return choice.groupId === group.id;
-        }
-
-        return choice.groupId === group.id && !choice.selected;
-      });
-
-      if (groupChoices.length >= 1) {
-        const dropdownGroup = this._getTemplate('choiceGroup', group);
-        groupFragment.appendChild(dropdownGroup);
-        this.renderChoices(groupChoices, groupFragment);
-      }
-    });
-
-    return groupFragment;
-  }
-
-  /**
-   * Render choices into a DOM fragment and append to choice list
-   * @param  {Array} choices    Choices to add to list
-   * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
-   * @return {DocumentFragment} Populated choices fragment
-   * @private
-   */
-  renderChoices(choices, fragment) {
-    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-    const choicesFragment = fragment || document.createDocumentFragment();
-    const filter = this.isSearching ? sortByScore : this.config.sortFilter;
-
-    // If sorting is enabled or the user is searching, filter choices
-    if (this.config.shouldSort || this.isSearching) {
-      choices.sort(filter);
-    }
-
-    choices.forEach((choice) => {
-      const dropdownItem = this._getTemplate('choice', choice);
-      const shouldRender = this.passedElement.type === 'select-one' || !choice.selected;
-      if (shouldRender) {
-        choicesFragment.appendChild(dropdownItem);
-      }
-    });
-
-    return choicesFragment;
-  }
-
-  /**
-   * Render items into a DOM fragment and append to items list
-   * @param  {Array} items    Items to add to list
-   * @param  {DocumentFragment} fragment Fragrment to add items to (optional)
-   * @return
-   * @private
-   */
-  renderItems(items, fragment) {
-    // Create fragment to add elements to
-    const itemListFragment = fragment || document.createDocumentFragment();
-    // Simplify store data to just values
-    const itemsFiltered = this.store.getItemsReducedToValues(items);
-
-    if (this.passedElement.type === 'text') {
-      // Assign hidden input array of values
-      this.passedElement.setAttribute('value', itemsFiltered.join(this.config.delimiter));
-    } else {
-      const selectedOptionsFragment = document.createDocumentFragment();
-
-      // Add each list item to list
-      items.forEach((item) => {
-        // Create a standard select option
-        const option = this._getTemplate('option', item);
-        // Append it to fragment
-        selectedOptionsFragment.appendChild(option);
-      });
-
-      // Update selected choices
-      this.passedElement.innerHTML = '';
-      this.passedElement.appendChild(selectedOptionsFragment);
-    }
-
-    // Add each list item to list
-    items.forEach((item) => {
-      // Create new list element
-      const listItem = this._getTemplate('item', item);
-      // Append it to list
-      itemListFragment.appendChild(listItem);
-    });
-
-    return itemListFragment;
-  }
-
-  /**
-   * Render DOM with values
-   * @return
-   * @private
-   */
-  render() {
-    this.currentState = this.store.getState();
-
-    // Only render if our state has actually changed
-    if (this.currentState !== this.prevState) {
-      // Choices
-      if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups) {
-        if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
-          // Get active groups/choices
-          const activeGroups = this.store.getGroupsFilteredByActive();
-          const activeChoices = this.store.getChoicesFilteredByActive();
-
-          let choiceListFragment = document.createDocumentFragment();
-
-          // Clear choices
-          this.choiceList.innerHTML = '';
-          // Scroll back to top of choices list
-          this.choiceList.scrollTop = 0;
-
-          // If we have grouped options
-          if (activeGroups.length >= 1 && this.isSearching !== true) {
-            choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
-          } else if (activeChoices.length >= 1) {
-            choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
-          }
-
-          if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-            // If we actually have anything to add to our dropdown
-            // append it and highlight the first choice
-            this.choiceList.appendChild(choiceListFragment);
-            this._highlightChoice();
-          } else {
-            // Otherwise show a notice
-            const dropdownItem = this.isSearching ?
-              this._getTemplate('notice', this.config.noResultsText) :
-              this._getTemplate('notice', this.config.noChoicesText);
-            this.choiceList.appendChild(dropdownItem);
-          }
-        }
-      }
-
-      // Items
-      if (this.currentState.items !== this.prevState.items) {
-        const activeItems = this.store.getItemsFilteredByActive();
-        if (activeItems) {
-          // Create a fragment to store our list items
-          // (so we don't have to update the DOM for each item)
-          const itemListFragment = this.renderItems(activeItems);
-
-          // Clear list
-          this.itemList.innerHTML = '';
-
-          // If we have items to add
-          if (itemListFragment.childNodes) {
-            // Update list
-            this.itemList.appendChild(itemListFragment);
-          }
-        }
-      }
-
-      this.prevState = this.currentState;
-    }
-  }
+  /*=====  End of Private functions  ======*/
 }
 
 window.Choices = module.exports = Choices;

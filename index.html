@@ -337,14 +337,14 @@
         search: false,
         removeItemButton: true,
         choices: [
-        {value: 'One', label: 'Label One'},
-        {value: 'Two', label: 'Label Two', disabled: true},
-        {value: 'Three', label: 'Label Three'},
+          {value: 'One', label: 'Label One'},
+          {value: 'Two', label: 'Label Two', disabled: true},
+          {value: 'Three', label: 'Label Three'},
         ],
       }).setChoices([
-      {value: 'Four', label: 'Label Four', disabled: true},
-      {value: 'Five', label: 'Label Five'},
-      {value: 'Six', label: 'Label Six', selected: true},
+        {value: 'Four', label: 'Label Four', disabled: true},
+        {value: 'Five', label: 'Label Five'},
+        {value: 'Six', label: 'Label Six', selected: true},
       ], 'value', 'label');
 
       var example14 = new Choices('#choices-single-preset-options', {
@@ -354,9 +354,9 @@
         id: 1,
         disabled: false,
         choices: [
-        {value: 'Child One', label: 'Child One', selected: true},
-        {value: 'Child Two', label: 'Child Two',  disabled: true},
-        {value: 'Child Three', label: 'Child Three'},
+          {value: 'Child One', label: 'Child One', selected: true},
+          {value: 'Child Two', label: 'Child Two',  disabled: true},
+          {value: 'Child Three', label: 'Child Three'},
         ]
       },
       {
@@ -364,17 +364,17 @@
         id: 2,
         disabled: false,
         choices: [
-        {value: 'Child Four', label: 'Child Four', disabled: true},
-        {value: 'Child Five', label: 'Child Five'},
-        {value: 'Child Six', label: 'Child Six'},
+          {value: 'Child Four', label: 'Child Four', disabled: true},
+          {value: 'Child Five', label: 'Child Five'},
+          {value: 'Child Six', label: 'Child Six'},
         ]
       }], 'value', 'label');
 
       var example15 = new Choices('#choices-single-selected-option', {
         choices: [
-        {value: 'One', label: 'Label One', selected: true},
-        {value: 'Two', label: 'Label Two', disabled: true},
-        {value: 'Three', label: 'Label Three'},
+          {value: 'One', label: 'Label One', selected: true},
+          {value: 'Two', label: 'Label Two', disabled: true},
+          {value: 'Three', label: 'Label Three'},
         ],
       }).setValueByChoice('Two');
 
