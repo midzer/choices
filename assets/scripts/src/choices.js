@@ -57,6 +57,7 @@ export default class Choices {
       delimiter: ',',
       paste: true,
       search: true,
+      searchFloor: 1,
       flip: true,
       regexFilter: null,
       shouldSort: true,
@@ -96,13 +97,13 @@ export default class Choices {
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
       },
-      callbackOnInit: () => {},
-      callbackOnAddItem: (id, value, passedInput) => {},
-      callbackOnRemoveItem: (id, value, passedInput) => {},
-      callbackOnHighlightItem: (id, value, passedInput) => {},
-      callbackOnUnhighlightItem: (id, value, passedInput) => {},
-      callbackOnChange: (value, passedInput) => {},
-      callbackOnItemSearch: null,
+      callbackOnInit: null,
+      callbackOnAddItem: null,
+      callbackOnRemoveItem: null,
+      callbackOnHighlightItem: null,
+      callbackOnUnhighlightItem: null,
+      callbackOnChange: null,
+      callbackOnSearch: null,
     };
 
     // Merge options with user options
@@ -162,8 +163,8 @@ export default class Choices {
     this.wasTap = true;
 
     // Cutting the mustard
-    const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document && 'classList' in document.createElement(
-      'div');
+    const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document
+      && 'classList' in document.createElement('div');
     if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
     // Input type check
@@ -268,7 +269,6 @@ export default class Choices {
         if (this.passedElement.type === 'select-one') {
           return choice.groupId === group.id;
         }
-
         return choice.groupId === group.id && !choice.selected;
       });
 
@@ -834,7 +834,8 @@ export default class Choices {
       if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
         // Show loading text
         this._handleLoadingState();
-        fn(this._getAjaxCallback());
+        // Run callback
+        fn(this._ajaxCallback());
       }
     }
     return this;
@@ -1068,17 +1069,19 @@ export default class Choices {
 
   /**
    * Retrieve the callback used to populate component's choices in an async way.
-   * @returns {function(*=, *=, *)} the callback as a function.
+   * @returns {Function} The callback as a function.
    * @private
    */
-  _getAjaxCallback() {
+  _ajaxCallback() {
     return (results, value, label) => {
-      if (!isType('Array', results) || !value) return;
-      if (results && results.length) {
+      if (!results || !value) return;
+      const parsedResults = isType('Object', results) ? [results] : results;
+
+      if (parsedResults && isType('Array', parsedResults) && parsedResults.length) {
         // Remove loading states/text
         this._handleLoadingState(false);
         // Add each result as a choice
-        results.forEach((result) => {
+        parsedResults.forEach((result) => {
           this._addChoice(false, false, result[value], result[label]);
         });
       }
@@ -1092,7 +1095,7 @@ export default class Choices {
    * @return
    * @private
    */
-  _filterChoices(value) {
+  _searchChoices(value) {
     const newValue = isType('String', value) ? value.trim() : value;
     const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
 
@@ -1122,35 +1125,28 @@ export default class Choices {
    */
   _handleSearch(value) {
     if (!value) return;
+    const choices = this.store.getChoices();
+    const hasUnactiveChoices = choices.some((option) => option.active !== true);
+
     // Run callback if it is a function
     if (this.input === document.activeElement) {
-      // If a custom callback has been provided, use it
-      if (this.config.callbackOnItemSearch) {
-        const callback = this.config.callbackOnItemSearch;
-        if (isType('Function', callback)) {
-          if(this.passedElement.type !== 'text') {
-            // Reset choices
-            this._clearChoices();
-            // Reset loading state/text
-            this._handleLoadingState();
+      // Check that we have a value to search and the input was an alphanumeric character
+      if (value && value.length > this.config.searchFloor) {
+        // Filter available choices
+        this._searchChoices(value);
+        // Run callback if it is a function
+        if (this.config.callbackOnSearch) {
+          const callback = this.config.callbackOnSearch;
+          if (isType('Function', callback)) {
+            callback(value, this.passedElement);
+          } else {
+            console.error('callbackOnSearch: Callback is not a function');
           }
-          // Run callback
-          callback(value, this._getAjaxCallback(), this.passedElement);
-        } else {
-          console.error('callbackOnOnItemSearch: Callback is not a function');
         }
-      } else {
-        const choices = this.store.getChoices();
-        const hasUnactiveChoices = choices.some((option) => option.active !== true);
-        // Check that we have a value to search and the input was an alphanumeric character
-        if (value && value.length > 1) {
-          // Filter available choices
-          this._filterChoices(value);
-        } else if (hasUnactiveChoices) {
-          // Otherwise reset choices to active
-          this.isSearching = false;
-          this.store.dispatch(activateChoices(true));
-        }
+      } else if (hasUnactiveChoices) {
+        // Otherwise reset choices to active
+        this.isSearching = false;
+        this.store.dispatch(activateChoices(true));
       }
     }
   }
@@ -1331,6 +1327,7 @@ export default class Choices {
       // If backspace or delete key is pressed and the input has no value
       if (hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
         this._handleBackspace(activeItems);
+        this._handleLoadingState();
         e.preventDefault();
       }
     };

@@ -122,9 +122,6 @@
         <option value="Dropdown item 4" disabled>Dropdown item 4</option>
       </select>
 
-      <label for="choices-multiple-xhr-search">Search among choices fetched from an URL</label>
-      <select class="form-control" name="choices-multiple-xhr-search" id="choices-multiple-xhr-search" placeholder="Search music" multiple></select>
-
       <hr>
 
       <h2>Single select input</h2>
@@ -137,6 +134,7 @@
       </select>
 
       <label for="choices-single-remote-fetch">Options from remote source (Fetch API)</label>
+      <p><small>If this doesn't work, the Discogs rate limit has probably been reached. Try again later!</small></p>
       <select class="form-control" name="choices-single-remote-fetch" id="choices-single-remote-fetch" placeholder="Pick an Arctic Monkeys record"></select>
 
       <label for="choices-single-remove-xhr">Options from remote source (XHR) &amp; remove button</label>
@@ -239,7 +237,7 @@
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var example1 = new Choices(document.getElementById('choices-text-remove-button'), {
+      var textRemove = new Choices(document.getElementById('choices-text-remove-button'), {
         delimiter: ',',
         editItems: true,
         maxItemCount: 5,
@@ -252,32 +250,32 @@
         },
       });
 
-      var example2 = new Choices('#choices-text-unique-values', {
+      var textUniqueVals = new Choices('#choices-text-unique-values', {
         paste: false,
         duplicateItems: false,
         editItems: true,
       });
 
-      var example3 = new Choices('#choices-text-email-filter', {
+      var textEmailFilter = new Choices('#choices-text-email-filter', {
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       });
 
-      var example4 = new Choices('#choices-text-disabled', {
+      var textDisabled = new Choices('#choices-text-disabled', {
         addItems: false,
         removeItems: false,
       }).disable();
 
-      var example5 = new Choices('#choices-text-prepend-append-value', {
+      var textPrependAppendVal = new Choices('#choices-text-prepend-append-value', {
         prependValue: 'item-',
         appendValue: '-' + Date.now(),
       }).removeActiveItems();
 
-      var example7 = new Choices('#choices-text-preset-values', {
+      var textPresetVal = new Choices('#choices-text-preset-values', {
         items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
       });
 
-      var example9 = new Choices('#choices-multiple-remote-fetch', {
+      var multipleFetch = new Choices('#choices-multiple-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Strokes record',
         maxItemCount: 5,
@@ -294,7 +292,7 @@
         });
       });
 
-      var example10 = new Choices('#choices-single-remote-fetch', {
+      var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Arctic Monkeys record'
       }).ajax(function(callback) {
@@ -302,7 +300,7 @@
         .then(function(response) {
           response.json().then(function(data) {
             callback(data.releases, 'title', 'title');
-            example10.setValueByChoice('Fake Tales Of San Francisco');
+            singleFetch.setValueByChoice('Fake Tales Of San Francisco');
           });
         })
         .catch(function(error) {
@@ -310,7 +308,7 @@
         });
       });
 
-      var example11 = new Choices('#choices-single-remove-xhr', {
+      var singleXhrRemove = new Choices('#choices-single-remove-xhr', {
         removeItemButton: true,
       }).ajax(function(callback) {
         var request = new XMLHttpRequest();
@@ -323,7 +321,7 @@
             if (status === 200) {
               data = JSON.parse(request.responseText);
               callback(data.releases, 'title', 'title');
-              example11.setValueByChoice('How Soon Is Now?');
+              singleXhrRemove.setValueByChoice('How Soon Is Now?');
             } else {
               console.error(status);
             }
@@ -332,35 +330,12 @@
         request.send();
       });
 
-      var example12 = new Choices('#choices-multiple-xhr-search', {
-        removeItemButton: true,
-        callbackOnItemSearch: function (value, fn, passedInput) {
-          var request = new XMLHttpRequest();
-          var url = 'https://api.discogs.com/database/search?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW&type=artist?q=' + value;
-          request.open('get', url, true);
-          request.onreadystatechange = function() {
-            var status;
-            var data;
-            if (request.readyState === 4) {
-              status = request.status;
-              if (status === 200) {
-                data = JSON.parse(request.responseText);
-                fn(data.results, 'id', 'title');
-              } else {
-                console.error(status);
-              }
-            }
-          };
-          request.send();
-        }
-      });
-
-      var example13 = new Choices('[data-choice]', {
+      var genericExamples = new Choices('[data-choice]', {
         placeholderValue: 'This is a placeholder set in the config',
         removeButton: true,
       });
 
-      var example14 = new Choices('#choices-single-no-search', {
+      var singleNoSearch = new Choices('#choices-single-no-search', {
         search: false,
         removeItemButton: true,
         choices: [
@@ -374,7 +349,7 @@
         {value: 'Six', label: 'Label Six', selected: true},
       ], 'value', 'label');
 
-      var example15 = new Choices('#choices-single-preset-options', {
+      var singlePresetOpts = new Choices('#choices-single-preset-options', {
         placeholder: true,
       }).setChoices([{
         label: 'Group one',
@@ -397,7 +372,7 @@
         ]
       }], 'value', 'label');
 
-      var example16 = new Choices('#choices-single-selected-option', {
+      var singleSelectedOpt = new Choices('#choices-single-selected-option', {
         choices: [
           {value: 'One', label: 'Label One', selected: true},
           {value: 'Two', label: 'Label Two', disabled: true},
@@ -405,7 +380,7 @@
         ],
       }).setValueByChoice('Two');
 
-      var example17 = new Choices('#choices-single-no-sorting', {
+      var singleNoSorting = new Choices('#choices-single-no-sorting', {
         shouldSort: false,
       });
 

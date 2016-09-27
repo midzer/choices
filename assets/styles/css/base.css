@@ -29,6 +29,9 @@ label {
   font-weight: 500;
   cursor: pointer; }
 
+p {
+  margin-top: 0; }
+
 hr {
   display: block;
   margin: 36px 0;
