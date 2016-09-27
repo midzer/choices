@@ -651,34 +651,9 @@ export default class Choices {
   ajax(fn) {
     if (this.initialised === true) {
       if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
-        this.containerOuter.classList.add(this.config.classNames.loadingState);
-        this.containerOuter.setAttribute('aria-busy', 'true');
-        if (this.passedElement.type === 'select-one') {
-          const placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-          this.itemList.appendChild(placeholderItem);
-        } else {
-          this.input.placeholder = this.config.loadingText;
-        }
-
-        const callback = (results, value, label) => {
-          if (!isType('Array', results) || !value) return;
-          if (results && results.length) {
-            // Remove loading states/text
-            this.containerOuter.classList.remove(this.config.classNames.loadingState);
-            if (this.passedElement.type === 'select-multiple') {
-              const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute(
-                  'placeholder') : false;
-              this.input.placeholder = placeholder || '';
-            }
-
-            // Add each result as a choice
-            results.forEach((result, index) => {
-              this._addChoice(false, false, result[value], result[label]);
-            });
-          }
-          this.containerOuter.removeAttribute('aria-busy');
-        };
-        fn(callback);
+        // Show loading text
+        this._handleLoadingState();
+        fn(this._getAjaxCallback());
       }
     }
     return this;
@@ -703,7 +678,6 @@ export default class Choices {
       }
     }
   }
-
 
   /**
    * Process enter/click of an item button
@@ -803,7 +777,7 @@ export default class Choices {
 
   /**
    * Process back space event
-   * @param  {Array} Active items
+   * @param  {Array} activeItems items
    * @return
    * @private
    */
@@ -873,6 +847,52 @@ export default class Choices {
   }
 
   /**
+   * Apply or remove a loading state to the component.
+   * @param {Boolean} isLoading default value set to 'true'.
+   * @return
+   * @private
+   */
+  _handleLoadingState(isLoading = true) {
+    if(isLoading) {
+      this.containerOuter.classList.add(this.config.classNames.loadingState);
+      this.containerOuter.setAttribute('aria-busy', 'true');
+      if (this.passedElement.type === 'select-one') {
+        const placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+        this.itemList.appendChild(placeholderItem);
+      } else {
+        this.input.placeholder = this.config.loadingText;
+      }
+    } else {
+      // Remove loading states/text
+      this.containerOuter.classList.remove(this.config.classNames.loadingState);
+      if (this.passedElement.type === 'select-multiple') {
+        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+        this.input.placeholder = placeholder || '';
+      }
+    }
+  }
+
+  /**
+   * Retrieve the callback used to populate component's choices in an async way.
+   * @returns {function(*=, *=, *)} the callback as a function.
+   * @private
+   */
+  _getAjaxCallback() {
+    return (results, value, label) => {
+      if (!isType('Array', results) || !value) return;
+      if (results && results.length) {
+        // Remove loading states/text
+        this._handleLoadingState(false);
+        // Add each result as a choice
+        results.forEach((result) => {
+          this._addChoice(false, false, result[value], result[label]);
+        });
+      }
+      this.containerOuter.removeAttribute('aria-busy');
+    };
+  }
+
+  /**
    * Filter choices based on search value
    * @param  {String} value Value to filter by
    * @return
@@ -880,39 +900,50 @@ export default class Choices {
    */
   _searchChoices(value) {
     if (!value) return;
-    if (this.input === document.activeElement) {
-      const choices = this.store.getChoices();
-      const hasUnactiveChoices = choices.some((option) => option.active !== true);
-
-      // Check that we have a value to search and the input was an alphanumeric character
-      if (value && value.length > 1) {
-        const handleFilter = () => {
-          const newValue = isType('String', value) ? value.trim() : value;
-          const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
-
-          if (newValue.length >= 1 && newValue !== `${currentValue} `) {
-            const haystack = this.store.getChoicesFilteredBySelectable();
-            const needle = newValue;
-            const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-            const fuse = new Fuse(haystack, {
-              keys,
-              shouldSort: true,
-              include: 'score',
-            });
-            const results = fuse.search(needle);
-
-            this.currentValue = newValue;
-            this.highlightPosition = 0;
-            this.isSearching = true;
-            this.store.dispatch(filterChoices(results));
-          }
-        };
-
-        handleFilter();
-      } else if (hasUnactiveChoices) {
-        // Otherwise reset choices to active
-        this.isSearching = false;
-        this.store.dispatch(activateChoices(true));
+    // Run callback if it is a function
+    if (this.config.callbackOnItemSearch) {
+      const userCallback = this.config.callbackOnItemSearch;
+      if (isType('Function', userCallback)) {
+        // Reset choices
+        this._clearChoices();
+        // Reset loading state/text
+        this._handleLoadingState();
+        userCallback(value, this._getAjaxCallback(), this.passedElement);
+      } else {
+        console.error('callbackOnOnItemSearch: Callback is not a function');
+      }
+    } else {
+      if (this.input === document.activeElement) {
+        const choices = this.store.getChoices();
+        const hasUnactiveChoices = choices.some((option) => option.active !== true);
+        // Check that we have a value to search and the input was an alphanumeric character
+        if (value && value.length > 1) {
+          const handleFilter = () => {
+            const newValue = isType('String', value) ? value.trim() : value;
+            const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+            if (newValue.length >= 1 && newValue !== `${currentValue} `) {
+              const haystack = this.store.getChoicesFilteredBySelectable();
+              const needle = newValue;
+              const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+              const fuse = new Fuse(
+                  haystack, {
+                    keys,
+                    shouldSort: true,
+                    include: 'score',
+                  });
+              const results = fuse.search(needle);
+              this.currentValue = newValue;
+              this.highlightPosition = 0;
+              this.isSearching = true;
+              this.store.dispatch(filterChoices(results));
+            }
+          };
+          handleFilter();
+        } else if (hasUnactiveChoices) {
+          // Otherwise reset choices to active
+          this.isSearching = false;
+          this.store.dispatch(activateChoices(true));
+        }
       }
     }
   }
@@ -1160,38 +1191,12 @@ export default class Choices {
           this.store.dispatch(activateChoices(true));
         }
       } else if (this.canSearch) {
-        // Run callback if it is a function
-        if (this.config.callbackOnItemSearch) {
-          const callback = this.config.callbackOnItemSearch;
-          if (isType('Function', callback)) {
-            const choicesCallback = (results, value, label) => {
-              if (!isType('Array', results) || !value) return;
-              if (results && results.length) {
-                // Remove loading states/text
-                this.containerOuter.classList.remove(this.config.classNames.loadingState);
-                if (this.passedElement.type === 'select-multiple') {
-                  const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute(
-                      'placeholder') : false;
-                  this.input.placeholder = placeholder || '';
-                }
-
-                // Add each result as a choice
-                results.forEach((result, index) => {
-                  this._addChoice(false, false, result[value], result[label]);
-                });
-              }
-              this.containerOuter.removeAttribute('aria-busy');
-            };
-            callback(this.input.value, choicesCallback, this.passedElement);
-          } else {
-            console.error('callbackOnOnItemSearch: Callback is not a function');
-          }
-        } else {
-          this._searchChoices(this.input.value);
-        }
+        this._searchChoices(this.input.value);
       }
     }
   }
+
+
 
   /**
    * Input event

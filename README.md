@@ -92,6 +92,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
         callbackOnHighlightItem: (id, value, passedInput) => {},
         callbackOnUnhighlightItem: (id, value, passedInput) => {},
         callbackOnChange: (value, passedInput) => {},
+        callbackOnItemSearch: (value, fn, passedInput) => {},
     });
 </script>
 ```
