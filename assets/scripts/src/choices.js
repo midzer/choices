@@ -853,20 +853,27 @@ export default class Choices {
    * @private
    */
   _handleLoadingState(isLoading = true) {
+    let placeholderItem = this.itemList.querySelector('.' + this.config.classNames.placeholder);
     if(isLoading) {
       this.containerOuter.classList.add(this.config.classNames.loadingState);
       this.containerOuter.setAttribute('aria-busy', 'true');
       if (this.passedElement.type === 'select-one') {
-        const placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-        this.itemList.appendChild(placeholderItem);
+        if (!placeholderItem) {
+          placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+          this.itemList.appendChild(placeholderItem);
+        } else {
+          placeholderItem.innerHTML = this.config.loadingText;
+        }
       } else {
         this.input.placeholder = this.config.loadingText;
       }
     } else {
       // Remove loading states/text
       this.containerOuter.classList.remove(this.config.classNames.loadingState);
-      if (this.passedElement.type === 'select-multiple') {
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+      const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+      if (this.passedElement.type === 'select-one') {
+        placeholderItem.innerHTML = placeholder || '';
+      } else {
         this.input.placeholder = placeholder || '';
       }
     }
