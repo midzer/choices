@@ -98,6 +98,10 @@ h6, .h6 {
     color: #00bcd4; }
 
 .logo {
+  display: block;
+  margin-bottom: 12px; }
+
+.logo__img {
   width: 100%;
   height: auto;
   display: inline-block;

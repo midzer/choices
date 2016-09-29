@@ -104,6 +104,11 @@ h6, .h6 { font-size: $global-font-size-h6; }
 }
 
 .logo {
+  display: block;
+  margin-bottom: $global-guttering/2;
+}
+
+.logo__img {
   width: 100%;
   height: auto;
   display: inline-block;
