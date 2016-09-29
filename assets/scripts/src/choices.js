@@ -1082,7 +1082,7 @@ export default class Choices {
         this._handleLoadingState(false);
         // Add each result as a choice
         parsedResults.forEach((result) => {
-          this._addChoice(false, false, result[value], result[label]);
+          this._addChoice(!!result.selected, !!result.disabled, result[value], result[label]);
         });
       }
       this.containerOuter.removeAttribute('aria-busy');
