@@ -420,6 +420,12 @@ const example = new Choices(element, {
 
 **Usage:** Function to run each time an item is added/removed by a user.
 
+### callbackOnSearch
+**Type:** `Function` **Default:** `null` **Arguments:** `value, passedInput`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Function to run when a user types into an input to search choices.
 
 ## Methods
 Methods can be called either directly or by chaining:
