@@ -51,6 +51,7 @@ describe('Choices', () => {
       expect(this.choices.config.delimiter).toEqual(jasmine.any(String));
       expect(this.choices.config.paste).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.search).toEqual(jasmine.any(Boolean));
+      expect(this.choices.config.searchFloor).toEqual(jasmine.any(Number));
       expect(this.choices.config.flip).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.regexFilter).toEqual(null);
       expect(this.choices.config.sortFilter).toEqual(jasmine.any(Function));
@@ -61,16 +62,26 @@ describe('Choices', () => {
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
       expect(this.choices.config.loadingText).toEqual(jasmine.any(String));
+      expect(this.choices.config.noResultsText).toEqual(jasmine.any(String));
+      expect(this.choices.config.noChoicesText).toEqual(jasmine.any(String));
+      expect(this.choices.config.itemSelectText).toEqual(jasmine.any(String));
       expect(this.choices.config.classNames).toEqual(jasmine.any(Object));
-      expect(this.choices.config.callbackOnInit).toEqual(jasmine.any(Function));
-      expect(this.choices.config.callbackOnAddItem).toEqual(jasmine.any(Function));
-      expect(this.choices.config.callbackOnRemoveItem).toEqual(jasmine.any(Function));
-      expect(this.choices.config.callbackOnChange).toEqual(jasmine.any(Function));
+      expect(this.choices.config.callbackOnInit).toEqual(null);
+      expect(this.choices.config.callbackOnAddItem).toEqual(null);
+      expect(this.choices.config.callbackOnRemoveItem).toEqual(null);
+      expect(this.choices.config.callbackOnHighlightItem).toEqual(null);
+      expect(this.choices.config.callbackOnUnhighlightItem).toEqual(null);
+      expect(this.choices.config.callbackOnChange).toEqual(null);
+      expect(this.choices.config.callbackOnSearch).toEqual(null);
     });
 
     it('should expose public methods', function() {
       expect(this.choices.init).toEqual(jasmine.any(Function));
       expect(this.choices.destroy).toEqual(jasmine.any(Function));
+      expect(this.choices.render).toEqual(jasmine.any(Function));
+      expect(this.choices.renderGroups).toEqual(jasmine.any(Function));
+      expect(this.choices.renderItems).toEqual(jasmine.any(Function));
+      expect(this.choices.renderChoices).toEqual(jasmine.any(Function));
       expect(this.choices.highlightItem).toEqual(jasmine.any(Function));
       expect(this.choices.unhighlightItem).toEqual(jasmine.any(Function));
       expect(this.choices.highlightAll).toEqual(jasmine.any(Function));
@@ -81,14 +92,14 @@ describe('Choices', () => {
       expect(this.choices.showDropdown).toEqual(jasmine.any(Function));
       expect(this.choices.hideDropdown).toEqual(jasmine.any(Function));
       expect(this.choices.toggleDropdown).toEqual(jasmine.any(Function));
+      expect(this.choices.getValue).toEqual(jasmine.any(Function));
       expect(this.choices.setValue).toEqual(jasmine.any(Function));
       expect(this.choices.setValueByChoice).toEqual(jasmine.any(Function));
       expect(this.choices.setChoices).toEqual(jasmine.any(Function));
-      expect(this.choices.clearStore).toEqual(jasmine.any(Function));
       expect(this.choices.disable).toEqual(jasmine.any(Function));
       expect(this.choices.enable).toEqual(jasmine.any(Function));
       expect(this.choices.ajax).toEqual(jasmine.any(Function));
-      expect(this.choices.clearInput).toEqual(jasmine.any(Function));
+      expect(this.choices.clearStore).toEqual(jasmine.any(Function));
       expect(this.choices.clearInput).toEqual(jasmine.any(Function));
     });
 
@@ -116,9 +127,9 @@ describe('Choices', () => {
       expect(this.choices.input).toEqual(jasmine.any(HTMLElement));
     });
 
-    it('should create a dropdown', function() {
-      expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
-    });
+    // it('should create a dropdown', function() {
+    //   expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
+    // });
   });
 
   describe('should accept text inputs', function() {
