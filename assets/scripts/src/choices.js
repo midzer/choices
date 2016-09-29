@@ -833,7 +833,7 @@ export default class Choices {
     if (this.initialised === true) {
       if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
         // Show loading text
-        this._handleLoadingState();
+        this._handleLoadingState(true);
         // Run callback
         fn(this._ajaxCallback());
       }
@@ -1327,7 +1327,7 @@ export default class Choices {
       // If backspace or delete key is pressed and the input has no value
       if (hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
         this._handleBackspace(activeItems);
-        this._handleLoadingState();
+        this._handleLoadingState(false);
         e.preventDefault();
       }
     };
