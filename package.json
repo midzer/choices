@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./assets/scripts/dist/choices.min.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "eslint-config-airbnb": "^10.0.1",
     "eslint-loader": "^1.5.0",
     "eslint-plugin-import": "^1.13.0",
-    "eslint-plugin-jsx-a11y": "^2.1.0",
+    "eslint-plugin-jsx-a11y": "^2.2.0",
     "eslint-plugin-react": "^6.1.0",
     "jasmine-core": "2.4.1",
     "karma": "^1.1.0",
