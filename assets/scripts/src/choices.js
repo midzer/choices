@@ -2030,10 +2030,8 @@ export default class Choices {
     // User's custom templates
     const callbackTemplate = this.config.callbackOnCreateTemplates;
     let userTemplates = {};
-    if (callbackTemplate) {
-      if (isType('Function', callbackTemplate)) {
-        userTemplates = callbackTemplate(this, strToEl);
-      }
+    if (callbackTemplate && isType('Function', callbackTemplate)) {
+      userTemplates = callbackTemplate(this, strToEl);
     }
     this.config.templates = extend(templates, userTemplates);
   }

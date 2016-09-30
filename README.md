@@ -92,6 +92,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
         callbackOnRemoveItem: null,
         callbackOnHighlightItem: null,
         callbackOnUnhighlightItem: null,
+        callbackOnCreateTemplates: null,
         callbackOnChange: null,
         callbackOnSearch: null,
     });
@@ -412,6 +413,39 @@ const example = new Choices(element, {
 **Input types affected:** `text`, `select-multiple`
 
 **Usage:** Function to run each time an item is unhighlighted.
+
+### callbackOnCreateTemplates
+**Type:** `Function` **Default:** `null` **Arguments:** `instance, template`
+
+**Input types affected:** `text`, `select-one`, `select-multiple`
+
+**Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see glossary). For Choices to work with custom templates, it is important you maintain the various attributes defined [here](https://github.com/jshjohnson/Choices/blob/master/assets/scripts/src/choices.js#L1946-L2030).
+
+**Example:**
+
+```js
+const example = new Choices(element, {
+  callbackOnCreateTemplates: function (instance, template) {
+    var classNames = instance.config.classNames;
+    return {
+      item: (data) => {
+        return template(`
+          <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+            <span>&bigstar;</span> ${data.label}
+          </div>
+          `);
+      },
+      choice: (data) => {
+        return template(`
+          <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${instance.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+              <span>&bigstar;</span> ${data.label}
+            </div>
+          `);
+      },
+    };
+  }
+});
+```
 
 ### callbackOnChange
 **Type:** `Function` **Default:** `null` **Arguments:** `value, passedInput`
