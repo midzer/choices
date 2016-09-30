@@ -163,6 +163,7 @@
 	      callbackOnRemoveItem: null,
 	      callbackOnHighlightItem: null,
 	      callbackOnUnhighlightItem: null,
+	      callbackOnCreateTemplates: null,
 	      callbackOnChange: null,
 	      callbackOnSearch: null
 	    };
@@ -1006,7 +1007,7 @@
 	      if (this.initialised === true) {
 	        if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
 	          // Show loading text
-	          this._handleLoadingState();
+	          this._handleLoadingState(true);
 	          // Run callback
 	          fn(this._ajaxCallback());
 	        }
@@ -1563,7 +1564,7 @@
 	        // If backspace or delete key is pressed and the input has no value
 	        if (hasFocusedInput && !e.target.value && _this17.passedElement.type !== 'select-one') {
 	          _this17._handleBackspace(activeItems);
-	          _this17._handleLoadingState();
+	          _this17._handleLoadingState(false);
 	          e.preventDefault();
 	        }
 	      };
@@ -2310,7 +2311,15 @@
 	        }
 	      };
 
-	      this.config.templates = templates;
+	      // User's custom templates
+	      var callbackTemplate = this.config.callbackOnCreateTemplates;
+	      var userTemplates = {};
+	      if (callbackTemplate) {
+	        if ((0, _utils.isType)('Function', callbackTemplate)) {
+	          userTemplates = callbackTemplate(this, _utils.strToEl);
+	        }
+	      }
+	      this.config.templates = (0, _utils.extend)(templates, userTemplates);
 	    }
 
 	    /**
