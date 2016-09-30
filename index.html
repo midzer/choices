@@ -238,26 +238,12 @@
         <option value="Staten Island">Staten Island</option>
       </select>
 
-      <label for="choices-custom-templates">Custom templates on items</label>
+      <label for="choices-custom-templates">Custom templates</label>
       <select class="form-control" name="choices-custom-templates" id="choices-custom-templates" placeholder="This is a placeholder">
-        <option value="Madrid">Madrid</option>
-        <option value="Toronto">Toronto</option>
-        <option value="Vancouver">Vancouver</option>
-        <option value="London">London</option>
-        <option value="Manchester">Manchester</option>
-        <option value="Liverpool">Liverpool</option>
-        <option value="Paris">Paris</option>
-        <option value="Malaga">Malaga</option>
-        <option value="Washington" disabled>Washington</option>
-        <option value="Lyon">Lyon</option>
-        <option value="Marseille">Marseille</option>
-        <option value="Hamburg">Hamburg</option>
-        <option value="Munich">Munich</option>
-        <option value="Barcelona">Barcelona</option>
-        <option value="Berlin">Berlin</option>
-        <option value="Montreal">Montreal</option>
-        <option value="New York">New York</option>
-        <option value="Michigan">Michigan</option>
+        <option value="React">React</option>
+        <option value="React">Angular</option>
+        <option value="React">Ember</option>
+        <option value="React">Vue</option>
       </select>
     </div>
   </div>
@@ -424,6 +410,13 @@
         callbackOnCreateTemplates: function (instance, strToEl) {
           var classNames = instance.config.classNames;
           return {
+            item: (data) => {
+              return strToEl(`
+                <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+                  <span>&bigstar;</span> ${data.label}
+                </div>
+                `);
+            },
             choice: (data) => {
               return strToEl(`
                 <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${instance.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
