@@ -219,6 +219,14 @@
         <option value="Michigan">Michigan</option>
       </select>
 
+      <label for="choices-custom-templates">Custom templates</label>
+      <select class="form-control" name="choices-custom-templates" id="choices-custom-templates" placeholder="This is a placeholder">
+        <option value="React">React</option>
+        <option value="React">Angular</option>
+        <option value="React">Ember</option>
+        <option value="React">Vue</option>
+      </select>
+
       <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
       <label for="states">States</label>
       <select class="form-control" name="states" id="states" placeholder="Choose a state">
@@ -395,6 +403,28 @@
           } else {
             boroughs.disable();
           }
+        }
+      });
+
+      var customTemplates = new Choices(document.getElementById('choices-custom-templates'), {
+        callbackOnCreateTemplates: function (instance, strToEl) {
+          var classNames = instance.config.classNames;
+          return {
+            item: (data) => {
+              return strToEl(`
+                <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+                  <span style="margin-right:10px;">🎉</span> ${data.label}
+                </div>
+                `);
+            },
+            choice: (data) => {
+              return strToEl(`
+                <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${instance.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+                    <span>&bigstar;</span> ${data.label}
+                  </div>
+                `);
+            },
+          };
         }
       });
 

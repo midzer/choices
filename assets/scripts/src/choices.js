@@ -102,6 +102,7 @@ export default class Choices {
       callbackOnRemoveItem: null,
       callbackOnHighlightItem: null,
       callbackOnUnhighlightItem: null,
+      callbackOnCreateTemplates: null,
       callbackOnChange: null,
       callbackOnSearch: null,
     };
@@ -2026,7 +2027,13 @@ export default class Choices {
       },
     };
 
-    this.config.templates = templates;
+    // User's custom templates
+    const callbackTemplate = this.config.callbackOnCreateTemplates;
+    let userTemplates = {};
+    if (callbackTemplate && isType('Function', callbackTemplate)) {
+      userTemplates = callbackTemplate(this, strToEl);
+    }
+    this.config.templates = extend(templates, userTemplates);
   }
 
   /**
