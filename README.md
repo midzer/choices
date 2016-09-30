@@ -11,6 +11,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Fast search/filtering
 * Clean API
 * Right-to-left support
+* Custom templates
 
 ## Setup
 
