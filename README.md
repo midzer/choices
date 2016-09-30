@@ -315,11 +315,11 @@ const example = new Choices(element, {
 **Usage:** The text that is shown whilst choices are being populated via AJAX.
 
 ### noResultsText
-**Type:** `String` **Default:** `No results round`
+**Type:** `String` **Default:** `No results found`
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** The text that is shown when a user's search has returned no results.
+**Usage:** The text that is shown when a user's search has returned no results or no choices have been passed.
 
 ### noChoicesText
 **Type:** `String` **Default:** `No choices to choose from`
