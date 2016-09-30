@@ -174,7 +174,7 @@ Pass an array of objects:
 
 **Input types affected:** `text`
 
-**Usage:** Whether a user can add items to the passed input's value.
+**Usage:** Whether a user can add items.
 
 ### removeItems
 **Type:** `Boolean` **Default:** `true`
@@ -188,7 +188,7 @@ Pass an array of objects:
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Whether a button should show that, when clicked, will remove an item.
+**Usage:** Whether each item should have a remove button.
 
 ### editItems
 **Type:** `Boolean` **Default:** `false`
@@ -202,14 +202,14 @@ Pass an array of objects:
 
 **Input types affected:** `text`, `select-multiple`
 
-**Usage:** Whether a user can input/choose a duplicate item.
+**Usage:** Whether each inputted/chosen item should be unique.
 
 ### delimiter
 **Type:** `String` **Default:** `,`
 
 **Input types affected:** `text`
 
-**Usage:** What divides each value. By default the delimited value would be `"Value 1, Value 2, Value 3"`.
+**Usage:** What divides each value. The default delimiter seperates each value with a comma: `"Value 1, Value 2, Value 3"`.
 
 ### paste
 **Type:** `Boolean` **Default:** `true`
@@ -237,7 +237,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether the dropdown should appear above the input if there is not enough space within the window. 
+**Usage:** Whether the dropdown should appear above the input (rather than beneath) if there is not enough space within the window. 
 
 ### regexFilter
 **Type:** `Regex` **Default:** `null`
@@ -419,7 +419,7 @@ const example = new Choices(element, {
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see glossary). For Choices to work with custom templates, it is important you maintain the various attributes defined [here](https://github.com/jshjohnson/Choices/blob/master/assets/scripts/src/choices.js#L1946-L2030).
+**Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various attributes defined [here](https://github.com/jshjohnson/Choices/blob/master/assets/scripts/src/choices.js#L1946-L2030).
 
 **Example:**
 
