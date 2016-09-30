@@ -196,7 +196,7 @@ Pass an array of objects:
 
 **Input types affected:** `text`
 
-**Usage:** Whether a user can edit items. An items value can be edited by pressing the backspace.
+**Usage:** Whether a user can edit items. An item's value can be edited by pressing the backspace.
 
 ### duplicateItems
 **Type:** `Boolean` **Default:** `true`
