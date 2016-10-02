@@ -1328,7 +1328,6 @@ export default class Choices {
       // If backspace or delete key is pressed and the input has no value
       if (hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
         this._handleBackspace(activeItems);
-        this._handleLoadingState(false);
         e.preventDefault();
       }
     };
