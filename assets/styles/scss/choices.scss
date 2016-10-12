@@ -135,7 +135,7 @@ $choices-button-offset: 8px !default;
 .#{$choices-selector}__list {
   margin: 0;
   padding-left: 0;
-  list-style-type: none;
+  list-style: none;
 }
 
 .#{$choices-selector}__list--single {
