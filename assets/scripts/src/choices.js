@@ -750,7 +750,7 @@ export default class Choices {
             const isSelected = result.selected ? result.selected : false;
             const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
-              this._addGroup(result, index);
+              this._addGroup(result, index, value, label);
             } else {
               this._addChoice(isSelected, isDisabled, result[value], result[label]);
             }
@@ -1082,8 +1082,14 @@ export default class Choices {
         // Remove loading states/text
         this._handleLoadingState(false);
         // Add each result as a choice
-        parsedResults.forEach((result) => {
-          this._addChoice(!!result.selected, !!result.disabled, result[value], result[label]);
+        parsedResults.forEach((result, index) => {
+          const isSelected = result.selected ? result.selected : false;
+          const isDisabled = result.disabled ? result.disabled : false;
+          if (result.choices) {
+            this._addGroup(result, index, value, label);
+          } else {
+            this._addChoice(isSelected, isDisabled, result[value], result[label]);
+          }
         });
       }
       this.containerOuter.removeAttribute('aria-busy');
@@ -1901,10 +1907,12 @@ export default class Choices {
    * Add group to dropdown
    * @param {Object} group Group to add
    * @param {Number} id Group ID
+   * @param {String} [valueKey] name of the value property on the object
+   * @param {String} [labelKey] name of the label property on the object
    * @return
    * @private
    */
-  _addGroup(group, id) {
+  _addGroup(group, id, valueKey = 'value', labelKey = 'label') {
     const groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
     const groupId = id;
     const isDisabled = group.disabled ? group.disabled : false;
@@ -1918,12 +1926,12 @@ export default class Choices {
         let label;
 
         if (isType('Object', option)) {
-          label = option.label || option.value;
+          label = option[labelKey] || option[valueKey];
         } else {
           label = option.innerHTML;
         }
 
-        this._addChoice(isOptSelected, isOptDisabled, option.value, label, groupId);
+        this._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
       });
     } else {
       this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));

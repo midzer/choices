@@ -1,4 +1,4 @@
-/*! choices.js v2.1.0 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.2.2 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -908,7 +908,7 @@
 	              var isSelected = result.selected ? result.selected : false;
 	              var isDisabled = result.disabled ? result.disabled : false;
 	              if (result.choices) {
-	                _this13._addGroup(result, index);
+	                _this13._addGroup(result, index, value, label);
 	              } else {
 	                _this13._addChoice(isSelected, isDisabled, result[value], result[label]);
 	              }
@@ -1298,8 +1298,14 @@
 	          // Remove loading states/text
 	          _this16._handleLoadingState(false);
 	          // Add each result as a choice
-	          parsedResults.forEach(function (result) {
-	            _this16._addChoice(!!result.selected, !!result.disabled, result[value], result[label]);
+	          parsedResults.forEach(function (result, index) {
+	            var isSelected = result.selected ? result.selected : false;
+	            var isDisabled = result.disabled ? result.disabled : false;
+	            if (result.choices) {
+	              _this16._addGroup(result, index, value, label);
+	            } else {
+	              _this16._addChoice(isSelected, isDisabled, result[value], result[label]);
+	            }
 	          });
 	        }
 	        _this16.containerOuter.removeAttribute('aria-busy');
@@ -1564,7 +1570,6 @@
 	        // If backspace or delete key is pressed and the input has no value
 	        if (hasFocusedInput && !e.target.value && _this17.passedElement.type !== 'select-one') {
 	          _this17._handleBackspace(activeItems);
-	          _this17._handleLoadingState(false);
 	          e.preventDefault();
 	        }
 	      };
@@ -2202,6 +2207,8 @@
 	     * Add group to dropdown
 	     * @param {Object} group Group to add
 	     * @param {Number} id Group ID
+	     * @param {String} [valueKey] name of the value property on the object
+	     * @param {String} [labelKey] name of the label property on the object
 	     * @return
 	     * @private
 	     */
@@ -2210,6 +2217,9 @@
 	    key: '_addGroup',
 	    value: function _addGroup(group, id) {
 	      var _this22 = this;
+
+	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
+	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
 
 	      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
 	      var groupId = id;
@@ -2224,12 +2234,12 @@
 	          var label = void 0;
 
 	          if ((0, _utils.isType)('Object', option)) {
-	            label = option.label || option.value;
+	            label = option[labelKey] || option[valueKey];
 	          } else {
 	            label = option.innerHTML;
 	          }
 
-	          _this22._addChoice(isOptSelected, isOptDisabled, option.value, label, groupId);
+	          _this22._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -2314,10 +2324,8 @@
 	      // User's custom templates
 	      var callbackTemplate = this.config.callbackOnCreateTemplates;
 	      var userTemplates = {};
-	      if (callbackTemplate) {
-	        if ((0, _utils.isType)('Function', callbackTemplate)) {
-	          userTemplates = callbackTemplate(this, _utils.strToEl);
-	        }
+	      if (callbackTemplate && (0, _utils.isType)('Function', callbackTemplate)) {
+	        userTemplates = callbackTemplate(this, _utils.strToEl);
 	      }
 	      this.config.templates = (0, _utils.extend)(templates, userTemplates);
 	    }
