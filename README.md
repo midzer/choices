@@ -664,7 +664,7 @@ example.setValueByChoice('Two'); // Choice with value of 'Two' has now been sele
 ### ajax(fn);
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Populate options via a callback.
+**Usage:** Populate choices/groups via a callback.
 
 **Example:**
 
