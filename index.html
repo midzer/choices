@@ -66,21 +66,29 @@
       <input class="form-control" id="choices-text-preset-values" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
 
       <label for="choices-text-preset-values">Right-to-left</label>
-      <input class="form-control" data-choice id="choices-text-rtl" type="text" value="Value 1, Value 2" dir="rtl">
+      <input class="form-control" data-trigger id="choices-text-rtl" type="text" value="Value 1, Value 2" dir="rtl">
 
       <hr>
 
       <h2>Multiple select input</h2>
       <label for="choices-multiple-default">Default</label>
-      <select class="form-control" data-choice name="choices-multiple-default" id="choices-multiple-default" placeholder="This is a placeholder" multiple>
+      <select class="form-control" data-trigger name="choices-multiple-default" id="choices-multiple-default" placeholder="This is a placeholder" multiple>
         <option value="Dropdown item 1" selected>Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
         <option value="Dropdown item 4" disabled>Dropdown item 4</option>
       </select>
 
+      <label for="choices-multiple-remove-button">With remove button</label>
+      <select class="form-control" name="choices-multiple-remove-button" id="choices-multiple-remove-button" placeholder="This is a placeholder" multiple>
+        <option value="Dropdown item 1" selected>Dropdown item 1</option>
+        <option value="Dropdown item 2">Dropdown item 2</option>
+        <option value="Dropdown item 3">Dropdown item 3</option>
+        <option value="Dropdown item 4">Dropdown item 4</option>
+      </select>
+
       <label for="choices-multiple-groups">Option groups</label>
-      <select class="form-control" data-choice name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
+      <select class="form-control" data-trigger name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
         <optgroup label="UK">
           <option value="London">London</option>
           <option value="Manchester">Manchester</option>
@@ -119,7 +127,7 @@
       <select class="form-control" name="choices-multiple-remote-fetch" id="choices-multiple-remote-fetch" multiple></select>
 
       <label for="choices-multiple-rtl">Right-to-left</label>
-      <select class="form-control" data-choice name="choices-multiple-rtl" id="choices-multiple-rtl" placeholder="This is a placeholder" multiple dir="rtl">
+      <select class="form-control" data-trigger name="choices-multiple-rtl" id="choices-multiple-rtl" placeholder="This is a placeholder" multiple dir="rtl">
         <option value="Dropdown item 1" selected>Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -130,7 +138,7 @@
 
       <h2>Single select input</h2>
       <label for="choices-single-default">Default</label>
-      <select class="form-control" data-choice name="choices-single-default" id="choices-single-default" placeholder="This is a search placeholder">
+      <select class="form-control" data-trigger name="choices-single-default" id="choices-single-default" placeholder="This is a search placeholder">
         <option selected disabled>This is a placeholder</option>
         <option value="Dropdown item 1">Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
@@ -146,7 +154,7 @@
       <select class="form-control" name="choices-single-remove-xhr" id="choices-single-remove-xhr" placeholder="Pick a Smiths record"></select>
 
       <label for="choices-single-groups">Option groups</label>
-      <select class="form-control" data-choice name="choices-single-groups" id="choices-single-groups" placeholder="This is a placeholder">
+      <select class="form-control" data-trigger name="choices-single-groups" id="choices-single-groups" placeholder="This is a placeholder">
         <optgroup label="UK">
           <option value="London">London</option>
           <option value="Manchester">Manchester</option>
@@ -180,7 +188,7 @@
       </select>
 
       <label for="choices-single-rtl">Right-to-left</label>
-      <select class="form-control" data-choice name="choices-single-rtl" id="choices-single-rtl" placeholder="This is a placeholder" dir="rtl">
+      <select class="form-control" data-trigger name="choices-single-rtl" id="choices-single-rtl" placeholder="This is a placeholder" dir="rtl">
         <option value="Dropdown item 1">Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -304,6 +312,10 @@
         });
       });
 
+      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+        removeItemButton: true,
+      })
+
       var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Arctic Monkeys record'
@@ -342,9 +354,8 @@
         request.send();
       });
 
-      var genericExamples = new Choices('[data-choice]', {
-        placeholderValue: 'This is a placeholder set in the config',
-        removeButton: true,
+      var genericExamples = new Choices('[data-trigger]', {
+        placeholderValue: 'This is a placeholder set in the config'
       });
 
       var singleNoSearch = new Choices('#choices-single-no-search', {
@@ -420,7 +431,7 @@
             choice: (data) => {
               return strToEl(`
                 <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${instance.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-                    <span>&bigstar;</span> ${data.label}
+                    <span style="margin-right:10px;">👉🏽</span> ${data.label}
                   </div>
                 `);
             },
