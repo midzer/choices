@@ -30,7 +30,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
     const choices = new Choices(element);
     
     // Pass reference
-    const choices = new Choices('[data-choice']);
+    const choices = new Choices('[data-trigger']);
     const choices = new Choices('.js-choice');
 
     // Pass jQuery element
