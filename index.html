@@ -262,11 +262,11 @@
         editItems: true,
         maxItemCount: 5,
         removeItemButton: true,
-        callbackOnHighlightItem: function(id, value, passedInput) {
-          // console.log(value);
+        callbackOnHighlightItem: function(id, value) {
+          console.log(value);
         },
-        callbackOnUnhighlightItem: function(id, value, passedInput) {
-          // console.log(value);
+        callbackOnUnhighlightItem: function(id, value) {
+          console.log(value);
         },
       });
 
@@ -296,12 +296,6 @@
       });
 
       var multipleDefault = new Choices('#choices-multiple-groups', {
-        callbackOnHighlightItem: function(id, value, groupValue) {
-          console.log(arguments);
-        },
-        callbackOnUnhighlightItem: function(id, value, groupValue) {
-          console.log(arguments);
-        },
         callbackOnAddItem: function(id, value, groupValue) {
           console.log(arguments);
         },
@@ -314,7 +308,9 @@
         placeholder: true,
         placeholderValue: 'Pick an Strokes record',
         maxItemCount: 5,
-        // callbackOnChange: function(value, passedInput) { console.log(value) }
+        callbackOnChange: function(value) {
+          console.log(value)
+        }
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
         .then(function(response) {
@@ -323,7 +319,7 @@
           });
         })
         .catch(function(error) {
-          // console.log(error);
+          // console.error(error);
         });
       });
 
@@ -343,7 +339,7 @@
           });
         })
         .catch(function(error) {
-          // console.log(error);
+          // console.error(error);
         });
       });
 

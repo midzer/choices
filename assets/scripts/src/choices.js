@@ -731,7 +731,7 @@ class Choices {
 
         if (foundChoice) {
           if (!foundChoice.selected) {
-            this._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+            this._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
           } else {
             console.warn('Attempting to select choice already selected');
           }
@@ -1817,7 +1817,6 @@ class Choices {
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
-    const passedGroupId = parseInt(groupId, 10) || -1;
 
     // If a prepended value has been passed, prepend it
     if (this.config.prependValue) {
@@ -1832,7 +1831,7 @@ class Choices {
     // Generate unique id
     const id = items ? items.length + 1 : 1;
 
-    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, passedGroupId));
+    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId));
 
     if (this.passedElement.type === 'select-one') {
       this.removeActiveItems(id);
@@ -1841,7 +1840,7 @@ class Choices {
     // Run callback if it is a function
     if (this.config.callbackOnAddItem) {
       const callback = this.config.callbackOnAddItem;
-      const group = this.store.getGroupById(passedGroupId);
+      const group = this.store.getGroupById(groupId);
       if (isType('Function', callback)) {
         if(group && group.value) {
           callback(id, passedValue, group.value);
