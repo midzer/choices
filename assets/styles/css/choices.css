@@ -306,7 +306,7 @@
   opacity: .5;
 }
 
-.choices__group .choices__heading {
+.choices__heading {
   font-weight: 600;
   font-size: 12px;
   padding: 10px;

@@ -251,14 +251,12 @@ $choices-button-offset: 8px !default;
   opacity: .5;
 }
 
-.#{$choices-selector}__group {
-  .#{$choices-selector}__heading {
-    font-weight: 600;
-    font-size: $choices-font-size-sm;
-    padding: 10px;
-    border-bottom: 1px solid lighten($choices-keyline-color, 10%);
-    color: lighten(#333, 30%);
-  }
+.#{$choices-selector}__heading {
+  font-weight: 600;
+  font-size: $choices-font-size-sm;
+  padding: 10px;
+  border-bottom: 1px solid lighten($choices-keyline-color, 10%);
+  color: lighten(#333, 30%);
 }
 
 .#{$choices-selector}__button {
