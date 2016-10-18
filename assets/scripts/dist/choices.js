@@ -536,7 +536,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.config.callbackOnHighlightItem) {
 	        var callback = this.config.callbackOnHighlightItem;
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback(id, item.value, this.passedElement);
+	          var group = this.store.getGroupById(item.groupId);
+	          if (group && group.value) {
+	            callback(id, item.value, group.value);
+	          } else {
+	            callback(id, item.value);
+	          }
 	        } else {
 	          console.error('callbackOnHighlightItem: Callback is not a function');
 	        }
@@ -563,7 +568,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.config.callbackOnUnhighlightItem) {
 	        var callback = this.config.callbackOnUnhighlightItem;
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback(id, item.value, this.passedElement);
+	          var group = this.store.getGroupById(item.groupId);
+	          if (group && group.value) {
+	            callback(id, item.value, group.value);
+	          } else {
+	            callback(id, item.value);
+	          }
 	        } else {
 	          console.error('callbackOnUnhighlightItem: Callback is not a function');
 	        }
@@ -877,7 +887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            if (foundChoice) {
 	              if (!foundChoice.selected) {
-	                _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id);
+	                _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
 	              } else {
 	                console.warn('Attempting to select choice already selected');
 	              }
@@ -1043,7 +1053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.config.callbackOnChange) {
 	        var callback = this.config.callbackOnChange;
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback(value, this.passedElement);
+	          callback(value);
 	        } else {
 	          console.error('callbackOnChange: Callback is not a function');
 	        }
@@ -1152,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var canAddItem = this._canAddItem(activeItems, choice.value);
 
 	        if (canAddItem.response) {
-	          this._addItem(choice.value, choice.label, choice.id);
+	          this._addItem(choice.value, choice.label, choice.id, choice.groupId);
 	          this._triggerChange(choice.value);
 	        }
 	      }
@@ -1375,7 +1385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (this.config.callbackOnSearch) {
 	            var callback = this.config.callbackOnSearch;
 	            if ((0, _utils.isType)('Function', callback)) {
-	              callback(value, this.passedElement);
+	              callback(value);
 	            } else {
 	              console.error('callbackOnSearch: Callback is not a function');
 	            }
@@ -2093,6 +2103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_addItem',
 	    value: function _addItem(value, label) {
 	      var choiceId = arguments.length <= 2 || arguments[2] === undefined ? -1 : arguments[2];
+	      var groupId = arguments.length <= 3 || arguments[3] === undefined ? -1 : arguments[3];
 
 	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
 	      var items = this.store.getItems();
@@ -2112,7 +2123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Generate unique id
 	      var id = items ? items.length + 1 : 1;
 
-	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId));
+	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId));
 
 	      if (this.passedElement.type === 'select-one') {
 	        this.removeActiveItems(id);
@@ -2121,8 +2132,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run callback if it is a function
 	      if (this.config.callbackOnAddItem) {
 	        var callback = this.config.callbackOnAddItem;
+	        var group = this.store.getGroupById(groupId);
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback(id, passedValue, this.passedElement);
+	          if (group && group.value) {
+	            callback(id, passedValue, group.value);
+	          } else {
+	            callback(id, passedValue);
+	          }
 	        } else {
 	          console.error('callbackOnAddItem: Callback is not a function');
 	        }
@@ -2157,11 +2173,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // Run callback
 	      if (callback) {
-	        if (!(0, _utils.isType)('Function', callback)) {
+	        if ((0, _utils.isType)('Function', callback)) {
+	          var group = this.store.getGroupById(item.groupId);
+	          if (group && group.value) {
+	            callback(id, value, group.value);
+	          } else {
+	            callback(id, value);
+	          }
+	        } else {
 	          console.error('callbackOnRemoveItem: Callback is not a function');
-	          return;
 	        }
-	        callback(id, value, this.passedElement);
 	      }
 
 	      return this;
@@ -3490,6 +3511,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return values;
 	    }
+
+	    /**
+	     * Get group by group id
+	     * @param  {Number} id Group ID
+	     * @return {Object}    Group data
+	     */
+
+	  }, {
+	    key: 'getGroupById',
+	    value: function getGroupById(id) {
+	      var groups = this.getGroups();
+	      var foundGroup = groups.find(function (group) {
+	        return group.id === id;
+	      });
+
+	      return foundGroup;
+	    }
 	  }]);
 
 	  return Store;
@@ -4420,6 +4458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var newState = [].concat(_toConsumableArray(state), [{
 	          id: action.id,
 	          choiceId: action.choiceId,
+	          groupId: action.groupId,
 	          value: action.value,
 	          label: action.label,
 	          active: true,
@@ -4637,14 +4676,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var addItem = exports.addItem = function addItem(value, label, id, choiceId, activateOptions) {
+	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId) {
 	  return {
 	    type: 'ADD_ITEM',
 	    value: value,
 	    label: label,
 	    id: id,
 	    choiceId: choiceId,
-	    activateOptions: activateOptions
+	    groupId: groupId
 	  };
 	};
 
