@@ -5,6 +5,7 @@ const items = (state = [], action) => {
       const newState = [...state, {
         id: action.id,
         choiceId: action.choiceId,
+        groupId: action.groupId,
         value: action.value,
         label: action.label,
         active: true,

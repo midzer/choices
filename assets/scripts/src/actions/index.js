@@ -1,11 +1,11 @@
-export const addItem = (value, label, id, choiceId, activateOptions) => {
+export const addItem = (value, label, id, choiceId, groupId) => {
   return {
     type: 'ADD_ITEM',
     value,
     label,
     id,
     choiceId,
-    activateOptions,
+    groupId,
   };
 };
 

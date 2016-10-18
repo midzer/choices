@@ -145,6 +145,20 @@ export default class Store {
 
     return values;
   }
+
+  /**
+   * Get group by group id
+   * @param  {Number} id Group ID
+   * @return {Object}    Group data
+   */
+  getGroupById(id) {
+    const groups = this.getGroups();
+    const foundGroup = groups.find((group) => {
+      return group.id === id;
+    });
+
+    return foundGroup;
+  }
 }
 
 module.exports = Store;

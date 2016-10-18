@@ -320,7 +320,7 @@ describe('Choices', () => {
         ctrlKey: false
       });
 
-      expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(HTMLElement));
+      expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String));
     });
 
     it('should open the dropdown on click', function() {

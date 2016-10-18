@@ -438,10 +438,17 @@ class Choices {
     if (this.config.callbackOnHighlightItem) {
       const callback = this.config.callbackOnHighlightItem;
       if (isType('Function', callback)) {
-        callback(id, item.value, this.passedElement);
+        const group = this.store.getGroupById(item.groupId);
+        if(group && group.value) {
+          callback(id, item.value, group.value);
+        } else {
+          callback(id, item.value)
+        }
       } else {
         console.error('callbackOnHighlightItem: Callback is not a function');
       }
+
+
     }
 
     return this;
@@ -462,7 +469,12 @@ class Choices {
     if (this.config.callbackOnUnhighlightItem) {
       const callback = this.config.callbackOnUnhighlightItem;
       if (isType('Function', callback)) {
-        callback(id, item.value, this.passedElement);
+        const group = this.store.getGroupById(item.groupId);
+        if(group && group.value) {
+          callback(id, item.value, group.value);
+        } else {
+          callback(id, item.value)
+        }
       } else {
         console.error('callbackOnUnhighlightItem: Callback is not a function');
       }
@@ -861,7 +873,7 @@ class Choices {
     if (this.config.callbackOnChange) {
       const callback = this.config.callbackOnChange;
       if (isType('Function', callback)) {
-        callback(value, this.passedElement);
+        callback(value);
       } else {
         console.error('callbackOnChange: Callback is not a function');
       }
@@ -950,7 +962,7 @@ class Choices {
       const canAddItem = this._canAddItem(activeItems, choice.value);
 
       if (canAddItem.response) {
-        this._addItem(choice.value, choice.label, choice.id);
+        this._addItem(choice.value, choice.label, choice.id, choice.groupId);
         this._triggerChange(choice.value);
       }
     }
@@ -1145,7 +1157,7 @@ class Choices {
         if (this.config.callbackOnSearch) {
           const callback = this.config.callbackOnSearch;
           if (isType('Function', callback)) {
-            callback(value, this.passedElement);
+            callback(value);
           } else {
             console.error('callbackOnSearch: Callback is not a function');
           }
@@ -1800,11 +1812,12 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  _addItem(value, label, choiceId = -1) {
+  _addItem(value, label, choiceId = -1, groupId = -1) {
     let passedValue = isType('String', value) ? value.trim() : value;
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
+    const passedGroupId = parseInt(groupId, 10) || -1;
 
     // If a prepended value has been passed, prepend it
     if (this.config.prependValue) {
@@ -1819,7 +1832,7 @@ class Choices {
     // Generate unique id
     const id = items ? items.length + 1 : 1;
 
-    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId));
+    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, passedGroupId));
 
     if (this.passedElement.type === 'select-one') {
       this.removeActiveItems(id);
@@ -1828,8 +1841,13 @@ class Choices {
     // Run callback if it is a function
     if (this.config.callbackOnAddItem) {
       const callback = this.config.callbackOnAddItem;
+      const group = this.store.getGroupById(passedGroupId);
       if (isType('Function', callback)) {
-        callback(id, passedValue, this.passedElement);
+        if(group && group.value) {
+          callback(id, passedValue, group.value);
+        } else {
+          callback(id, passedValue);
+        }
       } else {
         console.error('callbackOnAddItem: Callback is not a function');
       }
@@ -1859,11 +1877,16 @@ class Choices {
 
     // Run callback
     if (callback) {
-      if (!isType('Function', callback)) {
+      if (isType('Function', callback)) {
+        const group = this.store.getGroupById(item.groupId);
+        if(group && group.value) {
+          callback(id, value, group.value);
+        } else {
+          callback(id, value);
+        }
+      } else {
         console.error('callbackOnRemoveItem: Callback is not a function');
-        return;
       }
-      callback(id, value, this.passedElement);
     }
 
     return this;

@@ -88,7 +88,7 @@
       </select>
 
       <label for="choices-multiple-groups">Option groups</label>
-      <select class="form-control" data-trigger name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
+      <select class="form-control" name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
         <optgroup label="UK">
           <option value="London">London</option>
           <option value="Manchester">Manchester</option>
@@ -263,10 +263,10 @@
         maxItemCount: 5,
         removeItemButton: true,
         callbackOnHighlightItem: function(id, value, passedInput) {
-          console.log(value);
+          // console.log(value);
         },
         callbackOnUnhighlightItem: function(id, value, passedInput) {
-          console.log(value);
+          // console.log(value);
         },
       });
 
@@ -295,11 +295,26 @@
         items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
       });
 
+      var multipleDefault = new Choices('#choices-multiple-groups', {
+        callbackOnHighlightItem: function(id, value, groupValue) {
+          console.log(arguments);
+        },
+        callbackOnUnhighlightItem: function(id, value, groupValue) {
+          console.log(arguments);
+        },
+        callbackOnAddItem: function(id, value, groupValue) {
+          console.log(arguments);
+        },
+        callbackOnRemoveItem: function(id, value, groupValue) {
+          console.log(arguments);
+        },
+      });
+
       var multipleFetch = new Choices('#choices-multiple-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Strokes record',
         maxItemCount: 5,
-        callbackOnChange: function(value, passedInput) { console.log(value) }
+        // callbackOnChange: function(value, passedInput) { console.log(value) }
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
         .then(function(response) {
@@ -308,7 +323,7 @@
           });
         })
         .catch(function(error) {
-          console.log(error);
+          // console.log(error);
         });
       });
 
@@ -328,7 +343,7 @@
           });
         })
         .catch(function(error) {
-          console.log(error);
+          // console.log(error);
         });
       });
 
@@ -347,7 +362,7 @@
               callback(data.releases, 'title', 'title');
               singleXhrRemove.setValueByChoice('How Soon Is Now?');
             } else {
-              console.error(status);
+              // console.error(status);
             }
           }
         }
