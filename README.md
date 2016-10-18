@@ -378,7 +378,7 @@ classNames: {
 **Usage:** Function to run once Choices initialises.
 
 ### callbackOnAddItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
@@ -388,28 +388,28 @@ classNames: {
 
 ```js
 const example = new Choices(element, {
-  callbackOnAddItem: (id, value, passedInput) => {
+  callbackOnAddItem: (id, value, groupValue) => {
     // do something creative here...   
   },
 };
 ```
 
 ### callbackOnRemoveItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Function to run each time an item is removed (programmatically or by the user).
 
 ### callbackOnHighlightItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
 
 **Input types affected:** `text`, `select-multiple`
 
 **Usage:** Function to run each time an item is highlighted.
 
 ### callbackOnUnhighlightItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
 
 **Input types affected:** `text`, `select-multiple`
 
@@ -449,14 +449,14 @@ const example = new Choices(element, {
 ```
 
 ### callbackOnChange
-**Type:** `Function` **Default:** `null` **Arguments:** `value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `value`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Function to run each time an item is added/removed by a user.
 
 ### callbackOnSearch
-**Type:** `Function` **Default:** `null` **Arguments:** `value, passedInput`
+**Type:** `Function` **Default:** `null` **Arguments:** `value`
 
 **Input types affected:** `select-one`, `select-multiple`
 
