@@ -14,6 +14,9 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'choices.min.js',
     publicPath: '/assets/scripts/dist/',
+    library: 'Choices',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   eslint: {
     configFile: '.eslintrc'

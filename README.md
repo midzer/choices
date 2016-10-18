@@ -13,6 +13,10 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Right-to-left support
 * Custom templates
 
+## Installation
+
+`npm install choices.js --save`
+
 ## Setup
 
 ```html
@@ -99,10 +103,6 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
     });
 </script>
 ```
-
-## Installation
-
-`npm install choices.js --save`
 
 ## Terminology
 | Word   | Definition |

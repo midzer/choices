@@ -13,8 +13,12 @@ var config = {
   output: {
     path: path.join(__dirname, '/assets/scripts/dist'),
     filename: minimize ? 'choices.min.js' : 'choices.js',
-    publicPath: '/assets/scripts/dist/'
+    publicPath: '/assets/scripts/dist/',
+    library: 'Choices',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
+  libraryTarget: 'umd',
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {

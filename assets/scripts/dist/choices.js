@@ -1,5 +1,15 @@
-/*! choices.js v2.2.2 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
-/******/ (function(modules) { // webpackBootstrap
+/*! choices.js v2.2.3 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define("Choices", [], factory);
+	else if(typeof exports === 'object')
+		exports["Choices"] = factory();
+	else
+		root["Choices"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -54,10 +64,6 @@
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _fuse = __webpack_require__(2);
@@ -89,8 +95,8 @@
 	  function Choices() {
 	    var _this = this;
 
-	    var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '[data-choice]';
-	    var userConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	    var element = arguments.length <= 0 || arguments[0] === undefined ? '[data-choice]' : arguments[0];
+	    var userConfig = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	    _classCallCheck(this, Choices);
 
@@ -259,7 +265,7 @@
 	  _createClass(Choices, [{
 	    key: 'init',
 	    value: function init() {
-	      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.config.callbackOnInit;
+	      var callback = arguments.length <= 0 || arguments[0] === undefined ? this.config.callbackOnInit : arguments[0];
 
 	      if (this.initialised === true) return;
 
@@ -668,7 +674,7 @@
 	    value: function removeHighlightedItems() {
 	      var _this9 = this;
 
-	      var runCallback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var runCallback = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
 	      var items = this.store.getItemsFilteredByActive();
 
@@ -695,7 +701,7 @@
 	  }, {
 	    key: 'showDropdown',
 	    value: function showDropdown() {
-	      var focusInput = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var focusInput = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
 	      var body = document.body;
 	      var html = document.documentElement;
@@ -733,7 +739,7 @@
 	  }, {
 	    key: 'hideDropdown',
 	    value: function hideDropdown() {
-	      var blurInput = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var blurInput = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
 	      // A dropdown flips if it does not have space within the page
 	      var isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
@@ -785,7 +791,7 @@
 	    value: function getValue() {
 	      var _this10 = this;
 
-	      var valueOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var valueOnly = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
 	      var items = this.store.getItemsFilteredByActive();
 	      var selectedItems = [];
@@ -1096,7 +1102,7 @@
 	    value: function _handleItemAction(activeItems, element) {
 	      var _this15 = this;
 
-	      var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+	      var hasShiftKey = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	      if (!activeItems || !element) return;
 
@@ -1251,7 +1257,7 @@
 	  }, {
 	    key: '_handleLoadingState',
 	    value: function _handleLoadingState() {
-	      var isLoading = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+	      var isLoading = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
 	      var placeholderItem = this.itemList.querySelector('.' + this.config.classNames.placeholder);
 	      if (isLoading) {
@@ -2086,7 +2092,7 @@
 	  }, {
 	    key: '_addItem',
 	    value: function _addItem(value, label) {
-	      var choiceId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+	      var choiceId = arguments.length <= 2 || arguments[2] === undefined ? -1 : arguments[2];
 
 	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
 	      var items = this.store.getItems();
@@ -2136,7 +2142,7 @@
 	  }, {
 	    key: '_removeItem',
 	    value: function _removeItem(item) {
-	      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.config.callbackOnRemoveItem;
+	      var callback = arguments.length <= 1 || arguments[1] === undefined ? this.config.callbackOnRemoveItem : arguments[1];
 
 	      if (!item || !(0, _utils.isType)('Object', item)) {
 	        console.error('removeItem: No item object was passed to be removed');
@@ -2175,7 +2181,7 @@
 	  }, {
 	    key: '_addChoice',
 	    value: function _addChoice(isSelected, isDisabled, value, label) {
-	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
+	      var groupId = arguments.length <= 4 || arguments[4] === undefined ? -1 : arguments[4];
 
 	      if (!value) return;
 
@@ -2218,8 +2224,8 @@
 	    value: function _addGroup(group, id) {
 	      var _this22 = this;
 
-	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
-	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
+	      var valueKey = arguments.length <= 2 || arguments[2] === undefined ? 'value' : arguments[2];
+	      var labelKey = arguments.length <= 3 || arguments[3] === undefined ? 'label' : arguments[3];
 
 	      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
 	      var groupId = id;
@@ -2470,10 +2476,7 @@
 	  return Choices;
 	}();
 
-	exports.default = Choices;
-
-
-		window.Choices = module.exports = Choices;
+		module.exports = Choices;
 
 /***/ },
 /* 2 */
@@ -3382,7 +3385,7 @@
 	  }, {
 	    key: 'getItemsReducedToValues',
 	    value: function getItemsReducedToValues() {
-	      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getItems();
+	      var items = arguments.length <= 0 || arguments[0] === undefined ? this.getItems() : arguments[0];
 
 	      var values = items.reduce(function (prev, current) {
 	        prev.push(current.value);
@@ -3530,7 +3533,7 @@
 
 	var _warning2 = _interopRequireDefault(_warning);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 	/*
 	* This is a dummy function to check if the function name has been altered by minification.
@@ -3539,14 +3542,14 @@
 	function isCrushed() {}
 
 	if (false) {
-	  (0, _warning2['default'])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+	  (0, _warning2["default"])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
 	}
 
-	exports.createStore = _createStore2['default'];
-	exports.combineReducers = _combineReducers2['default'];
-	exports.bindActionCreators = _bindActionCreators2['default'];
-	exports.applyMiddleware = _applyMiddleware2['default'];
-	exports.compose = _compose2['default'];
+	exports.createStore = _createStore2["default"];
+	exports.combineReducers = _combineReducers2["default"];
+	exports.bindActionCreators = _bindActionCreators2["default"];
+	exports.applyMiddleware = _applyMiddleware2["default"];
+	exports.compose = _compose2["default"];
 
 /***/ },
 /* 5 */
@@ -3556,17 +3559,17 @@
 
 	exports.__esModule = true;
 	exports.ActionTypes = undefined;
-	exports['default'] = createStore;
+	exports["default"] = createStore;
 
 	var _isPlainObject = __webpack_require__(6);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _symbolObservable = __webpack_require__(10);
+	var _symbolObservable = __webpack_require__(11);
 
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 	/**
 	 * These are private action types reserved by Redux.
@@ -3589,7 +3592,7 @@
 	 * @param {Function} reducer A function that returns the next state tree, given
 	 * the current state tree and the action to handle.
 	 *
-	 * @param {any} [preloadedState] The initial state. You may optionally specify it
+	 * @param {any} [initialState] The initial state. You may optionally specify it
 	 * to hydrate the state from the server in universal apps, or to restore a
 	 * previously serialized user session.
 	 * If you use `combineReducers` to produce the root reducer function, this must be
@@ -3603,12 +3606,12 @@
 	 * @returns {Store} A Redux store that lets you read the state, dispatch actions
 	 * and subscribe to changes.
 	 */
-	function createStore(reducer, preloadedState, enhancer) {
+	function createStore(reducer, initialState, enhancer) {
 	  var _ref2;
 
-	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-	    enhancer = preloadedState;
-	    preloadedState = undefined;
+	  if (typeof initialState === 'function' && typeof enhancer === 'undefined') {
+	    enhancer = initialState;
+	    initialState = undefined;
 	  }
 
 	  if (typeof enhancer !== 'undefined') {
@@ -3616,7 +3619,7 @@
 	      throw new Error('Expected the enhancer to be a function.');
 	    }
 
-	    return enhancer(createStore)(reducer, preloadedState);
+	    return enhancer(createStore)(reducer, initialState);
 	  }
 
 	  if (typeof reducer !== 'function') {
@@ -3624,7 +3627,7 @@
 	  }
 
 	  var currentReducer = reducer;
-	  var currentState = preloadedState;
+	  var currentState = initialState;
 	  var currentListeners = [];
 	  var nextListeners = currentListeners;
 	  var isDispatching = false;
@@ -3716,7 +3719,7 @@
 	   * return something else (for example, a Promise you can await).
 	   */
 	  function dispatch(action) {
-	    if (!(0, _isPlainObject2['default'])(action)) {
+	    if (!(0, _isPlainObject2["default"])(action)) {
 	      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
 	    }
 
@@ -3781,6 +3784,7 @@
 	       * be used to unsubscribe the observable from the store, and prevent further
 	       * emission of values from the observable.
 	       */
+
 	      subscribe: function subscribe(observer) {
 	        if (typeof observer !== 'object') {
 	          throw new TypeError('Expected the observer to be an object.');
@@ -3796,7 +3800,7 @@
 	        var unsubscribe = outerSubscribe(observeState);
 	        return { unsubscribe: unsubscribe };
 	      }
-	    }, _ref[_symbolObservable2['default']] = function () {
+	    }, _ref[_symbolObservable2["default"]] = function () {
 	      return this;
 	    }, _ref;
 	  }
@@ -3811,7 +3815,7 @@
 	    subscribe: subscribe,
 	    getState: getState,
 	    replaceReducer: replaceReducer
-	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
+	  }, _ref2[_symbolObservable2["default"]] = observable, _ref2;
 	}
 
 /***/ },
@@ -3819,7 +3823,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var getPrototype = __webpack_require__(7),
-	    isObjectLike = __webpack_require__(9);
+	    isHostObject = __webpack_require__(9),
+	    isObjectLike = __webpack_require__(10);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -3873,7 +3878,8 @@
 	 * // => true
 	 */
 	function isPlainObject(value) {
-	  if (!isObjectLike(value) || objectToString.call(value) != objectTag) {
+	  if (!isObjectLike(value) ||
+	      objectToString.call(value) != objectTag || isHostObject(value)) {
 	    return false;
 	  }
 	  var proto = getPrototype(value);
@@ -3926,6 +3932,32 @@
 /***/ function(module, exports) {
 
 	/**
+	 * Checks if `value` is a host object in IE < 9.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+	 */
+	function isHostObject(value) {
+	  // Many host objects are `Object` objects that can coerce to strings
+	  // despite having improperly defined `toString` methods.
+	  var result = false;
+	  if (value != null && typeof value.toString != 'function') {
+	    try {
+	      result = !!(value + '');
+	    } catch (e) {}
+	  }
+	  return result;
+	}
+
+	module.exports = isHostObject;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	/**
 	 * Checks if `value` is object-like. A value is object-like if it's not `null`
 	 * and has a `typeof` result of "object".
 	 *
@@ -3950,45 +3982,21 @@
 	 * // => false
 	 */
 	function isObjectLike(value) {
-	  return value != null && typeof value == 'object';
+	  return !!value && typeof value == 'object';
 	}
 
 	module.exports = isObjectLike;
 
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(11);
-
-
-/***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {/* global window */
+	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
+	module.exports = __webpack_require__(12)(global || window || this);
 
-	var _ponyfill = __webpack_require__(12);
-
-	var _ponyfill2 = _interopRequireDefault(_ponyfill);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var root = undefined; /* global window */
-
-	if (typeof global !== 'undefined') {
-		root = global;
-	} else if (typeof window !== 'undefined') {
-		root = window;
-	}
-
-	var result = (0, _ponyfill2['default'])(root);
-	exports['default'] = result;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -3997,20 +4005,16 @@
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports['default'] = symbolObservablePonyfill;
-	function symbolObservablePonyfill(root) {
+	module.exports = function symbolObservablePonyfill(root) {
 		var result;
-		var _Symbol = root.Symbol;
+		var Symbol = root.Symbol;
 
-		if (typeof _Symbol === 'function') {
-			if (_Symbol.observable) {
-				result = _Symbol.observable;
+		if (typeof Symbol === 'function') {
+			if (Symbol.observable) {
+				result = Symbol.observable;
 			} else {
-				result = _Symbol('observable');
-				_Symbol.observable = result;
+				result = Symbol('observable');
+				Symbol.observable = result;
 			}
 		} else {
 			result = '@@observable';
@@ -4019,6 +4023,7 @@
 		return result;
 	};
 
+
 /***/ },
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
@@ -4026,7 +4031,7 @@
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = combineReducers;
+	exports["default"] = combineReducers;
 
 	var _createStore = __webpack_require__(5);
 
@@ -4038,7 +4043,7 @@
 
 	var _warning2 = _interopRequireDefault(_warning);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 	function getUndefinedStateErrorMessage(key, action) {
 	  var actionType = action && action.type;
@@ -4047,24 +4052,20 @@
 	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state.';
 	}
 
-	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
+	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action) {
 	  var reducerKeys = Object.keys(reducers);
-	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
+	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'initialState argument passed to createStore' : 'previous state received by the reducer';
 
 	  if (reducerKeys.length === 0) {
 	    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
 	  }
 
-	  if (!(0, _isPlainObject2['default'])(inputState)) {
+	  if (!(0, _isPlainObject2["default"])(inputState)) {
 	    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
 	  }
 
 	  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
-	    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
-	  });
-
-	  unexpectedKeys.forEach(function (key) {
-	    unexpectedKeyCache[key] = true;
+	    return !reducers.hasOwnProperty(key);
 	  });
 
 	  if (unexpectedKeys.length > 0) {
@@ -4109,22 +4110,11 @@
 	  var finalReducers = {};
 	  for (var i = 0; i < reducerKeys.length; i++) {
 	    var key = reducerKeys[i];
-
-	    if (false) {
-	      if (typeof reducers[key] === 'undefined') {
-	        (0, _warning2['default'])('No reducer provided for key "' + key + '"');
-	      }
-	    }
-
 	    if (typeof reducers[key] === 'function') {
 	      finalReducers[key] = reducers[key];
 	    }
 	  }
 	  var finalReducerKeys = Object.keys(finalReducers);
-
-	  if (false) {
-	    var unexpectedKeyCache = {};
-	  }
 
 	  var sanityError;
 	  try {
@@ -4142,9 +4132,9 @@
 	    }
 
 	    if (false) {
-	      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
+	      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action);
 	      if (warningMessage) {
-	        (0, _warning2['default'])(warningMessage);
+	        (0, _warning2["default"])(warningMessage);
 	      }
 	    }
 
@@ -4173,7 +4163,7 @@
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = warning;
+	exports["default"] = warning;
 	/**
 	 * Prints a warning in the console if it exists.
 	 *
@@ -4203,7 +4193,7 @@
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = bindActionCreators;
+	exports["default"] = bindActionCreators;
 	function bindActionCreator(actionCreator, dispatch) {
 	  return function () {
 	    return dispatch(actionCreator.apply(undefined, arguments));
@@ -4262,13 +4252,13 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	exports['default'] = applyMiddleware;
+	exports["default"] = applyMiddleware;
 
 	var _compose = __webpack_require__(17);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 	/**
 	 * Creates a store enhancer that applies middleware to the dispatch method
@@ -4292,8 +4282,8 @@
 	  }
 
 	  return function (createStore) {
-	    return function (reducer, preloadedState, enhancer) {
-	      var store = createStore(reducer, preloadedState, enhancer);
+	    return function (reducer, initialState, enhancer) {
+	      var store = createStore(reducer, initialState, enhancer);
 	      var _dispatch = store.dispatch;
 	      var chain = [];
 
@@ -4306,7 +4296,7 @@
 	      chain = middlewares.map(function (middleware) {
 	        return middleware(middlewareAPI);
 	      });
-	      _dispatch = _compose2['default'].apply(undefined, chain)(store.dispatch);
+	      _dispatch = _compose2["default"].apply(undefined, chain)(store.dispatch);
 
 	      return _extends({}, store, {
 	        dispatch: _dispatch
@@ -4343,19 +4333,21 @@
 	    return function (arg) {
 	      return arg;
 	    };
-	  }
+	  } else {
+	    var _ret = function () {
+	      var last = funcs[funcs.length - 1];
+	      var rest = funcs.slice(0, -1);
+	      return {
+	        v: function v() {
+	          return rest.reduceRight(function (composed, f) {
+	            return f(composed);
+	          }, last.apply(undefined, arguments));
+	        }
+	      };
+	    }();
 
-	  if (funcs.length === 1) {
-	    return funcs[0];
+	    if (typeof _ret === "object") return _ret.v;
 	  }
-
-	  var last = funcs[funcs.length - 1];
-	  var rest = funcs.slice(0, -1);
-	  return function () {
-	    return rest.reduceRight(function (composed, f) {
-	      return f(composed);
-	    }, last.apply(undefined, arguments));
-	  };
 	}
 
 /***/ },
@@ -4418,7 +4410,7 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var items = function items() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	  var action = arguments[1];
 
 	  switch (action.type) {
@@ -4485,7 +4477,7 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var groups = function groups() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	  var action = arguments[1];
 
 	  switch (action.type) {
@@ -4518,12 +4510,12 @@
 	  value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var choices = function choices() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	  var action = arguments[1];
 
 	  switch (action.type) {
@@ -4691,7 +4683,7 @@
 	};
 
 	var activateChoices = exports.activateChoices = function activateChoices() {
-	  var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+	  var active = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
 	  return {
 	    type: 'ACTIVATE_CHOICES',
@@ -4731,7 +4723,7 @@
 	  value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 	/* eslint-disable */
 	/**
@@ -5038,7 +5030,7 @@
 	 * @return {[HTMLElement}           Found element
 	 */
 	var getAdjacentEl = exports.getAdjacentEl = function getAdjacentEl(startEl, className) {
-	  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+	  var direction = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
 
 	  if (!startEl || !className) return;
 
@@ -5085,7 +5077,7 @@
 	 * @return {Boolean}
 	 */
 	var isScrolledIntoView = exports.isScrolledIntoView = function isScrolledIntoView(el, parent) {
-	  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+	  var direction = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
 
 	  if (!el) return;
 
@@ -5324,5 +5316,7 @@
 	}
 
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;
 //# sourceMappingURL=choices.js.map
