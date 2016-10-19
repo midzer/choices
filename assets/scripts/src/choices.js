@@ -192,8 +192,10 @@ class Choices {
    * @return
    * @public
    */
-  init(callback = this.config.callbackOnInit) {
+  init() {
     if (this.initialised === true) return;
+
+    const callback = this.config.callbackOnInit;
 
     // Set initialise flag
     this.initialised = true;
@@ -432,13 +434,14 @@ class Choices {
   highlightItem(item) {
     if (!item) return;
     const id = item.id;
+    const groupId = item.groupId;
+    const callback = this.config.callbackOnHighlightItem;
     this.store.dispatch(highlightItem(id, true));
 
     // Run callback if it is a function
-    if (this.config.callbackOnHighlightItem) {
-      const callback = this.config.callbackOnHighlightItem;
+    if (callback) {
       if (isType('Function', callback)) {
-        const group = this.store.getGroupById(item.groupId);
+        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
           callback(id, item.value, group.value);
         } else {
@@ -447,8 +450,6 @@ class Choices {
       } else {
         console.error('callbackOnHighlightItem: Callback is not a function');
       }
-
-
     }
 
     return this;
@@ -463,13 +464,15 @@ class Choices {
   unhighlightItem(item) {
     if (!item) return;
     const id = item.id;
+    const groupId = item.groupId;
+    const callback = this.config.callbackOnUnhighlightItem;
+
     this.store.dispatch(highlightItem(id, false));
 
     // Run callback if it is a function
-    if (this.config.callbackOnUnhighlightItem) {
-      const callback = this.config.callbackOnUnhighlightItem;
+    if (callback) {
       if (isType('Function', callback)) {
-        const group = this.store.getGroupById(item.groupId);
+        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
           callback(id, item.value, group.value);
         } else {
@@ -748,14 +751,19 @@ class Choices {
    * @param  {Array} choices - Choices to insert
    * @param  {String} value - Name of 'value' property
    * @param  {String} label - Name of 'label' property
+   * @param  {Boolean} replaceChoices Whether existing choices should be removed
    * @return {Object} Class instance
    * @public
    */
-  setChoices(choices, value, label) {
+  setChoices(choices, value, label, replaceChoices) {
     if (this.initialised === true) {
       if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
         if (!isType('Array', choices) || !value) return;
-
+        // Clear choices if needed
+        if(replaceChoices) {
+          this._clearChoices();
+        }
+        // Add choices if passed
         if (choices && choices.length) {
           this.containerOuter.classList.remove(this.config.classNames.loadingState);
           choices.forEach((result, index) => {
@@ -868,10 +876,10 @@ class Choices {
    */
   _triggerChange(value) {
     if (!value) return;
+    const callback = this.config.callbackOnChange;
 
     // Run callback if it is a function
-    if (this.config.callbackOnChange) {
-      const callback = this.config.callbackOnChange;
+    if (callback) {
       if (isType('Function', callback)) {
         callback(value);
       } else {
@@ -1146,6 +1154,7 @@ class Choices {
     if (!value) return;
     const choices = this.store.getChoices();
     const hasUnactiveChoices = choices.some((option) => option.active !== true);
+    const callback = this.config.callbackOnSearch;
 
     // Run callback if it is a function
     if (this.input === document.activeElement) {
@@ -1154,8 +1163,7 @@ class Choices {
         // Filter available choices
         this._searchChoices(value);
         // Run callback if it is a function
-        if (this.config.callbackOnSearch) {
-          const callback = this.config.callbackOnSearch;
+        if (callback) {
           if (isType('Function', callback)) {
             callback(value);
           } else {
@@ -1817,6 +1825,7 @@ class Choices {
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
+    const callback = this.config.callbackOnAddItem;
 
     // If a prepended value has been passed, prepend it
     if (this.config.prependValue) {
@@ -1838,9 +1847,8 @@ class Choices {
     }
 
     // Run callback if it is a function
-    if (this.config.callbackOnAddItem) {
-      const callback = this.config.callbackOnAddItem;
-      const group = this.store.getGroupById(groupId);
+    if (callback) {
+      const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
       if (isType('Function', callback)) {
         if(group && group.value) {
           callback(id, passedValue, group.value);
@@ -1862,7 +1870,7 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  _removeItem(item, callback = this.config.callbackOnRemoveItem) {
+  _removeItem(item) {
     if (!item || !isType('Object', item)) {
       console.error('removeItem: No item object was passed to be removed');
       return;
@@ -1871,13 +1879,15 @@ class Choices {
     const id = item.id;
     const value = item.value;
     const choiceId = item.choiceId;
+    const groupId = item.groupId;
+    const callback = this.config.callbackOnRemoveItem;
 
     this.store.dispatch(removeItem(id, choiceId));
 
     // Run callback
     if (callback) {
       if (isType('Function', callback)) {
-        const group = this.store.getGroupById(item.groupId);
+        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
           callback(id, value, group.value);
         } else {
