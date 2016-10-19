@@ -755,7 +755,7 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  setChoices(choices, value, label, replaceChoices) {
+  setChoices(choices, value, label, replaceChoices = false) {
     if (this.initialised === true) {
       if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
         if (!isType('Array', choices) || !value) return;

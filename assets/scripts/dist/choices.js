@@ -1,4 +1,4 @@
-/*! choices.js v2.2.5 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.3.0 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -265,9 +265,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Choices, [{
 	    key: 'init',
 	    value: function init() {
-	      var callback = arguments.length <= 0 || arguments[0] === undefined ? this.config.callbackOnInit : arguments[0];
-
 	      if (this.initialised === true) return;
+
+	      var callback = this.config.callbackOnInit;
 
 	      // Set initialise flag
 	      this.initialised = true;
@@ -530,13 +530,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function highlightItem(item) {
 	      if (!item) return;
 	      var id = item.id;
+	      var groupId = item.groupId;
+	      var callback = this.config.callbackOnHighlightItem;
 	      this.store.dispatch((0, _index3.highlightItem)(id, true));
 
 	      // Run callback if it is a function
-	      if (this.config.callbackOnHighlightItem) {
-	        var callback = this.config.callbackOnHighlightItem;
+	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = this.store.getGroupById(item.groupId);
+	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
 	            callback(id, item.value, group.value);
 	          } else {
@@ -562,13 +563,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function unhighlightItem(item) {
 	      if (!item) return;
 	      var id = item.id;
+	      var groupId = item.groupId;
+	      var callback = this.config.callbackOnUnhighlightItem;
+
 	      this.store.dispatch((0, _index3.highlightItem)(id, false));
 
 	      // Run callback if it is a function
-	      if (this.config.callbackOnUnhighlightItem) {
-	        var callback = this.config.callbackOnUnhighlightItem;
+	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = this.store.getGroupById(item.groupId);
+	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
 	            callback(id, item.value, group.value);
 	          } else {
@@ -905,6 +908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param  {Array} choices - Choices to insert
 	     * @param  {String} value - Name of 'value' property
 	     * @param  {String} label - Name of 'label' property
+	     * @param  {Boolean} replaceChoices Whether existing choices should be removed
 	     * @return {Object} Class instance
 	     * @public
 	     */
@@ -914,10 +918,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function setChoices(choices, value, label) {
 	      var _this13 = this;
 
+	      var replaceChoices = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
 	      if (this.initialised === true) {
 	        if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
 	          if (!(0, _utils.isType)('Array', choices) || !value) return;
-
+	          // Clear choices if needed
+	          if (replaceChoices) {
+	            this._clearChoices();
+	          }
+	          // Add choices if passed
 	          if (choices && choices.length) {
 	            this.containerOuter.classList.remove(this.config.classNames.loadingState);
 	            choices.forEach(function (result, index) {
@@ -1048,10 +1058,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_triggerChange',
 	    value: function _triggerChange(value) {
 	      if (!value) return;
+	      var callback = this.config.callbackOnChange;
 
 	      // Run callback if it is a function
-	      if (this.config.callbackOnChange) {
-	        var callback = this.config.callbackOnChange;
+	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
 	          callback(value);
 	        } else {
@@ -1374,6 +1384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var hasUnactiveChoices = choices.some(function (option) {
 	        return option.active !== true;
 	      });
+	      var callback = this.config.callbackOnSearch;
 
 	      // Run callback if it is a function
 	      if (this.input === document.activeElement) {
@@ -1382,8 +1393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // Filter available choices
 	          this._searchChoices(value);
 	          // Run callback if it is a function
-	          if (this.config.callbackOnSearch) {
-	            var callback = this.config.callbackOnSearch;
+	          if (callback) {
 	            if ((0, _utils.isType)('Function', callback)) {
 	              callback(value);
 	            } else {
@@ -2109,6 +2119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var items = this.store.getItems();
 	      var passedLabel = label || passedValue;
 	      var passedOptionId = parseInt(choiceId, 10) || -1;
+	      var callback = this.config.callbackOnAddItem;
 
 	      // If a prepended value has been passed, prepend it
 	      if (this.config.prependValue) {
@@ -2130,9 +2141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // Run callback if it is a function
-	      if (this.config.callbackOnAddItem) {
-	        var callback = this.config.callbackOnAddItem;
-	        var group = this.store.getGroupById(groupId);
+	      if (callback) {
+	        var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	        if ((0, _utils.isType)('Function', callback)) {
 	          if (group && group.value) {
 	            callback(id, passedValue, group.value);
@@ -2158,8 +2168,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_removeItem',
 	    value: function _removeItem(item) {
-	      var callback = arguments.length <= 1 || arguments[1] === undefined ? this.config.callbackOnRemoveItem : arguments[1];
-
 	      if (!item || !(0, _utils.isType)('Object', item)) {
 	        console.error('removeItem: No item object was passed to be removed');
 	        return;
@@ -2168,13 +2176,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var id = item.id;
 	      var value = item.value;
 	      var choiceId = item.choiceId;
+	      var groupId = item.groupId;
+	      var callback = this.config.callbackOnRemoveItem;
 
 	      this.store.dispatch((0, _index3.removeItem)(id, choiceId));
 
 	      // Run callback
 	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = this.store.getGroupById(item.groupId);
+	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
 	            callback(id, value, group.value);
 	          } else {
@@ -4528,6 +4538,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          active: action.active,
 	          disabled: action.disabled
 	        }]);
+	      }
+
+	    case 'CLEAR_CHOICES':
+	      {
+	        return state.groups = [];
 	      }
 
 	    default:

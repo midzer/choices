@@ -541,10 +541,10 @@ choices.disable();
 
 **Usage:** Toggle dropdown between showing/hidden.
 
-### setChoices(choices, value, label);
+### setChoices(choices, value, label, replaceChoices);
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Set choices of select input via an array of objects, a value name and a label name. This behaves the same as passing items via the `choices` option but can be called after initialising Choices. This can also be used to add groups of choices (see example 2);
+**Usage:** Set choices of select input via an array of objects, a value name and a label name. This behaves the same as passing items via the `choices` option but can be called after initialising Choices. This can also be used to add groups of choices (see example 2); Optionally pass a true `replaceChoices` value to remove any existing choices.
 
 **Example 1:**
 
@@ -555,7 +555,7 @@ example.setChoices([
     {value: 'One', label: 'Label One', disabled: true},
     {value: 'Two', label: 'Label Two' selected: true},
     {value: 'Three', label: 'Label Three'},
-], 'value', 'label');
+], 'value', 'label', false);
 ```
 
 **Example 2:**
