@@ -582,7 +582,7 @@ example.setChoices([{
         {value: 'Child Five', label: 'Child Five'},
         {value: 'Child Six', label: 'Child Six'},
     ]
-}], 'value', 'label');
+}], 'value', 'label', false);
 ```
 
 ### getValue(valueOnly)
