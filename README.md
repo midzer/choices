@@ -14,11 +14,15 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Custom templates
 
 ## Installation
-
-`npm install choices.js --save`
-
-## Setup
-
+With [NPM](https://www.npmjs.com/package/choices.js):
+```bash
+npm install choices.js --save
+```
+With [Bower](https://bower.io/):
+```bash
+bower install choices.js --save
+```
+Or include Choices directly:
 ```html
 <!-- Include base CSS (optional) -->
 <link rel="stylesheet" href="assets/styles/css/base.min.css">
@@ -26,82 +30,84 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 <link rel="stylesheet" href="assets/styles/css/choices.min.css">
 <!-- Include Choices JavaScript -->
 <script src="/assets/scripts/dist/choices.min.js"></script>
-<script>
-    // Pass multiple elements:
-    const choices = new Choices(elements);
-    
-    // Pass single element:
-    const choices = new Choices(element);
-    
-    // Pass reference
-    const choices = new Choices('[data-trigger']);
-    const choices = new Choices('.js-choice');
+```
+## Setup
 
-    // Pass jQuery element
-    const choices = new Choices($('.js-choice')[0]);
+```js
+  // Pass multiple elements:
+  const choices = new Choices(elements);
     
-    // Passing options (with default options)
-    const choices = new Choices(elements, {
-        items: [],
-        choices: [],
-        maxItemCount: -1,
-        addItems: true,
-        removeItems: true,
-        removeItemButton: false,
-        editItems: false,
-        duplicateItems: true,
-        delimiter: ',',
-        paste: true,
-        search: true,
-        searchFloor: 1,
-        flip: true,
-        regexFilter: null,
-        shouldSort: true,
-        sortFilter: sortByAlpha,
-        sortFields: ['label', 'value'],
-        placeholder: true,
-        placeholderValue: null,
-        prependValue: null,
-        appendValue: null,
-        loadingText: 'Loading...',
-        noResultsText: 'No results round',
-        noChoicesText: 'No choices to choose from',
-        itemSelectText: 'Press to select',
-        classNames: {
-            containerOuter: 'choices',
-            containerInner: 'choices__inner',
-            input: 'choices__input',
-            inputCloned: 'choices__input--cloned',
-            list: 'choices__list',
-            listItems: 'choices__list--multiple',
-            listSingle: 'choices__list--single',
-            listDropdown: 'choices__list--dropdown',
-            item: 'choices__item',
-            itemSelectable: 'choices__item--selectable',
-            itemDisabled: 'choices__item--disabled',
-            itemChoice: 'choices__item--choice',
-            group: 'choices__group',
-            groupHeading : 'choices__heading',
-            button: 'choices__button',
-            activeState: 'is-active',
-            focusState: 'is-focused',
-            openState: 'is-open',
-            disabledState: 'is-disabled',
-            highlightedState: 'is-highlighted',
-            hiddenState: 'is-hidden',
-            flippedState: 'is-flipped',
-            loadingState: 'is-loading',
-        },
-        callbackOnInit: null,
-        callbackOnAddItem: null,
-        callbackOnRemoveItem: null,
-        callbackOnHighlightItem: null,
-        callbackOnUnhighlightItem: null,
-        callbackOnCreateTemplates: null,
-        callbackOnChange: null,
-        callbackOnSearch: null,
-    });
-</script>
+  // Pass single element:
+  const choices = new Choices(element);
+    
+  // Pass reference
+  const choices = new Choices('[data-trigger']);
+  const choices = new Choices('.js-choice');
+
+  // Pass jQuery element
+  const choices = new Choices($('.js-choice')[0]);
+    
+   // Passing options (with default options)
+  const choices = new Choices(elements, {
+    items: [],
+    choices: [],
+    maxItemCount: -1,
+    addItems: true,
+    removeItems: true,
+    removeItemButton: false,
+    editItems: false,
+    duplicateItems: true,
+    delimiter: ',',
+    paste: true,
+    search: true,
+    searchFloor: 1,
+    flip: true,
+    regexFilter: null,
+    shouldSort: true,
+    sortFilter: sortByAlpha,
+    sortFields: ['label', 'value'],
+    placeholder: true,
+    placeholderValue: null,
+    prependValue: null,
+    appendValue: null,
+    loadingText: 'Loading...',
+    noResultsText: 'No results round',
+    noChoicesText: 'No choices to choose from',
+    itemSelectText: 'Press to select',
+    classNames: {
+        containerOuter: 'choices',
+        containerInner: 'choices__inner',
+        input: 'choices__input',
+        inputCloned: 'choices__input--cloned',
+        list: 'choices__list',
+        listItems: 'choices__list--multiple',
+        listSingle: 'choices__list--single',
+        listDropdown: 'choices__list--dropdown',
+        item: 'choices__item',
+        itemSelectable: 'choices__item--selectable',
+        itemDisabled: 'choices__item--disabled',
+        itemChoice: 'choices__item--choice',
+        group: 'choices__group',
+        groupHeading : 'choices__heading',
+        button: 'choices__button',
+        activeState: 'is-active',
+        focusState: 'is-focused',
+        openState: 'is-open',
+        disabledState: 'is-disabled',
+        highlightedState: 'is-highlighted',
+        hiddenState: 'is-hidden',
+        flippedState: 'is-flipped',
+        loadingState: 'is-loading',
+    },
+    callbackOnInit: null,
+    callbackOnAddItem: null,
+    callbackOnRemoveItem: null,
+    callbackOnHighlightItem: null,
+    callbackOnUnhighlightItem: null,
+    callbackOnCreateTemplates: null,
+    callbackOnChange: null,
+    callbackOnSearch: null,
+  });
 ```
 
 ## Terminology
