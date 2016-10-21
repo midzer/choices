@@ -71,7 +71,7 @@ Or include Choices directly:
     prependValue: null,
     appendValue: null,
     loadingText: 'Loading...',
-    noResultsText: 'No results round',
+    noResultsText: 'No results found',
     noChoicesText: 'No choices to choose from',
     itemSelectText: 'Press to select',
     classNames: {
