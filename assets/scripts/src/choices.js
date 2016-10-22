@@ -120,6 +120,7 @@ class Choices {
     this.currentValue = '';
 
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+    this.element = element;
     this.passedElement = isType('String', element) ? document.querySelector(element) : element;
 
     if (!this.passedElement) {
@@ -233,17 +234,24 @@ class Choices {
 
     // Reinstate passed element
     this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-    this.passedElement.tabIndex = '';
+    this.passedElement.removeAttribute('tabindex');
     this.passedElement.removeAttribute('style', 'display:none;');
     this.passedElement.removeAttribute('aria-hidden');
+    this.passedElement.removeAttribute('data-choice', 'active');
 
-    this.containerOuter.outerHTML = this.passedElement.outerHTML;
+    // Re-assign values - this is weird, I know
+    this.passedElement.value = this.passedElement.value;
 
-    // Nullify stores
-    this.passedElement = null;
-    this.userConfig = null;
-    this.config = null;
-    this.store = null;
+    // Move passed element back to original position
+    this.containerOuter.parentNode.insertBefore(this.passedElement, this.containerOuter);
+    // Remove added elements
+    this.containerOuter.parentNode.removeChild(this.containerOuter);
+
+    // Clear data store
+    this.clearStore();
+
+    // Nullify instance-specific data
+    this.config.templates = null;
 
     // Uninitialise
     this.initialised = false;
@@ -367,8 +375,10 @@ class Choices {
     // Only render if our state has actually changed
     if (this.currentState !== this.prevState) {
       // Choices
-      if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups) {
-        if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+      if (this.currentState.choices !== this.prevState.choices ||
+        this.currentState.groups !== this.prevState.groups) {
+        if (this.passedElement.type === 'select-multiple' ||
+            this.passedElement.type === 'select-one') {
           // Get active groups/choices
           const activeGroups = this.store.getGroupsFilteredByActive();
           const activeChoices = this.store.getChoicesFilteredByActive();
@@ -1204,7 +1214,7 @@ class Choices {
   }
 
   /**
-   * Destroy event listeners
+   * Remove event listeners
    * @return
    * @private
    */
