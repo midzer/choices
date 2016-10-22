@@ -810,7 +810,7 @@ class Choices {
   clearInput() {
     if (this.input.value) this.input.value = '';
     if (this.passedElement.type !== 'select-one') {
-      this.input.style.width = getWidthOfInput(this.input);
+      this._setInputWidth();
     }
     if (this.passedElement.type !== 'text' && this.config.search) {
       this.isSearching = false;
@@ -1009,7 +1009,7 @@ class Choices {
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
         this.input.value = lastItem.value;
-        this.input.style.width = getWidthOfInput(this.input);
+        this._setInputWidth();
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
       } else {
@@ -1239,6 +1239,26 @@ class Choices {
   }
 
   /**
+   * Set the correct input width based on placeholder
+   * value or input value
+   * @return
+   */
+  _setInputWidth() {
+    if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+      // If there is a placeholder, we only want to set the width of the input when it is a greater
+      // length than 75% of the placeholder. This stops the input jumping around.
+      const placeholder = this.config.placeholder ? this.config.placeholderValue ||
+        this.passedElement.getAttribute('placeholder') : false;
+      if (this.input.value && this.input.value.length >= (placeholder.length / 1.25)) {
+        this.input.style.width = getWidthOfInput(this.input);
+      }
+    } else {
+      // If there is no placeholder, resize input to contents
+      this.input.style.width = getWidthOfInput(this.input);
+    }
+  }
+
+  /**
    * Key down event
    * @param  {Object} e Event
    * @return
@@ -1444,18 +1464,7 @@ class Choices {
    */
   _onInput() {
     if (this.passedElement.type !== 'select-one') {
-      if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
-        // If there is a placeholder, we only want to set the width of the input when it is a greater
-        // length than 75% of the placeholder. This stops the input jumping around.
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
-          false;
-        if (this.input.value && this.input.value.length >= (placeholder.length / 1.25)) {
-          this.input.style.width = getWidthOfInput(this.input);
-        }
-      } else {
-        // If there is no placeholder, resize input to contents
-        this.input.style.width = getWidthOfInput(this.input);
-      }
+      this._setInputWidth();
     }
   }
 
