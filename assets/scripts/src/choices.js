@@ -122,6 +122,8 @@ class Choices {
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     this.element = element;
     this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
+    this.isTextElement = this.passedElement.type === 'text';
 
     if (!this.passedElement) {
       console.error('Passed element not found');
@@ -165,8 +167,7 @@ class Choices {
     this.wasTap = true;
 
     // Cutting the mustard
-    const cuttingTheMustard = 'querySelector' in document && 'addEventListener' in document
-      && 'classList' in document.createElement('div');
+    const cuttingTheMustard = 'classList' in document.documentElement;
     if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
 
     // Input type check
@@ -334,7 +335,7 @@ class Choices {
     // Simplify store data to just values
     const itemsFiltered = this.store.getItemsReducedToValues(items);
 
-    if (this.passedElement.type === 'text') {
+    if (this.isTextElement) {
       // Assign hidden input array of values
       this.passedElement.setAttribute('value', itemsFiltered.join(this.config.delimiter));
     } else {
@@ -675,7 +676,7 @@ class Choices {
     const selectedItems = [];
 
     items.forEach((item) => {
-      if (this.passedElement.type === 'text') {
+      if (this.isTextElement) {
         selectedItems.push(valueOnly ? item.value : item);
       } else if (item.active) {
         selectedItems.push(valueOnly ? item.value : item);
@@ -699,20 +700,21 @@ class Choices {
   setValue(args) {
     if (this.initialised === true) {
       // Convert args to an itterable array
-      const values = [...args];
+      const values = [...args],
+        passedElementType = this.passedElement.type;
 
       values.forEach((item) => {
         if (isType('Object', item)) {
           if (!item.value) return;
           // If we are dealing with a select input, we need to create an option first
           // that is then selected. For text inputs we can just add items normally.
-          if (this.passedElement.type !== 'text') {
+          if (passedElementType !== 'text') {
             this._addChoice(true, false, item.value, item.label, -1);
           } else {
             this._addItem(item.value, item.label, item.id);
           }
         } else if (isType('String', item)) {
-          if (this.passedElement.type !== 'text') {
+          if (passedElementType !== 'text') {
             this._addChoice(true, false, item, item, -1);
           } else {
             this._addItem(item);
@@ -767,7 +769,7 @@ class Choices {
    */
   setChoices(choices, value, label, replaceChoices = false) {
     if (this.initialised === true) {
-      if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+      if (this.isSelectElement) {
         if (!isType('Array', choices) || !value) return;
         // Clear choices if needed
         if(replaceChoices) {
@@ -862,7 +864,7 @@ class Choices {
    */
   ajax(fn) {
     if (this.initialised === true) {
-      if (this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple') {
+      if (this.isSelectElement) {
         // Show loading text
         this._handleLoadingState(true);
         // Run callback
@@ -1267,7 +1269,7 @@ class Choices {
     if (e.target !== this.input && !this.containerOuter.contains(e.target)) return;
 
     const target = e.target;
-
+    const passedElementType = this.passedElement.type;
     const activeItems = this.store.getItemsFilteredByActive();
     const hasFocusedInput = this.input === document.activeElement;
     const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
@@ -1284,7 +1286,7 @@ class Choices {
     const ctrlDownKey = e.ctrlKey || e.metaKey;
 
     // If a user is typing and the dropdown is not active
-    if (this.passedElement.type !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
+    if (passedElementType !== 'text' && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
       this.showDropdown(true);
     }
 
@@ -1303,7 +1305,7 @@ class Choices {
 
     const onEnterKey = () => {
       // If enter key is pressed and the input has a value
-      if (this.passedElement.type === 'text' && target.value) {
+      if (passedElementType === 'text' && target.value) {
         const value = this.input.value;
         const canAddItem = this._canAddItem(activeItems, value);
 
@@ -1330,7 +1332,7 @@ class Choices {
         if (highlighted) {
           this._handleChoiceAction(activeItems, highlighted);
         }
-      } else if (this.passedElement.type === 'select-one') {
+      } else if (passedElementType === 'select-one') {
         // Open single select dropdown if it's not active
         if (!hasActiveDropdown) {
           this.showDropdown(true);
@@ -1347,7 +1349,7 @@ class Choices {
 
     const onDirectionKey = () => {
       // If up or down key is pressed, traverse through options
-      if (hasActiveDropdown || this.passedElement.type === 'select-one') {
+      if (hasActiveDropdown || passedElementType === 'select-one') {
         // Show dropdown if focus
         if (!hasActiveDropdown) {
           this.showDropdown(true);
@@ -1382,7 +1384,7 @@ class Choices {
 
     const onDeleteKey = () => {
       // If backspace or delete key is pressed and the input has no value
-      if (hasFocusedInput && !e.target.value && this.passedElement.type !== 'select-one') {
+      if (hasFocusedInput && !e.target.value && passedElementType !== 'select-one') {
         this._handleBackspace(activeItems);
         e.preventDefault();
       }
@@ -1416,7 +1418,7 @@ class Choices {
 
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
-    if (this.passedElement.type === 'text') {
+    if (this.isTextElement) {
       const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
       const value = this.input.value;
 
@@ -1494,7 +1496,7 @@ class Choices {
     if (this.wasTap === true && this.containerOuter.contains(target)) {
       // ...and we aren't dealing with a single select box, show dropdown/focus input
       if ((target === this.containerOuter || target === this.containerInner) && this.passedElement.type !== 'select-one') {
-        if (this.passedElement.type === 'text') {
+        if (this.isTextElement) {
           // If text element, we only want to focus the input (if it isn't already)
           if (document.activeElement !== this.input) {
             this.input.focus();
@@ -1554,7 +1556,7 @@ class Choices {
       }
 
       if (!hasActiveDropdown) {
-        if (this.passedElement.type === 'text') {
+        if (this.isTextElement) {
           if (document.activeElement !== this.input) {
             this.input.focus();
           }
@@ -1744,36 +1746,34 @@ class Choices {
 
     const dropdownHeight = this.choiceList.offsetHeight;
     const choiceHeight = choice.offsetHeight;
-
     // Distance from bottom of element to top of parent
     const choicePos = choice.offsetTop + choiceHeight;
-
     // Scroll position of dropdown
     const containerScrollPos = this.choiceList.scrollTop + dropdownHeight;
-
     // Difference between the choice and scroll position
     const endPoint = direction > 0 ? ((this.choiceList.scrollTop + choicePos) - containerScrollPos) : choice.offsetTop;
 
     const animateScroll = () => {
       const strength = 4;
+      const choiceListScrollTop = this.choiceList.scrollTop;
       let continueAnimation = false;
       let easing;
       let distance;
 
       if (direction > 0) {
-        easing = (endPoint - this.choiceList.scrollTop) / strength;
+        easing = (endPoint - choiceListScrollTop) / strength;
         distance = easing > 1 ? easing : 1;
 
-        this.choiceList.scrollTop = this.choiceList.scrollTop + distance;
-        if (this.choiceList.scrollTop < endPoint) {
+        this.choiceList.scrollTop = choiceListScrollTop + distance;
+        if (choiceListScrollTop < endPoint) {
           continueAnimation = true;
         }
       } else {
-        easing = (this.choiceList.scrollTop - endPoint) / strength;
+        easing = (choiceListScrollTop - endPoint) / strength;
         distance = easing > 1 ? easing : 1;
 
-        this.choiceList.scrollTop = this.choiceList.scrollTop - distance;
-        if (this.choiceList.scrollTop > endPoint) {
+        this.choiceList.scrollTop = choiceListScrollTop - distance;
+        if (choiceListScrollTop > endPoint) {
           continueAnimation = true;
         }
       }
@@ -2207,7 +2207,7 @@ class Choices {
           }
         });
       }
-    } else if (this.passedElement.type === 'text') {
+    } else if (this.isTextElement) {
       // Add any preset values seperated by delimiter
       this.presetItems.forEach((item) => {
         if (isType('Object', item)) {
