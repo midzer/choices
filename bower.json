@@ -15,7 +15,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "assets/images",
+    "webpack.config.dev.js",
+    "webpack.config.prod.js",
+    "server.js"
   ]
 }
 
