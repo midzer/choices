@@ -16,7 +16,6 @@ var config = {
     publicPath: '/assets/scripts/dist/',
     library: 'Choices',
     libraryTarget: 'umd',
-    umdNamedDefine: true
   },
   libraryTarget: 'umd',
   plugins: [

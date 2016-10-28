@@ -16,7 +16,6 @@ module.exports = {
     publicPath: '/assets/scripts/dist/',
     library: 'Choices',
     libraryTarget: 'umd',
-    umdNamedDefine: true
   },
   eslint: {
     configFile: '.eslintrc'
