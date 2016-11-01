@@ -3,8 +3,8 @@
   "version": "2.4.1",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": [
-      "./assets/scripts/dist/choices.js",
-      "./assets/styles/css/choices.css"
+    "./assets/scripts/dist/choices.js",
+    "./assets/styles/css/choices.css"
   ],
   "authors": [
     "Josh Johnson"
@@ -21,6 +21,13 @@
     "webpack.config.dev.js",
     "webpack.config.prod.js",
     "server.js"
+  ],
+  "keywords": [
+    "customisable",
+    "input",
+    "select",
+    "vanilla",
+    "plugin",
+    "js"
   ]
 }
-
