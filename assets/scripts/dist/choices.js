@@ -1,4 +1,4 @@
-/*! choices.js v2.4.0 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.4.1 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -74,11 +74,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _index3 = __webpack_require__(23);
+	var _index3 = __webpack_require__(22);
 
-	var _utils = __webpack_require__(24);
+	var _utils = __webpack_require__(23);
 
-	__webpack_require__(25);
+	__webpack_require__(24);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -288,7 +288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run callback if it is a function
 	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback();
+	          callback.call(this);
 	        } else {
 	          console.error('callbackOnInit: Callback is not a function');
 	        }
@@ -549,9 +549,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if ((0, _utils.isType)('Function', callback)) {
 	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
-	            callback(id, item.value, group.value);
+	            callback.call(this, id, item.value, group.value);
 	          } else {
-	            callback(id, item.value);
+	            callback.call(this, id, item.value);
 	          }
 	        } else {
 	          console.error('callbackOnHighlightItem: Callback is not a function');
@@ -583,9 +583,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if ((0, _utils.isType)('Function', callback)) {
 	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
-	            callback(id, item.value, group.value);
+	            callback.call(this, id, item.value, group.value);
 	          } else {
-	            callback(id, item.value);
+	            callback.call(this, id, item.value);
 	          }
 	        } else {
 	          console.error('callbackOnUnhighlightItem: Callback is not a function');
@@ -1076,7 +1076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run callback if it is a function
 	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
-	          callback(value);
+	          callback.call(this, value);
 	        } else {
 	          console.error('callbackOnChange: Callback is not a function');
 	        }
@@ -1408,7 +1408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // Run callback if it is a function
 	          if (callback) {
 	            if ((0, _utils.isType)('Function', callback)) {
-	              callback(value);
+	              callback.call(this, value);
 	            } else {
 	              console.error('callbackOnSearch: Callback is not a function');
 	            }
@@ -2168,9 +2168,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	        if ((0, _utils.isType)('Function', callback)) {
 	          if (group && group.value) {
-	            callback(id, passedValue, group.value);
+	            callback.call(this, id, passedValue, group.value);
 	          } else {
-	            callback(id, passedValue);
+	            callback.call(this, id, passedValue);
 	          }
 	        } else {
 	          console.error('callbackOnAddItem: Callback is not a function');
@@ -2209,9 +2209,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if ((0, _utils.isType)('Function', callback)) {
 	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 	          if (group && group.value) {
-	            callback(id, value, group.value);
+	            callback.call(this, id, value, group.value);
 	          } else {
-	            callback(id, value);
+	            callback.call(this, id, value);
 	          }
 	        } else {
 	          console.error('callbackOnRemoveItem: Callback is not a function');
@@ -2385,7 +2385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var callbackTemplate = this.config.callbackOnCreateTemplates;
 	      var userTemplates = {};
 	      if (callbackTemplate && (0, _utils.isType)('Function', callbackTemplate)) {
-	        userTemplates = callbackTemplate(this, _utils.strToEl);
+	        userTemplates = callbackTemplate.call(this, _utils.strToEl);
 	      }
 	      this.config.templates = (0, _utils.extend)(templates, userTemplates);
 	    }
@@ -3352,7 +3352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _redux = __webpack_require__(4);
 
-	var _index = __webpack_require__(19);
+	var _index = __webpack_require__(18);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -3584,23 +3584,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(14);
+	var _combineReducers = __webpack_require__(13);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(16);
+	var _bindActionCreators = __webpack_require__(15);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(17);
+	var _applyMiddleware = __webpack_require__(16);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(18);
+	var _compose = __webpack_require__(17);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(15);
+	var _warning = __webpack_require__(14);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -4041,55 +4041,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 
-	var _ponyfill = __webpack_require__(13);
+	var _ponyfill = __webpack_require__(12);
 
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var root; /* global window */
+	var root = undefined; /* global window */
 
-
-	if (typeof self !== 'undefined') {
-	  root = self;
+	if (typeof global !== 'undefined') {
+		root = global;
 	} else if (typeof window !== 'undefined') {
-	  root = window;
-	} else if (typeof global !== 'undefined') {
-	  root = global;
-	} else if (true) {
-	  root = module;
-	} else {
-	  root = Function('return this')();
+		root = window;
 	}
 
 	var result = (0, _ponyfill2['default'])(root);
 	exports['default'] = result;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(12)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 12 */
-/***/ function(module, exports) {
-
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
-
-
-/***/ },
-/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4117,7 +4094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4131,7 +4108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(15);
+	var _warning = __webpack_require__(14);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -4264,7 +4241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4294,7 +4271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4350,7 +4327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4361,7 +4338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(18);
+	var _compose = __webpack_require__(17);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -4413,7 +4390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4456,7 +4433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4467,15 +4444,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _redux = __webpack_require__(4);
 
-	var _items = __webpack_require__(20);
+	var _items = __webpack_require__(19);
 
 	var _items2 = _interopRequireDefault(_items);
 
-	var _groups = __webpack_require__(21);
+	var _groups = __webpack_require__(20);
 
 	var _groups2 = _interopRequireDefault(_groups);
 
-	var _choices = __webpack_require__(22);
+	var _choices = __webpack_require__(21);
 
 	var _choices2 = _interopRequireDefault(_choices);
 
@@ -4503,7 +4480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = rootReducer;
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4571,7 +4548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = items;
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4612,7 +4589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = groups;
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4740,7 +4717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = choices;
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4825,7 +4802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		};
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5307,7 +5284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports) {
 
 	'use strict';

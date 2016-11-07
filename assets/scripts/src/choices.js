@@ -215,7 +215,7 @@ class Choices {
     // Run callback if it is a function
     if (callback) {
       if (isType('Function', callback)) {
-        callback();
+        callback.call(this);
       } else {
         console.error('callbackOnInit: Callback is not a function');
       }
@@ -454,9 +454,9 @@ class Choices {
       if (isType('Function', callback)) {
         const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
-          callback(id, item.value, group.value);
+          callback.call(this, id, item.value, group.value);
         } else {
-          callback(id, item.value)
+          callback.call(this, id, item.value)
         }
       } else {
         console.error('callbackOnHighlightItem: Callback is not a function');
@@ -485,9 +485,9 @@ class Choices {
       if (isType('Function', callback)) {
         const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
-          callback(id, item.value, group.value);
+          callback.call(this, id, item.value, group.value);
         } else {
-          callback(id, item.value)
+          callback.call(this, id, item.value)
         }
       } else {
         console.error('callbackOnUnhighlightItem: Callback is not a function');
@@ -893,7 +893,7 @@ class Choices {
     // Run callback if it is a function
     if (callback) {
       if (isType('Function', callback)) {
-        callback(value);
+        callback.call(this, value);
       } else {
         console.error('callbackOnChange: Callback is not a function');
       }
@@ -1177,7 +1177,7 @@ class Choices {
         // Run callback if it is a function
         if (callback) {
           if (isType('Function', callback)) {
-            callback(value);
+            callback.call(this, value);
           } else {
             console.error('callbackOnSearch: Callback is not a function');
           }
@@ -1870,9 +1870,9 @@ class Choices {
       const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
       if (isType('Function', callback)) {
         if(group && group.value) {
-          callback(id, passedValue, group.value);
+          callback.call(this, id, passedValue, group.value);
         } else {
-          callback(id, passedValue);
+          callback.call(this, id, passedValue);
         }
       } else {
         console.error('callbackOnAddItem: Callback is not a function');
@@ -1908,9 +1908,9 @@ class Choices {
       if (isType('Function', callback)) {
         const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
         if(group && group.value) {
-          callback(id, value, group.value);
+          callback.call(this, id, value, group.value);
         } else {
-          callback(id, value);
+          callback.call(this, id, value);
         }
       } else {
         console.error('callbackOnRemoveItem: Callback is not a function');
@@ -2089,7 +2089,7 @@ class Choices {
     const callbackTemplate = this.config.callbackOnCreateTemplates;
     let userTemplates = {};
     if (callbackTemplate && isType('Function', callbackTemplate)) {
-      userTemplates = callbackTemplate(this, strToEl);
+      userTemplates = callbackTemplate.call(this, strToEl);
     }
     this.config.templates = extend(templates, userTemplates);
   }
