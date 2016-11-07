@@ -65,7 +65,10 @@
       <label for="choices-text-preset-values">Preset values passed through options</label>
       <input class="form-control" id="choices-text-preset-values" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
 
-      <label for="choices-text-preset-values">Right-to-left</label>
+      <label for="choices-text-i18n">I18N labels</label>
+      <input class="form-control" data-trigger id="choices-text-i18n" type="text">
+
+      <label for="choices-text-rtl">Right-to-left</label>
       <input class="form-control" data-trigger id="choices-text-rtl" type="text" value="Value 1, Value 2" dir="rtl">
 
       <hr>
@@ -274,6 +277,19 @@
         paste: false,
         duplicateItems: false,
         editItems: true,
+      });
+
+      var texti18n = new Choices('#choices-text-i18n', {
+        paste: false,
+        duplicateItems: false,
+        editItems: true,
+        addItemText: (value) => {
+          return `Appuyez sur Entrée pour ajouter <b>"${value}"</b>`;
+        },
+        maxItemText: (maxItemCount) => {
+          return `${maxItemCount} valeurs peuvent être ajoutées`;
+        },
+        uniqueItemText: 'Cette valeur est déjà présente',
       });
 
       var textEmailFilter = new Choices('#choices-text-email-filter', {
