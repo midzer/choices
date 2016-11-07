@@ -71,6 +71,13 @@ class Choices {
       noResultsText: 'No results found',
       noChoicesText: 'No choices to choose from',
       itemSelectText: 'Press to select',
+      addItemText: (value) => {
+        return `Press Enter to add <b>"${value}"</b>`;
+      },
+      maxItemText: (maxItemCount) => {
+        return `Only ${maxItemCount} values can be added.`;
+      },
+      uniqueItemText: 'Only unique values can be added.',
       classNames: {
         containerOuter: 'choices',
         containerInner: 'choices__inner',
@@ -1032,14 +1039,14 @@ class Choices {
    */
   _canAddItem(activeItems, value) {
     let canAddItem = true;
-    let notice = `Press Enter to add <b>"${value}"</b>`;
+    let notice = isType('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
     if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
         // If there is a max entry limit and we have reached that limit
         // don't update
         canAddItem = false;
-        notice = `Only ${this.config.maxItemCount} values can be added.`;
+        notice = isType('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
       }
     }
 
@@ -1057,7 +1064,7 @@ class Choices {
       // in the array
       if (this.config.duplicateItems === false && !isUnique) {
         canAddItem = false;
-        notice = 'Only unique values can be added.';
+        notice = isType('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
       }
     }
 

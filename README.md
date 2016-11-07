@@ -74,6 +74,12 @@ Or include Choices directly:
     noResultsText: 'No results found',
     noChoicesText: 'No choices to choose from',
     itemSelectText: 'Press to select',
+    addItemText: (value) => {
+      return `Press Enter to add <b>"${value}"</b>`;
+    },
+    maxItemText: (maxItemCount) => {
+      return `Only ${maxItemCount} values can be added.`;
+    },
     classNames: {
         containerOuter: 'choices',
         containerInner: 'choices__inner',
@@ -340,6 +346,20 @@ const example = new Choices(element, {
 **Input types affected:** `select-multiple`, `select-one`
 
 **Usage:** The text that is shown when a user hovers over a selectable choice.
+
+### addItemText
+**Type:** `String/Function` **Default:** `Press Enter to add "${value}"`
+
+**Input types affected:** `text`
+
+**Usage:** The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example), otherwise pass a string.
+
+### maxItemText
+**Type:** `String/Function` **Default:** `Only ${maxItemCount} values can be added.`
+
+**Input types affected:** `text`
+
+**Usage:** The text that is shown when a user has focus on the input but has already reached the [max item count](https://github.com/jshjohnson/Choices#maxitemcount). To access the max item count, pass a function with a `maxItemCount` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example), otherwise pass a string.
 
 ### classNames
 **Type:** `Object` **Default:**
