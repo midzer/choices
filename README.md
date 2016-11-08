@@ -15,11 +15,11 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 
 ## Installation
 With [NPM](https://www.npmjs.com/package/choices.js):
-```bash
+```zsh
 npm install choices.js --save
 ```
 With [Bower](https://bower.io/):
-```bash
+```zsh
 bower install choices.js --save
 ```
 Or include Choices directly:
