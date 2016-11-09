@@ -64,7 +64,7 @@ Or include Choices directly:
     flip: true,
     regexFilter: null,
     shouldSort: true,
-    sortFilter: () => {},
+    sortFilter: () => {...},
     sortFields: ['label', 'value'],
     placeholder: true,
     placeholderValue: null,
