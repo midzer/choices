@@ -1333,12 +1333,14 @@ class Choices {
       }
 
       if (hasActiveDropdown) {
+        e.preventDefault();
         const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
 
         // If we have a highlighted choice
         if (highlighted) {
           this._handleChoiceAction(activeItems, highlighted);
         }
+
       } else if (passedElementType === 'select-one') {
         // Open single select dropdown if it's not active
         if (!hasActiveDropdown) {

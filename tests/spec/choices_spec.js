@@ -294,7 +294,8 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
+        preventDefault: () => {}
       });
 
       expect(this.choices.currentState.items.length).toBe(2);
@@ -317,7 +318,8 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
+        preventDefault: () => {}
       });
 
       expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String));
