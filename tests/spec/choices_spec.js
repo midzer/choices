@@ -640,6 +640,21 @@ describe('Choices', () => {
       expect(choices[choices.length - 2].value).toEqual('Child Five');
     });
 
+    it('should handle setChoices() with blank values', function() {
+      this.choices.setChoices([{
+        label: 'Choice one',
+        value: 'one'
+      }, {
+        label: 'Choice two',
+        value: ''
+      }], 'value', 'label', true);
+
+
+      const choices = this.choices.currentState.choices;
+      expect(choices[0].value).toEqual('one');
+      expect(choices[1].value).toEqual('');
+    });
+
     it('should handle clearStore()', function() {
       this.choices.clearStore();
 

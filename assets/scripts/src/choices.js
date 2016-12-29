@@ -1940,7 +1940,7 @@ class Choices {
    * @private
    */
   _addChoice(isSelected, isDisabled, value, label, groupId = -1) {
-    if (!value) return;
+    if (typeof value === 'undefined' || value === null) return;
 
     // Generate unique id
     const choices = this.store.getChoices();
