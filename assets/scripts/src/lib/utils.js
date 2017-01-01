@@ -30,7 +30,7 @@ export const isNode = (o) => {
   return (
     typeof Node === "object" ? o instanceof Node :
     o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
-  );
+    );
 };
 
 /**
@@ -42,7 +42,7 @@ export const isElement = (o) => {
   return (
     typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
     o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
-  );
+    );
 };
 
 /**
@@ -58,7 +58,7 @@ export const extend = function() {
    * Merge one object into another
    * @param  {Object} obj  Object to merge into extended object
    */
-  let merge = function(obj) {
+   let merge = function(obj) {
     for (let prop in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         // If deep merge and property is an object, merge properties
@@ -91,7 +91,7 @@ export const extend = function() {
  */
 export const whichTransitionEvent = function() {
   var t,
-    el = document.createElement("fakeelement");
+  el = document.createElement("fakeelement");
 
   var transitions = {
     "transition": "transitionend",
@@ -113,7 +113,7 @@ export const whichTransitionEvent = function() {
  */
 export const whichAnimationEvent = function() {
   var t,
-    el = document.createElement('fakeelement');
+  el = document.createElement('fakeelement');
 
   var animations = {
     'animation': 'animationend',
@@ -259,7 +259,7 @@ export const debounce = function(func, wait, immediate) {
   var timeout;
   return function() {
     var context = this,
-      args = arguments;
+    args = arguments;
     var later = function() {
       timeout = null;
       if (!immediate) func.apply(context, args);
@@ -459,6 +459,14 @@ export const getWidthOfInput = (input) => {
   return `${width}px`;
 };
 
+/**
+ * Sorting function for current and previous string
+ * @param  {String} a Current value
+ * @param  {String} b Next value
+ * @return {Number}   -1 for after previous,
+ *                    1 for before,
+ *                    0 for same location
+ */
 export const sortByAlpha = (a, b) => {
   const labelA = (a.label || a.value).toLowerCase();
   const labelB = (b.label || b.value).toLowerCase();
@@ -468,6 +476,31 @@ export const sortByAlpha = (a, b) => {
   return 0;
 };
 
+/**
+ * Sort by numeric score
+ * @param  {Object} a Current value
+ * @param  {Object} b Next value
+ * @return {Number}   -1 for after previous,
+ *                    1 for before,
+ *                    0 for same location
+ */
 export const sortByScore = (a, b) => {
   return a.score - b.score;
+};
+
+/**
+ * Trigger native event
+ * @param  {NodeElement} element Element to trigger event on
+ * @param  {String} type         Type of event to trigger
+ * @param  {Object} customArgs   Data to pass with event
+ * @return {Object}              Triggered event
+ */
+export const triggerEvent = (element, type, customArgs = null) => {
+  const event = new CustomEvent(type, {
+    detail: customArgs,
+    bubbles: true,
+    cancelable: true
+  });
+
+  return element.dispatchEvent(event);
 };

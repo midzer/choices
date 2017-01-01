@@ -18,11 +18,14 @@ With [NPM](https://www.npmjs.com/package/choices.js):
 ```zsh
 npm install choices.js --save
 ```
+
 With [Bower](https://bower.io/):
 ```zsh
 bower install choices.js --save
 ```
+
 Or include Choices directly:
+
 ```html
 <!-- Include base CSS (optional) -->
 <link rel="stylesheet" href="assets/styles/css/base.min.css">
@@ -106,13 +109,7 @@ Or include Choices directly:
         loadingState: 'is-loading',
     },
     callbackOnInit: null,
-    callbackOnAddItem: null,
-    callbackOnRemoveItem: null,
-    callbackOnHighlightItem: null,
-    callbackOnUnhighlightItem: null,
     callbackOnCreateTemplates: null,
-    callbackOnChange: null,
-    callbackOnSearch: null,
   });
 ```
 
@@ -406,44 +403,6 @@ classNames: {
 
 **Usage:** Function to run once Choices initialises.
 
-### callbackOnAddItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
-
-**Input types affected:** `text`, `select-one`, `select-multiple`
-
-**Usage:** Function to run each time an item is added (programmatically or by the user).
-
-**Example:**
-
-```js
-const example = new Choices(element, {
-  callbackOnAddItem: (id, value, groupValue) => {
-    // do something creative here...   
-  },
-};
-```
-
-### callbackOnRemoveItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
-
-**Input types affected:** `text`, `select-one`, `select-multiple`
-
-**Usage:** Function to run each time an item is removed (programmatically or by the user).
-
-### callbackOnHighlightItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
-
-**Input types affected:** `text`, `select-multiple`
-
-**Usage:** Function to run each time an item is highlighted.
-
-### callbackOnUnhighlightItem
-**Type:** `Function` **Default:** `null` **Arguments:** `id, value, groupValue`
-
-**Input types affected:** `text`, `select-multiple`
-
-**Usage:** Function to run each time an item is unhighlighted.
-
 ### callbackOnCreateTemplates
 **Type:** `Function` **Default:** `null` **Arguments:** `template`
 
@@ -477,19 +436,73 @@ const example = new Choices(element, {
 });
 ```
 
-### callbackOnChange
-**Type:** `Function` **Default:** `null` **Arguments:** `value`
+## Events
+**Note:** Events fired by Choices behave the same as standard events. Each event is triggered on the element passed to Choices (accessible via `this.passedElement`. Arguments are accessible within the `event.detail` object. 
+
+**Example:**
+
+```js
+const element = document.getElementById('example');
+const example = new Choices(element);
+
+element.addEventListener('addItem', function(event) {
+  // do something creative here...
+  console.log(event.detail.id);
+  console.log(event.detail.value);
+  console.log(event.detail.groupValue);
+}, false);
+
+// or 
+const example = new Choices(document.getElementById('example'));
+
+example.passedElement.addEventListener('addItem', function(event) {
+  // do something creative here...
+  console.log(event.detail.id);
+  console.log(event.detail.value);
+  console.log(event.detail.groupValue);
+}, false);
+
+```
+
+### addItem
+**Arguments:** `id, value, groupValue`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Function to run each time an item is added/removed by a user.
+**Usage:** Triggered each time an item is added (programmatically or by the user).
 
-### callbackOnSearch
-**Type:** `Function` **Default:** `null` **Arguments:** `value`
+### removeItem
+**Arguments:** `id, value, groupValue`
 
-**Input types affected:** `select-one`, `select-multiple`
+**Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Function to run when a user types into an input to search choices.
+**Usage:** Triggered each time an item is removed (programmatically or by the user).
+
+### highlightItem
+**Arguments:** `id, value, groupValue`
+
+**Input types affected:** `text`, `select-multiple`
+
+**Usage:** Triggered each time an item is highlighted.
+
+### unhighlightItem
+**Arguments:** `id, value, groupValue`
+
+**Input types affected:** `text`, `select-multiple`
+
+**Usage:** Triggered each time an item is unhighlighted.
+
+### change
+**Arguments:** `value`
+
+**Input types affected:** `text`, `select-one`, `select-multiple`
+
+**Usage:** Triggered each time an item is added/removed **by a user**.
+
+### search
+**Arguments:** `value` **Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Triggered when a user types into an input to search choices.
 
 ## Methods
 Methods can be called either directly or by chaining:

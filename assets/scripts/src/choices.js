@@ -23,6 +23,7 @@ import {
   getWidthOfInput,
   sortByAlpha,
   sortByScore,
+  triggerEvent,
 }
 from './lib/utils.js';
 import './lib/polyfills.js';
@@ -105,13 +106,7 @@ class Choices {
         loadingState: 'is-loading',
       },
       callbackOnInit: null,
-      callbackOnAddItem: null,
-      callbackOnRemoveItem: null,
-      callbackOnHighlightItem: null,
-      callbackOnUnhighlightItem: null,
       callbackOnCreateTemplates: null,
-      callbackOnChange: null,
-      callbackOnSearch: null,
     };
 
     // Merge options with user options
@@ -223,8 +218,6 @@ class Choices {
     if (callback) {
       if (isType('Function', callback)) {
         callback.call(this);
-      } else {
-        console.error('callbackOnInit: Callback is not a function');
       }
     }
   }
@@ -449,24 +442,26 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  highlightItem(item) {
+  highlightItem(item, runEvent = true) {
     if (!item) return;
     const id = item.id;
     const groupId = item.groupId;
-    const callback = this.config.callbackOnHighlightItem;
+    const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+
     this.store.dispatch(highlightItem(id, true));
 
-    // Run callback if it is a function
-    if (callback) {
-      if (isType('Function', callback)) {
-        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-        if(group && group.value) {
-          callback.call(this, id, item.value, group.value);
-        } else {
-          callback.call(this, id, item.value)
-        }
+    if (runEvent) {
+      if(group && group.value) {
+        triggerEvent(this.passedElement, 'highlightItem', {
+          id,
+          value: item.value,
+          groupValue: group.value
+        });
       } else {
-        console.error('callbackOnHighlightItem: Callback is not a function');
+        triggerEvent(this.passedElement, 'highlightItem', {
+          id,
+          value: item.value,
+        });
       }
     }
 
@@ -483,22 +478,21 @@ class Choices {
     if (!item) return;
     const id = item.id;
     const groupId = item.groupId;
-    const callback = this.config.callbackOnUnhighlightItem;
+    const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(highlightItem(id, false));
 
-    // Run callback if it is a function
-    if (callback) {
-      if (isType('Function', callback)) {
-        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-        if(group && group.value) {
-          callback.call(this, id, item.value, group.value);
-        } else {
-          callback.call(this, id, item.value)
-        }
-      } else {
-        console.error('callbackOnUnhighlightItem: Callback is not a function');
-      }
+    if(group && group.value) {
+      triggerEvent(this.passedElement, 'unhighlightItem', {
+        id,
+        value: item.value,
+        groupValue: group.value
+      });
+    } else {
+      triggerEvent(this.passedElement, 'unhighlightItem', {
+        id,
+        value: item.value,
+      });
     }
 
     return this;
@@ -580,15 +574,15 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  removeHighlightedItems(runCallback = false) {
+  removeHighlightedItems(runEvent = false) {
     const items = this.store.getItemsFilteredByActive();
 
     items.forEach((item) => {
       if (item.highlighted && item.active) {
         this._removeItem(item);
         // If this action was performed by the user
-        // run the callback
-        if (runCallback) {
+        // trigger the event
+        if (runEvent) {
           this._triggerChange(item.value);
         }
       }
@@ -895,16 +889,10 @@ class Choices {
    */
   _triggerChange(value) {
     if (!value) return;
-    const callback = this.config.callbackOnChange;
 
-    // Run callback if it is a function
-    if (callback) {
-      if (isType('Function', callback)) {
-        callback.call(this, value);
-      } else {
-        console.error('callbackOnChange: Callback is not a function');
-      }
-    }
+    triggerEvent(this.passedElement, 'change', {
+      value
+    });
   }
 
   /**
@@ -1023,7 +1011,7 @@ class Choices {
         this._triggerChange(lastItem.value);
       } else {
         if (!hasHighlightedItems) {
-          this.highlightItem(lastItem);
+          this.highlightItem(lastItem, false);
         }
         this.removeHighlightedItems(true);
       }
@@ -1173,7 +1161,6 @@ class Choices {
     if (!value) return;
     const choices = this.store.getChoices();
     const hasUnactiveChoices = choices.some((option) => option.active !== true);
-    const callback = this.config.callbackOnSearch;
 
     // Run callback if it is a function
     if (this.input === document.activeElement) {
@@ -1181,14 +1168,10 @@ class Choices {
       if (value && value.length > this.config.searchFloor) {
         // Filter available choices
         this._searchChoices(value);
-        // Run callback if it is a function
-        if (callback) {
-          if (isType('Function', callback)) {
-            callback.call(this, value);
-          } else {
-            console.error('callbackOnSearch: Callback is not a function');
-          }
-        }
+        // Trigger search event
+        triggerEvent(this.passedElement, 'search', {
+          value,
+        });
       } else if (hasUnactiveChoices) {
         // Otherwise reset choices to active
         this.isSearching = false;
@@ -1853,7 +1836,12 @@ class Choices {
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
-    const callback = this.config.callbackOnAddItem;
+
+    // Get group if group ID passed
+    const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+
+    // Generate unique id
+    const id = items ? items.length + 1 : 1;
 
     // If a prepended value has been passed, prepend it
     if (this.config.prependValue) {
@@ -1865,27 +1853,24 @@ class Choices {
       passedValue += this.config.appendValue.toString();
     }
 
-    // Generate unique id
-    const id = items ? items.length + 1 : 1;
-
     this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId));
 
     if (this.passedElement.type === 'select-one') {
       this.removeActiveItems(id);
     }
 
-    // Run callback if it is a function
-    if (callback) {
-      const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-      if (isType('Function', callback)) {
-        if(group && group.value) {
-          callback.call(this, id, passedValue, group.value);
-        } else {
-          callback.call(this, id, passedValue);
-        }
-      } else {
-        console.error('callbackOnAddItem: Callback is not a function');
-      }
+    // Trigger change event
+    if(group && group.value) {
+      triggerEvent(this.passedElement, 'addItem', {
+        id,
+        value: passedValue,
+        groupValue: group.value,
+      });
+    } else {
+      triggerEvent(this.passedElement, 'addItem', {
+        id,
+        value: passedValue,
+      });
     }
 
     return this;
@@ -1908,22 +1893,21 @@ class Choices {
     const value = item.value;
     const choiceId = item.choiceId;
     const groupId = item.groupId;
-    const callback = this.config.callbackOnRemoveItem;
+    const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(removeItem(id, choiceId));
 
-    // Run callback
-    if (callback) {
-      if (isType('Function', callback)) {
-        const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-        if(group && group.value) {
-          callback.call(this, id, value, group.value);
-        } else {
-          callback.call(this, id, value);
-        }
-      } else {
-        console.error('callbackOnRemoveItem: Callback is not a function');
-      }
+    if(group && group.value) {
+      triggerEvent(this.passedElement, 'removeItem', {
+        id,
+        value,
+        groupValue: group.value,
+      });
+    } else {
+      triggerEvent(this.passedElement, 'removeItem', {
+        id,
+        value,
+      });
     }
 
     return this;
@@ -2100,6 +2084,7 @@ class Choices {
     if (callbackTemplate && isType('Function', callbackTemplate)) {
       userTemplates = callbackTemplate.call(this, strToEl);
     }
+
     this.config.templates = extend(templates, userTemplates);
   }
 

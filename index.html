@@ -15,7 +15,7 @@
   <meta name="theme-color" content="#ffffff">
 
   <!-- Ignore these -->
-  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.5.2">
+  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.6.0">
   <!-- End ignore these -->
 
   <!-- Optional includes -->
@@ -23,8 +23,8 @@
   <!-- End optional includes -->
 
   <!-- Choices includes -->
-  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.5.2">
-  <script src="assets/scripts/dist/choices.min.js?version=2.5.2"></script>
+  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.6.0">
+  <script src="assets/scripts/dist/choices.min.js?version=2.6.0"></script>
   <!-- End Choices includes -->
 
   <!--[if lt IE 9]>
@@ -265,12 +265,6 @@
         editItems: true,
         maxItemCount: 5,
         removeItemButton: true,
-        callbackOnHighlightItem: function(id, value) {
-          console.log(value);
-        },
-        callbackOnUnhighlightItem: function(id, value) {
-          console.log(value);
-        },
       });
 
       var textUniqueVals = new Choices('#choices-text-unique-values', {
@@ -311,22 +305,12 @@
         items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
       });
 
-      var multipleDefault = new Choices('#choices-multiple-groups', {
-        callbackOnAddItem: function(id, value, groupValue) {
-          console.log(arguments);
-        },
-        callbackOnRemoveItem: function(id, value, groupValue) {
-          console.log(arguments);
-        },
-      });
+      var multipleDefault = new Choices(document.getElementById('choices-multiple-groups'));
 
       var multipleFetch = new Choices('#choices-multiple-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Strokes record',
         maxItemCount: 5,
-        callbackOnChange: function(value) {
-          console.log(value)
-        }
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
         .then(function(response) {
@@ -335,7 +319,7 @@
           });
         })
         .catch(function(error) {
-          // console.error(error);
+          console.error(error);
         });
       });
 
@@ -355,7 +339,7 @@
           });
         })
         .catch(function(error) {
-          // console.error(error);
+          console.error(error);
         });
       });
 
@@ -374,7 +358,7 @@
               callback(data.releases, 'title', 'title');
               singleXhrRemove.setValueByChoice('How Soon Is Now?');
             } else {
-              // console.error(status);
+              console.error(status);
             }
           }
         }
@@ -434,13 +418,13 @@
         shouldSort: false,
       });
 
-      var states = new Choices(document.getElementById('states'), {
-        callbackOnChange: function(value) {
-          if(value === 'New York') {
-            boroughs.enable();
-          } else {
-            boroughs.disable();
-          }
+      var states = new Choices(document.getElementById('states'));
+
+      states.passedElement.addEventListener('change', function(e) {
+        if(e.detail.value === 'New York') {
+          boroughs.enable();
+        } else {
+          boroughs.disable();
         }
       });
 
