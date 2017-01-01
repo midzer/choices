@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": [
     "./assets/scripts/dist/choices.js",
@@ -17,10 +17,6 @@
     "bower_components",
     "test",
     "tests",
-    "assets/images",
-    "webpack.config.dev.js",
-    "webpack.config.prod.js",
-    "server.js"
   ],
   "keywords": [
     "customisable",
