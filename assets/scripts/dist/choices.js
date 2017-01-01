@@ -1,4 +1,4 @@
-/*! choices.js v2.5.1 | (c) 2016 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.6.0 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -172,13 +172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        loadingState: 'is-loading'
 	      },
 	      callbackOnInit: null,
-	      callbackOnAddItem: null,
-	      callbackOnRemoveItem: null,
-	      callbackOnHighlightItem: null,
-	      callbackOnUnhighlightItem: null,
-	      callbackOnCreateTemplates: null,
-	      callbackOnChange: null,
-	      callbackOnSearch: null
+	      callbackOnCreateTemplates: null
 	    };
 
 	    // Merge options with user options
@@ -296,8 +290,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (callback) {
 	        if ((0, _utils.isType)('Function', callback)) {
 	          callback.call(this);
-	        } else {
-	          console.error('callbackOnInit: Callback is not a function');
 	        }
 	      }
 	    }
@@ -545,23 +537,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'highlightItem',
 	    value: function highlightItem(item) {
+	      var runEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
 	      if (!item) return;
 	      var id = item.id;
 	      var groupId = item.groupId;
-	      var callback = this.config.callbackOnHighlightItem;
+	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+
 	      this.store.dispatch((0, _index3.highlightItem)(id, true));
 
-	      // Run callback if it is a function
-	      if (callback) {
-	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-	          if (group && group.value) {
-	            callback.call(this, id, item.value, group.value);
-	          } else {
-	            callback.call(this, id, item.value);
-	          }
+	      if (runEvent) {
+	        if (group && group.value) {
+	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
+	            id: id,
+	            value: item.value,
+	            groupValue: group.value
+	          });
 	        } else {
-	          console.error('callbackOnHighlightItem: Callback is not a function');
+	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
+	            id: id,
+	            value: item.value
+	          });
 	        }
 	      }
 
@@ -581,22 +577,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!item) return;
 	      var id = item.id;
 	      var groupId = item.groupId;
-	      var callback = this.config.callbackOnUnhighlightItem;
+	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
 	      this.store.dispatch((0, _index3.highlightItem)(id, false));
 
-	      // Run callback if it is a function
-	      if (callback) {
-	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-	          if (group && group.value) {
-	            callback.call(this, id, item.value, group.value);
-	          } else {
-	            callback.call(this, id, item.value);
-	          }
-	        } else {
-	          console.error('callbackOnUnhighlightItem: Callback is not a function');
-	        }
+	      if (group && group.value) {
+	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
+	          id: id,
+	          value: item.value,
+	          groupValue: group.value
+	        });
+	      } else {
+	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
+	          id: id,
+	          value: item.value
+	        });
 	      }
 
 	      return this;
@@ -704,7 +699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function removeHighlightedItems() {
 	      var _this9 = this;
 
-	      var runCallback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	      var runEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
 	      var items = this.store.getItemsFilteredByActive();
 
@@ -712,8 +707,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (item.highlighted && item.active) {
 	          _this9._removeItem(item);
 	          // If this action was performed by the user
-	          // run the callback
-	          if (runCallback) {
+	          // trigger the event
+	          if (runEvent) {
 	            _this9._triggerChange(item.value);
 	          }
 	        }
@@ -1078,16 +1073,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_triggerChange',
 	    value: function _triggerChange(value) {
 	      if (!value) return;
-	      var callback = this.config.callbackOnChange;
 
-	      // Run callback if it is a function
-	      if (callback) {
-	        if ((0, _utils.isType)('Function', callback)) {
-	          callback.call(this, value);
-	        } else {
-	          console.error('callbackOnChange: Callback is not a function');
-	        }
-	      }
+	      (0, _utils.triggerEvent)(this.passedElement, 'change', {
+	        value: value
+	      });
 	    }
 
 	    /**
@@ -1231,7 +1220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this._triggerChange(lastItem.value);
 	        } else {
 	          if (!hasHighlightedItems) {
-	            this.highlightItem(lastItem);
+	            this.highlightItem(lastItem, false);
 	          }
 	          this.removeHighlightedItems(true);
 	        }
@@ -1404,7 +1393,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var hasUnactiveChoices = choices.some(function (option) {
 	        return option.active !== true;
 	      });
-	      var callback = this.config.callbackOnSearch;
 
 	      // Run callback if it is a function
 	      if (this.input === document.activeElement) {
@@ -1412,14 +1400,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (value && value.length > this.config.searchFloor) {
 	          // Filter available choices
 	          this._searchChoices(value);
-	          // Run callback if it is a function
-	          if (callback) {
-	            if ((0, _utils.isType)('Function', callback)) {
-	              callback.call(this, value);
-	            } else {
-	              console.error('callbackOnSearch: Callback is not a function');
-	            }
-	          }
+	          // Trigger search event
+	          (0, _utils.triggerEvent)(this.passedElement, 'search', {
+	            value: value
+	          });
 	        } else if (hasUnactiveChoices) {
 	          // Otherwise reset choices to active
 	          this.isSearching = false;
@@ -2150,7 +2134,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var items = this.store.getItems();
 	      var passedLabel = label || passedValue;
 	      var passedOptionId = parseInt(choiceId, 10) || -1;
-	      var callback = this.config.callbackOnAddItem;
+
+	      // Get group if group ID passed
+	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+
+	      // Generate unique id
+	      var id = items ? items.length + 1 : 1;
 
 	      // If a prepended value has been passed, prepend it
 	      if (this.config.prependValue) {
@@ -2162,27 +2151,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        passedValue += this.config.appendValue.toString();
 	      }
 
-	      // Generate unique id
-	      var id = items ? items.length + 1 : 1;
-
 	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId));
 
 	      if (this.passedElement.type === 'select-one') {
 	        this.removeActiveItems(id);
 	      }
 
-	      // Run callback if it is a function
-	      if (callback) {
-	        var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-	        if ((0, _utils.isType)('Function', callback)) {
-	          if (group && group.value) {
-	            callback.call(this, id, passedValue, group.value);
-	          } else {
-	            callback.call(this, id, passedValue);
-	          }
-	        } else {
-	          console.error('callbackOnAddItem: Callback is not a function');
-	        }
+	      // Trigger change event
+	      if (group && group.value) {
+	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
+	          id: id,
+	          value: passedValue,
+	          groupValue: group.value
+	        });
+	      } else {
+	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
+	          id: id,
+	          value: passedValue
+	        });
 	      }
 
 	      return this;
@@ -2208,22 +2194,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var value = item.value;
 	      var choiceId = item.choiceId;
 	      var groupId = item.groupId;
-	      var callback = this.config.callbackOnRemoveItem;
+	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
 	      this.store.dispatch((0, _index3.removeItem)(id, choiceId));
 
-	      // Run callback
-	      if (callback) {
-	        if ((0, _utils.isType)('Function', callback)) {
-	          var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-	          if (group && group.value) {
-	            callback.call(this, id, value, group.value);
-	          } else {
-	            callback.call(this, id, value);
-	          }
-	        } else {
-	          console.error('callbackOnRemoveItem: Callback is not a function');
-	        }
+	      if (group && group.value) {
+	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
+	          id: id,
+	          value: value,
+	          groupValue: group.value
+	        });
+	      } else {
+	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
+	          id: id,
+	          value: value
+	        });
 	      }
 
 	      return this;
@@ -2245,7 +2230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _addChoice(isSelected, isDisabled, value, label) {
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 
-	      if (!value) return;
+	      if (typeof value === 'undefined' || value === null) return;
 
 	      // Generate unique id
 	      var choices = this.store.getChoices();
@@ -2395,6 +2380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (callbackTemplate && (0, _utils.isType)('Function', callbackTemplate)) {
 	        userTemplates = callbackTemplate.call(this, _utils.strToEl);
 	      }
+
 	      this.config.templates = (0, _utils.extend)(templates, userTemplates);
 	    }
 
@@ -5301,6 +5287,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return width + "px";
 	};
 
+	/**
+	 * Sorting function for current and previous string
+	 * @param  {String} a Current value
+	 * @param  {String} b Next value
+	 * @return {Number}   -1 for after previous,
+	 *                    1 for before,
+	 *                    0 for same location
+	 */
 	var sortByAlpha = exports.sortByAlpha = function sortByAlpha(a, b) {
 	  var labelA = (a.label || a.value).toLowerCase();
 	  var labelB = (b.label || b.value).toLowerCase();
@@ -5310,8 +5304,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return 0;
 	};
 
+	/**
+	 * Sort by numeric score
+	 * @param  {Object} a Current value
+	 * @param  {Object} b Next value
+	 * @return {Number}   -1 for after previous,
+	 *                    1 for before,
+	 *                    0 for same location
+	 */
 	var sortByScore = exports.sortByScore = function sortByScore(a, b) {
 	  return a.score - b.score;
+	};
+
+	/**
+	 * Trigger native event
+	 * @param  {NodeElement} element Element to trigger event on
+	 * @param  {String} type         Type of event to trigger
+	 * @param  {Object} customArgs   Data to pass with event
+	 * @return {Object}              Triggered event
+	 */
+	var triggerEvent = exports.triggerEvent = function triggerEvent(element, type) {
+	  var customArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+	  var event = new CustomEvent(type, {
+	    detail: customArgs,
+	    bubbles: true,
+	    cancelable: true
+	  });
+
+	  return element.dispatchEvent(event);
 	};
 
 /***/ },
@@ -5321,118 +5342,135 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	/* eslint-disable */
-	// Production steps of ECMA-262, Edition 6, 22.1.2.1
-	// Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
-	if (!Array.from) {
-	  Array.from = function () {
-	    var toStr = Object.prototype.toString;
+	(function () {
+	  // Production steps of ECMA-262, Edition 6, 22.1.2.1
+	  // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
+	  if (!Array.from) {
+	    Array.from = function () {
+	      var toStr = Object.prototype.toString;
 
-	    var isCallable = function isCallable(fn) {
-	      return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
-	    };
+	      var isCallable = function isCallable(fn) {
+	        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+	      };
 
-	    var toInteger = function toInteger(value) {
-	      var number = Number(value);
-	      if (isNaN(number)) {
-	        return 0;
-	      }
-	      if (number === 0 || !isFinite(number)) {
-	        return number;
-	      }
-	      return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
-	    };
+	      var toInteger = function toInteger(value) {
+	        var number = Number(value);
+	        if (isNaN(number)) {
+	          return 0;
+	        }
+	        if (number === 0 || !isFinite(number)) {
+	          return number;
+	        }
+	        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+	      };
 
-	    var maxSafeInteger = Math.pow(2, 53) - 1;
+	      var maxSafeInteger = Math.pow(2, 53) - 1;
 
-	    var toLength = function toLength(value) {
-	      var len = toInteger(value);
-	      return Math.min(Math.max(len, 0), maxSafeInteger);
-	    };
+	      var toLength = function toLength(value) {
+	        var len = toInteger(value);
+	        return Math.min(Math.max(len, 0), maxSafeInteger);
+	      };
 
-	    // The length property of the from method is 1.
-	    return function from(arrayLike /*, mapFn, thisArg */) {
-	      // 1. Let C be the this value.
-	      var C = this;
+	      // The length property of the from method is 1.
+	      return function from(arrayLike /*, mapFn, thisArg */) {
+	        // 1. Let C be the this value.
+	        var C = this;
 
-	      // 2. Let items be ToObject(arrayLike).
-	      var items = Object(arrayLike);
+	        // 2. Let items be ToObject(arrayLike).
+	        var items = Object(arrayLike);
 
-	      // 3. ReturnIfAbrupt(items).
-	      if (arrayLike == null) {
-	        throw new TypeError("Array.from requires an array-like object - not null or undefined");
-	      }
-
-	      // 4. If mapfn is undefined, then let mapping be false.
-	      var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-	      var T;
-	      if (typeof mapFn !== 'undefined') {
-	        // 5. else
-	        // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-	        if (!isCallable(mapFn)) {
-	          throw new TypeError('Array.from: when provided, the second argument must be a function');
+	        // 3. ReturnIfAbrupt(items).
+	        if (arrayLike == null) {
+	          throw new TypeError("Array.from requires an array-like object - not null or undefined");
 	        }
 
-	        // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-	        if (arguments.length > 2) {
-	          T = arguments[2];
+	        // 4. If mapfn is undefined, then let mapping be false.
+	        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+	        var T;
+	        if (typeof mapFn !== 'undefined') {
+	          // 5. else
+	          // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+	          if (!isCallable(mapFn)) {
+	            throw new TypeError('Array.from: when provided, the second argument must be a function');
+	          }
+
+	          // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+	          if (arguments.length > 2) {
+	            T = arguments[2];
+	          }
+	        }
+
+	        // 10. Let lenValue be Get(items, "length").
+	        // 11. Let len be ToLength(lenValue).
+	        var len = toLength(items.length);
+
+	        // 13. If IsConstructor(C) is true, then
+	        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+	        // 14. a. Else, Let A be ArrayCreate(len).
+	        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+
+	        // 16. Let k be 0.
+	        var k = 0;
+	        // 17. Repeat, while k < len… (also steps a - h)
+	        var kValue;
+	        while (k < len) {
+	          kValue = items[k];
+	          if (mapFn) {
+	            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+	          } else {
+	            A[k] = kValue;
+	          }
+	          k += 1;
+	        }
+	        // 18. Let putStatus be Put(A, "length", len, true).
+	        A.length = len;
+	        // 20. Return A.
+	        return A;
+	      };
+	    }();
+	  }
+
+	  // Reference: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+	  if (!Array.prototype.find) {
+	    Array.prototype.find = function (predicate) {
+	      'use strict';
+
+	      if (this == null) {
+	        throw new TypeError('Array.prototype.find called on null or undefined');
+	      }
+	      if (typeof predicate !== 'function') {
+	        throw new TypeError('predicate must be a function');
+	      }
+	      var list = Object(this);
+	      var length = list.length >>> 0;
+	      var thisArg = arguments[1];
+	      var value;
+
+	      for (var i = 0; i < length; i++) {
+	        value = list[i];
+	        if (predicate.call(thisArg, value, i, list)) {
+	          return value;
 	        }
 	      }
-
-	      // 10. Let lenValue be Get(items, "length").
-	      // 11. Let len be ToLength(lenValue).
-	      var len = toLength(items.length);
-
-	      // 13. If IsConstructor(C) is true, then
-	      // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
-	      // 14. a. Else, Let A be ArrayCreate(len).
-	      var A = isCallable(C) ? Object(new C(len)) : new Array(len);
-
-	      // 16. Let k be 0.
-	      var k = 0;
-	      // 17. Repeat, while k < len… (also steps a - h)
-	      var kValue;
-	      while (k < len) {
-	        kValue = items[k];
-	        if (mapFn) {
-	          A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-	        } else {
-	          A[k] = kValue;
-	        }
-	        k += 1;
-	      }
-	      // 18. Let putStatus be Put(A, "length", len, true).
-	      A.length = len;
-	      // 20. Return A.
-	      return A;
+	      return undefined;
 	    };
-	  }();
-	}
+	  }
 
-	// Reference: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-	if (!Array.prototype.find) {
-	  Array.prototype.find = function (predicate) {
-	    'use strict';
+	  function CustomEvent(event, params) {
+	    params = params || {
+	      bubbles: false,
+	      cancelable: false,
+	      detail: undefined
+	    };
+	    var evt = document.createEvent('CustomEvent');
+	    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+	    return evt;
+	  }
 
-	    if (this == null) {
-	      throw new TypeError('Array.prototype.find called on null or undefined');
-	    }
-	    if (typeof predicate !== 'function') {
-	      throw new TypeError('predicate must be a function');
-	    }
-	    var list = Object(this);
-	    var length = list.length >>> 0;
-	    var thisArg = arguments[1];
-	    var value;
+	  CustomEvent.prototype = window.Event.prototype;
 
-	    for (var i = 0; i < length; i++) {
-	      value = list[i];
-	      if (predicate.call(thisArg, value, i, list)) {
-	        return value;
-	      }
-	    }
-	    return undefined;
-	  };
-	}
+	  window.CustomEvent = CustomEvent;
+	})();
 
 /***/ }
 /******/ ])
