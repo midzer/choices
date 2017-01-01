@@ -105,8 +105,6 @@ class Choices {
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
       },
-      // Choices uses the great Fuse library for searching. You
-      // can find more options here: https://github.com/krisk/Fuse#options
       fuseOptions: {
         include: 'score',
       },
