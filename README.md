@@ -108,6 +108,11 @@ Or include Choices directly:
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
     },
+    // Choices uses the great Fuse library for searching. You
+    // can find more options here: https://github.com/krisk/Fuse#options
+    fuseOptions: {
+      include: 'score',
+    },
     callbackOnInit: null,
     callbackOnCreateTemplates: null,
   });

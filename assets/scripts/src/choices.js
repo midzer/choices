@@ -105,6 +105,9 @@ class Choices {
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
       },
+      fuseOptions: {
+        include: 'score',
+      },
       callbackOnInit: null,
       callbackOnCreateTemplates: null,
     };
@@ -1138,12 +1141,10 @@ class Choices {
       const haystack = this.store.getChoicesFilteredBySelectable();
       const needle = newValue;
       const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
-      const fuse = new Fuse(haystack, {
-        keys,
-        shouldSort: true,
-        include: 'score',
-      });
+      const options = Object.assign(this.config.fuseOptions, { keys });
+      const fuse = new Fuse(haystack, options);
       const results = fuse.search(needle);
+
       this.currentValue = newValue;
       this.highlightPosition = 0;
       this.isSearching = true;
