@@ -65,6 +65,7 @@ Or include Choices directly:
     search: true,
     searchFloor: 1,
     flip: true,
+    resetScrollPosition: true,
     regexFilter: null,
     shouldSort: true,
     sortFilter: () => {...},
