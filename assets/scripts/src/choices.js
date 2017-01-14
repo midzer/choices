@@ -60,6 +60,7 @@ class Choices {
       search: true,
       searchFloor: 1,
       flip: true,
+      resetScrollPosition: true,
       regexFilter: null,
       shouldSort: true,
       sortFilter: sortByAlpha,
@@ -391,8 +392,11 @@ class Choices {
 
           // Clear choices
           this.choiceList.innerHTML = '';
+
           // Scroll back to top of choices list
-          this.choiceList.scrollTop = 0;
+          if(this.config.resetScrollPosition){
+            this.choiceList.scrollTop = 0;
+          }
 
           // If we have grouped options
           if (activeGroups.length >= 1 && this.isSearching !== true) {
