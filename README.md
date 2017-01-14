@@ -255,6 +255,13 @@ Pass an array of objects:
 
 **Usage:** Whether the dropdown should appear above the input (rather than beneath) if there is not enough space within the window. 
 
+### resetScrollPosition
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `select-multiple`
+
+**Usage:** Whether the scroll position should reset after adding an item.
+
 ### regexFilter
 **Type:** `Regex` **Default:** `null`
 
