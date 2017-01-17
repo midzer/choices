@@ -2,6 +2,30 @@ import 'whatwg-fetch';
 import 'es6-promise';
 import Choices from '../../assets/scripts/src/choices.js';
 
+if (typeof Object.assign != 'function') {
+  Object.assign = function (target, varArgs) { // .length of function is 2
+    if (target == null) { // TypeError if undefined or null
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) { // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+
 describe('Choices', () => {
 
   afterEach(function() {
@@ -12,7 +36,7 @@ describe('Choices', () => {
 
     beforeEach(function() {
       this.input = document.createElement('input');
-      this.input.type = "text";
+      this.input.type = 'text';
       this.input.className = 'js-choices';
 
       document.body.appendChild(this.input);
@@ -67,12 +91,7 @@ describe('Choices', () => {
       expect(this.choices.config.itemSelectText).toEqual(jasmine.any(String));
       expect(this.choices.config.classNames).toEqual(jasmine.any(Object));
       expect(this.choices.config.callbackOnInit).toEqual(null);
-      expect(this.choices.config.callbackOnAddItem).toEqual(null);
-      expect(this.choices.config.callbackOnRemoveItem).toEqual(null);
-      expect(this.choices.config.callbackOnHighlightItem).toEqual(null);
-      expect(this.choices.config.callbackOnUnhighlightItem).toEqual(null);
-      expect(this.choices.config.callbackOnChange).toEqual(null);
-      expect(this.choices.config.callbackOnSearch).toEqual(null);
+      expect(this.choices.config.callbackOnCreateTemplates).toEqual(null);
     });
 
     it('should expose public methods', function() {
@@ -127,15 +146,15 @@ describe('Choices', () => {
       expect(this.choices.input).toEqual(jasmine.any(HTMLElement));
     });
 
-    // it('should create a dropdown', function() {
-    //   expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
-    // });
+    it('should create a dropdown', function() {
+      expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
+    });
   });
 
   describe('should accept text inputs', function() {
     beforeEach(function() {
       this.input = document.createElement('input');
-      this.input.type = "text";
+      this.input.type = 'text';
       this.input.className = 'js-choices';
       this.input.placeholder = 'Placeholder text';
 
@@ -294,15 +313,23 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
+        preventDefault: () => {}
       });
 
       expect(this.choices.currentState.items.length).toBe(2);
     });
 
-    it('should trigger a change callback on selection', function() {
+    it('should trigger add/change event on selection', function() {
       this.choices = new Choices(this.input);
-      spyOn(this.choices.config, 'callbackOnChange');
+
+      const changeSpy = jasmine.createSpy('changeSpy');
+      const addSpy = jasmine.createSpy('addSpy');
+      const passedElement = this.choices.passedElement;
+
+      passedElement.addEventListener('change', changeSpy);
+      passedElement.addEventListener('addItem', addSpy);
+
       this.choices.input.focus();
 
       // Key down to second choice
@@ -317,10 +344,14 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
+        preventDefault: () => {}
       });
 
-      expect(this.choices.config.callbackOnChange).toHaveBeenCalledWith(jasmine.any(String));
+      const returnValue = changeSpy.calls.mostRecent().args[0].detail.value;
+      expect(returnValue).toEqual(jasmine.any(String));
+      expect(changeSpy).toHaveBeenCalled();
+      expect(addSpy).toHaveBeenCalled();
     });
 
     it('should open the dropdown on click', function() {
@@ -356,6 +387,12 @@ describe('Choices', () => {
 
     it('should filter choices when searching', function() {
       this.choices = new Choices(this.input);
+
+      const searchSpy = jasmine.createSpy('searchSpy');
+      const passedElement = this.choices.passedElement;
+
+      passedElement.addEventListener('search', searchSpy);
+
       this.choices.input.focus();
       this.choices.input.value = 'Value 3';
 
@@ -369,6 +406,7 @@ describe('Choices', () => {
       const mostAccurateResult = this.choices.currentState.choices[0];
 
       expect(this.choices.isSearching && mostAccurateResult.value === 'Value 3').toBeTruthy;
+      expect(searchSpy).toHaveBeenCalled();
     });
 
     it('shouldn\'t sort choices if shouldSort is false', function() {
@@ -638,6 +676,21 @@ describe('Choices', () => {
       expect(choices[choices.length - 2].value).toEqual('Child Five');
     });
 
+    it('should handle setChoices() with blank values', function() {
+      this.choices.setChoices([{
+        label: 'Choice one',
+        value: 'one'
+      }, {
+        label: 'Choice two',
+        value: ''
+      }], 'value', 'label', true);
+
+
+      const choices = this.choices.currentState.choices;
+      expect(choices[0].value).toEqual('one');
+      expect(choices[1].value).toEqual('');
+    });
+
     it('should handle clearStore()', function() {
       this.choices.clearStore();
 
@@ -684,9 +737,9 @@ describe('Choices', () => {
   describe('should handle public methods on text input types', function() {
     beforeEach(function() {
       this.input = document.createElement('input');
-      this.input.type = "text";
+      this.input.type = 'text';
       this.input.className = 'js-choices';
-      this.input.value = "Value 1, Value 2, Value 3, Value 4";
+      this.input.value = 'Value 1, Value 2, Value 3, Value 4';
 
       document.body.appendChild(this.input);
       this.choices = new Choices(this.input);
