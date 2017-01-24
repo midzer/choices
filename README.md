@@ -3,6 +3,10 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
+----
+###Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials!
+----
+
 ## TL;DR 
 * Lightweight
 * No jQuery dependency
