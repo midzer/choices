@@ -60,6 +60,7 @@ class Choices {
       search: true,
       searchFloor: 1,
       flip: true,
+      resetScrollPosition: true,
       regexFilter: null,
       shouldSort: true,
       sortFilter: sortByAlpha,
@@ -391,8 +392,11 @@ class Choices {
 
           // Clear choices
           this.choiceList.innerHTML = '';
+
           // Scroll back to top of choices list
-          this.choiceList.scrollTop = 0;
+          if(this.config.resetScrollPosition){
+            this.choiceList.scrollTop = 0;
+          }
 
           // If we have grouped options
           if (activeGroups.length >= 1 && this.isSearching !== true) {
@@ -1274,6 +1278,8 @@ class Choices {
     const escapeKey = 27;
     const upKey = 38;
     const downKey = 40;
+    const pageUpKey = 33;
+    const pageDownKey = 34;
     const ctrlDownKey = e.ctrlKey || e.metaKey;
 
     // If a user is typing and the dropdown is not active
@@ -1348,16 +1354,25 @@ class Choices {
           this.showDropdown(true);
         }
 
-        const currentEl = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
-        const directionInt = e.keyCode === downKey ? 1 : -1;
-        let nextEl;
-
         this.canSearch = false;
 
-        if (currentEl) {
-          nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
+        const directionInt = e.keyCode === downKey || e.keyCode === pageDownKey ? 1 : -1;
+        const skipKey = e.metaKey || e.keyCode === pageDownKey || e.keyCode === pageUpKey;
+
+        let nextEl;
+        if (skipKey) {
+          if (directionInt > 0) {
+            nextEl = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]')).pop();
+          } else {
+            nextEl = this.dropdown.querySelector('[data-choice-selectable]');
+          }
         } else {
-          nextEl = this.dropdown.querySelector('[data-choice-selectable]');
+          const currentEl = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
+          if (currentEl) {
+            nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
+          } else {
+            nextEl = this.dropdown.querySelector('[data-choice-selectable]');
+          }
         }
 
         if (nextEl) {
@@ -1389,7 +1404,9 @@ class Choices {
       [enterKey]: onEnterKey,
       [escapeKey]: onEscapeKey,
       [upKey]: onDirectionKey,
+      [pageUpKey]: onDirectionKey,
       [downKey]: onDirectionKey,
+      [pageDownKey]: onDirectionKey,
       [deleteKey]: onDeleteKey,
       [backKey]: onDeleteKey,
     };

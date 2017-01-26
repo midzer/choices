@@ -1,4 +1,4 @@
-# Choices.js [![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)](https://travis-ci.org/jshjohnson/Choices) 
+# Choices.js [![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)](https://travis-ci.org/jshjohnson/Choices) [![Project Sponsored By ES6.io](https://img.shields.io/badge/👍_Project_Sponsored_By-ES6.io Tutorials-brightgreen.svg)](https://ES6.io/friend/JOHNSON)
 A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
@@ -12,6 +12,10 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Clean API
 * Right-to-left support
 * Custom templates
+
+----
+###Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials!
+----
 
 ## Installation
 With [NPM](https://www.npmjs.com/package/choices.js):
@@ -65,6 +69,7 @@ Or include Choices directly:
     search: true,
     searchFloor: 1,
     flip: true,
+    resetScrollPosition: true,
     regexFilter: null,
     shouldSort: true,
     sortFilter: () => {...},
@@ -253,6 +258,13 @@ Pass an array of objects:
 **Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** Whether the dropdown should appear above the input (rather than beneath) if there is not enough space within the window. 
+
+### resetScrollPosition
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `select-multiple`
+
+**Usage:** Whether the scroll position should reset after adding an item.
 
 ### regexFilter
 **Type:** `Regex` **Default:** `null`
