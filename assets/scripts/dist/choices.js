@@ -1,4 +1,4 @@
-/*! choices.js v2.6.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.6.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -126,6 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      search: true,
 	      searchFloor: 1,
 	      flip: true,
+	      resetScrollPosition: true,
 	      regexFilter: null,
 	      shouldSort: true,
 	      sortFilter: _utils.sortByAlpha,
@@ -484,8 +485,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            // Clear choices
 	            this.choiceList.innerHTML = '';
+
 	            // Scroll back to top of choices list
-	            this.choiceList.scrollTop = 0;
+	            if (this.config.resetScrollPosition) {
+	              this.choiceList.scrollTop = 0;
+	            }
 
 	            // If we have grouped options
 	            if (activeGroups.length >= 1 && this.isSearching !== true) {
@@ -1520,6 +1524,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var escapeKey = 27;
 	      var upKey = 38;
 	      var downKey = 40;
+	      var pageUpKey = 33;
+	      var pageDownKey = 34;
 	      var ctrlDownKey = e.ctrlKey || e.metaKey;
 
 	      // If a user is typing and the dropdown is not active
@@ -1593,16 +1599,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this17.showDropdown(true);
 	          }
 
-	          var currentEl = _this17.dropdown.querySelector('.' + _this17.config.classNames.highlightedState);
-	          var directionInt = e.keyCode === downKey ? 1 : -1;
-	          var nextEl = void 0;
-
 	          _this17.canSearch = false;
 
-	          if (currentEl) {
-	            nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
+	          var directionInt = e.keyCode === downKey || e.keyCode === pageDownKey ? 1 : -1;
+	          var skipKey = e.metaKey || e.keyCode === pageDownKey || e.keyCode === pageUpKey;
+
+	          var nextEl = void 0;
+	          if (skipKey) {
+	            if (directionInt > 0) {
+	              nextEl = Array.from(_this17.dropdown.querySelectorAll('[data-choice-selectable]')).pop();
+	            } else {
+	              nextEl = _this17.dropdown.querySelector('[data-choice-selectable]');
+	            }
 	          } else {
-	            nextEl = _this17.dropdown.querySelector('[data-choice-selectable]');
+	            var currentEl = _this17.dropdown.querySelector('.' + _this17.config.classNames.highlightedState);
+	            if (currentEl) {
+	              nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
+	            } else {
+	              nextEl = _this17.dropdown.querySelector('[data-choice-selectable]');
+	            }
 	          }
 
 	          if (nextEl) {
@@ -1629,7 +1644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 
 	      // Map keys to key actions
-	      var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, aKey, onAKey), _defineProperty(_keyDownActions, enterKey, onEnterKey), _defineProperty(_keyDownActions, escapeKey, onEscapeKey), _defineProperty(_keyDownActions, upKey, onDirectionKey), _defineProperty(_keyDownActions, downKey, onDirectionKey), _defineProperty(_keyDownActions, deleteKey, onDeleteKey), _defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
+	      var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, aKey, onAKey), _defineProperty(_keyDownActions, enterKey, onEnterKey), _defineProperty(_keyDownActions, escapeKey, onEscapeKey), _defineProperty(_keyDownActions, upKey, onDirectionKey), _defineProperty(_keyDownActions, pageUpKey, onDirectionKey), _defineProperty(_keyDownActions, downKey, onDirectionKey), _defineProperty(_keyDownActions, pageDownKey, onDirectionKey), _defineProperty(_keyDownActions, deleteKey, onDeleteKey), _defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
 
 	      // If keycode has a function, run it
 	      if (keyDownActions[e.keyCode]) {
