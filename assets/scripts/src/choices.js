@@ -790,7 +790,7 @@ class Choices {
             const isSelected = result.selected ? result.selected : false;
             const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
-              this._addGroup(result, index, value, label);
+              this._addGroup(result, result.id, value, label);
             } else {
               this._addChoice(isSelected, isDisabled, result[value], result[label]);
             }
@@ -1120,7 +1120,7 @@ class Choices {
           const isSelected = result.selected ? result.selected : false;
           const isDisabled = result.disabled ? result.disabled : false;
           if (result.choices) {
-            this._addGroup(result, index, value, label);
+            this._addGroup(result, result.id, value, label);
           } else {
             this._addChoice(isSelected, isDisabled, result[value], result[label]);
           }
@@ -2172,8 +2172,8 @@ class Choices {
       this.isSearching = false;
 
       if (passedGroups && passedGroups.length) {
-        passedGroups.forEach((group, index) => {
-          this._addGroup(group, index);
+        passedGroups.forEach((group) => {
+          this._addGroup(group, group.id);
         });
       } else {
         const passedOptions = Array.from(this.passedElement.options);
