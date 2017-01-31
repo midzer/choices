@@ -790,6 +790,7 @@ class Choices {
             const isSelected = result.selected ? result.selected : false;
             const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
+              if (result.id === undefined || result.id === null) throw new Error('Group id field missing');
               this._addGroup(result, result.id, value, label);
             } else {
               this._addChoice(isSelected, isDisabled, result[value], result[label]);
@@ -1120,6 +1121,7 @@ class Choices {
           const isSelected = result.selected ? result.selected : false;
           const isDisabled = result.disabled ? result.disabled : false;
           if (result.choices) {
+            if (result.id === undefined || result.id === null) throw new Error('Group id field missing');
             this._addGroup(result, result.id, value, label);
           } else {
             this._addChoice(isSelected, isDisabled, result[value], result[label]);
@@ -2173,6 +2175,7 @@ class Choices {
 
       if (passedGroups && passedGroups.length) {
         passedGroups.forEach((group) => {
+          if (group.id === undefined || group.id === null) throw new Error('Group id field missing');
           this._addGroup(group, group.id);
         });
       } else {
