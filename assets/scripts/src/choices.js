@@ -2032,7 +2032,7 @@ class Choices {
         if (this.config.removeItemButton) {
           return strToEl(`
               <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
-              ${data.label}<button class="${classNames.button}" data-button>Remove item</button>
+              ${data.label}<button type="button" class="${classNames.button}" data-button>Remove item</button>
               </div>
             `);
         }
