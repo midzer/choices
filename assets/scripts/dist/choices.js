@@ -1,4 +1,4 @@
-/*! choices.js v2.6.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.7.0 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -956,7 +956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var isSelected = result.selected ? result.selected : false;
 	              var isDisabled = result.disabled ? result.disabled : false;
 	              if (result.choices) {
-	                _this13._addGroup(result, index, value, label);
+	                _this13._addGroup(result, result.id || null, value, label);
 	              } else {
 	                _this13._addChoice(isSelected, isDisabled, result[value], result[label]);
 	              }
@@ -1344,7 +1344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var isSelected = result.selected ? result.selected : false;
 	            var isDisabled = result.disabled ? result.disabled : false;
 	            if (result.choices) {
-	              _this16._addGroup(result, index, value, label);
+	              _this16._addGroup(result, result.id || null, value, label);
 	            } else {
 	              _this16._addChoice(isSelected, isDisabled, result[value], result[label]);
 	            }
@@ -2291,7 +2291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
 
 	      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
-	      var groupId = id;
+	      var groupId = id ? id : Math.floor(new Date().valueOf() * Math.random());
 	      var isDisabled = group.disabled ? group.disabled : false;
 
 	      if (groupChoices) {
@@ -2363,7 +2363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        item: function item(data) {
 	          if (_this23.config.removeItemButton) {
-	            return (0, _utils.strToEl)('\n              <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n              ' + data.label + '<button class="' + classNames.button + '" data-button>Remove item</button>\n              </div>\n            ');
+	            return (0, _utils.strToEl)('\n              <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n              ' + data.label + '<button type="button" class="' + classNames.button + '" data-button>Remove item</button>\n              </div>\n            ');
 	          }
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            ' + data.label + '\n          </div>\n          ');
 	        },
@@ -2471,8 +2471,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.isSearching = false;
 
 	        if (passedGroups && passedGroups.length) {
-	          passedGroups.forEach(function (group, index) {
-	            _this24._addGroup(group, index);
+	          passedGroups.forEach(function (group) {
+	            _this24._addGroup(group, group.id || null);
 	          });
 	        } else {
 	          (function () {
