@@ -790,8 +790,7 @@ class Choices {
             const isSelected = result.selected ? result.selected : false;
             const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
-              if (result.id === undefined || result.id === null) throw new Error('Group id field missing');
-              this._addGroup(result, result.id, value, label);
+              this._addGroup(result, (result.id || null), value, label);
             } else {
               this._addChoice(isSelected, isDisabled, result[value], result[label]);
             }
@@ -1121,8 +1120,7 @@ class Choices {
           const isSelected = result.selected ? result.selected : false;
           const isDisabled = result.disabled ? result.disabled : false;
           if (result.choices) {
-            if (result.id === undefined || result.id === null) throw new Error('Group id field missing');
-            this._addGroup(result, result.id, value, label);
+            this._addGroup(result, (result.id || null), value, label);
           } else {
             this._addChoice(isSelected, isDisabled, result[value], result[label]);
           }
@@ -1978,7 +1976,7 @@ class Choices {
    */
   _addGroup(group, id, valueKey = 'value', labelKey = 'label') {
     const groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
-    const groupId = id;
+    const groupId = id ? id : Math.floor(new Date().valueOf() * Math.random());
     const isDisabled = group.disabled ? group.disabled : false;
 
     if (groupChoices) {
@@ -2175,8 +2173,7 @@ class Choices {
 
       if (passedGroups && passedGroups.length) {
         passedGroups.forEach((group) => {
-          if (group.id === undefined || group.id === null) throw new Error('Group id field missing');
-          this._addGroup(group, group.id);
+          this._addGroup(group, (group.id || null));
         });
       } else {
         const passedOptions = Array.from(this.passedElement.options);
