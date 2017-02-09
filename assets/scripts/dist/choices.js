@@ -1,4 +1,4 @@
-/*! choices.js v2.7.0 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.7.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -505,7 +505,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	              this._highlightChoice();
 	            } else {
 	              // Otherwise show a notice
-	              var dropdownItem = this.isSearching ? this._getTemplate('notice', this.config.noResultsText) : this._getTemplate('notice', this.config.noChoicesText);
+	              var dropdownItem = void 0;
+	              var notice = void 0;
+
+	              if (this.isSearching) {
+	                notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+	                dropdownItem = this._getTemplate('notice', notice);
+	              } else {
+	                notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+	                dropdownItem = this._getTemplate('notice', notice);
+	              }
+
 	              this.choiceList.appendChild(dropdownItem);
 	            }
 	          }
