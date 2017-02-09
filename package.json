@@ -13,7 +13,8 @@
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",
     "js:test": "./node_modules/karma/bin/karma start --single-run --no-auto-watch tests/karma.config.js",
     "js:test:watch": "./node_modules/karma/bin/karma start --auto-watch --no-single-run tests/karma.config.js",
-    "preversion": "npm run js:build"
+    "version": "node version.js --current $npm_package_version --new $npm_config_newVersion",
+    "postversion": "npm run js:build"
   },
   "repository": {
     "type": "git",
