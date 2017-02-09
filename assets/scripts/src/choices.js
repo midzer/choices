@@ -412,9 +412,17 @@ class Choices {
             this._highlightChoice();
           } else {
             // Otherwise show a notice
-            const dropdownItem = this.isSearching ?
-              this._getTemplate('notice', this.config.noResultsText) :
-              this._getTemplate('notice', this.config.noChoicesText);
+            let dropdownItem;
+            let notice;
+
+            if (this.isSearching) {
+              notice = isType('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+              dropdownItem = this._getTemplate('notice', notice);
+            } else {
+              notice = isType('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+              dropdownItem = this._getTemplate('notice', notice);
+            }
+
             this.choiceList.appendChild(dropdownItem);
           }
         }
