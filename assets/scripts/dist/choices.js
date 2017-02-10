@@ -1,4 +1,4 @@
-/*! choices.js v2.7.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.7.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1344,6 +1344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return function (results, value, label) {
 	        if (!results || !value) return;
+
 	        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
 
 	        if (parsedResults && (0, _utils.isType)('Array', parsedResults) && parsedResults.length) {
@@ -1359,7 +1360,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _this16._addChoice(isSelected, isDisabled, result[value], result[label]);
 	            }
 	          });
+	        } else {
+	          // No results, remove loading state
+	          _this16._handleLoadingState(false);
 	        }
+
 	        _this16.containerOuter.removeAttribute('aria-busy');
 	      };
 	    }
