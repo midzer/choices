@@ -1118,6 +1118,7 @@ class Choices {
   _ajaxCallback() {
     return (results, value, label) => {
       if (!results || !value) return;
+
       const parsedResults = isType('Object', results) ? [results] : results;
 
       if (parsedResults && isType('Array', parsedResults) && parsedResults.length) {
@@ -1133,7 +1134,11 @@ class Choices {
             this._addChoice(isSelected, isDisabled, result[value], result[label]);
           }
         });
+      } else {
+        // No results, remove loading state
+        this._handleLoadingState(false);
       }
+
       this.containerOuter.removeAttribute('aria-busy');
     };
   }
