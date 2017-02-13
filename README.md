@@ -14,7 +14,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Custom templates
 
 ----
-###Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials!
+###Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼 
 ----
 
 ## Installation
