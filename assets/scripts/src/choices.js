@@ -710,7 +710,7 @@ class Choices {
   /**
    * Set value of input. If the input is a select box, a choice will be created and selected otherwise
    * an item will created directly.
-   * @param {Array/String} args Array of value objects or value strings/Single value string
+   * @param  {Array}   args  Array of value objects or value strings
    * @return {Object} Class instance
    * @public
    */
