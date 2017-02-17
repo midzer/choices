@@ -34,7 +34,7 @@ const updateVersion = (config) => {
   const args = argvToObject();
   const currentVersion = args.current;
   const newVersion = args.new;
-  console.log(args);
+  console.log(`Updating version from ${currentVersion} to ${newVersion}`);
   config.files.forEach((file) => {
     const filePath = path.join(__dirname, file);
     const regex = new RegExp(currentVersion, 'g');
