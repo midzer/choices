@@ -289,7 +289,7 @@
       var textEmailFilter = new Choices('#choices-text-email-filter', {
         editItems: true,
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      });
+      }).setValue(['joe@bloggs.com']);
 
       var textDisabled = new Choices('#choices-text-disabled', {
         addItems: false,

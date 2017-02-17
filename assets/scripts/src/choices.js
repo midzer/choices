@@ -16,6 +16,7 @@ import {
   isScrolledIntoView,
   getAdjacentEl,
   wrap,
+  getType,
   isType,
   isElement,
   strToEl,
@@ -709,34 +710,42 @@ class Choices {
   /**
    * Set value of input. If the input is a select box, a choice will be created and selected otherwise
    * an item will created directly.
-   * @param {Array} args Array of value objects or value strings
+   * @param {Array/String} args Array of value objects or value strings/Single value string
    * @return {Object} Class instance
    * @public
    */
   setValue(args) {
     if (this.initialised === true) {
-      // Convert args to an itterable array
+      // Convert args to an iterable array
       const values = [...args],
-        passedElementType = this.passedElement.type;
+        passedElementType = this.passedElement.type,
+        handleValue = (item) => {
+          const itemType = getType(item);
+          if (itemType === 'Object') {
+            if (!item.value) return;
+            // If we are dealing with a select input, we need to create an option first
+            // that is then selected. For text inputs we can just add items normally.
+            if (passedElementType !== 'text') {
+              this._addChoice(true, false, item.value, item.label, -1);
+            } else {
+              this._addItem(item.value, item.label, item.id);
+            }
+          } else if (itemType === 'String') {
+            if (passedElementType !== 'text') {
+              this._addChoice(true, false, item, item, -1);
+            } else {
+              this._addItem(item);
+            }
+          }
+        };
 
-      values.forEach((item) => {
-        if (isType('Object', item)) {
-          if (!item.value) return;
-          // If we are dealing with a select input, we need to create an option first
-          // that is then selected. For text inputs we can just add items normally.
-          if (passedElementType !== 'text') {
-            this._addChoice(true, false, item.value, item.label, -1);
-          } else {
-            this._addItem(item.value, item.label, item.id);
-          }
-        } else if (isType('String', item)) {
-          if (passedElementType !== 'text') {
-            this._addChoice(true, false, item, item, -1);
-          } else {
-            this._addItem(item);
-          }
-        }
-      });
+      if (values.length > 1) {
+        values.forEach((value) => {
+          handleValue(value);
+        });
+      } else {
+        handleValue(values[0]);
+      }
     }
     return this;
   }
@@ -2235,10 +2244,11 @@ class Choices {
     } else if (this.isTextElement) {
       // Add any preset values seperated by delimiter
       this.presetItems.forEach((item) => {
-        if (isType('Object', item)) {
+        const itemType = getType(item);
+        if (itemType === 'Object') {
           if (!item.value) return;
           this._addItem(item.value, item.label, item.id);
-        } else if (isType('String', item)) {
+        } else if (itemType === 'String') {
           this._addItem(item);
         }
       });
