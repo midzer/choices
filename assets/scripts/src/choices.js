@@ -60,7 +60,7 @@ class Choices {
       paste: true,
       search: true,
       searchFloor: 1,
-      flip: true,
+      position: 'auto',
       resetScrollPosition: true,
       regexFilter: null,
       shouldSort: true,
@@ -615,8 +615,13 @@ class Choices {
   showDropdown(focusInput = false) {
     const body = document.body;
     const html = document.documentElement;
-    const winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight,
-      html.scrollHeight, html.offsetHeight);
+    const winHeight = Math.max(
+        body.scrollHeight,
+        body.offsetHeight,
+        html.clientHeight,
+        html.scrollHeight,
+        html.offsetHeight
+      );
 
     this.containerOuter.classList.add(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'true');
@@ -624,8 +629,14 @@ class Choices {
 
     const dimensions = this.dropdown.getBoundingClientRect();
     const dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+
     // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
-    const shouldFlip = this.config.flip ? dropdownPos >= winHeight : false;
+    let shouldFlip = false;
+    if (this.config.position === 'auto') {
+      shouldFlip = dropdownPos >= winHeight;
+    } else if (this.config.position === 'top') {
+      shouldFlip = true;
+    }
 
     if (shouldFlip) {
       this.containerOuter.classList.add(this.config.classNames.flippedState);

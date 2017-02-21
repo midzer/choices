@@ -68,7 +68,7 @@ Or include Choices directly:
     paste: true,
     search: true,
     searchFloor: 1,
-    flip: true,
+    position: 'auto',
     resetScrollPosition: true,
     regexFilter: null,
     shouldSort: true,
@@ -252,12 +252,12 @@ Pass an array of objects:
 
 **Usage:** The minimum length a search value should be before choices are searched.
 
-### flip
-**Type:** `Boolean` **Default:** `true`
+### position
+**Type:** `Boolean` **Default:** `auto`
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether the dropdown should appear above the input (rather than beneath) if there is not enough space within the window. 
+**Usage:** Whether the dropdown should appear above or below the input. By default, if there is not enough space within the window the dropdown will appear above the input, otherwise below it. 
 
 ### resetScrollPosition
 **Type:** `Boolean` **Default:** `true`

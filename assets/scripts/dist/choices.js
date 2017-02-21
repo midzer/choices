@@ -125,7 +125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      paste: true,
 	      search: true,
 	      searchFloor: 1,
-	      flip: true,
+	      position: 'auto',
 	      resetScrollPosition: true,
 	      regexFilter: null,
 	      shouldSort: true,
@@ -753,8 +753,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var dimensions = this.dropdown.getBoundingClientRect();
 	      var dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+
 	      // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
-	      var shouldFlip = this.config.flip ? dropdownPos >= winHeight : false;
+	      var shouldFlip = false;
+	      if (this.config.position === 'auto') {
+	        shouldFlip = dropdownPos >= winHeight;
+	      } else if (this.config.position === 'top') {
+	        shouldFlip = true;
+	      }
 
 	      if (shouldFlip) {
 	        this.containerOuter.classList.add(this.config.classNames.flippedState);
@@ -854,7 +860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Set value of input. If the input is a select box, a choice will be created and selected otherwise
 	     * an item will created directly.
-	     * @param {Array/String} args Array of value objects or value strings/Single value string
+	     * @param  {Array}   args  Array of value objects or value strings
 	     * @return {Object} Class instance
 	     * @public
 	     */
