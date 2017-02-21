@@ -257,7 +257,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether the dropdown should appear above or below the input. By default, if there is not enough space within the window the dropdown will appear above the input, otherwise below it. 
+**Usage:** Whether the dropdown should appear above (`top`) or below (`bottom`) the input. By default, if there is not enough space within the window the dropdown will appear above the input, otherwise below it. 
 
 ### resetScrollPosition
 **Type:** `Boolean` **Default:** `true`
