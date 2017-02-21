@@ -253,7 +253,7 @@ Pass an array of objects:
 **Usage:** The minimum length a search value should be before choices are searched.
 
 ### position
-**Type:** `Boolean` **Default:** `auto`
+**Type:** `String` **Default:** `auto`
 
 **Input types affected:** `select-one`, `select-multiple`
 
