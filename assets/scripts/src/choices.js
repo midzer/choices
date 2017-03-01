@@ -1915,12 +1915,14 @@ class Choices {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
+	label: passedLabel,
         groupValue: group.value,
       });
     } else {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
+	label: passedLabel,
       });
     }
 
@@ -1942,6 +1944,7 @@ class Choices {
 
     const id = item.id;
     const value = item.value;
+    const label = item.label;
     const choiceId = item.choiceId;
     const groupId = item.groupId;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -1952,12 +1955,14 @@ class Choices {
       triggerEvent(this.passedElement, 'removeItem', {
         id,
         value,
+        label,
         groupValue: group.value,
       });
     } else {
       triggerEvent(this.passedElement, 'removeItem', {
         id,
         value,
+	label,
       });
     }
 
