@@ -1,4 +1,4 @@
-/*! choices.js v2.7.4 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.7.5 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -566,12 +566,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
 	            id: id,
 	            value: item.value,
+	            label: item.label,
 	            groupValue: group.value
 	          });
 	        } else {
 	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
 	            id: id,
-	            value: item.value
+	            value: item.value,
+	            label: item.label
 	          });
 	        }
 	      }
@@ -600,12 +602,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
 	          id: id,
 	          value: item.value,
+	          label: item.label,
 	          groupValue: group.value
 	        });
 	      } else {
 	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
 	          id: id,
-	          value: item.value
+	          value: item.value,
+	          label: item.label
 	        });
 	      }
 
@@ -2662,7 +2666,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {!Object<string, *>} options
 	   */
 	  function Fuse (list, options) {
+	    var i
+	    var len
 	    var key
+	    var keys
 
 	    this.list = list
 	    this.options = options = options || {}
@@ -2681,7 +2688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.2'
+	  Fuse.VERSION = '2.6.0'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
