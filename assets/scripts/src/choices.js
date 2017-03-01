@@ -1915,14 +1915,14 @@ class Choices {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
-	label: passedLabel,
+        label: passedLabel,
         groupValue: group.value,
       });
     } else {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
-	label: passedLabel,
+        label: passedLabel,
       });
     }
 
@@ -1962,7 +1962,7 @@ class Choices {
       triggerEvent(this.passedElement, 'removeItem', {
         id,
         value,
-	label,
+        label,
       });
     }
 
