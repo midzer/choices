@@ -256,6 +256,11 @@
         <option value="Queens">Queens</option>
         <option value="Staten Island">Staten Island</option>
       </select>
+
+      <label for="label-event">Use label in event (add/remove)</label>
+      <select id="choices-select" multiple></select>
+      <p id="message"></p>
+
     </div>
   </div>
   <script>
@@ -451,6 +456,30 @@
       });
 
       var boroughs = new Choices(document.getElementById('boroughs')).disable();
+
+/* Use label on event */
+      var choicesSelect = new Choices('#choices-select', {
+        search: false,
+        removeItemButton: true,
+        choices: [
+          {value: 'One', label: 'Label One'},
+          {value: 'Two', label: 'Label Two', disabled: true},
+          {value: 'Three', label: 'Label Three'},
+        ],
+      }).setChoices([
+        {value: 'Four', label: 'Label Four', disabled: true},
+        {value: 'Five', label: 'Label Five'},
+        {value: 'Six', label: 'Label Six', selected: true},
+      ], 'value', 'label', false);
+      function useLabelOnAddItem (event) {
+		document.getElementById('message').innerHTML = 'You just added ' + event.detail.label;
+      };
+      function useLabelOnRemoveItem (event) {
+		document.getElementById('message').innerHTML = 'You just removed ' + event.detail.label;
+      };
+      choicesSelect.passedElement.addEventListener('addItem',useLabelOnAddItem);
+      choicesSelect.passedElement.addEventListener('removeItem',useLabelOnRemoveItem);
+/* End of use label on event*/
     });
   </script>
 
