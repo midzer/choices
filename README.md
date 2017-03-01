@@ -466,6 +466,7 @@ element.addEventListener('addItem', function(event) {
   // do something creative here...
   console.log(event.detail.id);
   console.log(event.detail.value);
+  console.log(event.detail.label);
   console.log(event.detail.groupValue);
 }, false);
 
@@ -476,34 +477,35 @@ example.passedElement.addEventListener('addItem', function(event) {
   // do something creative here...
   console.log(event.detail.id);
   console.log(event.detail.value);
+  console.log(event.detail.label);
   console.log(event.detail.groupValue);
 }, false);
 
 ```
 
 ### addItem
-**Arguments:** `id, value, groupValue`
+**Arguments:** `id, value, label, groupValue`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Triggered each time an item is added (programmatically or by the user).
 
 ### removeItem
-**Arguments:** `id, value, groupValue`
+**Arguments:** `id, value, label, groupValue`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Triggered each time an item is removed (programmatically or by the user).
 
 ### highlightItem
-**Arguments:** `id, value, groupValue`
+**Arguments:** `id, value, label, groupValue`
 
 **Input types affected:** `text`, `select-multiple`
 
 **Usage:** Triggered each time an item is highlighted.
 
 ### unhighlightItem
-**Arguments:** `id, value, groupValue`
+**Arguments:** `id, value, label, groupValue`
 
 **Input types affected:** `text`, `select-multiple`
 

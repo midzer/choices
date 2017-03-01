@@ -471,12 +471,14 @@ class Choices {
         triggerEvent(this.passedElement, 'highlightItem', {
           id,
           value: item.value,
+          label: item.label,
           groupValue: group.value
         });
       } else {
         triggerEvent(this.passedElement, 'highlightItem', {
           id,
           value: item.value,
+          label: item.label,
         });
       }
     }
@@ -502,12 +504,14 @@ class Choices {
       triggerEvent(this.passedElement, 'unhighlightItem', {
         id,
         value: item.value,
+        label: item.label,
         groupValue: group.value
       });
     } else {
       triggerEvent(this.passedElement, 'unhighlightItem', {
         id,
         value: item.value,
+        label: item.label,
       });
     }
 
