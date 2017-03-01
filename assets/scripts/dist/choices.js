@@ -2191,12 +2191,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
 	          id: id,
 	          value: passedValue,
+	          label: passedLabel,
 	          groupValue: group.value
 	        });
 	      } else {
 	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
 	          id: id,
-	          value: passedValue
+	          value: passedValue,
+	          label: passedLabel
 	        });
 	      }
 
@@ -2221,6 +2223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var id = item.id;
 	      var value = item.value;
+	      var label = item.label;
 	      var choiceId = item.choiceId;
 	      var groupId = item.groupId;
 	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -2231,12 +2234,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
 	          id: id,
 	          value: value,
+	          label: label,
 	          groupValue: group.value
 	        });
 	      } else {
 	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
 	          id: id,
-	          value: value
+	          value: value,
+	          label: label
 	        });
 	      }
 
@@ -2657,10 +2662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {!Object<string, *>} options
 	   */
 	  function Fuse (list, options) {
-	    var i
-	    var len
 	    var key
-	    var keys
 
 	    this.list = list
 	    this.options = options = options || {}
@@ -2679,7 +2681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.0'
+	  Fuse.VERSION = '2.6.2'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
