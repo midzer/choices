@@ -523,6 +523,16 @@ example.passedElement.addEventListener('addItem', function(event) {
 
 **Usage:** Triggered when a user types into an input to search choices.
 
+### showDropdown
+**Arguments:** - **Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Triggered when the dropdown is shown.
+
+### hideDropdown
+**Arguments:** - **Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Triggered when the dropdown is hidden.
+
 ## Methods
 Methods can be called either directly or by chaining:
 
