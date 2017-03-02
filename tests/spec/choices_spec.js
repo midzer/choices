@@ -386,6 +386,52 @@ describe('Choices', () => {
       expect(document.activeElement === this.choices.input && container.classList.contains(openState)).toBe(false);
     });
 
+    it('should trigger showDropdown on dropdown opening', function() {
+      this.choices = new Choices(this.input);
+      const container = this.choices.containerOuter;
+      
+      const showDropdownSpy = jasmine.createSpy('showDropdownSpy');
+      const passedElement = this.choices.passedElement;
+
+      passedElement.addEventListener('showDropdown', showDropdownSpy);
+
+      this.choices.input.focus();
+
+      this.choices._onClick({
+        target: container,
+        ctrlKey: false,
+        preventDefault: () => {}
+      });
+
+      expect(showDropdownSpy).toHaveBeenCalled();
+    });
+
+it('should trigger hideDropdown on dropdown closing', function() {
+      this.choices = new Choices(this.input);
+      const container = this.choices.containerOuter;
+      
+      const hideDropdownSpy = jasmine.createSpy('hideDropdownSpy');
+      const passedElement = this.choices.passedElement;
+
+      passedElement.addEventListener('hideDropdown', hideDropdownSpy);
+
+      this.choices.input.focus();
+
+      this.choices._onClick({
+        target: container,
+        ctrlKey: false,
+        preventDefault: () => {}
+      });
+
+      this.choices._onClick({
+        target: container,
+        ctrlKey: false,
+        preventDefault: () => {}
+      });
+
+      expect(hideDropdownSpy).toHaveBeenCalled();
+    });
+
     it('should filter choices when searching', function() {
       this.choices = new Choices(this.input);
 

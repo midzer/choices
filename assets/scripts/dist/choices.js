@@ -566,12 +566,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
 	            id: id,
 	            value: item.value,
+	            label: item.label,
 	            groupValue: group.value
 	          });
 	        } else {
 	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
 	            id: id,
-	            value: item.value
+	            value: item.value,
+	            label: item.label
 	          });
 	        }
 	      }
@@ -600,12 +602,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
 	          id: id,
 	          value: item.value,
+	          label: item.label,
 	          groupValue: group.value
 	        });
 	      } else {
 	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
 	          id: id,
-	          value: item.value
+	          value: item.value,
+	          label: item.label
 	        });
 	      }
 
@@ -773,6 +777,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.focus();
 	      }
 
+	      (0, _utils.triggerEvent)(this.passedElement, "showDropdown", {});
+
 	      return this;
 	    }
 
@@ -802,6 +808,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (blurInput && this.canSearch && document.activeElement === this.input) {
 	        this.input.blur();
 	      }
+
+	      (0, _utils.triggerEvent)(this.passedElement, "hideDropdown", {});
 
 	      return this;
 	    }
