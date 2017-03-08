@@ -653,6 +653,8 @@ class Choices {
       this.input.focus();
     }
 
+    triggerEvent(this.passedElement, "showDropdown", {});
+
     return this;
   }
 
@@ -677,6 +679,8 @@ class Choices {
     if (blurInput && this.canSearch && document.activeElement === this.input) {
       this.input.blur();
     }
+
+    triggerEvent(this.passedElement, "hideDropdown", {});
 
     return this;
   }

@@ -777,6 +777,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.focus();
 	      }
 
+	      (0, _utils.triggerEvent)(this.passedElement, "showDropdown", {});
+
 	      return this;
 	    }
 
@@ -806,6 +808,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (blurInput && this.canSearch && document.activeElement === this.input) {
 	        this.input.blur();
 	      }
+
+	      (0, _utils.triggerEvent)(this.passedElement, "hideDropdown", {});
 
 	      return this;
 	    }
