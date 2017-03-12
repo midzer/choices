@@ -1574,11 +1574,11 @@ class Choices {
    * @private
    */
   _onMouseDown(e) {
-    let target = e.target;
+    const target = e.target;
     if (this.containerOuter.contains(target) && target !== this.input) {
+      let foundTarget;
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
-      let foundTarget;
 
       if (foundTarget = findAncestorByAttr(target, 'data-item')) {
         this._handleItemAction(activeItems, foundTarget, hasShiftKey);
