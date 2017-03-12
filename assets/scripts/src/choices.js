@@ -25,7 +25,7 @@ import {
   sortByAlpha,
   sortByScore,
   triggerEvent,
-  findAncestorByAttr
+  findAncestorByAttrName
 }
 from './lib/utils.js';
 import './lib/polyfills.js';
@@ -1580,9 +1580,9 @@ class Choices {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
-      if (foundTarget = findAncestorByAttr(target, 'data-item')) {
+      if (foundTarget = findAncestorByAttrName(target, 'data-item')) {
         this._handleItemAction(activeItems, foundTarget, hasShiftKey);
-      } else if (foundTarget = findAncestorByAttr(target, 'data-choice')) {
+      } else if (foundTarget = findAncestorByAttrName(target, 'data-choice')) {
         this._handleChoiceAction(activeItems, foundTarget);
       }
 

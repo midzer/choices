@@ -264,7 +264,7 @@ export const findAncestor = function(el, cls) {
  * @param  {string} attr Attribute name of parent
  * @return {?NodeElement}     Found parent element or null
  */
-export const findAncestorByAttr = function(el, attr) {
+export const findAncestorByAttrName = function(el, attr) {
   let target = el;
 
   while (target) {
