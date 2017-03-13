@@ -777,7 +777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.focus();
 	      }
 
-	      (0, _utils.triggerEvent)(this.passedElement, "showDropdown", {});
+	      (0, _utils.triggerEvent)(this.passedElement, 'showDropdown', {});
 
 	      return this;
 	    }
@@ -809,7 +809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.blur();
 	      }
 
-	      (0, _utils.triggerEvent)(this.passedElement, "hideDropdown", {});
+	      (0, _utils.triggerEvent)(this.passedElement, 'hideDropdown', {});
 
 	      return this;
 	    }
@@ -1811,11 +1811,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.containerOuter.contains(target) && target !== this.input) {
 	        var activeItems = this.store.getItemsFilteredByActive();
 	        var hasShiftKey = e.shiftKey;
+	        var foundTarget = void 0;
 
-	        if (target.hasAttribute('data-item')) {
-	          this._handleItemAction(activeItems, target, hasShiftKey);
-	        } else if (target.hasAttribute('data-choice')) {
-	          this._handleChoiceAction(activeItems, target);
+	        if (foundTarget = (0, _utils.findAncestorByAttr)(target, 'data-item')) {
+	          this._handleItemAction(activeItems, foundTarget, hasShiftKey);
+	        } else if (foundTarget = (0, _utils.findAncestorByAttr)(target, 'data-choice')) {
+	          this._handleChoiceAction(activeItems, foundTarget);
 	        }
 
 	        e.preventDefault();
@@ -2670,10 +2671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {!Object<string, *>} options
 	   */
 	  function Fuse (list, options) {
-	    var i
-	    var len
 	    var key
-	    var keys
 
 	    this.list = list
 	    this.options = options = options || {}
@@ -2692,7 +2690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.0'
+	  Fuse.VERSION = '2.6.2'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
@@ -5288,6 +5286,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	var findAncestor = exports.findAncestor = function findAncestor(el, cls) {
 	  while ((el = el.parentElement) && !el.classList.contains(cls)) {}
 	  return el;
+	};
+
+	/**
+	 * Find ancestor in DOM tree by attribute name
+	 * @param  {NodeElement} el  Element to start search from
+	 * @param  {string} attr Attribute name of parent
+	 * @return {?NodeElement}     Found parent element or null
+	 */
+	var findAncestorByAttr = exports.findAncestorByAttr = function findAncestorByAttr(el, attr) {
+	  var target = el;
+
+	  while (target) {
+	    if (target.hasAttribute(attr)) {
+	      return target;
+	    }
+
+	    target = target.parentElement;
+	  }
+
+	  return null;
 	};
 
 	/**

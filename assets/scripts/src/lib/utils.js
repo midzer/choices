@@ -259,6 +259,26 @@ export const findAncestor = function(el, cls) {
 };
 
 /**
+ * Find ancestor in DOM tree by attribute name
+ * @param  {NodeElement} el  Element to start search from
+ * @param  {string} attr Attribute name of parent
+ * @return {?NodeElement}     Found parent element or null
+ */
+export const findAncestorByAttrName = function(el, attr) {
+  let target = el;
+
+  while (target) {
+    if (target.hasAttribute(attr)) {
+      return target;
+    }
+
+    target = target.parentElement;
+  }
+
+  return null;
+};
+
+/**
  * Debounce an event handler.
  * @param  {Function} func      Function to run after wait
  * @param  {Number} wait      The delay before the function is executed

@@ -25,6 +25,7 @@ import {
   sortByAlpha,
   sortByScore,
   triggerEvent,
+  findAncestorByAttrName
 }
 from './lib/utils.js';
 import './lib/polyfills.js';
@@ -653,7 +654,7 @@ class Choices {
       this.input.focus();
     }
 
-    triggerEvent(this.passedElement, "showDropdown", {});
+    triggerEvent(this.passedElement, 'showDropdown', {});
 
     return this;
   }
@@ -680,7 +681,7 @@ class Choices {
       this.input.blur();
     }
 
-    triggerEvent(this.passedElement, "hideDropdown", {});
+    triggerEvent(this.passedElement, 'hideDropdown', {});
 
     return this;
   }
@@ -1575,13 +1576,14 @@ class Choices {
   _onMouseDown(e) {
     const target = e.target;
     if (this.containerOuter.contains(target) && target !== this.input) {
+      let foundTarget;
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
-      if (target.hasAttribute('data-item')) {
-        this._handleItemAction(activeItems, target, hasShiftKey);
-      } else if (target.hasAttribute('data-choice')) {
-        this._handleChoiceAction(activeItems, target);
+      if (foundTarget = findAncestorByAttrName(target, 'data-item')) {
+        this._handleItemAction(activeItems, foundTarget, hasShiftKey);
+      } else if (foundTarget = findAncestorByAttrName(target, 'data-choice')) {
+        this._handleChoiceAction(activeItems, foundTarget);
       }
 
       e.preventDefault();
