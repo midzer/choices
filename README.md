@@ -1,4 +1,4 @@
-# Choices.js [![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)](https://travis-ci.org/jshjohnson/Choices) [![Project Sponsored By ES6.io](https://img.shields.io/badge/👍_Project_Sponsored_By-ES6.io Tutorials-brightgreen.svg)](https://ES6.io/friend/JOHNSON)
+# Choices.js ![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master)
 A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
@@ -14,7 +14,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Custom templates
 
 ----
-###Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼 
+### Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼 
 ----
 
 ## Installation
