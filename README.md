@@ -511,6 +511,13 @@ example.passedElement.addEventListener('addItem', function(event) {
 
 **Usage:** Triggered each time an item is unhighlighted.
 
+### choice
+**Arguments:** `value`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Triggered each time a chouce is selected **by a user**, regardless if it changes the value of the input.
+
 ### change
 **Arguments:** `value`
 
