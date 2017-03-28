@@ -631,6 +631,7 @@ class Choices {
     this.containerOuter.classList.add(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'true');
     this.dropdown.classList.add(this.config.classNames.activeState);
+    this.dropdown.setAttribute('aria-expanded', 'true');
 
     const dimensions = this.dropdown.getBoundingClientRect();
     const dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
@@ -671,6 +672,7 @@ class Choices {
     this.containerOuter.classList.remove(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'false');
     this.dropdown.classList.remove(this.config.classNames.activeState);
+    this.dropdown.setAttribute('aria-expanded', 'false');
 
     if (isFlipped) {
       this.containerOuter.classList.remove(this.config.classNames.flippedState);
