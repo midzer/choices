@@ -516,7 +516,7 @@ example.passedElement.addEventListener('addItem', function(event) {
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Triggered each time a chouce is selected **by a user**, regardless if it changes the value of the input.
+**Usage:** Triggered each time a choice is selected **by a user**, regardless if it changes the value of the input.
 
 ### change
 **Arguments:** `value`
