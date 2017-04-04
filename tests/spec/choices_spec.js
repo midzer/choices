@@ -781,6 +781,42 @@ it('should trigger hideDropdown on dropdown closing', function() {
     });
   });
 
+  describe('should handle public methods on select-one input types', function() {
+    beforeEach(function() {
+      this.input = document.createElement('select');
+      this.input.className = 'js-choices';
+      this.input.placeholder = 'Placeholder text';
+
+      for (let i = 1; i < 10; i++) {
+        const option = document.createElement('option');
+
+        option.value = `Value ${i}`;
+        option.innerHTML = `Value ${i}`;
+
+        if (i % 2) {
+          option.selected = true;
+        }
+
+        this.input.appendChild(option);
+      }
+
+      document.body.appendChild(this.input);
+      this.choices = new Choices(this.input);
+    });
+
+    it('should handle disable()', function() {
+      this.choices.disable();
+
+      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('should handle enable()', function() {
+      this.choices.enable();
+
+      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('0');
+    });
+  });
+
   describe('should handle public methods on text input types', function() {
     beforeEach(function() {
       this.input = document.createElement('input');

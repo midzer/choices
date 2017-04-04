@@ -881,6 +881,9 @@ class Choices {
       this.input.removeAttribute('disabled');
       this.containerOuter.classList.remove(this.config.classNames.disabledState);
       this.containerOuter.removeAttribute('aria-disabled');
+      if (this.passedElement.type === 'select-one') {
+        this.containerOuter.setAttribute('tabindex', '0');
+      }
     }
     return this;
   }
@@ -899,6 +902,9 @@ class Choices {
       this.input.setAttribute('disabled', '');
       this.containerOuter.classList.add(this.config.classNames.disabledState);
       this.containerOuter.setAttribute('aria-disabled', 'true');
+      if (this.passedElement.type === 'select-one') {
+        this.containerOuter.setAttribute('tabindex', '-1');
+      }
     }
     return this;
   }
