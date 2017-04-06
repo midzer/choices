@@ -3,7 +3,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
-## TL;DR 
+## TL;DR
 * Lightweight
 * No jQuery dependency
 * Configurable sorting
@@ -14,7 +14,7 @@ A vanilla, lightweight (~15kb gzipped 🎉), configurable select box/text input 
 * Custom templates
 
 ----
-### Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼 
+### Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼
 ----
 
 ## Installation
@@ -43,17 +43,17 @@ Or include Choices directly:
 ```js
   // Pass multiple elements:
   const choices = new Choices(elements);
-    
+
   // Pass single element:
   const choices = new Choices(element);
-    
+
   // Pass reference
   const choices = new Choices('[data-trigger']);
   const choices = new Choices('.js-choice');
 
   // Pass jQuery element
   const choices = new Choices($('.js-choice')[0]);
-    
+
    // Passing options (with default options)
   const choices = new Choices(elements, {
     items: [],
@@ -67,6 +67,7 @@ Or include Choices directly:
     delimiter: ',',
     paste: true,
     search: true,
+    searchChoices: true,
     searchFloor: 1,
     position: 'auto',
     resetScrollPosition: true,
@@ -137,23 +138,23 @@ Or include Choices directly:
 
 **Input types affected:** `text`
 
-**Usage:** Add pre-selected items (see terminology) to text input. 
+**Usage:** Add pre-selected items (see terminology) to text input.
 
-Pass an array of strings: 
+Pass an array of strings:
 
 `['value 1', 'value 2', 'value 3']`
 
 Pass an array of objects:
 
 ```
-[{ 
+[{
 	value: 'Value 1',
-	label: 'Label 1', 
-	id: 1 
+	label: 'Label 1',
+	id: 1
 },
-{ 
+{
 	value: 'Value 2',
-	label: 'Label 2', 
+	label: 'Label 2',
 	id: 2
 }]
 ```
@@ -163,7 +164,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Add choices (see terminology) to select input. 
+**Usage:** Add choices (see terminology) to select input.
 
 Pass an array of objects:
 
@@ -245,6 +246,13 @@ Pass an array of objects:
 
 **Usage:** Whether a user should be allowed to search avaiable choices. Note that multiple select boxes will always show search inputs.
 
+### searchChoices
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `select-one`
+
+**Usage:** Whether the plugin should filter the choices by input or not. If `false` the search event will be emited.
+
 ### searchFloor
 **Type:** `Number` **Default:** `1`
 
@@ -257,7 +265,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether the dropdown should appear above (`top`) or below (`bottom`) the input. By default, if there is not enough space within the window the dropdown will appear above the input, otherwise below it. 
+**Usage:** Whether the dropdown should appear above (`top`) or below (`bottom`) the input. By default, if there is not enough space within the window the dropdown will appear above the input, otherwise below it.
 
 ### resetScrollPosition
 **Type:** `Boolean` **Default:** `true`
@@ -278,7 +286,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether choices should be sorted. If false, choices will appear in the order they were given. 
+**Usage:** Whether choices should be sorted. If false, choices will appear in the order they were given.
 
 ### sortFilter
 **Type:** `Function` **Default:** sortByAlpha
@@ -303,7 +311,7 @@ const example = new Choices(element, {
 
 **Input types affected:**`select-one`, `select-multiple`
 
-**Usage:** Specify which fields should be used for sorting when a user is searching. If a user is not searching and sorting is enabled, only the choice's label will be sorted.  
+**Usage:** Specify which fields should be used for sorting when a user is searching. If a user is not searching and sorting is enabled, only the choice's label will be sorted.
 
 ### placeholder
 **Type:** `Boolean` **Default:** `true`
@@ -454,7 +462,7 @@ const example = new Choices(element, {
 ```
 
 ## Events
-**Note:** Events fired by Choices behave the same as standard events. Each event is triggered on the element passed to Choices (accessible via `this.passedElement`. Arguments are accessible within the `event.detail` object. 
+**Note:** Events fired by Choices behave the same as standard events. Each event is triggered on the element passed to Choices (accessible via `this.passedElement`. Arguments are accessible within the `event.detail` object.
 
 **Example:**
 
@@ -470,7 +478,7 @@ element.addEventListener('addItem', function(event) {
   console.log(event.detail.groupValue);
 }, false);
 
-// or 
+// or
 const example = new Choices(document.getElementById('example'));
 
 example.passedElement.addEventListener('addItem', function(event) {
@@ -570,7 +578,7 @@ choices.disable();
 
 **Usage:** Creates a new instance of Choices, adds event listeners, creates templates and renders a Choices element to the DOM.
 
-**Note:** This is called implicitly when a new instance of Choices is created. This would be used after a Choices instance had already been destroyed (using `destroy()`). 
+**Note:** This is called implicitly when a new instance of Choices is created. This would be used after a Choices instance had already been destroyed (using `destroy()`).
 
 ### highlightAll();
 **Input types affected:** `text`, `select-multiple`
@@ -650,7 +658,7 @@ example.setChoices([{
         {value: 'Child Two', label: 'Child Two',  disabled: true},
         {value: 'Child Three', label: 'Child Three'},
     ]
-}, 
+},
 {
     label: 'Group two',
     id: 2,
@@ -800,7 +808,7 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using npm scripts...bla bla bla
 
 ## License
-MIT License 
+MIT License
 
 ## Misc
 Thanks to [@mikefrancis](https://github.com/mikefrancis/) for [sending me on a hunt](https://twitter.com/_mikefrancis/status/701797835826667520) for a non-jQuery solution for select boxes that eventually led to this being built!

@@ -389,7 +389,7 @@ describe('Choices', () => {
     it('should trigger showDropdown on dropdown opening', function() {
       this.choices = new Choices(this.input);
       const container = this.choices.containerOuter;
-      
+
       const showDropdownSpy = jasmine.createSpy('showDropdownSpy');
       const passedElement = this.choices.passedElement;
 
@@ -406,10 +406,10 @@ describe('Choices', () => {
       expect(showDropdownSpy).toHaveBeenCalled();
     });
 
-it('should trigger hideDropdown on dropdown closing', function() {
+    it('should trigger hideDropdown on dropdown closing', function() {
       this.choices = new Choices(this.input);
       const container = this.choices.containerOuter;
-      
+
       const hideDropdownSpy = jasmine.createSpy('hideDropdownSpy');
       const passedElement = this.choices.passedElement;
 
@@ -441,7 +441,7 @@ it('should trigger hideDropdown on dropdown closing', function() {
       passedElement.addEventListener('search', searchSpy);
 
       this.choices.input.focus();
-      this.choices.input.value = 'Value 3';
+      this.choices.input.value = '3 ';
 
       // Key down to search
       this.choices._onKeyUp({
@@ -450,9 +450,41 @@ it('should trigger hideDropdown on dropdown closing', function() {
         ctrlKey: false
       });
 
-      const mostAccurateResult = this.choices.currentState.choices[0];
+      const mostAccurateResult = this.choices.currentState.choices.filter(function (choice) {
+        return choice.active;
+      });
 
-      expect(this.choices.isSearching && mostAccurateResult.value === 'Value 3').toBeTruthy;
+      expect(this.choices.isSearching && mostAccurateResult[0].value === 'Value 3').toBe(true);
+      expect(searchSpy).toHaveBeenCalled();
+    });
+
+    it('shouldn\'t filter choices when searching', function() {
+      this.choices = new Choices(this.input, {
+        searchChoices: false
+      });
+
+      this.choices.setValue(['Javascript', 'HTML', 'Jasmine']);
+
+      const searchSpy = jasmine.createSpy('searchSpy');
+      const passedElement = this.choices.passedElement;
+
+      passedElement.addEventListener('search', searchSpy);
+
+      this.choices.input.focus();
+      this.choices.input.value = 'Javascript';
+
+      // Key down to search
+      this.choices._onKeyUp({
+        target: this.choices.input,
+        keyCode: 13,
+        ctrlKey: false
+      });
+
+      const activeOptions = this.choices.currentState.choices.filter(function (choice) {
+        return choice.active;
+      });
+
+      expect(activeOptions.length).toEqual(this.choices.currentState.choices.length);
       expect(searchSpy).toHaveBeenCalled();
     });
 

@@ -60,6 +60,7 @@ class Choices {
       delimiter: ',',
       paste: true,
       search: true,
+      searchChoices: true,
       searchFloor: 1,
       position: 'auto',
       resetScrollPosition: true,
@@ -1225,8 +1226,11 @@ class Choices {
     if (this.input === document.activeElement) {
       // Check that we have a value to search and the input was an alphanumeric character
       if (value && value.length > this.config.searchFloor) {
-        // Filter available choices
-        this._searchChoices(value);
+        // Check flag to filter search input
+        if (this.config.searchChoices) {
+          // Filter available choices
+          this._searchChoices(value);
+        }
         // Trigger search event
         triggerEvent(this.passedElement, 'search', {
           value,

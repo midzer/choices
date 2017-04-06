@@ -124,6 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      delimiter: ',',
 	      paste: true,
 	      search: true,
+	      searchChoices: true,
 	      searchFloor: 1,
 	      position: 'auto',
 	      resetScrollPosition: true,
@@ -1045,6 +1046,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.removeAttribute('disabled');
 	        this.containerOuter.classList.remove(this.config.classNames.disabledState);
 	        this.containerOuter.removeAttribute('aria-disabled');
+	        if (this.passedElement.type === 'select-one') {
+	          this.containerOuter.setAttribute('tabindex', '0');
+	        }
 	      }
 	      return this;
 	    }
@@ -1066,6 +1070,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.input.setAttribute('disabled', '');
 	        this.containerOuter.classList.add(this.config.classNames.disabledState);
 	        this.containerOuter.setAttribute('aria-disabled', 'true');
+	        if (this.passedElement.type === 'select-one') {
+	          this.containerOuter.setAttribute('tabindex', '-1');
+	        }
 	      }
 	      return this;
 	    }
@@ -1434,8 +1441,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.input === document.activeElement) {
 	        // Check that we have a value to search and the input was an alphanumeric character
 	        if (value && value.length > this.config.searchFloor) {
-	          // Filter available choices
-	          this._searchChoices(value);
+	          // Check flag to filter search input
+	          if (this.config.searchChoices) {
+	            // Filter available choices
+	            this._searchChoices(value);
+	          }
 	          // Trigger search event
 	          (0, _utils.triggerEvent)(this.passedElement, 'search', {
 	            value: value
@@ -2679,10 +2689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {!Object<string, *>} options
 	   */
 	  function Fuse (list, options) {
-	    var i
-	    var len
 	    var key
-	    var keys
 
 	    this.list = list
 	    this.options = options = options || {}
@@ -2701,7 +2708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.0'
+	  Fuse.VERSION = '2.6.2'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
