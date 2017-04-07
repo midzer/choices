@@ -1,4 +1,4 @@
-/*! choices.js v2.7.7 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.7.7 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -131,7 +131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      regexFilter: null,
 	      shouldSort: true,
 	      sortFilter: _utils.sortByAlpha,
-	      sortFields: ['label', 'value'],
+	      searchFields: ['label', 'value'],
 	      placeholder: true,
 	      placeholderValue: null,
 	      prependValue: null,
@@ -1409,7 +1409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (newValue.length >= 1 && newValue !== currentValue + ' ') {
 	        var haystack = this.store.getChoicesFilteredBySelectable();
 	        var needle = newValue;
-	        var keys = (0, _utils.isType)('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+	        var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
 	        var options = Object.assign(this.config.fuseOptions, { keys: keys });
 	        var fuse = new _fuse2.default(haystack, options);
 	        var results = fuse.search(needle);

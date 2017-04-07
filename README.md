@@ -69,12 +69,12 @@ Or include Choices directly:
     search: true,
     searchChoices: true,
     searchFloor: 1,
+    searchFields: ['label', 'value'],
     position: 'auto',
     resetScrollPosition: true,
     regexFilter: null,
     shouldSort: true,
     sortFilter: () => {...},
-    sortFields: ['label', 'value'],
     placeholder: true,
     placeholderValue: null,
     prependValue: null,
@@ -251,7 +251,15 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`
 
-**Usage:** Whether the plugin should filter the choices by input or not. If `false` the search event will be emited.
+**Usage:** Whether the plugin should filter the choices by input or not. If `false`, the search event will still emit.
+
+
+### searchFields
+**Type:** `Array/String` **Default:** `['label', 'value']`
+
+**Input types affected:**`select-one`, `select-multiple`
+
+**Usage:** Specify which fields should be used when a user is searching.
 
 ### searchFloor
 **Type:** `Number` **Default:** `1`
@@ -305,13 +313,6 @@ const example = new Choices(element, {
     },
 };
 ```
-
-### sortFields
-**Type:** `Array/String` **Default:** `['label', 'value']`
-
-**Input types affected:**`select-one`, `select-multiple`
-
-**Usage:** Specify which fields should be used for sorting when a user is searching. If a user is not searching and sorting is enabled, only the choice's label will be sorted.
 
 ### placeholder
 **Type:** `Boolean` **Default:** `true`
