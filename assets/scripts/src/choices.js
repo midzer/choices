@@ -60,13 +60,14 @@ class Choices {
       delimiter: ',',
       paste: true,
       search: true,
+      searchChoices: true,
       searchFloor: 1,
+      searchFields: ['label', 'value'],
       position: 'auto',
       resetScrollPosition: true,
       regexFilter: null,
       shouldSort: true,
       sortFilter: sortByAlpha,
-      sortFields: ['label', 'value'],
       placeholder: true,
       placeholderValue: null,
       prependValue: null,
@@ -1198,7 +1199,7 @@ class Choices {
     if (newValue.length >= 1 && newValue !== `${currentValue} `) {
       const haystack = this.store.getChoicesFilteredBySelectable();
       const needle = newValue;
-      const keys = isType('Array', this.config.sortFields) ? this.config.sortFields : [this.config.sortFields];
+      const keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
       const options = Object.assign(this.config.fuseOptions, { keys });
       const fuse = new Fuse(haystack, options);
       const results = fuse.search(needle);
@@ -1225,8 +1226,11 @@ class Choices {
     if (this.input === document.activeElement) {
       // Check that we have a value to search and the input was an alphanumeric character
       if (value && value.length > this.config.searchFloor) {
-        // Filter available choices
-        this._searchChoices(value);
+        // Check flag to filter search input
+        if (this.config.searchChoices) {
+          // Filter available choices
+          this._searchChoices(value);
+        }
         // Trigger search event
         triggerEvent(this.passedElement, 'search', {
           value,
