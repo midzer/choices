@@ -647,8 +647,6 @@ class Choices {
 
     if (shouldFlip) {
       this.containerOuter.classList.add(this.config.classNames.flippedState);
-    } else {
-      this.containerOuter.classList.remove(this.config.classNames.flippedState);
     }
 
     // Optionally focus the input if we have a search input
