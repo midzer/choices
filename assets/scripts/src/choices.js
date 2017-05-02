@@ -635,7 +635,7 @@ class Choices {
     this.dropdown.setAttribute('aria-expanded', 'true');
 
     const dimensions = this.dropdown.getBoundingClientRect();
-    const dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+    const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
 
     // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
     let shouldFlip = false;
