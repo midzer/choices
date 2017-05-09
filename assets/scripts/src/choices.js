@@ -635,7 +635,7 @@ class Choices {
     this.dropdown.setAttribute('aria-expanded', 'true');
 
     const dimensions = this.dropdown.getBoundingClientRect();
-    const dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+    const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
 
     // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
     let shouldFlip = false;
@@ -647,8 +647,6 @@ class Choices {
 
     if (shouldFlip) {
       this.containerOuter.classList.add(this.config.classNames.flippedState);
-    } else {
-      this.containerOuter.classList.remove(this.config.classNames.flippedState);
     }
 
     // Optionally focus the input if we have a search input
