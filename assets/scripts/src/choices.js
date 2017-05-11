@@ -408,21 +408,36 @@ class Choices {
             choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
           }
 
+          const activeItems = this.store.getItemsFilteredByActive();
+          const canAddItem = this._canAddItem(activeItems, this.input.value);
+
+          // If we have choices to show
           if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-            // If we actually have anything to add to our dropdown
-            // append it and highlight the first choice
-            this.choiceList.appendChild(choiceListFragment);
-            this._highlightChoice();
+            // ...and we can select them
+            if (canAddItem.response) {
+              // ...append them and highlight the first choice
+              this.choiceList.appendChild(choiceListFragment);
+              this._highlightChoice();
+            } else {
+              // ...otherwise show a notice
+              this.choiceList.appendChild(this._getTemplate('notice', canAddItem.notice));
+            }
           } else {
             // Otherwise show a notice
             let dropdownItem;
             let notice;
 
             if (this.isSearching) {
-              notice = isType('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+              notice = isType('Function', this.config.noResultsText) ?
+                this.config.noResultsText() :
+                this.config.noResultsText;
+
               dropdownItem = this._getTemplate('notice', notice);
             } else {
-              notice = isType('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+              notice = isType('Function', this.config.noChoicesText) ?
+                this.config.noChoicesText() :
+                this.config.noChoicesText;
+
               dropdownItem = this._getTemplate('notice', notice);
             }
 
@@ -1085,15 +1100,17 @@ class Choices {
     let notice = isType('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
     if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
-      if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+      if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
         // If there is a max entry limit and we have reached that limit
         // don't update
         canAddItem = false;
-        notice = isType('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
+        notice = isType('Function', this.config.maxItemText) ?
+          this.config.maxItemText(this.config.maxItemCount) :
+          this.config.maxItemText;
       }
     }
 
-    if (this.passedElement.type === 'text' && this.config.addItems) {
+    if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
       const isUnique = !activeItems.some((item) => item.value === value.trim());
 
       // If a user has supplied a regular expression filter
@@ -1482,15 +1499,15 @@ class Choices {
   _onKeyUp(e) {
     if (e.target !== this.input) return;
 
+    const value = this.input.value;
+    const activeItems = this.store.getItemsFilteredByActive();
+    const canAddItem = this._canAddItem(activeItems, value);
+
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this.isTextElement) {
       const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-      const value = this.input.value;
-
       if (value) {
-        const activeItems = this.store.getItemsFilteredByActive();
-        const canAddItem = this._canAddItem(activeItems, value);
 
         if (canAddItem.notice) {
           const dropdownItem = this._getTemplate('notice', canAddItem.notice);
@@ -1518,7 +1535,7 @@ class Choices {
           this.isSearching = false;
           this.store.dispatch(activateChoices(true));
         }
-      } else if (this.canSearch) {
+      } else if (this.canSearch && canAddItem.response) {
         this._handleSearch(this.input.value);
       }
     }
