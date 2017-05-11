@@ -1,4 +1,4 @@
-/*! choices.js v2.7.8 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -497,11 +497,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	              choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
 	            }
 
+	            var activeItems = this.store.getItemsFilteredByActive();
+	            var canAddItem = this._canAddItem(activeItems, this.input.value);
+
+	            // If we have choices to show
 	            if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-	              // If we actually have anything to add to our dropdown
-	              // append it and highlight the first choice
-	              this.choiceList.appendChild(choiceListFragment);
-	              this._highlightChoice();
+	              // ...and we can select them
+	              if (canAddItem.response) {
+	                // ...append them and highlight the first choice
+	                this.choiceList.appendChild(choiceListFragment);
+	                this._highlightChoice();
+	              } else {
+	                // ...otherwise show a notice
+	                this.choiceList.appendChild(this._getTemplate('notice', canAddItem.notice));
+	              }
 	            } else {
 	              // Otherwise show a notice
 	              var dropdownItem = void 0;
@@ -509,9 +518,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	              if (this.isSearching) {
 	                notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+
 	                dropdownItem = this._getTemplate('notice', notice);
 	              } else {
 	                notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+
 	                dropdownItem = this._getTemplate('notice', notice);
 	              }
 
@@ -522,11 +533,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Items
 	        if (this.currentState.items !== this.prevState.items) {
-	          var activeItems = this.store.getItemsFilteredByActive();
-	          if (activeItems) {
+	          var _activeItems = this.store.getItemsFilteredByActive();
+	          if (_activeItems) {
 	            // Create a fragment to store our list items
 	            // (so we don't have to update the DOM for each item)
-	            var itemListFragment = this.renderItems(activeItems);
+	            var itemListFragment = this.renderItems(_activeItems);
 
 	            // Clear list
 	            this.itemList.innerHTML = '';
@@ -758,7 +769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.dropdown.setAttribute('aria-expanded', 'true');
 
 	      var dimensions = this.dropdown.getBoundingClientRect();
-	      var dropdownPos = Math.ceil(dimensions.top + window.scrollY + dimensions.height);
+	      var dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
 
 	      // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
 	      var shouldFlip = false;
@@ -770,8 +781,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (shouldFlip) {
 	        this.containerOuter.classList.add(this.config.classNames.flippedState);
-	      } else {
-	        this.containerOuter.classList.remove(this.config.classNames.flippedState);
 	      }
 
 	      // Optionally focus the input if we have a search input
@@ -1282,7 +1291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
 	      if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
-	        if (this.config.maxItemCount > 0 && this.config.maxItemCount <= this.itemList.children.length) {
+	        if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
 	          // If there is a max entry limit and we have reached that limit
 	          // don't update
 	          canAddItem = false;
@@ -1290,7 +1299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      if (this.passedElement.type === 'text' && this.config.addItems) {
+	      if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
 	        var isUnique = !activeItems.some(function (item) {
 	          return item.value === value.trim();
 	        });
@@ -1705,15 +1714,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _onKeyUp(e) {
 	      if (e.target !== this.input) return;
 
+	      var value = this.input.value;
+	      var activeItems = this.store.getItemsFilteredByActive();
+	      var canAddItem = this._canAddItem(activeItems, value);
+
 	      // We are typing into a text input and have a value, we want to show a dropdown
 	      // notice. Otherwise hide the dropdown
 	      if (this.isTextElement) {
 	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	        var value = this.input.value;
-
 	        if (value) {
-	          var activeItems = this.store.getItemsFilteredByActive();
-	          var canAddItem = this._canAddItem(activeItems, value);
 
 	          if (canAddItem.notice) {
 	            var dropdownItem = this._getTemplate('notice', canAddItem.notice);
@@ -1741,7 +1750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.isSearching = false;
 	            this.store.dispatch((0, _index3.activateChoices)(true));
 	          }
-	        } else if (this.canSearch) {
+	        } else if (this.canSearch && canAddItem.response) {
 	          this._handleSearch(this.input.value);
 	        }
 	      }
@@ -2689,10 +2698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {!Object<string, *>} options
 	   */
 	  function Fuse (list, options) {
-	    var i
-	    var len
 	    var key
-	    var keys
 
 	    this.list = list
 	    this.options = options = options || {}
@@ -2711,7 +2717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.0'
+	  Fuse.VERSION = '2.6.2'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
