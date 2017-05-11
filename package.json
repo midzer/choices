@@ -50,7 +50,7 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-spec-reporter": "0.0.26",
     "karma-webpack": "^1.7.0",
-    "node-sass": "3.4.2",
+    "node-sass": "^3.4.2",
     "nodemon": "^1.9.1",
     "opn-cli": "^3.1.0",
     "postcss-cli": "^2.5.1",
