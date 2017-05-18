@@ -49,6 +49,7 @@ class Choices {
     }
 
     const defaultConfig = {
+      silent: false,
       items: [],
       choices: [],
       maxItemCount: -1,
@@ -59,7 +60,7 @@ class Choices {
       duplicateItems: true,
       delimiter: ',',
       paste: true,
-      search: true,
+      searchEnabled: true,
       searchChoices: true,
       searchFloor: 1,
       searchFields: ['label', 'value'],
@@ -131,16 +132,19 @@ class Choices {
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     this.element = element;
     this.passedElement = isType('String', element) ? document.querySelector(element) : element;
-    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
     this.isTextElement = this.passedElement.type === 'text';
+    this.isSelectElement = this.passedElement.type === 'select-one' ||
+      this.passedElement.type === 'select-multiple';
 
     if (!this.passedElement) {
-      console.error('Passed element not found');
+      if (!this.config.silent) {
+        console.error('Passed element not found');
+      }
       return;
     }
 
     this.highlightPosition = 0;
-    this.canSearch = this.config.search;
+    this.canSearch = this.config.searchEnabled;
 
     // Assing preset choices from passed object
     this.presetChoices = this.config.choices;
@@ -179,7 +183,9 @@ class Choices {
 
     // Cutting the mustard
     const cuttingTheMustard = 'classList' in document.documentElement;
-    if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
+    if (!cuttingTheMustard && !this.config.silent) {
+      console.error('Choices: Your browser doesn\'t support Choices');
+    }
 
     // Input type check
     const isValidType = ['select-one', 'select-multiple', 'text'].some(type => type === this.passedElement.type);
@@ -193,7 +199,7 @@ class Choices {
 
       // Let's go
       this.init();
-    } else {
+    } else if (!this.config.silent) {
       console.error('Incompatible input passed');
     }
   }
@@ -585,7 +591,9 @@ class Choices {
    */
   removeItemsByValue(value) {
     if (!value || !isType('String', value)) {
-      console.error('removeItemsByValue: No value was passed to be removed');
+      if (!this.config.silent) {
+        console.error('removeItemsByValue: No value was passed to be removed');
+      }
       return;
     }
 
@@ -825,10 +833,10 @@ class Choices {
         if (foundChoice) {
           if (!foundChoice.selected) {
             this._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
-          } else {
+          } else if (!this.config.silent) {
             console.warn('Attempting to select choice already selected');
           }
-        } else {
+        } else if (!this.config.silent) {
           console.warn('Attempting to select choice that does not exist');
         }
       });
@@ -894,7 +902,7 @@ class Choices {
     if (this.passedElement.type !== 'select-one') {
       this._setInputWidth();
     }
-    if (this.passedElement.type !== 'text' && this.config.search) {
+    if (this.passedElement.type !== 'text' && this.config.searchEnabled) {
       this.isSearching = false;
       this.store.dispatch(activateChoices(true));
     }
@@ -1404,7 +1412,7 @@ class Choices {
       this.showDropdown(true);
     }
 
-    this.canSearch = this.config.search;
+    this.canSearch = this.config.searchEnabled;
 
     const onAKey = () => {
       // If CTRL + A or CMD + A have been pressed and there are items to select
@@ -2056,7 +2064,9 @@ class Choices {
    */
   _removeItem(item) {
     if (!item || !isType('Object', item)) {
-      console.error('removeItem: No item object was passed to be removed');
+      if (!this.config.silent) {
+        console.error('removeItem: No item object was passed to be removed');
+      }
       return;
     }
 
@@ -2327,8 +2337,7 @@ class Choices {
       dropdown.appendChild(choiceList);
     }
 
-    if ((this.passedElement.type === 'select-multiple' && this.canSearch) ||
-      this.passedElement.type === 'text') {
+    if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
       containerInner.appendChild(input);
     } else if (this.canSearch) {
       dropdown.insertBefore(input, dropdown.firstChild);

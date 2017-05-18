@@ -64,6 +64,7 @@ describe('Choices', () => {
     });
 
     it('should have config options', function() {
+      expect(this.choices.config.silent).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.items).toEqual(jasmine.any(Array));
       expect(this.choices.config.choices).toEqual(jasmine.any(Array));
       expect(this.choices.config.maxItemCount).toEqual(jasmine.any(Number));
@@ -74,7 +75,8 @@ describe('Choices', () => {
       expect(this.choices.config.duplicateItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.delimiter).toEqual(jasmine.any(String));
       expect(this.choices.config.paste).toEqual(jasmine.any(Boolean));
-      expect(this.choices.config.search).toEqual(jasmine.any(Boolean));
+      expect(this.choices.config.searchEnabled).toEqual(jasmine.any(Boolean));
+      expect(this.choices.config.searchChoices).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.searchFloor).toEqual(jasmine.any(Number));
       expect(this.choices.config.searchFields).toEqual(jasmine.any(Array) || jasmine.any(String));
       expect(this.choices.config.position).toEqual(jasmine.any(String));
