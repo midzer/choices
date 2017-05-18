@@ -1138,21 +1138,27 @@ class Choices {
     }
 
     if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
-      const isUnique = !activeItems.some((item) => item.value === value.trim());
-
       // If a user has supplied a regular expression filter
       if (this.config.regexFilter) {
         // Determine whether we can update based on whether
         // our regular expression passes
         canAddItem = this._regexFilter(value);
       }
+    }
 
-      // If no duplicates are allowed, and the value already exists
-      // in the array
-      if (this.config.duplicateItems === false && !isUnique) {
-        canAddItem = false;
-        notice = isType('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
-      }
+
+    // If no duplicates are allowed, and the value already exists
+    // in the array
+    const isUnique = !activeItems.some((item) => item.value === value.trim());
+
+    if (
+      !isUnique &&
+      !this.config.duplicateItems &&
+      this.passedElement.type !== 'select-one' &&
+      canAddItem
+    ) {
+      canAddItem = false;
+      notice = isType('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
     }
 
     return {
