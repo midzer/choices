@@ -150,7 +150,9 @@ class Choices {
 
     // Then add any values passed from attribute
     if (this.passedElement.value) {
-      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
+      this.presetItems = this.presetItems.concat(
+        this.passedElement.value.split(this.config.delimiter)
+      );
     }
 
     // Bind methods
@@ -2201,7 +2203,10 @@ class Choices {
     const choiceList = this._getTemplate('choiceList');
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
-    const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+    const placeholder = this.config.placeholder ?
+      this.config.placeholderValue ||
+      this.passedElement.getAttribute('placeholder') :
+      false;
 
     this.containerOuter = containerOuter;
     this.containerInner = containerInner;
@@ -2211,7 +2216,10 @@ class Choices {
     this.dropdown = dropdown;
 
     // Hide passed input
-    this.passedElement.classList.add(this.config.classNames.input, this.config.classNames.hiddenState);
+    this.passedElement.classList.add(
+      this.config.classNames.input,
+      this.config.classNames.hiddenState
+    );
     this.passedElement.tabIndex = '-1';
     this.passedElement.setAttribute('style', 'display:none;');
     this.passedElement.setAttribute('aria-hidden', 'true');
@@ -2247,7 +2255,7 @@ class Choices {
       dropdown.insertBefore(input, dropdown.firstChild);
     }
 
-    if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+    if (this.isSelectElement) {
       const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
       this.highlightPosition = 0;
