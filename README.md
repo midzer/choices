@@ -158,13 +158,13 @@ Pass an array of objects:
 ```
 [{
   value: 'Value 1',
-	label: 'Label 1',
-	id: 1
+  label: 'Label 1',
+  id: 1
 },
 {
-	value: 'Value 2',
-	label: 'Label 2',
-	id: 2
+  value: 'Value 2',
+  label: 'Label 2',
+  id: 2
 }]
 ```
 
@@ -179,16 +179,16 @@ Pass an array of objects:
 
 ```
 [{
-	value: 'Option 1',
-	label: 'Option 1',
-	selected: true,
-	disabled: false,
+  value: 'Option 1',
+  label: 'Option 1',
+  selected: true,
+  disabled: false,
 },
 {
-	value: 'Option 2',
-	label: 'Option 2',
-	selected: false,
-	disabled: true,
+  value: 'Option 2',
+  label: 'Option 2',
+  selected: false,
+  disabled: true,
 }]
 ```
 
