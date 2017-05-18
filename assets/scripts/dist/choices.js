@@ -1,4 +1,4 @@
-/*! choices.js v2.8.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -53,14 +53,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -113,6 +113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var defaultConfig = {
+	      silent: false,
 	      items: [],
 	      choices: [],
 	      maxItemCount: -1,
@@ -123,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      duplicateItems: true,
 	      delimiter: ',',
 	      paste: true,
-	      search: true,
+	      searchEnabled: true,
 	      searchChoices: true,
 	      searchFloor: 1,
 	      searchFields: ['label', 'value'],
@@ -195,16 +196,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Retrieve triggering element (i.e. element with 'data-choice' trigger)
 	    this.element = element;
 	    this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-	    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
 	    this.isTextElement = this.passedElement.type === 'text';
+	    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
 
 	    if (!this.passedElement) {
-	      console.error('Passed element not found');
+	      if (!this.config.silent) {
+	        console.error('Passed element not found');
+	      }
 	      return;
 	    }
 
 	    this.highlightPosition = 0;
-	    this.canSearch = this.config.search;
+	    this.canSearch = this.config.searchEnabled;
 
 	    // Assing preset choices from passed object
 	    this.presetChoices = this.config.choices;
@@ -241,7 +244,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // Cutting the mustard
 	    var cuttingTheMustard = 'classList' in document.documentElement;
-	    if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
+	    if (!cuttingTheMustard && !this.config.silent) {
+	      console.error('Choices: Your browser doesn\'t support Choices');
+	    }
 
 	    // Input type check
 	    var isValidType = ['select-one', 'select-multiple', 'text'].some(function (type) {
@@ -251,11 +256,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (canInit) {
 	      // If element has already been initalised with Choices
-	      if (this.passedElement.getAttribute('data-choice') === 'active') return;
+	      if (this.passedElement.getAttribute('data-choice') === 'active') {
+	        return;
+	      }
 
 	      // Let's go
 	      this.init();
-	    } else {
+	    } else if (!this.config.silent) {
 	      console.error('Incompatible input passed');
 	    }
 	  }
@@ -274,7 +281,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Choices, [{
 	    key: 'init',
 	    value: function init() {
-	      if (this.initialised === true) return;
+	      if (this.initialised === true) {
+	        return;
+	      }
 
 	      var callback = this.config.callbackOnInit;
 
@@ -308,7 +317,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      if (this.initialised === false) return;
+	      if (this.initialised === false) {
+	        return;
+	      }
 
 	      // Remove all event listeners
 	      this._removeEventListeners();
@@ -566,7 +577,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function highlightItem(item) {
 	      var runEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-	      if (!item) return;
+	      if (!item) {
+	        return;
+	      }
+
 	      var id = item.id;
 	      var groupId = item.groupId;
 	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -603,7 +617,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'unhighlightItem',
 	    value: function unhighlightItem(item) {
-	      if (!item) return;
+	      if (!item) {
+	        return;
+	      }
+
 	      var id = item.id;
 	      var groupId = item.groupId;
 	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -679,7 +696,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this7 = this;
 
 	      if (!value || !(0, _utils.isType)('String', value)) {
-	        console.error('removeItemsByValue: No value was passed to be removed');
+	        if (!this.config.silent) {
+	          console.error('removeItemsByValue: No value was passed to be removed');
+	        }
 	        return;
 	      }
 
@@ -897,7 +916,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            handleValue = function handleValue(item) {
 	          var itemType = (0, _utils.getType)(item);
 	          if (itemType === 'Object') {
-	            if (!item.value) return;
+	            if (!item.value) {
+	              return;
+	            }
+
 	            // If we are dealing with a select input, we need to create an option first
 	            // that is then selected. For text inputs we can just add items normally.
 	            if (passedElementType !== 'text') {
@@ -952,10 +974,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (foundChoice) {
 	            if (!foundChoice.selected) {
 	              _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
-	            } else {
+	            } else if (!_this12.config.silent) {
 	              console.warn('Attempting to select choice already selected');
 	            }
-	          } else {
+	          } else if (!_this12.config.silent) {
 	            console.warn('Attempting to select choice that does not exist');
 	          }
 	        });
@@ -982,7 +1004,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (this.initialised === true) {
 	        if (this.isSelectElement) {
-	          if (!(0, _utils.isType)('Array', choices) || !value) return;
+	          if (!(0, _utils.isType)('Array', choices) || !value) {
+	            return;
+	          }
 	          // Clear choices if needed
 	          if (replaceChoices) {
 	            this._clearChoices();
@@ -1032,7 +1056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.passedElement.type !== 'select-one') {
 	        this._setInputWidth();
 	      }
-	      if (this.passedElement.type !== 'text' && this.config.search) {
+	      if (this.passedElement.type !== 'text' && this.config.searchEnabled) {
 	        this.isSearching = false;
 	        this.store.dispatch((0, _index3.activateChoices)(true));
 	      }
@@ -1123,7 +1147,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_triggerChange',
 	    value: function _triggerChange(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
 
 	      (0, _utils.triggerEvent)(this.passedElement, 'change', {
 	        value: value
@@ -1141,7 +1167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleButtonAction',
 	    value: function _handleButtonAction(activeItems, element) {
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on a button
 	      if (this.config.removeItems && this.config.removeItemButton) {
@@ -1180,7 +1208,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on an item
 	      if (this.config.removeItems && this.passedElement.type !== 'select-one') {
@@ -1215,7 +1245,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleChoiceAction',
 	    value: function _handleChoiceAction(activeItems, element) {
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on an option
 	      var id = element.getAttribute('data-id');
@@ -1300,23 +1332,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
-	        var isUnique = !activeItems.some(function (item) {
-	          return item.value === value.trim();
-	        });
-
 	        // If a user has supplied a regular expression filter
 	        if (this.config.regexFilter) {
 	          // Determine whether we can update based on whether
 	          // our regular expression passes
 	          canAddItem = this._regexFilter(value);
 	        }
+	      }
 
-	        // If no duplicates are allowed, and the value already exists
-	        // in the array
-	        if (this.config.duplicateItems === false && !isUnique) {
-	          canAddItem = false;
-	          notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
-	        }
+	      // If no duplicates are allowed, and the value already exists
+	      // in the array
+	      var isUnique = !activeItems.some(function (item) {
+	        return item.value === value.trim();
+	      });
+
+	      if (!isUnique && !this.config.duplicateItems && this.passedElement.type !== 'select-one' && canAddItem) {
+	        canAddItem = false;
+	        notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
 	      }
 
 	      return {
@@ -1375,7 +1407,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this15 = this;
 
 	      return function (results, value, label) {
-	        if (!results || !value) return;
+	        if (!results || !value) {
+	          return;
+	        }
 
 	        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
 
@@ -1440,7 +1474,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleSearch',
 	    value: function _handleSearch(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
+
 	      var choices = this.store.getChoices();
 	      var hasUnactiveChoices = choices.some(function (option) {
 	        return option.active !== true;
@@ -1449,7 +1486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run callback if it is a function
 	      if (this.input === document.activeElement) {
 	        // Check that we have a value to search and the input was an alphanumeric character
-	        if (value && value.length > this.config.searchFloor) {
+	        if (value && value.length >= this.config.searchFloor) {
 	          // Check flag to filter search input
 	          if (this.config.searchChoices) {
 	            // Filter available choices
@@ -1483,6 +1520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.addEventListener('touchend', this._onTouchEnd);
 	      document.addEventListener('mousedown', this._onMouseDown);
 	      document.addEventListener('mouseover', this._onMouseOver);
+	      document.addEventListener('focus', this._onDocumentFocus);
 
 	      if (this.passedElement.type && this.passedElement.type === 'select-one') {
 	        this.containerOuter.addEventListener('focus', this._onFocus);
@@ -1511,6 +1549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.removeEventListener('touchend', this._onTouchEnd);
 	      document.removeEventListener('mousedown', this._onMouseDown);
 	      document.removeEventListener('mouseover', this._onMouseOver);
+	      document.removeEventListener('focus', this._onDocumentFocus);
 
 	      if (this.passedElement.type && this.passedElement.type === 'select-one') {
 	        this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1557,7 +1596,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this16 = this,
 	          _keyDownActions;
 
-	      if (e.target !== this.input && !this.containerOuter.contains(e.target)) return;
+	      if (e.target !== this.input && !this.containerOuter.contains(e.target)) {
+	        return;
+	      }
 
 	      var target = e.target;
 	      var passedElementType = this.passedElement.type;
@@ -1583,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.showDropdown(true);
 	      }
 
-	      this.canSearch = this.config.search;
+	      this.canSearch = this.config.searchEnabled;
 
 	      var onAKey = function onAKey() {
 	        // If CTRL + A or CMD + A have been pressed and there are items to select
@@ -1712,7 +1753,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onKeyUp',
 	    value: function _onKeyUp(e) {
-	      if (e.target !== this.input) return;
+	      if (e.target !== this.input) {
+	        return;
+	      }
 
 	      var value = this.input.value;
 	      var activeItems = this.store.getItemsFilteredByActive();
@@ -1924,6 +1967,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
+	     * Focus event on everything in the document
+	     * @param  {Object} e Event
+	     * @return
+	     * @private
+	     */
+
+	  }, {
+	    key: '_onDocumentFocus',
+	    value: function _onDocumentFocus(e) {
+	      var _this17 = this;
+
+	      var target = e.target;
+	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+	      var blurActions = {
+	        text: function text() {
+	          if (target !== _this17.input) {
+	            if (hasActiveDropdown) {
+	              _this17.hideDropdown();
+	            }
+	          }
+	        },
+	        'select-one': function selectOne() {
+	          if (target !== _this17.containerOuter) {
+	            if (hasActiveDropdown && !_this17.canSearch) {
+	              _this17.hideDropdown();
+	            }
+	          }
+	        },
+	        'select-multiple': function selectMultiple() {
+	          if (target !== _this17.input) {
+	            if (hasActiveDropdown) {
+	              _this17.hideDropdown();
+	            }
+	          }
+	        }
+	      };
+
+	      blurActions[this.passedElement.type]();
+	    }
+
+	    /**
 	     * Paste event
 	     * @param  {Object} e Event
 	     * @return
@@ -1949,7 +2034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onFocus',
 	    value: function _onFocus(e) {
-	      var _this17 = this;
+	      var _this18 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
@@ -1957,27 +2042,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 	        var focusActions = {
 	          text: function text() {
-	            if (target === _this17.input) {
-	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
+	            if (target === _this18.input) {
+	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
-	            if (target === _this17.input) {
+	            _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
+	            if (target === _this18.input) {
 	              // Show dropdown if it isn't already showing
 	              if (!hasActiveDropdown) {
-	                _this17.showDropdown();
+	                _this18.showDropdown();
 	              }
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this17.input) {
+	            if (target === _this18.input) {
 	              // If element is a select box, the focussed element is the container and the dropdown
 	              // isn't already open, focus and show dropdown
-	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
+	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
 
 	              if (!hasActiveDropdown) {
-	                _this17.showDropdown(true);
+	                _this18.showDropdown(true);
 	              }
 	            }
 	          }
@@ -1997,7 +2082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onBlur',
 	    value: function _onBlur(e) {
-	      var _this18 = this;
+	      var _this19 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
@@ -2009,45 +2094,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        var blurActions = {
 	          text: function text() {
-	            if (target === _this18.input) {
+	            if (target === _this19.input) {
 	              // Remove the focus state
-	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
+	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this18.unhighlightAll();
-	              }
-	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
+	                _this19.unhighlightAll();
 	              }
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
-	            if (target === _this18.containerOuter) {
+	            _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
+	            if (target === _this19.containerOuter) {
 	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown && !_this18.canSearch) {
-	                _this18.hideDropdown();
-	              }
-	            }
-
-	            if (target === _this18.input) {
-	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
+	              if (hasActiveDropdown && !_this19.canSearch) {
+	                _this19.hideDropdown();
 	              }
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this18.input) {
+	            if (target === _this19.input) {
 	              // Remove the focus state
-	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
-	              }
+	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this18.unhighlightAll();
+	                _this19.unhighlightAll();
 	              }
 	            }
 	          }
@@ -2067,7 +2138,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_regexFilter',
 	    value: function _regexFilter(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
+
 	      var regex = this.config.regexFilter;
 	      var expression = new RegExp(regex.source, 'i');
 	      return expression.test(value);
@@ -2084,9 +2158,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_scrollToChoice',
 	    value: function _scrollToChoice(choice, direction) {
-	      var _this19 = this;
+	      var _this20 = this;
 
-	      if (!choice) return;
+	      if (!choice) {
+	        return;
+	      }
 
 	      var dropdownHeight = this.choiceList.offsetHeight;
 	      var choiceHeight = choice.offsetHeight;
@@ -2099,7 +2175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var animateScroll = function animateScroll() {
 	        var strength = 4;
-	        var choiceListScrollTop = _this19.choiceList.scrollTop;
+	        var choiceListScrollTop = _this20.choiceList.scrollTop;
 	        var continueAnimation = false;
 	        var easing = void 0;
 	        var distance = void 0;
@@ -2108,7 +2184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (endPoint - choiceListScrollTop) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this19.choiceList.scrollTop = choiceListScrollTop + distance;
+	          _this20.choiceList.scrollTop = choiceListScrollTop + distance;
 	          if (choiceListScrollTop < endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2116,7 +2192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (choiceListScrollTop - endPoint) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this19.choiceList.scrollTop = choiceListScrollTop - distance;
+	          _this20.choiceList.scrollTop = choiceListScrollTop - distance;
 	          if (choiceListScrollTop > endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2144,7 +2220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_highlightChoice',
 	    value: function _highlightChoice(el) {
-	      var _this20 = this;
+	      var _this21 = this;
 
 	      // Highlight first element in dropdown
 	      var choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
@@ -2154,7 +2230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Remove any highlighted choices
 	        highlightedChoices.forEach(function (choice) {
-	          choice.classList.remove(_this20.config.classNames.highlightedState);
+	          choice.classList.remove(_this21.config.classNames.highlightedState);
 	          choice.setAttribute('aria-selected', 'false');
 	        });
 
@@ -2253,7 +2329,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_removeItem',
 	    value: function _removeItem(item) {
 	      if (!item || !(0, _utils.isType)('Object', item)) {
-	        console.error('removeItem: No item object was passed to be removed');
+	        if (!this.config.silent) {
+	          console.error('removeItem: No item object was passed to be removed');
+	        }
 	        return;
 	      }
 
@@ -2300,7 +2378,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _addChoice(isSelected, isDisabled, value, label) {
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 
-	      if (typeof value === 'undefined' || value === null) return;
+	      if (typeof value === 'undefined' || value === null) {
+	        return;
+	      }
 
 	      // Generate unique id
 	      var choices = this.store.getChoices();
@@ -2339,7 +2419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addGroup',
 	    value: function _addGroup(group, id) {
-	      var _this21 = this;
+	      var _this22 = this;
 
 	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
 	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
@@ -2362,7 +2442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            label = option.innerHTML;
 	          }
 
-	          _this21._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
+	          _this22._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -2380,7 +2460,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_getTemplate',
 	    value: function _getTemplate(template) {
-	      if (!template) return;
+	      if (!template) {
+	        return;
+	      }
 	      var templates = this.config.templates;
 
 	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -2399,36 +2481,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createTemplates',
 	    value: function _createTemplates() {
-	      var _this22 = this;
+	      var _this23 = this;
 
 	      var classNames = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" data-type="' + _this22.passedElement.type + '" ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" data-type="' + _this23.passedElement.type + '" ' + (_this23.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
 	        },
 	        containerInner: function containerInner() {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerInner + '"></div>\n        ');
 	        },
 	        itemList: function itemList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + (_this22.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + (_this23.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n        ');
 	        },
 	        placeholder: function placeholder(value) {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.placeholder + '">' + value + '</div>\n        ');
 	        },
 	        item: function item(data) {
-	          if (_this22.config.removeItemButton) {
+	          if (_this23.config.removeItemButton) {
 	            return (0, _utils.strToEl)('\n            <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n            ' + data.label + '<button type="button" class="' + classNames.button + '" data-button>Remove item</button>\n            </div>\n          ');
 	          }
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this22.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this23.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n        ');
 	        },
 	        choiceGroup: function choiceGroup(data) {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
 	        },
 	        choice: function choice(data) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this22.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this23.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        input: function input() {
 	          return (0, _utils.strToEl)('\n          <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n        ');
@@ -2463,7 +2545,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createInput',
 	    value: function _createInput() {
-	      var _this23 = this;
+	      var _this24 = this;
 
 	      var direction = this.passedElement.getAttribute('dir') || 'ltr';
 	      var containerOuter = this._getTemplate('containerOuter', direction);
@@ -2502,7 +2584,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      if (!this.config.addItems) this.disable();
+	      if (!this.config.addItems) {
+	        this.disable();
+	      }
 
 	      containerOuter.appendChild(containerInner);
 	      containerOuter.appendChild(dropdown);
@@ -2518,7 +2602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dropdown.insertBefore(input, dropdown.firstChild);
 	      }
 
-	      if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+	      if (this.isSelectElement) {
 	        var passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
 	        this.highlightPosition = 0;
@@ -2526,7 +2610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (passedGroups && passedGroups.length) {
 	          passedGroups.forEach(function (group) {
-	            _this23._addGroup(group, group.id || null);
+	            _this24._addGroup(group, group.id || null);
 	          });
 	        } else {
 	          var passedOptions = Array.from(this.passedElement.options);
@@ -2558,17 +2642,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var isDisabled = choice.disabled ? choice.disabled : false;
 	            var isSelected = choice.selected ? choice.selected : false;
 	            // Pre-select first choice if it's a single select
-	            if (_this23.passedElement.type === 'select-one') {
+	            if (_this24.passedElement.type === 'select-one') {
 	              if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
 	                // If there is a selected choice already or the choice is not
 	                // the first in the array, add each choice normally
-	                _this23._addChoice(isSelected, isDisabled, choice.value, choice.label);
+	                _this24._addChoice(isSelected, isDisabled, choice.value, choice.label);
 	              } else {
 	                // Otherwise pre-select the first choice in the array
-	                _this23._addChoice(true, false, choice.value, choice.label);
+	                _this24._addChoice(true, false, choice.value, choice.label);
 	              }
 	            } else {
-	              _this23._addChoice(isSelected, isDisabled, choice.value, choice.label);
+	              _this24._addChoice(isSelected, isDisabled, choice.value, choice.label);
 	            }
 	          });
 	        }
@@ -2577,10 +2661,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.presetItems.forEach(function (item) {
 	          var itemType = (0, _utils.getType)(item);
 	          if (itemType === 'Object') {
-	            if (!item.value) return;
-	            _this23._addItem(item.value, item.label, item.id);
+	            if (!item.value) {
+	              return;
+	            }
+	            _this24._addItem(item.value, item.label, item.id);
 	          } else if (itemType === 'String') {
-	            _this23._addItem(item);
+	            _this24._addItem(item);
 	          }
 	        });
 	      }
@@ -2595,9 +2681,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		module.exports = Choices;
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/**
 	 * @license
@@ -2717,7 +2803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.2'
+	  Fuse.VERSION = '2.7.3'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
@@ -2997,7 +3083,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = this.options
 	    var getFn = options.getFn
 	    var finalOutput = []
-	    var item
 	    var i
 	    var len
 	    var results = this.results
@@ -3057,8 +3142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // since it contains other metadata
 	    for (i = 0, len = results.length; i < len; i++) {
 	      replaceValue(i)
-	      item = getItemAtIndex(i)
-	      finalOutput.push(item)
+	      finalOutput.push(getItemAtIndex(i))
 	    }
 
 	    return finalOutput
@@ -3334,12 +3418,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          matchMask[j - 1] = 1
 	        }
 
-	        if (i === 0) {
-	          // First pass: exact match.
-	          bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch
-	        } else {
+	        bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch
+
+	        if (i !== 0) {
 	          // Subsequent passes: fuzzy match.
-	          bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch | (((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1) | lastBitArr[j + 1]
+	          bitArr[j] |= (((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1) | lastBitArr[j + 1]
 	        }
 	        if (bitArr[j] & this.matchmask) {
 	          score = this._bitapScore(i, j - 1)
@@ -3352,13 +3435,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            bestLoc = j - 1
 	            locations.push(bestLoc)
 
-	            if (bestLoc > location) {
-	              // When passing loc, don't exceed our current distance from loc.
-	              start = Math.max(1, 2 * location - bestLoc)
-	            } else {
-	              // Already passed loc, downhill from here on in.
+	            // Already passed loc, downhill from here on in.
+	            if (bestLoc <= location) {
 	              break
 	            }
+
+	            // When passing loc, don't exceed our current distance from loc.
+	            start = Math.max(1, 2 * location - bestLoc)
 	          }
 	        }
 	      }
@@ -3426,9 +3509,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(this);
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3659,9 +3742,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		module.exports = Store;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3710,9 +3793,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.applyMiddleware = _applyMiddleware2['default'];
 	exports.compose = _compose2['default'];
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3976,9 +4059,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var baseGetTag = __webpack_require__(7),
 	    getPrototype = __webpack_require__(13),
@@ -4044,9 +4127,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isPlainObject;
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(8),
 	    getRawTag = __webpack_require__(11),
@@ -4078,9 +4161,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = baseGetTag;
 
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var root = __webpack_require__(9);
 
@@ -4090,9 +4173,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Symbol;
 
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var freeGlobal = __webpack_require__(10);
 
@@ -4105,9 +4188,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = root;
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
 	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -4116,9 +4199,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(8);
 
@@ -4168,9 +4251,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = getRawTag;
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -4196,9 +4279,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = objectToString;
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var overArg = __webpack_require__(14);
 
@@ -4208,9 +4291,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = getPrototype;
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Creates a unary function that invokes `func` with its argument transformed.
@@ -4229,9 +4312,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = overArg;
 
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -4264,16 +4347,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isObjectLike;
 
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(17);
 
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
 
@@ -4306,9 +4389,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = result;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(18)(module)))
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -4322,9 +4405,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4350,9 +4433,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		return result;
 	};
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4497,9 +4580,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4527,9 +4610,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /* eslint-enable no-empty */
 	}
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4583,9 +4666,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return boundActionCreators;
 	}
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4646,9 +4729,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -4689,9 +4772,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4736,9 +4819,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = rootReducer;
 
-/***/ },
+/***/ }),
 /* 26 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4804,9 +4887,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = items;
 
-/***/ },
+/***/ }),
 /* 27 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4845,9 +4928,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = groups;
 
-/***/ },
+/***/ }),
 /* 28 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4965,9 +5048,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = choices;
 
-/***/ },
+/***/ }),
 /* 29 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -5050,9 +5133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 		};
 
-/***/ },
+/***/ }),
 /* 30 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -5597,9 +5680,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return element.dispatchEvent(event);
 	};
 
-/***/ },
+/***/ }),
 /* 31 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -5734,7 +5817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  window.CustomEvent = CustomEvent;
 	})();
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
