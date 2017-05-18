@@ -1309,6 +1309,7 @@ class Choices {
     document.addEventListener('touchend', this._onTouchEnd);
     document.addEventListener('mousedown', this._onMouseDown);
     document.addEventListener('mouseover', this._onMouseOver);
+    document.addEventListener('focus', this._onDocumentFocus);
 
     if (this.passedElement.type && this.passedElement.type === 'select-one') {
       this.containerOuter.addEventListener('focus', this._onFocus);
@@ -1334,6 +1335,7 @@ class Choices {
     document.removeEventListener('touchend', this._onTouchEnd);
     document.removeEventListener('mousedown', this._onMouseDown);
     document.removeEventListener('mouseover', this._onMouseOver);
+    document.removeEventListener('focus', this._onDocumentFocus);
 
     if (this.passedElement.type && this.passedElement.type === 'select-one') {
       this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1732,6 +1734,43 @@ class Choices {
   }
 
   /**
+   * Focus event on everything in the document
+   * @param  {Object} e Event
+   * @return
+   * @private
+   */
+  _onDocumentFocus (e) {
+    const target = e.target;
+    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+    const blurActions = {
+      text: () => {
+        if (target !== this.input) {
+          if (hasActiveDropdown) {
+            this.hideDropdown();
+          }
+        }
+      },
+      'select-one': () => {
+        if (target !== this.containerOuter) {
+          if (hasActiveDropdown && !this.canSearch) {
+            this.hideDropdown();
+          }
+        }
+      },
+      'select-multiple': () => {
+        if (target !== this.input) {
+          if (hasActiveDropdown) {
+            this.hideDropdown();
+          }
+        }
+      },
+    };
+
+    blurActions[this.passedElement.type]();
+  }
+
+  /**
    * Paste event
    * @param  {Object} e Event
    * @return
@@ -1809,10 +1848,6 @@ class Choices {
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
-            // Hide dropdown if it is showing
-            if (hasActiveDropdown) {
-              this.hideDropdown();
-            }
           }
         },
         'select-one': () => {
@@ -1823,21 +1858,11 @@ class Choices {
               this.hideDropdown();
             }
           }
-
-          if (target === this.input) {
-            // Hide dropdown if it is showing
-            if (hasActiveDropdown) {
-              this.hideDropdown();
-            }
-          }
         },
         'select-multiple': () => {
           if (target === this.input) {
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
-            if (hasActiveDropdown) {
-              this.hideDropdown();
-            }
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
