@@ -1124,7 +1124,9 @@ class Choices {
    */
   _canAddItem(activeItems, value) {
     let canAddItem = true;
-    let notice = isType('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
+    let notice = isType('Function', this.config.addItemText) ?
+      this.config.addItemText(value) :
+      this.config.addItemText;
 
     if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'text') {
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
