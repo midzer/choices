@@ -1240,7 +1240,7 @@ class Choices {
     // Run callback if it is a function
     if (this.input === document.activeElement) {
       // Check that we have a value to search and the input was an alphanumeric character
-      if (value && value.length > this.config.searchFloor) {
+      if (value && value.length >= this.config.searchFloor) {
         // Check flag to filter search input
         if (this.config.searchChoices) {
           // Filter available choices
