@@ -139,7 +139,7 @@ Or include Choices directly:
 
 **Input types affected:** `text`, `select-single`, `select-multiple`
 
-**Usage:** Optionally supress console errors and warnings.
+**Usage:** Optionally suppress console errors and warnings.
 
 
 ### items
@@ -157,7 +157,7 @@ Pass an array of objects:
 
 ```
 [{
-	value: 'Value 1',
+  value: 'Value 1',
 	label: 'Label 1',
 	id: 1
 },
