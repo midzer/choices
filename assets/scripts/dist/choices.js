@@ -1,4 +1,4 @@
-/*! choices.js v2.8.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.3 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1231,7 +1231,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Focus input as without focus, a user cannot do anything with a
 	        // highlighted item
-	        if (document.activeElement !== this.input) this.input.focus();
+	        if (document.activeElement !== this.input) {
+	          this.input.focus();
+	        }
 	      }
 	    }
 
@@ -1520,7 +1522,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.addEventListener('touchend', this._onTouchEnd);
 	      document.addEventListener('mousedown', this._onMouseDown);
 	      document.addEventListener('mouseover', this._onMouseOver);
-	      document.addEventListener('focus', this._onDocumentFocus);
 
 	      if (this.passedElement.type && this.passedElement.type === 'select-one') {
 	        this.containerOuter.addEventListener('focus', this._onFocus);
@@ -1549,7 +1550,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.removeEventListener('touchend', this._onTouchEnd);
 	      document.removeEventListener('mousedown', this._onMouseDown);
 	      document.removeEventListener('mouseover', this._onMouseOver);
-	      document.removeEventListener('focus', this._onDocumentFocus);
 
 	      if (this.passedElement.type && this.passedElement.type === 'select-one') {
 	        this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1571,7 +1571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_setInputWidth',
 	    value: function _setInputWidth() {
-	      if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+	      if (this.config.placeholderValue || this.passedElement.getAttribute('placeholder') && this.config.placeholder) {
 	        // If there is a placeholder, we only want to set the width of the input when it is a greater
 	        // length than 75% of the placeholder. This stops the input jumping around.
 	        var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
@@ -1967,48 +1967,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Focus event on everything in the document
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onDocumentFocus',
-	    value: function _onDocumentFocus(e) {
-	      var _this17 = this;
-
-	      var target = e.target;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-	      var blurActions = {
-	        text: function text() {
-	          if (target !== _this17.input) {
-	            if (hasActiveDropdown) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        },
-	        'select-one': function selectOne() {
-	          if (target !== _this17.containerOuter) {
-	            if (hasActiveDropdown && !_this17.canSearch) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        },
-	        'select-multiple': function selectMultiple() {
-	          if (target !== _this17.input) {
-	            if (hasActiveDropdown) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        }
-	      };
-
-	      blurActions[this.passedElement.type]();
-	    }
-
-	    /**
 	     * Paste event
 	     * @param  {Object} e Event
 	     * @return
@@ -2034,7 +1992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onFocus',
 	    value: function _onFocus(e) {
-	      var _this18 = this;
+	      var _this17 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
@@ -2042,27 +2000,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 	        var focusActions = {
 	          text: function text() {
-	            if (target === _this18.input) {
-	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
+	            if (target === _this17.input) {
+	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
-	            if (target === _this18.input) {
+	            _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
+	            if (target === _this17.input) {
 	              // Show dropdown if it isn't already showing
 	              if (!hasActiveDropdown) {
-	                _this18.showDropdown();
+	                _this17.showDropdown();
 	              }
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this18.input) {
+	            if (target === _this17.input) {
 	              // If element is a select box, the focussed element is the container and the dropdown
 	              // isn't already open, focus and show dropdown
-	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
+	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
 
 	              if (!hasActiveDropdown) {
-	                _this18.showDropdown(true);
+	                _this17.showDropdown(true);
 	              }
 	            }
 	          }
@@ -2082,7 +2040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onBlur',
 	    value: function _onBlur(e) {
-	      var _this19 = this;
+	      var _this18 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
@@ -2094,31 +2052,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        var blurActions = {
 	          text: function text() {
-	            if (target === _this19.input) {
+	            if (target === _this18.input) {
 	              // Remove the focus state
-	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
+	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this19.unhighlightAll();
+	                _this18.unhighlightAll();
+	              }
+	              // Hide dropdown if it is showing
+	              if (hasActiveDropdown) {
+	                _this18.hideDropdown();
 	              }
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
-	            if (target === _this19.containerOuter) {
+	            _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
+	            if (target === _this18.containerOuter) {
 	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown && !_this19.canSearch) {
-	                _this19.hideDropdown();
+	              if (hasActiveDropdown && !_this18.canSearch) {
+	                _this18.hideDropdown();
 	              }
+	            }
+	            if (target === _this18.input && hasActiveDropdown) {
+	              // Hide dropdown if it is showing
+	              _this18.hideDropdown();
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this19.input) {
+	            if (target === _this18.input) {
 	              // Remove the focus state
-	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
+	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
+	              // Hide dropdown if it is showing
+	              if (hasActiveDropdown) {
+	                _this18.hideDropdown();
+	              }
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this19.unhighlightAll();
+	                _this18.unhighlightAll();
 	              }
 	            }
 	          }
@@ -2158,7 +2128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_scrollToChoice',
 	    value: function _scrollToChoice(choice, direction) {
-	      var _this20 = this;
+	      var _this19 = this;
 
 	      if (!choice) {
 	        return;
@@ -2175,7 +2145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var animateScroll = function animateScroll() {
 	        var strength = 4;
-	        var choiceListScrollTop = _this20.choiceList.scrollTop;
+	        var choiceListScrollTop = _this19.choiceList.scrollTop;
 	        var continueAnimation = false;
 	        var easing = void 0;
 	        var distance = void 0;
@@ -2184,7 +2154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (endPoint - choiceListScrollTop) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this20.choiceList.scrollTop = choiceListScrollTop + distance;
+	          _this19.choiceList.scrollTop = choiceListScrollTop + distance;
 	          if (choiceListScrollTop < endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2192,7 +2162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (choiceListScrollTop - endPoint) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this20.choiceList.scrollTop = choiceListScrollTop - distance;
+	          _this19.choiceList.scrollTop = choiceListScrollTop - distance;
 	          if (choiceListScrollTop > endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2220,7 +2190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_highlightChoice',
 	    value: function _highlightChoice(el) {
-	      var _this21 = this;
+	      var _this20 = this;
 
 	      // Highlight first element in dropdown
 	      var choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
@@ -2230,7 +2200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Remove any highlighted choices
 	        highlightedChoices.forEach(function (choice) {
-	          choice.classList.remove(_this21.config.classNames.highlightedState);
+	          choice.classList.remove(_this20.config.classNames.highlightedState);
 	          choice.setAttribute('aria-selected', 'false');
 	        });
 
@@ -2419,7 +2389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addGroup',
 	    value: function _addGroup(group, id) {
-	      var _this22 = this;
+	      var _this21 = this;
 
 	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
 	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
@@ -2442,7 +2412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            label = option.innerHTML;
 	          }
 
-	          _this22._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
+	          _this21._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -2481,36 +2451,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createTemplates',
 	    value: function _createTemplates() {
-	      var _this23 = this;
+	      var _this22 = this;
 
 	      var classNames = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" data-type="' + _this23.passedElement.type + '" ' + (_this23.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" data-type="' + _this22.passedElement.type + '" ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
 	        },
 	        containerInner: function containerInner() {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerInner + '"></div>\n        ');
 	        },
 	        itemList: function itemList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + (_this23.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + (_this22.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n        ');
 	        },
 	        placeholder: function placeholder(value) {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.placeholder + '">' + value + '</div>\n        ');
 	        },
 	        item: function item(data) {
-	          if (_this23.config.removeItemButton) {
+	          if (_this22.config.removeItemButton) {
 	            return (0, _utils.strToEl)('\n            <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n            ' + data.label + '<button type="button" class="' + classNames.button + '" data-button>Remove item</button>\n            </div>\n          ');
 	          }
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this23.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this22.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n        ');
 	        },
 	        choiceGroup: function choiceGroup(data) {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
 	        },
 	        choice: function choice(data) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this23.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this22.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        input: function input() {
 	          return (0, _utils.strToEl)('\n          <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n        ');
@@ -2545,7 +2515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createInput',
 	    value: function _createInput() {
-	      var _this24 = this;
+	      var _this23 = this;
 
 	      var direction = this.passedElement.getAttribute('dir') || 'ltr';
 	      var containerOuter = this._getTemplate('containerOuter', direction);
@@ -2565,6 +2535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // Hide passed input
 	      this.passedElement.classList.add(this.config.classNames.input, this.config.classNames.hiddenState);
+
 	      this.passedElement.tabIndex = '-1';
 	      this.passedElement.setAttribute('style', 'display:none;');
 	      this.passedElement.setAttribute('aria-hidden', 'true');
@@ -2610,7 +2581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (passedGroups && passedGroups.length) {
 	          passedGroups.forEach(function (group) {
-	            _this24._addGroup(group, group.id || null);
+	            _this23._addGroup(group, group.id || null);
 	          });
 	        } else {
 	          var passedOptions = Array.from(this.passedElement.options);
@@ -2642,17 +2613,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var isDisabled = choice.disabled ? choice.disabled : false;
 	            var isSelected = choice.selected ? choice.selected : false;
 	            // Pre-select first choice if it's a single select
-	            if (_this24.passedElement.type === 'select-one') {
+	            if (_this23.passedElement.type === 'select-one') {
 	              if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
 	                // If there is a selected choice already or the choice is not
 	                // the first in the array, add each choice normally
-	                _this24._addChoice(isSelected, isDisabled, choice.value, choice.label);
+	                _this23._addChoice(isSelected, isDisabled, choice.value, choice.label);
 	              } else {
 	                // Otherwise pre-select the first choice in the array
-	                _this24._addChoice(true, false, choice.value, choice.label);
+	                _this23._addChoice(true, false, choice.value, choice.label);
 	              }
 	            } else {
-	              _this24._addChoice(isSelected, isDisabled, choice.value, choice.label);
+	              _this23._addChoice(isSelected, isDisabled, choice.value, choice.label);
 	            }
 	          });
 	        }
@@ -2664,9 +2635,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!item.value) {
 	              return;
 	            }
-	            _this24._addItem(item.value, item.label, item.id);
+	            _this23._addItem(item.value, item.label, item.id);
 	          } else if (itemType === 'String') {
-	            _this24._addItem(item);
+	            _this23._addItem(item);
 	          }
 	        });
 	      }
