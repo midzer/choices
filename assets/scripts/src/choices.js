@@ -1054,7 +1054,9 @@ class Choices {
 
       // Focus input as without focus, a user cannot do anything with a
       // highlighted item
-      if (document.activeElement !== this.input) this.input.focus();
+      if (document.activeElement !== this.input) {
+        this.input.focus();
+      }
     }
   }
 
@@ -1319,7 +1321,6 @@ class Choices {
     document.addEventListener('touchend', this._onTouchEnd);
     document.addEventListener('mousedown', this._onMouseDown);
     document.addEventListener('mouseover', this._onMouseOver);
-    document.addEventListener('focus', this._onDocumentFocus);
 
     if (this.passedElement.type && this.passedElement.type === 'select-one') {
       this.containerOuter.addEventListener('focus', this._onFocus);
@@ -1345,7 +1346,6 @@ class Choices {
     document.removeEventListener('touchend', this._onTouchEnd);
     document.removeEventListener('mousedown', this._onMouseDown);
     document.removeEventListener('mouseover', this._onMouseOver);
-    document.removeEventListener('focus', this._onDocumentFocus);
 
     if (this.passedElement.type && this.passedElement.type === 'select-one') {
       this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1364,7 +1364,8 @@ class Choices {
    * @return
    */
   _setInputWidth() {
-    if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+    if ((this.config.placeholderValue || this.passedElement.getAttribute('placeholder') &&
+      this.config.placeholder)) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
       const placeholder = this.config.placeholder ? this.config.placeholderValue ||
@@ -1744,43 +1745,6 @@ class Choices {
   }
 
   /**
-   * Focus event on everything in the document
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
-  _onDocumentFocus (e) {
-    const target = e.target;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-    const blurActions = {
-      text: () => {
-        if (target !== this.input) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
-        }
-      },
-      'select-one': () => {
-        if (target !== this.containerOuter) {
-          if (hasActiveDropdown && !this.canSearch) {
-            this.hideDropdown();
-          }
-        }
-      },
-      'select-multiple': () => {
-        if (target !== this.input) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
-        }
-      },
-    };
-
-    blurActions[this.passedElement.type]();
-  }
-
-  /**
    * Paste event
    * @param  {Object} e Event
    * @return
@@ -1858,6 +1822,10 @@ class Choices {
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
+            // Hide dropdown if it is showing
+            if (hasActiveDropdown) {
+              this.hideDropdown();
+            }
           }
         },
         'select-one': () => {
@@ -1868,11 +1836,19 @@ class Choices {
               this.hideDropdown();
             }
           }
+          if (target === this.input && hasActiveDropdown) {
+            // Hide dropdown if it is showing
+            this.hideDropdown();
+          }
         },
         'select-multiple': () => {
           if (target === this.input) {
             // Remove the focus state
             this.containerOuter.classList.remove(this.config.classNames.focusState);
+            // Hide dropdown if it is showing
+            if (hasActiveDropdown) {
+              this.hideDropdown();
+            }
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
@@ -2306,6 +2282,7 @@ class Choices {
       this.config.classNames.input,
       this.config.classNames.hiddenState
     );
+
     this.passedElement.tabIndex = '-1';
     this.passedElement.setAttribute('style', 'display:none;');
     this.passedElement.setAttribute('aria-hidden', 'true');
