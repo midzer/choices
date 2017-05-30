@@ -1111,7 +1111,7 @@ class Choices {
     }
 
     if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
-      const isUnique = !activeItems.some((item) => item.value === value.trim());
+      const isUnique = !activeItems.some((item) => item.value === isType('String', value) ? value.trim() : value);
 
       // If a user has supplied a regular expression filter
       if (this.config.regexFilter) {
