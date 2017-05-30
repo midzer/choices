@@ -56,6 +56,7 @@ Or include Choices directly:
 
    // Passing options (with default options)
   const choices = new Choices(elements, {
+    silent: false,
     items: [],
     choices: [],
     maxItemCount: -1,
@@ -66,7 +67,7 @@ Or include Choices directly:
     duplicateItems: true,
     delimiter: ',',
     paste: true,
-    search: true,
+    searchEnabled: true,
     searchChoices: true,
     searchFloor: 1,
     searchFields: ['label', 'value'],
@@ -133,6 +134,14 @@ Or include Choices directly:
 
 
 ## Configuration options
+### silent
+**Type:** `Boolean`  **Default:**  `false`
+
+**Input types affected:** `text`, `select-single`, `select-multiple`
+
+**Usage:** Optionally suppress console errors and warnings.
+
+
 ### items
 **Type:** `Array`  **Default:**  `[]`
 
@@ -148,14 +157,14 @@ Pass an array of objects:
 
 ```
 [{
-	value: 'Value 1',
-	label: 'Label 1',
-	id: 1
+  value: 'Value 1',
+  label: 'Label 1',
+  id: 1
 },
 {
-	value: 'Value 2',
-	label: 'Label 2',
-	id: 2
+  value: 'Value 2',
+  label: 'Label 2',
+  id: 2
 }]
 ```
 
@@ -170,16 +179,16 @@ Pass an array of objects:
 
 ```
 [{
-	value: 'Option 1',
-	label: 'Option 1',
-	selected: true,
-	disabled: false,
+  value: 'Option 1',
+  label: 'Option 1',
+  selected: true,
+  disabled: false,
 },
 {
-	value: 'Option 2',
-	label: 'Option 2',
-	selected: false,
-	disabled: true,
+  value: 'Option 2',
+  label: 'Option 2',
+  selected: false,
+  disabled: true,
 }]
 ```
 
@@ -239,19 +248,19 @@ Pass an array of objects:
 
 **Usage:** Whether a user can paste into the input.
 
-### search
+### searchEnabled
 **Type:** `Boolean` **Default:** `true`
 
 **Input types affected:** `select-one`
 
-**Usage:** Whether a user should be allowed to search avaiable choices. Note that multiple select boxes will always show search inputs.
+**Usage:** Whether a search area should be shown. **Note:** Multiple select boxes will *always* show search areas.
 
 ### searchChoices
 **Type:** `Boolean` **Default:** `true`
 
 **Input types affected:** `select-one`
 
-**Usage:** Whether the plugin should filter the choices by input or not. If `false`, the search event will still emit.
+**Usage:** Whether choices should be filtered by input or not. If `false`, the search event will still emit, but choices will not be filtered.
 
 
 ### searchFields

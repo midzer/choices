@@ -1,4 +1,4 @@
-/*! choices.js v2.8.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.3 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -53,14 +53,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -113,6 +113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var defaultConfig = {
+	      silent: false,
 	      items: [],
 	      choices: [],
 	      maxItemCount: -1,
@@ -123,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      duplicateItems: true,
 	      delimiter: ',',
 	      paste: true,
-	      search: true,
+	      searchEnabled: true,
 	      searchChoices: true,
 	      searchFloor: 1,
 	      searchFields: ['label', 'value'],
@@ -195,16 +196,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Retrieve triggering element (i.e. element with 'data-choice' trigger)
 	    this.element = element;
 	    this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-	    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
 	    this.isTextElement = this.passedElement.type === 'text';
+	    this.isSelectElement = this.passedElement.type === 'select-one' || this.passedElement.type === 'select-multiple';
 
 	    if (!this.passedElement) {
-	      console.error('Passed element not found');
+	      if (!this.config.silent) {
+	        console.error('Passed element not found');
+	      }
 	      return;
 	    }
 
 	    this.highlightPosition = 0;
-	    this.canSearch = this.config.search;
+	    this.canSearch = this.config.searchEnabled;
 
 	    // Assing preset choices from passed object
 	    this.presetChoices = this.config.choices;
@@ -241,7 +244,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // Cutting the mustard
 	    var cuttingTheMustard = 'classList' in document.documentElement;
-	    if (!cuttingTheMustard) console.error('Choices: Your browser doesn\'t support Choices');
+	    if (!cuttingTheMustard && !this.config.silent) {
+	      console.error('Choices: Your browser doesn\'t support Choices');
+	    }
 
 	    // Input type check
 	    var isValidType = ['select-one', 'select-multiple', 'text'].some(function (type) {
@@ -251,11 +256,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (canInit) {
 	      // If element has already been initalised with Choices
-	      if (this.passedElement.getAttribute('data-choice') === 'active') return;
+	      if (this.passedElement.getAttribute('data-choice') === 'active') {
+	        return;
+	      }
 
 	      // Let's go
 	      this.init();
-	    } else {
+	    } else if (!this.config.silent) {
 	      console.error('Incompatible input passed');
 	    }
 	  }
@@ -274,7 +281,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Choices, [{
 	    key: 'init',
 	    value: function init() {
-	      if (this.initialised === true) return;
+	      if (this.initialised === true) {
+	        return;
+	      }
 
 	      var callback = this.config.callbackOnInit;
 
@@ -308,7 +317,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      if (this.initialised === false) return;
+	      if (this.initialised === false) {
+	        return;
+	      }
 
 	      // Remove all event listeners
 	      this._removeEventListeners();
@@ -566,7 +577,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function highlightItem(item) {
 	      var runEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-	      if (!item) return;
+	      if (!item) {
+	        return;
+	      }
+
 	      var id = item.id;
 	      var groupId = item.groupId;
 	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -603,7 +617,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'unhighlightItem',
 	    value: function unhighlightItem(item) {
-	      if (!item) return;
+	      if (!item) {
+	        return;
+	      }
+
 	      var id = item.id;
 	      var groupId = item.groupId;
 	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
@@ -679,7 +696,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this7 = this;
 
 	      if (!value || !(0, _utils.isType)('String', value)) {
-	        console.error('removeItemsByValue: No value was passed to be removed');
+	        if (!this.config.silent) {
+	          console.error('removeItemsByValue: No value was passed to be removed');
+	        }
 	        return;
 	      }
 
@@ -897,7 +916,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            handleValue = function handleValue(item) {
 	          var itemType = (0, _utils.getType)(item);
 	          if (itemType === 'Object') {
-	            if (!item.value) return;
+	            if (!item.value) {
+	              return;
+	            }
+
 	            // If we are dealing with a select input, we need to create an option first
 	            // that is then selected. For text inputs we can just add items normally.
 	            if (passedElementType !== 'text') {
@@ -952,10 +974,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (foundChoice) {
 	            if (!foundChoice.selected) {
 	              _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
-	            } else {
+	            } else if (!_this12.config.silent) {
 	              console.warn('Attempting to select choice already selected');
 	            }
-	          } else {
+	          } else if (!_this12.config.silent) {
 	            console.warn('Attempting to select choice that does not exist');
 	          }
 	        });
@@ -982,7 +1004,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (this.initialised === true) {
 	        if (this.isSelectElement) {
-	          if (!(0, _utils.isType)('Array', choices) || !value) return;
+	          if (!(0, _utils.isType)('Array', choices) || !value) {
+	            return;
+	          }
 	          // Clear choices if needed
 	          if (replaceChoices) {
 	            this._clearChoices();
@@ -1032,7 +1056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.passedElement.type !== 'select-one') {
 	        this._setInputWidth();
 	      }
-	      if (this.passedElement.type !== 'text' && this.config.search) {
+	      if (this.passedElement.type !== 'text' && this.config.searchEnabled) {
 	        this.isSearching = false;
 	        this.store.dispatch((0, _index3.activateChoices)(true));
 	      }
@@ -1123,7 +1147,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_triggerChange',
 	    value: function _triggerChange(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
 
 	      (0, _utils.triggerEvent)(this.passedElement, 'change', {
 	        value: value
@@ -1141,7 +1167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleButtonAction',
 	    value: function _handleButtonAction(activeItems, element) {
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on a button
 	      if (this.config.removeItems && this.config.removeItemButton) {
@@ -1180,7 +1208,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on an item
 	      if (this.config.removeItems && this.passedElement.type !== 'select-one') {
@@ -1201,7 +1231,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Focus input as without focus, a user cannot do anything with a
 	        // highlighted item
-	        if (document.activeElement !== this.input) this.input.focus();
+	        if (document.activeElement !== this.input) {
+	          this.input.focus();
+	        }
 	      }
 	    }
 
@@ -1215,7 +1247,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleChoiceAction',
 	    value: function _handleChoiceAction(activeItems, element) {
-	      if (!activeItems || !element) return;
+	      if (!activeItems || !element) {
+	        return;
+	      }
 
 	      // If we are clicking on an option
 	      var id = element.getAttribute('data-id');
@@ -1300,23 +1334,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      if (this.passedElement.type === 'text' && this.config.addItems && canAddItem) {
-	        var isUnique = !activeItems.some(function (item) {
-	          return item.value === value.trim();
-	        });
-
 	        // If a user has supplied a regular expression filter
 	        if (this.config.regexFilter) {
 	          // Determine whether we can update based on whether
 	          // our regular expression passes
 	          canAddItem = this._regexFilter(value);
 	        }
+	      }
 
-	        // If no duplicates are allowed, and the value already exists
-	        // in the array
-	        if (this.config.duplicateItems === false && !isUnique) {
-	          canAddItem = false;
-	          notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
-	        }
+	      // If no duplicates are allowed, and the value already exists
+	      // in the array
+	      var isUnique = !activeItems.some(function (item) {
+	        return item.value === value.trim();
+	      });
+
+	      if (!isUnique && !this.config.duplicateItems && this.passedElement.type !== 'select-one' && canAddItem) {
+	        canAddItem = false;
+	        notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
 	      }
 
 	      return {
@@ -1375,7 +1409,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this15 = this;
 
 	      return function (results, value, label) {
-	        if (!results || !value) return;
+	        if (!results || !value) {
+	          return;
+	        }
 
 	        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
 
@@ -1440,7 +1476,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_handleSearch',
 	    value: function _handleSearch(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
+
 	      var choices = this.store.getChoices();
 	      var hasUnactiveChoices = choices.some(function (option) {
 	        return option.active !== true;
@@ -1449,7 +1488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run callback if it is a function
 	      if (this.input === document.activeElement) {
 	        // Check that we have a value to search and the input was an alphanumeric character
-	        if (value && value.length > this.config.searchFloor) {
+	        if (value && value.length >= this.config.searchFloor) {
 	          // Check flag to filter search input
 	          if (this.config.searchChoices) {
 	            // Filter available choices
@@ -1532,7 +1571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_setInputWidth',
 	    value: function _setInputWidth() {
-	      if (this.config.placeholder && (this.config.placeholderValue || this.passedElement.getAttribute('placeholder'))) {
+	      if (this.config.placeholderValue || this.passedElement.getAttribute('placeholder') && this.config.placeholder) {
 	        // If there is a placeholder, we only want to set the width of the input when it is a greater
 	        // length than 75% of the placeholder. This stops the input jumping around.
 	        var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
@@ -1557,7 +1596,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this16 = this,
 	          _keyDownActions;
 
-	      if (e.target !== this.input && !this.containerOuter.contains(e.target)) return;
+	      if (e.target !== this.input && !this.containerOuter.contains(e.target)) {
+	        return;
+	      }
 
 	      var target = e.target;
 	      var passedElementType = this.passedElement.type;
@@ -1583,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.showDropdown(true);
 	      }
 
-	      this.canSearch = this.config.search;
+	      this.canSearch = this.config.searchEnabled;
 
 	      var onAKey = function onAKey() {
 	        // If CTRL + A or CMD + A have been pressed and there are items to select
@@ -1712,7 +1753,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onKeyUp',
 	    value: function _onKeyUp(e) {
-	      if (e.target !== this.input) return;
+	      if (e.target !== this.input) {
+	        return;
+	      }
 
 	      var value = this.input.value;
 	      var activeItems = this.store.getItemsFilteredByActive();
@@ -2030,18 +2073,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this18.hideDropdown();
 	              }
 	            }
-
-	            if (target === _this18.input) {
+	            if (target === _this18.input && hasActiveDropdown) {
 	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
-	              }
+	              _this18.hideDropdown();
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
 	            if (target === _this18.input) {
 	              // Remove the focus state
 	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
+	              // Hide dropdown if it is showing
 	              if (hasActiveDropdown) {
 	                _this18.hideDropdown();
 	              }
@@ -2067,7 +2108,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_regexFilter',
 	    value: function _regexFilter(value) {
-	      if (!value) return;
+	      if (!value) {
+	        return;
+	      }
+
 	      var regex = this.config.regexFilter;
 	      var expression = new RegExp(regex.source, 'i');
 	      return expression.test(value);
@@ -2086,7 +2130,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _scrollToChoice(choice, direction) {
 	      var _this19 = this;
 
-	      if (!choice) return;
+	      if (!choice) {
+	        return;
+	      }
 
 	      var dropdownHeight = this.choiceList.offsetHeight;
 	      var choiceHeight = choice.offsetHeight;
@@ -2253,7 +2299,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_removeItem',
 	    value: function _removeItem(item) {
 	      if (!item || !(0, _utils.isType)('Object', item)) {
-	        console.error('removeItem: No item object was passed to be removed');
+	        if (!this.config.silent) {
+	          console.error('removeItem: No item object was passed to be removed');
+	        }
 	        return;
 	      }
 
@@ -2300,7 +2348,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _addChoice(isSelected, isDisabled, value, label) {
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 
-	      if (typeof value === 'undefined' || value === null) return;
+	      if (typeof value === 'undefined' || value === null) {
+	        return;
+	      }
 
 	      // Generate unique id
 	      var choices = this.store.getChoices();
@@ -2380,7 +2430,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_getTemplate',
 	    value: function _getTemplate(template) {
-	      if (!template) return;
+	      if (!template) {
+	        return;
+	      }
 	      var templates = this.config.templates;
 
 	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -2483,6 +2535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // Hide passed input
 	      this.passedElement.classList.add(this.config.classNames.input, this.config.classNames.hiddenState);
+
 	      this.passedElement.tabIndex = '-1';
 	      this.passedElement.setAttribute('style', 'display:none;');
 	      this.passedElement.setAttribute('aria-hidden', 'true');
@@ -2502,7 +2555,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      if (!this.config.addItems) this.disable();
+	      if (!this.config.addItems) {
+	        this.disable();
+	      }
 
 	      containerOuter.appendChild(containerInner);
 	      containerOuter.appendChild(dropdown);
@@ -2518,7 +2573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dropdown.insertBefore(input, dropdown.firstChild);
 	      }
 
-	      if (this.passedElement.type === 'select-multiple' || this.passedElement.type === 'select-one') {
+	      if (this.isSelectElement) {
 	        var passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
 
 	        this.highlightPosition = 0;
@@ -2577,7 +2632,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.presetItems.forEach(function (item) {
 	          var itemType = (0, _utils.getType)(item);
 	          if (itemType === 'Object') {
-	            if (!item.value) return;
+	            if (!item.value) {
+	              return;
+	            }
 	            _this23._addItem(item.value, item.label, item.id);
 	          } else if (itemType === 'String') {
 	            _this23._addItem(item);
@@ -2595,9 +2652,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		module.exports = Choices;
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/**
 	 * @license
@@ -2717,7 +2774,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  Fuse.VERSION = '2.6.2'
+	  Fuse.VERSION = '2.7.3'
 
 	  /**
 	   * Sets a new list for Fuse to match against.
@@ -2997,7 +3054,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = this.options
 	    var getFn = options.getFn
 	    var finalOutput = []
-	    var item
 	    var i
 	    var len
 	    var results = this.results
@@ -3057,8 +3113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // since it contains other metadata
 	    for (i = 0, len = results.length; i < len; i++) {
 	      replaceValue(i)
-	      item = getItemAtIndex(i)
-	      finalOutput.push(item)
+	      finalOutput.push(getItemAtIndex(i))
 	    }
 
 	    return finalOutput
@@ -3334,12 +3389,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          matchMask[j - 1] = 1
 	        }
 
-	        if (i === 0) {
-	          // First pass: exact match.
-	          bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch
-	        } else {
+	        bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch
+
+	        if (i !== 0) {
 	          // Subsequent passes: fuzzy match.
-	          bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch | (((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1) | lastBitArr[j + 1]
+	          bitArr[j] |= (((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1) | lastBitArr[j + 1]
 	        }
 	        if (bitArr[j] & this.matchmask) {
 	          score = this._bitapScore(i, j - 1)
@@ -3352,13 +3406,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            bestLoc = j - 1
 	            locations.push(bestLoc)
 
-	            if (bestLoc > location) {
-	              // When passing loc, don't exceed our current distance from loc.
-	              start = Math.max(1, 2 * location - bestLoc)
-	            } else {
-	              // Already passed loc, downhill from here on in.
+	            // Already passed loc, downhill from here on in.
+	            if (bestLoc <= location) {
 	              break
 	            }
+
+	            // When passing loc, don't exceed our current distance from loc.
+	            start = Math.max(1, 2 * location - bestLoc)
 	          }
 	        }
 	      }
@@ -3426,9 +3480,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(this);
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3659,9 +3713,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		module.exports = Store;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3710,9 +3764,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.applyMiddleware = _applyMiddleware2['default'];
 	exports.compose = _compose2['default'];
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3976,9 +4030,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var baseGetTag = __webpack_require__(7),
 	    getPrototype = __webpack_require__(13),
@@ -4044,9 +4098,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isPlainObject;
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(8),
 	    getRawTag = __webpack_require__(11),
@@ -4078,9 +4132,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = baseGetTag;
 
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var root = __webpack_require__(9);
 
@@ -4090,9 +4144,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Symbol;
 
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var freeGlobal = __webpack_require__(10);
 
@@ -4105,9 +4159,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = root;
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
 	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -4116,9 +4170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(8);
 
@@ -4168,9 +4222,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = getRawTag;
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -4196,9 +4250,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = objectToString;
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var overArg = __webpack_require__(14);
 
@@ -4208,9 +4262,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = getPrototype;
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Creates a unary function that invokes `func` with its argument transformed.
@@ -4229,9 +4283,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = overArg;
 
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -4264,16 +4318,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isObjectLike;
 
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(17);
 
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
 
@@ -4306,9 +4360,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = result;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(18)(module)))
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -4322,9 +4376,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4350,9 +4404,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		return result;
 	};
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4497,9 +4551,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4527,9 +4581,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /* eslint-enable no-empty */
 	}
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4583,9 +4637,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return boundActionCreators;
 	}
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4646,9 +4700,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -4689,9 +4743,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4736,9 +4790,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = rootReducer;
 
-/***/ },
+/***/ }),
 /* 26 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4804,9 +4858,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = items;
 
-/***/ },
+/***/ }),
 /* 27 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4845,9 +4899,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = groups;
 
-/***/ },
+/***/ }),
 /* 28 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4965,9 +5019,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = choices;
 
-/***/ },
+/***/ }),
 /* 29 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -5050,9 +5104,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 		};
 
-/***/ },
+/***/ }),
 /* 30 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -5597,9 +5651,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return element.dispatchEvent(event);
 	};
 
-/***/ },
+/***/ }),
 /* 31 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -5734,7 +5788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  window.CustomEvent = CustomEvent;
 	})();
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
