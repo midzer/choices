@@ -1161,7 +1161,7 @@ class Choices {
 
     // If no duplicates are allowed, and the value already exists
     // in the array
-    const isUnique = !activeItems.some((item) => item.value === value.trim());
+    const isUnique = !activeItems.some((item) => item.value === isType('String', value) ? value.trim() : value);
 
     if (
       !isUnique &&
