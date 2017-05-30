@@ -649,7 +649,7 @@ const example = new Choices(element);
 
 example.setChoices([
     {value: 'One', label: 'Label One', disabled: true},
-    {value: 'Two', label: 'Label Two' selected: true},
+    {value: 'Two', label: 'Label Two', selected: true},
     {value: 'Three', label: 'Label Three'},
 ], 'value', 'label', false);
 ```
