@@ -181,6 +181,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      callbackOnCreateTemplates: null
 	    };
 
+	    this.idNames = {
+	      itemChoice: 'item-choice'
+	    };
+
 	    // Merge options with user options
 	    this.config = (0, _utils.extend)(defaultConfig, userConfig);
 
@@ -219,6 +223,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.passedElement.value) {
 	      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
 	    }
+
+	    //Set unique base Id
+	    this.baseId = (0, _utils.generateId)(this.passedElement, 'choices-');
 
 	    // Bind methods
 	    this.init = this.init.bind(this);
@@ -1345,7 +1352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // If no duplicates are allowed, and the value already exists
 	      // in the array
 	      var isUnique = !activeItems.some(function (item) {
-	        return item.value === value.trim();
+	        return item.value === (0, _utils.isType)('String', value) ? value.trim() : value;
 	      });
 
 	      if (!isUnique && !this.config.duplicateItems && this.passedElement.type !== 'select-one' && canAddItem) {
@@ -1797,6 +1804,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this._handleSearch(this.input.value);
 	        }
 	      }
+	      // Re-establish canSearch value from changes in _onKeyDown
+	      this.canSearch = this.config.search;
 	    }
 
 	    /**
@@ -2205,25 +2214,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 
 	        if (el) {
-	          // Highlight given option
-	          el.classList.add(this.config.classNames.highlightedState);
 	          this.highlightPosition = choices.indexOf(el);
 	        } else {
 	          // Highlight choice based on last known highlight location
-	          var choice = void 0;
-
 	          if (choices.length > this.highlightPosition) {
 	            // If we have an option to highlight
-	            choice = choices[this.highlightPosition];
+	            el = choices[this.highlightPosition];
 	          } else {
 	            // Otherwise highlight the option before
-	            choice = choices[choices.length - 1];
+	            el = choices[choices.length - 1];
 	          }
 
-	          if (!choice) choice = choices[0];
-	          choice.classList.add(this.config.classNames.highlightedState);
-	          choice.setAttribute('aria-selected', 'true');
+	          if (!el) el = choices[0];
 	        }
+
+	        // Highlight given option, and set accessiblity attributes
+	        el.classList.add(this.config.classNames.highlightedState);
+	        el.setAttribute('aria-selected', 'true');
+	        this.containerOuter.setAttribute('aria-activedescendant', el.id);
+	        this.input.setAttribute('aria-activedescendant', el.id);
 	      }
 	    }
 
@@ -2356,8 +2365,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choices = this.store.getChoices();
 	      var choiceLabel = label || value;
 	      var choiceId = choices ? choices.length + 1 : 1;
+	      var choiceElementId = this.baseId + "-" + this.idNames.itemChoice + "-" + choiceId;
 
-	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled));
+	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
 
 	      if (isSelected) {
 	        this._addItem(value, choiceLabel, choiceId);
@@ -2456,7 +2466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var classNames = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" data-type="' + _this22.passedElement.type + '" ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" ' + (_this22.isSelectElement ? _this22.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + ' data-type="' + _this22.passedElement.type + '" ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
 	        },
 	        containerInner: function containerInner() {
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerInner + '"></div>\n        ');
@@ -2480,7 +2490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return (0, _utils.strToEl)('\n          <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
 	        },
 	        choice: function choice(data) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this22.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this22.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' id="' + data.elementId + '" data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        input: function input() {
 	          return (0, _utils.strToEl)('\n          <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n        ');
@@ -4925,6 +4935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        return [].concat(_toConsumableArray(state), [{
 	          id: action.id,
+	          elementId: action.elementId,
 	          groupId: action.groupId,
 	          value: action.value,
 	          label: action.label,
@@ -5055,14 +5066,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
-	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled) {
+	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId) {
 	  return {
 	    type: 'ADD_CHOICE',
 	    value: value,
 	    label: label,
 	    id: id,
 	    groupId: groupId,
-	    disabled: disabled
+	    disabled: disabled,
+	    elementId: elementId
 	  };
 	};
 
@@ -5108,7 +5120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ (function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -5126,6 +5138,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.replace(/\w\S*/g, function (txt) {
 	    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 	  });
+	};
+
+	/**
+	 * Generates a string of random chars
+	 * @param  {Number} length Length of the string to generate
+	 * @return {String} String of random chars
+	 */
+	var generateChars = exports.generateChars = function generateChars(length) {
+	  var chars = '';
+
+	  for (var i = 0; i < length; i++) {
+	    var randomChar = getRandomNumber(0, 36);
+	    chars += randomChar.toString(36);
+	  }
+
+	  return chars;
+	};
+
+	/**
+	 * Generates a unique id based on an element
+	 * @param  {HTMLElement} element Element to generate the id from
+	 * @param  {String} Prefix for the Id
+	 * @return {String} Unique Id
+	 */
+	var generateId = exports.generateId = function generateId(element, prefix) {
+	  var id = element.id || element.name && element.name + '-' + generateChars(2) || generateChars(4);
+	  id = id.replace(/(:|\.|\[|\]|,)/g, '');
+	  id = prefix + id;
+
+	  return id;
 	};
 
 	/**
@@ -5155,7 +5197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Boolean}
 	 */
 	var isNode = exports.isNode = function isNode(o) {
-	  return (typeof Node === "undefined" ? "undefined" : _typeof(Node)) === "object" ? o instanceof Node : o && (typeof o === "undefined" ? "undefined" : _typeof(o)) === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string";
+	  return (typeof Node === 'undefined' ? 'undefined' : _typeof(Node)) === "object" ? o instanceof Node : o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string";
 	};
 
 	/**
@@ -5164,8 +5206,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Boolean}
 	 */
 	var isElement = exports.isElement = function isElement(o) {
-	  return (typeof HTMLElement === "undefined" ? "undefined" : _typeof(HTMLElement)) === "object" ? o instanceof HTMLElement : //DOM2
-	  o && (typeof o === "undefined" ? "undefined" : _typeof(o)) === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string";
+	  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === "object" ? o instanceof HTMLElement : //DOM2
+	  o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string";
 	};
 
 	/**
@@ -5583,7 +5625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var width = input.offsetWidth;
 
 	  if (value) {
-	    var testEl = strToEl("<span>" + value + "</span>");
+	    var testEl = strToEl('<span>' + value + '</span>');
 	    testEl.style.position = 'absolute';
 	    testEl.style.padding = '0';
 	    testEl.style.top = '-9999px';
@@ -5600,7 +5642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    document.body.removeChild(testEl);
 	  }
 
-	  return width + "px";
+	  return width + 'px';
 	};
 
 	/**

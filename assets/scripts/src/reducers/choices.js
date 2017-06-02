@@ -8,6 +8,7 @@ const choices = (state = [], action) => {
        */
       return [...state, {
         id: action.id,
+        elementId: action.elementId,
         groupId: action.groupId,
         value: action.value,
         label: action.label,
