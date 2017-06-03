@@ -1,4 +1,4 @@
-/*! choices.js v2.8.3 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.4 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -224,7 +224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
 	    }
 
-	    //Set unique base Id
+	    // Set unique base Id
 	    this.baseId = (0, _utils.generateId)(this.passedElement, 'choices-');
 
 	    // Bind methods
@@ -1686,6 +1686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var onEscapeKey = function onEscapeKey() {
 	        if (hasActiveDropdown) {
 	          _this16.toggleDropdown();
+	          _this16.containerOuter.focus();
 	        }
 	      };
 
@@ -2203,6 +2204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // Highlight first element in dropdown
 	      var choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
+	      var passedEl = el;
 
 	      if (choices && choices.length) {
 	        var highlightedChoices = Array.from(this.dropdown.querySelectorAll('.' + this.config.classNames.highlightedState));
@@ -2213,26 +2215,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	          choice.setAttribute('aria-selected', 'false');
 	        });
 
-	        if (el) {
-	          this.highlightPosition = choices.indexOf(el);
+	        if (passedEl) {
+	          this.highlightPosition = choices.indexOf(passedEl);
 	        } else {
 	          // Highlight choice based on last known highlight location
 	          if (choices.length > this.highlightPosition) {
 	            // If we have an option to highlight
-	            el = choices[this.highlightPosition];
+	            passedEl = choices[this.highlightPosition];
 	          } else {
 	            // Otherwise highlight the option before
-	            el = choices[choices.length - 1];
+	            passedEl = choices[choices.length - 1];
 	          }
 
-	          if (!el) el = choices[0];
+	          if (!passedEl) {
+	            passedEl = choices[0];
+	          }
 	        }
 
 	        // Highlight given option, and set accessiblity attributes
-	        el.classList.add(this.config.classNames.highlightedState);
-	        el.setAttribute('aria-selected', 'true');
-	        this.containerOuter.setAttribute('aria-activedescendant', el.id);
-	        this.input.setAttribute('aria-activedescendant', el.id);
+	        passedEl.classList.add(this.config.classNames.highlightedState);
+	        passedEl.setAttribute('aria-selected', 'true');
+	        this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+	        this.input.setAttribute('aria-activedescendant', passedEl.id);
 	      }
 	    }
 
@@ -2365,7 +2369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choices = this.store.getChoices();
 	      var choiceLabel = label || value;
 	      var choiceId = choices ? choices.length + 1 : 1;
-	      var choiceElementId = this.baseId + "-" + this.idNames.itemChoice + "-" + choiceId;
+	      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
 	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
 
