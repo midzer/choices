@@ -164,7 +164,7 @@ class Choices {
       );
     }
 
-    //Set unique base Id
+    // Set unique base Id
     this.baseId = generateId(this.passedElement, 'choices-');
 
     // Bind methods
@@ -1954,6 +1954,7 @@ class Choices {
   _highlightChoice(el) {
     // Highlight first element in dropdown
     const choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
+    let passedEl = el;
 
     if (choices && choices.length) {
       const highlightedChoices = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
@@ -1964,26 +1965,28 @@ class Choices {
         choice.setAttribute('aria-selected', 'false');
       });
 
-      if (el) {
-        this.highlightPosition = choices.indexOf(el);
+      if (passedEl) {
+        this.highlightPosition = choices.indexOf(passedEl);
       } else {
         // Highlight choice based on last known highlight location
         if (choices.length > this.highlightPosition) {
           // If we have an option to highlight
-          el = choices[this.highlightPosition];
+          passedEl = choices[this.highlightPosition];
         } else {
           // Otherwise highlight the option before
-          el = choices[choices.length - 1];
+          passedEl = choices[choices.length - 1];
         }
 
-        if (!el) el = choices[0];
+        if (!passedEl) {
+          passedEl = choices[0];
+        }
       }
 
       // Highlight given option, and set accessiblity attributes
-      el.classList.add(this.config.classNames.highlightedState);
-      el.setAttribute('aria-selected', 'true');
-      this.containerOuter.setAttribute('aria-activedescendant', el.id);
-      this.input.setAttribute('aria-activedescendant', el.id);
+      passedEl.classList.add(this.config.classNames.highlightedState);
+      passedEl.setAttribute('aria-selected', 'true');
+      this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+      this.input.setAttribute('aria-activedescendant', passedEl.id);
     }
   }
 
@@ -2102,7 +2105,7 @@ class Choices {
     const choices = this.store.getChoices();
     const choiceLabel = label || value;
     const choiceId = choices ? choices.length + 1 : 1;
-    const choiceElementId = this.baseId + "-" + this.idNames.itemChoice + "-" + choiceId;
+    const choiceElementId = `${this.baseId}-${this.idNames.itemChoice}-${choiceId}`;
 
     this.store.dispatch(addChoice(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
 
