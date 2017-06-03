@@ -11,6 +11,37 @@ export const capitalise = function(str) {
 };
 
 /**
+ * Generates a string of random chars
+ * @param  {Number} length Length of the string to generate
+ * @return {String} String of random chars
+ */
+export const generateChars = function (length) {
+  var chars = '';
+
+  for (var i = 0; i < length; i++) {
+    var randomChar = getRandomNumber(0, 36);
+    chars += randomChar.toString(36);
+  }
+
+  return chars;
+};
+
+/**
+ * Generates a unique id based on an element
+ * @param  {HTMLElement} element Element to generate the id from
+ * @param  {String} Prefix for the Id
+ * @return {String} Unique Id
+ */
+export const generateId = function (element, prefix) {
+  var id = element.id || (element.name && (element.name + '-' + generateChars(2))) || generateChars(4);
+  id = id.replace(/(:|\.|\[|\]|,)/g, '');
+  id = prefix + id;
+
+  return id;
+};
+
+
+/**
  * Tests the type of an object
  * @param  {String}  type Type to test object against
  * @param  {Object}  obj  Object to be tested

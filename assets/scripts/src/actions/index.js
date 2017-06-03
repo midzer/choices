@@ -25,7 +25,7 @@ export const highlightItem = (id, highlighted) => {
   };
 };
 
-export const addChoice = (value, label, id, groupId, disabled) => {
+export const addChoice = (value, label, id, groupId, disabled, elementId) => {
   return {
     type: 'ADD_CHOICE',
     value,
@@ -33,6 +33,7 @@ export const addChoice = (value, label, id, groupId, disabled) => {
     id,
     groupId,
     disabled,
+    elementId: elementId,
   };
 };
 

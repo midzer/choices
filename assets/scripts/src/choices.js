@@ -24,6 +24,7 @@ import {
   getWidthOfInput,
   sortByAlpha,
   sortByScore,
+  generateId,
   triggerEvent,
   findAncestorByAttrName
 }
@@ -117,6 +118,10 @@ class Choices {
       callbackOnCreateTemplates: null,
     };
 
+    this.idNames = {
+      itemChoice: 'item-choice'
+    };
+
     // Merge options with user options
     this.config = extend(defaultConfig, userConfig);
 
@@ -158,6 +163,9 @@ class Choices {
         this.passedElement.value.split(this.config.delimiter)
       );
     }
+
+    // Set unique base Id
+    this.baseId = generateId(this.passedElement, 'choices-');
 
     // Bind methods
     this.init = this.init.bind(this);
@@ -1594,6 +1602,8 @@ class Choices {
         this._handleSearch(this.input.value);
       }
     }
+    // Re-establish canSearch value from changes in _onKeyDown
+    this.canSearch = this.config.search;
   }
 
   /**
@@ -1944,6 +1954,7 @@ class Choices {
   _highlightChoice(el) {
     // Highlight first element in dropdown
     const choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
+    let passedEl = el;
 
     if (choices && choices.length) {
       const highlightedChoices = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
@@ -1954,26 +1965,28 @@ class Choices {
         choice.setAttribute('aria-selected', 'false');
       });
 
-      if (el) {
-        // Highlight given option
-        el.classList.add(this.config.classNames.highlightedState);
-        this.highlightPosition = choices.indexOf(el);
+      if (passedEl) {
+        this.highlightPosition = choices.indexOf(passedEl);
       } else {
         // Highlight choice based on last known highlight location
-        let choice;
-
         if (choices.length > this.highlightPosition) {
           // If we have an option to highlight
-          choice = choices[this.highlightPosition];
+          passedEl = choices[this.highlightPosition];
         } else {
           // Otherwise highlight the option before
-          choice = choices[choices.length - 1];
+          passedEl = choices[choices.length - 1];
         }
 
-        if (!choice) choice = choices[0];
-        choice.classList.add(this.config.classNames.highlightedState);
-        choice.setAttribute('aria-selected', 'true');
+        if (!passedEl) {
+          passedEl = choices[0];
+        }
       }
+
+      // Highlight given option, and set accessiblity attributes
+      passedEl.classList.add(this.config.classNames.highlightedState);
+      passedEl.setAttribute('aria-selected', 'true');
+      this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+      this.input.setAttribute('aria-activedescendant', passedEl.id);
     }
   }
 
@@ -2092,8 +2105,9 @@ class Choices {
     const choices = this.store.getChoices();
     const choiceLabel = label || value;
     const choiceId = choices ? choices.length + 1 : 1;
+    const choiceElementId = `${this.baseId}-${this.idNames.itemChoice}-${choiceId}`;
 
-    this.store.dispatch(addChoice(value, choiceLabel, choiceId, groupId, isDisabled));
+    this.store.dispatch(addChoice(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
 
     if (isSelected) {
       this._addItem(value, choiceLabel, choiceId);
@@ -2169,7 +2183,7 @@ class Choices {
     const templates = {
       containerOuter: (direction) => {
         return strToEl(`
-          <div class="${classNames.containerOuter}" data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
+          <div class="${classNames.containerOuter}" ${this.isSelectElement ? ( this.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"') : ''} data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
         `);
       },
       containerInner: () => {
@@ -2215,7 +2229,7 @@ class Choices {
       },
       choice: (data) => {
         return strToEl(`
-          <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+          <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} id="${data.elementId}" data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
             ${data.label}
           </div>
         `);
