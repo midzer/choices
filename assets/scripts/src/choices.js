@@ -1477,6 +1477,7 @@ class Choices {
     const onEscapeKey = () => {
       if (hasActiveDropdown) {
         this.toggleDropdown();
+        this.containerOuter.focus();
       }
     };
 
