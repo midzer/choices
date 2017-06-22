@@ -1604,7 +1604,7 @@ class Choices {
       }
     }
     // Re-establish canSearch value from changes in _onKeyDown
-    this.canSearch = this.config.search;
+    this.canSearch = this.config.searchEnabled;
   }
 
   /**
