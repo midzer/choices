@@ -1,4 +1,4 @@
-/*! choices.js v2.8.4 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.5 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -131,6 +131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      searchEnabled: true,
 	      searchChoices: true,
 	      searchFloor: 1,
+	      searchResultLimit: 4,
 	      searchFields: ['label', 'value'],
 	      position: 'auto',
 	      resetScrollPosition: true,
@@ -417,19 +418,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
 	      var choicesFragment = fragment || document.createDocumentFragment();
 	      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
+	      var appendChoice = function appendChoice(choice) {
+	        var dropdownItem = _this3._getTemplate('choice', choice);
+	        var shouldRender = _this3.passedElement.type === 'select-one' || !choice.selected;
+	        if (shouldRender) {
+	          choicesFragment.appendChild(dropdownItem);
+	        }
+	      };
 
 	      // If sorting is enabled or the user is searching, filter choices
 	      if (this.config.shouldSort || this.isSearching) {
 	        choices.sort(filter);
 	      }
 
-	      choices.forEach(function (choice) {
-	        var dropdownItem = _this3._getTemplate('choice', choice);
-	        var shouldRender = _this3.passedElement.type === 'select-one' || !choice.selected;
-	        if (shouldRender) {
-	          choicesFragment.appendChild(dropdownItem);
+	      if (this.isSearching) {
+	        for (var i = 0; i < this.config.searchResultLimit; i++) {
+	          var choice = choices[i];
+	          if (choice) {
+	            appendChoice(choice);
+	          }
 	        }
-	      });
+	      } else {
+	        choices.forEach(function (choice) {
+	          return appendChoice(choice);
+	        });
+	      }
 
 	      return choicesFragment;
 	    }
@@ -5025,7 +5038,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          groupId: action.groupId,
 	          value: action.value,
 	          label: action.label || action.value,
-	          disabled: action.disabled,
+	          disabled: action.disabled || false,
 	          selected: false,
 	          active: true,
 	          score: 9999
