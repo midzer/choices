@@ -65,7 +65,7 @@ class Choices {
       searchEnabled: true,
       searchChoices: true,
       searchFloor: 1,
-      searchChoiceLimit: 4,
+      searchResultLimit: 4,
       searchFields: ['label', 'value'],
       position: 'auto',
       resetScrollPosition: true,
@@ -350,16 +350,14 @@ class Choices {
     }
 
     if (this.isSearching) {
-      for (var i = 0; i < this.config.searchChoiceLimit; i++) {
+      for (let i = 0; i < this.config.searchResultLimit; i++) {
         const choice = choices[i];
         if (choice) {
           appendChoice(choice);
         }
       }
     } else {
-      choices.forEach((choice) => {
-        appendChoice(choice);
-      });
+      choices.forEach(choice => appendChoice(choice));
     }
 
     return choicesFragment;

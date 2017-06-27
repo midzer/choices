@@ -70,7 +70,7 @@ Or include Choices directly:
     searchEnabled: true,
     searchChoices: true,
     searchFloor: 1,
-    searchChoiceLimit: 4,
+    searchResultLimit: 4,
     searchFields: ['label', 'value'],
     position: 'auto',
     resetScrollPosition: true,
@@ -278,7 +278,7 @@ Pass an array of objects:
 
 **Usage:** The minimum length a search value should be before choices are searched.
 
-### searchChoiceLimit: 4,
+### searchResultLimit: 4,
 **Type:** `Number` **Default:** `4`
 
 **Input types affected:** `select-one`, `select-multiple`
