@@ -1116,7 +1116,7 @@ class Choices {
   _handleBackspace(activeItems) {
     if (this.config.removeItems && activeItems) {
       const lastItem = activeItems[activeItems.length - 1];
-      const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+      const hasHighlightedItems = activeItems.some(item => item.highlighted);
 
       // If editing the last item is allowed and there are not other selected items,
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
@@ -1167,10 +1167,15 @@ class Choices {
       }
     }
 
-
     // If no duplicates are allowed, and the value already exists
     // in the array
-    const isUnique = !activeItems.some((item) => item.value === isType('String', value) ? value.trim() : value);
+    const isUnique = !activeItems.some((item) => {
+      if (isType('String', value)) {
+        return item.value === value.trim();
+      }
+
+      return item.value === value;
+    });
 
     if (
       !isUnique &&
@@ -1179,7 +1184,9 @@ class Choices {
       canAddItem
     ) {
       canAddItem = false;
-      notice = isType('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+      notice = isType('Function', this.config.uniqueItemText) ?
+        this.config.uniqueItemText(value) :
+        this.config.uniqueItemText;
     }
 
     return {
@@ -1294,7 +1301,7 @@ class Choices {
     }
 
     const choices = this.store.getChoices();
-    const hasUnactiveChoices = choices.some((option) => option.active !== true);
+    const hasUnactiveChoices = choices.some(option => !option.active);
 
     // Run callback if it is a function
     if (this.input === document.activeElement) {
@@ -1726,7 +1733,7 @@ class Choices {
         this.hideDropdown(true);
       }
     } else {
-      const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+      const hasHighlightedItems = activeItems.some(item => item.highlighted);
 
       // De-select any highlighted items
       if (hasHighlightedItems) {
@@ -1824,7 +1831,7 @@ class Choices {
     if (this.containerOuter.contains(target)) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-      const hasHighlightedItems = activeItems.some((item) => item.highlighted === true);
+      const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
           if (target === this.input) {
@@ -2187,9 +2194,16 @@ class Choices {
         return strToEl(`
           <div
             class="${globalClasses.containerOuter}"
-            ${this.isSelectElement ? (this.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"') : ''}
+            ${this.isSelectElement ? (this.config.searchEnabled ?
+              'role="combobox" aria-autocomplete="list"' :
+              'role="listbox"') :
+              ''
+            }
             data-type="${this.passedElement.type}"
-            ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''}
+            ${this.passedElement.type === 'select-one' ?
+              'tabindex="0"' :
+              ''
+            }
             aria-haspopup="true"
             aria-expanded="false"
             dir="${direction}"
@@ -2246,11 +2260,25 @@ class Choices {
               data-item
               data-id="${data.id}"
               data-value="${data.value}"
-              ${data.active ? 'aria-selected="true"' : ''}
-              ${data.disabled ? 'aria-disabled="true"' : ''}
               data-deletable
+              ${data.active ?
+                'aria-selected="true"' :
+                ''
+              }
+              ${data.disabled ?
+                'aria-disabled="true"' :
+                ''
+              }
               >
-              ${data.label}<button type="button" class="${globalClasses.button}" data-button>Remove item</button>
+              ${data.label}<!--
+           --><button
+                type="button"
+                class="${globalClasses.button}"
+                data-button
+                aria-label="Remove item '${data.value}'"
+                >
+                Remove item
+              </button>
             </div>
           `);
         }
@@ -2261,8 +2289,14 @@ class Choices {
             data-item
             data-id="${data.id}"
             data-value="${data.value}"
-            ${data.active ? 'aria-selected="true"' : ''}
-            ${data.disabled ? 'aria-disabled="true"' : ''}
+            ${data.active ?
+              'aria-selected="true"' :
+              ''
+            }
+            ${data.disabled ?
+              'aria-disabled="true"' :
+              ''
+            }
             >
             ${data.label}
           </div>
@@ -2274,7 +2308,10 @@ class Choices {
             class="${globalClasses.list}"
             dir="ltr"
             role="listbox"
-            ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}
+            ${this.passedElement.type !== 'select-one' ?
+              'aria-multiselectable="true"' :
+              ''
+            }
             >
           </div>
         `);
@@ -2294,7 +2331,10 @@ class Choices {
             data-id="${data.id}"
             data-value="${data.value}"
             role="group"
-            ${data.disabled ? 'aria-disabled="true"' : ''}
+            ${data.disabled ?
+              'aria-disabled="true"' :
+              ''
+            }
             >
             <div class="${globalClasses.groupHeading}">${data.value}</div>
           </div>
@@ -2315,11 +2355,17 @@ class Choices {
             class="${localClasses}"
             data-select-text="${this.config.itemSelectText}"
             data-choice
-            ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'}
-            id="${data.elementId}"
             data-id="${data.id}"
             data-value="${data.value}"
-            ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}
+            ${data.disabled ?
+              'data-choice-disabled aria-disabled="true"' :
+              'data-choice-selectable'
+            }
+            id="${data.elementId}"
+            ${data.groupId > 0 ?
+              'role="treeitem"' :
+              'role="option"'
+            }
             >
             ${data.label}
           </div>
@@ -2485,9 +2531,7 @@ class Choices {
         }
 
         // Determine whether there is a selected choice
-        const hasSelectedChoice = allChoices.some((choice) => {
-          return choice.selected === true;
-        });
+        const hasSelectedChoice = allChoices.some(choice => choice.selected);
 
         // Add each choice
         allChoices.forEach((choice, index) => {
