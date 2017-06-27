@@ -70,15 +70,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _fuse2 = _interopRequireDefault(_fuse);
 
-	var _index = __webpack_require__(3);
+	var _classnames = __webpack_require__(3);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _index = __webpack_require__(4);
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _index3 = __webpack_require__(29);
+	var _index3 = __webpack_require__(30);
 
-	var _utils = __webpack_require__(30);
+	var _utils = __webpack_require__(31);
 
-	__webpack_require__(31);
+	__webpack_require__(32);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2467,43 +2471,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _createTemplates() {
 	      var _this22 = this;
 
-	      var classNames = this.config.classNames;
+	      var globalClasses = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerOuter + '" ' + (_this22.isSelectElement ? _this22.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + ' data-type="' + _this22.passedElement.type + '" ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + ' aria-haspopup="true" aria-expanded="false" dir="' + direction + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.containerOuter + '"\n            ' + (_this22.isSelectElement ? _this22.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + '\n            data-type="' + _this22.passedElement.type + '"\n            ' + (_this22.passedElement.type === 'select-one' ? 'tabindex="0"' : '') + '\n            aria-haspopup="true"\n            aria-expanded="false"\n            dir="' + direction + '"\n            >\n          </div>\n        ');
 	        },
 	        containerInner: function containerInner() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.containerInner + '"></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + globalClasses.containerInner + '"></div>\n        ');
 	        },
 	        itemList: function itemList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + (_this22.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems) + '"></div>\n        ');
+	          var _classNames;
+
+	          var localClasses = (0, _classnames2.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, _this22.passedElement.type === 'select-one'), _defineProperty(_classNames, globalClasses.listItems, _this22.passedElement.type !== 'select-one'), _classNames));
+
+	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '"></div>\n        ');
 	        },
 	        placeholder: function placeholder(value) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.placeholder + '">' + value + '</div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div class="' + globalClasses.placeholder + '">\n            ' + value + '\n          </div>\n        ');
 	        },
 	        item: function item(data) {
+	          var _classNames2;
+
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _classNames2));
+
 	          if (_this22.config.removeItemButton) {
-	            return (0, _utils.strToEl)('\n            <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : '') + ' ' + (!data.disabled ? classNames.itemSelectable : '') + '" data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + ' data-deletable>\n            ' + data.label + '<button type="button" class="' + classNames.button + '" data-button>Remove item</button>\n            </div>\n          ');
+	            var _classNames3;
+
+	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _classNames3));
+
+	            return (0, _utils.strToEl)('\n            <div\n              class="' + localClasses + '"\n              data-item\n              data-id="' + data.id + '"\n              data-value="' + data.value + '"\n              ' + (data.active ? 'aria-selected="true"' : '') + '\n              ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n              data-deletable\n              >\n              ' + data.label + '<button type="button" class="' + globalClasses.button + '" data-button>Remove item</button>\n            </div>\n          ');
 	          }
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + (data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"  data-item data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.active ? 'aria-selected="true"' : '') + ' ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            ' + data.label + '\n          </div>\n        ');
+
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-item\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.active ? 'aria-selected="true"' : '') + '\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + '" dir="ltr" role="listbox" ' + (_this22.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '></div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.list + '"\n            dir="ltr"\n            role="listbox"\n            ' + (_this22.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : '') + '\n            >\n          </div>\n        ');
 	        },
 	        choiceGroup: function choiceGroup(data) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.group + ' ' + (data.disabled ? classNames.itemDisabled : '') + '" data-group data-id="' + data.id + '" data-value="' + data.value + '" role="group" ' + (data.disabled ? 'aria-disabled="true"' : '') + '>\n            <div class="' + classNames.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
+	          var localClasses = (0, _classnames2.default)(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
+
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-group\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            role="group"\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            <div class="' + globalClasses.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
 	        },
 	        choice: function choice(data) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + ' ' + (data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '" data-select-text="' + _this22.config.itemSelectText + '" data-choice ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + ' id="' + data.elementId + '" data-id="' + data.id + '" data-value="' + data.value + '" ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '>\n            ' + data.label + '\n          </div>\n        ');
+	          var _classNames5;
+
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _classNames5));
+
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-select-text="' + _this22.config.itemSelectText + '"\n            data-choice\n            ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n            id="' + data.elementId + '"\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        input: function input() {
-	          return (0, _utils.strToEl)('\n          <input type="text" class="' + classNames.input + ' ' + classNames.inputCloned + '" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">\n        ');
+	          var localClasses = (0, _classnames2.default)(globalClasses.input, globalClasses.inputCloned);
+
+	          return (0, _utils.strToEl)('\n          <input\n            type="text"\n            class="' + localClasses + '"\n            autocomplete="off"\n            autocapitalize="off"\n            spellcheck="false"\n            role="textbox"\n            aria-autocomplete="list"\n            >\n        ');
 	        },
 	        dropdown: function dropdown() {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.list + ' ' + classNames.listDropdown + '" aria-expanded="false"></div>\n        ');
+	          var localClasses = (0, _classnames2.default)(globalClasses.list, globalClasses.listDropdown);
+
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            aria-expanded="false"\n            >\n          </div>\n        ');
 	        },
 	        notice: function notice(label) {
-	          return (0, _utils.strToEl)('\n          <div class="' + classNames.item + ' ' + classNames.itemChoice + '">' + label + '</div>\n        ');
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice);
+
+	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '">\n            ' + label + '\n          </div>\n        ');
 	        },
 	        option: function option(data) {
 	          return (0, _utils.strToEl)('\n          <option value="' + data.value + '" selected>' + data.label + '</option>\n        ');
@@ -3498,6 +3527,60 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3506,9 +3589,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _redux = __webpack_require__(4);
+	var _redux = __webpack_require__(5);
 
-	var _index = __webpack_require__(25);
+	var _index = __webpack_require__(26);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -3728,7 +3811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		module.exports = Store;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3736,27 +3819,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 
-	var _createStore = __webpack_require__(5);
+	var _createStore = __webpack_require__(6);
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(20);
+	var _combineReducers = __webpack_require__(21);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(22);
+	var _bindActionCreators = __webpack_require__(23);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(23);
+	var _applyMiddleware = __webpack_require__(24);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(24);
+	var _compose = __webpack_require__(25);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(21);
+	var _warning = __webpack_require__(22);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -3779,7 +3862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.compose = _compose2['default'];
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3788,11 +3871,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.ActionTypes = undefined;
 	exports['default'] = createStore;
 
-	var _isPlainObject = __webpack_require__(6);
+	var _isPlainObject = __webpack_require__(7);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _symbolObservable = __webpack_require__(16);
+	var _symbolObservable = __webpack_require__(17);
 
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 
@@ -3806,33 +3889,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var ActionTypes = exports.ActionTypes = {
 	  INIT: '@@redux/INIT'
+	};
 
-	  /**
-	   * Creates a Redux store that holds the state tree.
-	   * The only way to change the data in the store is to call `dispatch()` on it.
-	   *
-	   * There should only be a single store in your app. To specify how different
-	   * parts of the state tree respond to actions, you may combine several reducers
-	   * into a single reducer function by using `combineReducers`.
-	   *
-	   * @param {Function} reducer A function that returns the next state tree, given
-	   * the current state tree and the action to handle.
-	   *
-	   * @param {any} [preloadedState] The initial state. You may optionally specify it
-	   * to hydrate the state from the server in universal apps, or to restore a
-	   * previously serialized user session.
-	   * If you use `combineReducers` to produce the root reducer function, this must be
-	   * an object with the same shape as `combineReducers` keys.
-	   *
-	   * @param {Function} [enhancer] The store enhancer. You may optionally specify it
-	   * to enhance the store with third-party capabilities such as middleware,
-	   * time travel, persistence, etc. The only store enhancer that ships with Redux
-	   * is `applyMiddleware()`.
-	   *
-	   * @returns {Store} A Redux store that lets you read the state, dispatch actions
-	   * and subscribe to changes.
-	   */
-	};function createStore(reducer, preloadedState, enhancer) {
+	/**
+	 * Creates a Redux store that holds the state tree.
+	 * The only way to change the data in the store is to call `dispatch()` on it.
+	 *
+	 * There should only be a single store in your app. To specify how different
+	 * parts of the state tree respond to actions, you may combine several reducers
+	 * into a single reducer function by using `combineReducers`.
+	 *
+	 * @param {Function} reducer A function that returns the next state tree, given
+	 * the current state tree and the action to handle.
+	 *
+	 * @param {any} [preloadedState] The initial state. You may optionally specify it
+	 * to hydrate the state from the server in universal apps, or to restore a
+	 * previously serialized user session.
+	 * If you use `combineReducers` to produce the root reducer function, this must be
+	 * an object with the same shape as `combineReducers` keys.
+	 *
+	 * @param {Function} enhancer The store enhancer. You may optionally specify it
+	 * to enhance the store with third-party capabilities such as middleware,
+	 * time travel, persistence, etc. The only store enhancer that ships with Redux
+	 * is `applyMiddleware()`.
+	 *
+	 * @returns {Store} A Redux store that lets you read the state, dispatch actions
+	 * and subscribe to changes.
+	 */
+	function createStore(reducer, preloadedState, enhancer) {
 	  var _ref2;
 
 	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
@@ -3966,8 +4050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var listeners = currentListeners = nextListeners;
 	    for (var i = 0; i < listeners.length; i++) {
-	      var listener = listeners[i];
-	      listener();
+	      listeners[i]();
 	    }
 
 	    return action;
@@ -3996,7 +4079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Interoperability point for observable/reactive libraries.
 	   * @returns {observable} A minimal observable of state changes.
 	   * For more information, see the observable proposal:
-	   * https://github.com/tc39/proposal-observable
+	   * https://github.com/zenparsing/es-observable
 	   */
 	  function observable() {
 	    var _ref;
@@ -4045,12 +4128,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var baseGetTag = __webpack_require__(7),
-	    getPrototype = __webpack_require__(13),
-	    isObjectLike = __webpack_require__(15);
+	var baseGetTag = __webpack_require__(8),
+	    getPrototype = __webpack_require__(14),
+	    isObjectLike = __webpack_require__(16);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -4113,12 +4196,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(8),
-	    getRawTag = __webpack_require__(11),
-	    objectToString = __webpack_require__(12);
+	var Symbol = __webpack_require__(9),
+	    getRawTag = __webpack_require__(12),
+	    objectToString = __webpack_require__(13);
 
 	/** `Object#toString` result references. */
 	var nullTag = '[object Null]',
@@ -4147,10 +4230,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(9);
+	var root = __webpack_require__(10);
 
 	/** Built-in value references. */
 	var Symbol = root.Symbol;
@@ -4159,10 +4242,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var freeGlobal = __webpack_require__(10);
+	var freeGlobal = __webpack_require__(11);
 
 	/** Detect free variable `self`. */
 	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -4174,7 +4257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
@@ -4185,10 +4268,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(8);
+	var Symbol = __webpack_require__(9);
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -4237,7 +4320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 	/** Used for built-in method references. */
@@ -4265,10 +4348,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var overArg = __webpack_require__(14);
+	var overArg = __webpack_require__(15);
 
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -4277,7 +4360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 	/**
@@ -4298,7 +4381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 	/**
@@ -4333,14 +4416,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(17);
+	module.exports = __webpack_require__(18);
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
@@ -4349,7 +4432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _ponyfill = __webpack_require__(19);
+	var _ponyfill = __webpack_require__(20);
 
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -4372,10 +4455,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var result = (0, _ponyfill2['default'])(root);
 	exports['default'] = result;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(18)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(19)(module)))
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 	module.exports = function(module) {
@@ -4391,7 +4474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -4419,7 +4502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4427,13 +4510,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.__esModule = true;
 	exports['default'] = combineReducers;
 
-	var _createStore = __webpack_require__(5);
+	var _createStore = __webpack_require__(6);
 
-	var _isPlainObject = __webpack_require__(6);
+	var _isPlainObject = __webpack_require__(7);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(21);
+	var _warning = __webpack_require__(22);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -4443,7 +4526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionType = action && action.type;
 	  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
 
-	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state. ' + 'If you want this reducer to hold no value, you can return null instead of undefined.';
+	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state.';
 	}
 
 	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
@@ -4471,18 +4554,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	function assertReducerShape(reducers) {
+	function assertReducerSanity(reducers) {
 	  Object.keys(reducers).forEach(function (key) {
 	    var reducer = reducers[key];
 	    var initialState = reducer(undefined, { type: _createStore.ActionTypes.INIT });
 
 	    if (typeof initialState === 'undefined') {
-	      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined. If you don\'t want to set a value for this reducer, ' + 'you can use null instead of undefined.');
+	      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined.');
 	    }
 
 	    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
 	    if (typeof reducer(undefined, { type: type }) === 'undefined') {
-	      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + _createStore.ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined, but can be null.');
+	      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + _createStore.ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined.');
 	    }
 	  });
 	}
@@ -4521,24 +4604,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  var finalReducerKeys = Object.keys(finalReducers);
 
-	  var unexpectedKeyCache = void 0;
 	  if (false) {
-	    unexpectedKeyCache = {};
+	    var unexpectedKeyCache = {};
 	  }
 
-	  var shapeAssertionError = void 0;
+	  var sanityError;
 	  try {
-	    assertReducerShape(finalReducers);
+	    assertReducerSanity(finalReducers);
 	  } catch (e) {
-	    shapeAssertionError = e;
+	    sanityError = e;
 	  }
 
 	  return function combination() {
-	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	    var action = arguments[1];
 
-	    if (shapeAssertionError) {
-	      throw shapeAssertionError;
+	    if (sanityError) {
+	      throw sanityError;
 	    }
 
 	    if (false) {
@@ -4550,16 +4632,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var hasChanged = false;
 	    var nextState = {};
-	    for (var _i = 0; _i < finalReducerKeys.length; _i++) {
-	      var _key = finalReducerKeys[_i];
-	      var reducer = finalReducers[_key];
-	      var previousStateForKey = state[_key];
+	    for (var i = 0; i < finalReducerKeys.length; i++) {
+	      var key = finalReducerKeys[i];
+	      var reducer = finalReducers[key];
+	      var previousStateForKey = state[key];
 	      var nextStateForKey = reducer(previousStateForKey, action);
 	      if (typeof nextStateForKey === 'undefined') {
-	        var errorMessage = getUndefinedStateErrorMessage(_key, action);
+	        var errorMessage = getUndefinedStateErrorMessage(key, action);
 	        throw new Error(errorMessage);
 	      }
-	      nextState[_key] = nextStateForKey;
+	      nextState[key] = nextStateForKey;
 	      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
 	    }
 	    return hasChanged ? nextState : state;
@@ -4567,7 +4649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -4597,20 +4679,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 23 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
 	exports.__esModule = true;
 	exports['default'] = bindActionCreators;
-
-	var _warning = __webpack_require__(21);
-
-	var _warning2 = _interopRequireDefault(_warning);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	function bindActionCreator(actionCreator, dispatch) {
 	  return function () {
 	    return dispatch(actionCreator.apply(undefined, arguments));
@@ -4654,15 +4729,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var actionCreator = actionCreators[key];
 	    if (typeof actionCreator === 'function') {
 	      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
-	    } else {
-	      (0, _warning2['default'])('bindActionCreators expected a function actionCreator for key \'' + key + '\', instead received type \'' + typeof actionCreator + '\'.');
 	    }
 	  }
 	  return boundActionCreators;
 	}
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4673,7 +4746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(24);
+	var _compose = __webpack_require__(25);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -4725,7 +4798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -4758,15 +4831,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return funcs[0];
 	  }
 
-	  return funcs.reduce(function (a, b) {
-	    return function () {
-	      return a(b.apply(undefined, arguments));
-	    };
-	  });
+	  var last = funcs[funcs.length - 1];
+	  var rest = funcs.slice(0, -1);
+	  return function () {
+	    return rest.reduceRight(function (composed, f) {
+	      return f(composed);
+	    }, last.apply(undefined, arguments));
+	  };
 	}
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4775,17 +4850,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _redux = __webpack_require__(4);
+	var _redux = __webpack_require__(5);
 
-	var _items = __webpack_require__(26);
+	var _items = __webpack_require__(27);
 
 	var _items2 = _interopRequireDefault(_items);
 
-	var _groups = __webpack_require__(27);
+	var _groups = __webpack_require__(28);
 
 	var _groups2 = _interopRequireDefault(_groups);
 
-	var _choices = __webpack_require__(28);
+	var _choices = __webpack_require__(29);
 
 	var _choices2 = _interopRequireDefault(_choices);
 
@@ -4813,7 +4888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = rootReducer;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -4881,7 +4956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = items;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -4922,7 +4997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = groups;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -5043,7 +5118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = choices;
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -5129,7 +5204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		};
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -5616,8 +5691,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var strToEl = exports.strToEl = function () {
 	  var tmpEl = document.createElement('div');
 	  return function (str) {
-	    var r;
-	    tmpEl.innerHTML = str;
+	    var cleanedInput = str.trim();
+	    var r = void 0;
+	    tmpEl.innerHTML = cleanedInput;
 	    r = tmpEl.children[0];
 
 	    while (tmpEl.firstChild) {
@@ -5706,7 +5782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	'use strict';

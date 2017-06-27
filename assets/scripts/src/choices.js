@@ -1,4 +1,5 @@
 import Fuse from 'fuse.js';
+import classNames from 'classnames';
 import Store from './store/index.js';
 import {
   addItem,
@@ -2180,74 +2181,192 @@ class Choices {
    * @private
    */
   _createTemplates() {
-    const classNames = this.config.classNames;
+    const globalClasses = this.config.classNames;
     const templates = {
       containerOuter: (direction) => {
         return strToEl(`
-          <div class="${classNames.containerOuter}" ${this.isSelectElement ? ( this.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"') : ''} data-type="${this.passedElement.type}" ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''} aria-haspopup="true" aria-expanded="false" dir="${direction}"></div>
+          <div
+            class="${globalClasses.containerOuter}"
+            ${this.isSelectElement ? (this.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"') : ''}
+            data-type="${this.passedElement.type}"
+            ${this.passedElement.type === 'select-one' ? 'tabindex="0"' : ''}
+            aria-haspopup="true"
+            aria-expanded="false"
+            dir="${direction}"
+            >
+          </div>
         `);
       },
       containerInner: () => {
         return strToEl(`
-          <div class="${classNames.containerInner}"></div>
+          <div class="${globalClasses.containerInner}"></div>
         `);
       },
       itemList: () => {
+        const localClasses = classNames(
+          globalClasses.list,
+          {
+            [globalClasses.listSingle]: (this.passedElement.type === 'select-one'),
+            [globalClasses.listItems]: (this.passedElement.type !== 'select-one')
+          }
+        );
+
         return strToEl(`
-          <div class="${classNames.list} ${this.passedElement.type === 'select-one' ? classNames.listSingle : classNames.listItems}"></div>
+          <div class="${localClasses}"></div>
         `);
       },
       placeholder: (value) => {
         return strToEl(`
-          <div class="${classNames.placeholder}">${value}</div>
+          <div class="${globalClasses.placeholder}">
+            ${value}
+          </div>
         `);
       },
       item: (data) => {
+        let localClasses = classNames(
+          globalClasses.item,
+          {
+            [globalClasses.highlightedState]: data.highlighted,
+            [globalClasses.itemSelectable]: !data.highlighted
+          }
+        );
+
         if (this.config.removeItemButton) {
+          localClasses = classNames(
+            globalClasses.item,
+            {
+              [globalClasses.highlightedState]: data.highlighted,
+              [globalClasses.itemSelectable]: !data.disabled
+            }
+          );
+
           return strToEl(`
-            <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : ''} ${!data.disabled ? classNames.itemSelectable : ''}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''} data-deletable>
-            ${data.label}<button type="button" class="${classNames.button}" data-button>Remove item</button>
+            <div
+              class="${localClasses}"
+              data-item
+              data-id="${data.id}"
+              data-value="${data.value}"
+              ${data.active ? 'aria-selected="true"' : ''}
+              ${data.disabled ? 'aria-disabled="true"' : ''}
+              data-deletable
+              >
+              ${data.label}<button type="button" class="${globalClasses.button}" data-button>Remove item</button>
             </div>
           `);
         }
+
         return strToEl(`
-          <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}"  data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+          <div
+            class="${localClasses}"
+            data-item
+            data-id="${data.id}"
+            data-value="${data.value}"
+            ${data.active ? 'aria-selected="true"' : ''}
+            ${data.disabled ? 'aria-disabled="true"' : ''}
+            >
             ${data.label}
           </div>
         `);
       },
       choiceList: () => {
         return strToEl(`
-          <div class="${classNames.list}" dir="ltr" role="listbox" ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}></div>
+          <div
+            class="${globalClasses.list}"
+            dir="ltr"
+            role="listbox"
+            ${this.passedElement.type !== 'select-one' ? 'aria-multiselectable="true"' : ''}
+            >
+          </div>
         `);
       },
       choiceGroup: (data) => {
+        let localClasses = classNames(
+          globalClasses.group,
+          {
+            [globalClasses.itemDisabled]: data.disabled
+          }
+        );
+
         return strToEl(`
-          <div class="${classNames.group} ${data.disabled ? classNames.itemDisabled : ''}" data-group data-id="${data.id}" data-value="${data.value}" role="group" ${data.disabled ? 'aria-disabled="true"' : ''}>
-            <div class="${classNames.groupHeading}">${data.value}</div>
+          <div
+            class="${localClasses}"
+            data-group
+            data-id="${data.id}"
+            data-value="${data.value}"
+            role="group"
+            ${data.disabled ? 'aria-disabled="true"' : ''}
+            >
+            <div class="${globalClasses.groupHeading}">${data.value}</div>
           </div>
         `);
       },
       choice: (data) => {
+        let localClasses = classNames(
+          globalClasses.item,
+          globalClasses.itemChoice,
+          {
+            [globalClasses.itemDisabled]: data.disabled,
+            [globalClasses.itemSelectable]: !data.disabled
+          }
+        );
+
         return strToEl(`
-          <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} id="${data.elementId}" data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+          <div
+            class="${localClasses}"
+            data-select-text="${this.config.itemSelectText}"
+            data-choice
+            ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'}
+            id="${data.elementId}"
+            data-id="${data.id}"
+            data-value="${data.value}"
+            ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}
+            >
             ${data.label}
           </div>
         `);
       },
       input: () => {
+        let localClasses = classNames(
+          globalClasses.input,
+          globalClasses.inputCloned
+        );
+
         return strToEl(`
-          <input type="text" class="${classNames.input} ${classNames.inputCloned}" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list">
+          <input
+            type="text"
+            class="${localClasses}"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            role="textbox"
+            aria-autocomplete="list"
+            >
         `);
       },
       dropdown: () => {
+        let localClasses = classNames(
+          globalClasses.list,
+          globalClasses.listDropdown
+        );
+
         return strToEl(`
-          <div class="${classNames.list} ${classNames.listDropdown}" aria-expanded="false"></div>
+          <div
+            class="${localClasses}"
+            aria-expanded="false"
+            >
+          </div>
         `);
       },
       notice: (label) => {
+        let localClasses = classNames(
+          globalClasses.item,
+          globalClasses.itemChoice
+        );
+
         return strToEl(`
-          <div class="${classNames.item} ${classNames.itemChoice}">${label}</div>
+          <div class="${localClasses}">
+            ${label}
+          </div>
         `);
       },
       option: (data) => {
