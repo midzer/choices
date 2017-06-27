@@ -362,10 +362,10 @@ class Choices {
   renderItems(items, fragment) {
     // Create fragment to add elements to
     const itemListFragment = fragment || document.createDocumentFragment();
-    // Simplify store data to just values
-    const itemsFiltered = this.store.getItemsReducedToValues(items);
 
     if (this.isTextElement) {
+      // Simplify store data to just values
+      const itemsFiltered = this.store.getItemsReducedToValues(items);
       // Assign hidden input array of values
       this.passedElement.setAttribute('value', itemsFiltered.join(this.config.delimiter));
     } else {
@@ -420,7 +420,7 @@ class Choices {
           this.choiceList.innerHTML = '';
 
           // Scroll back to top of choices list
-          if(this.config.resetScrollPosition){
+          if (this.config.resetScrollPosition) {
             this.choiceList.scrollTop = 0;
           }
 
@@ -510,7 +510,7 @@ class Choices {
     this.store.dispatch(highlightItem(id, true));
 
     if (runEvent) {
-      if(group && group.value) {
+      if (group && group.value) {
         triggerEvent(this.passedElement, 'highlightItem', {
           id,
           value: item.value,
@@ -546,7 +546,7 @@ class Choices {
 
     this.store.dispatch(highlightItem(id, false));
 
-    if(group && group.value) {
+    if (group && group.value) {
       triggerEvent(this.passedElement, 'unhighlightItem', {
         id,
         value: item.value,
@@ -796,13 +796,29 @@ class Choices {
             // If we are dealing with a select input, we need to create an option first
             // that is then selected. For text inputs we can just add items normally.
             if (passedElementType !== 'text') {
-              this._addChoice(true, false, item.value, item.label, -1);
+              this._addChoice(
+                item.value,
+                item.label,
+                true,
+                false,
+                -1
+              );
             } else {
-              this._addItem(item.value, item.label, item.id);
+              this._addItem(
+                item.value,
+                item.label,
+                item.id
+              );
             }
           } else if (itemType === 'String') {
             if (passedElementType !== 'text') {
-              this._addChoice(true, false, item, item, -1);
+              this._addChoice(
+                item,
+                item,
+                true,
+                false,
+                -1
+              );
             } else {
               this._addItem(item);
             }
@@ -869,19 +885,27 @@ class Choices {
           return;
         }
         // Clear choices if needed
-        if(replaceChoices) {
+        if (replaceChoices) {
           this._clearChoices();
         }
         // Add choices if passed
         if (choices && choices.length) {
           this.containerOuter.classList.remove(this.config.classNames.loadingState);
           choices.forEach((result, index) => {
-            const isSelected = result.selected ? result.selected : false;
-            const isDisabled = result.disabled ? result.disabled : false;
             if (result.choices) {
-              this._addGroup(result, (result.id || null), value, label);
+              this._addGroup(
+                result,
+                (result.id || null),
+                value,
+                label
+              );
             } else {
-              this._addChoice(isSelected, isDisabled, result[value], result[label]);
+              this._addChoice(
+                result[value],
+                result[label],
+                result.selected,
+                result.disabled
+              );
             }
           });
         }
@@ -969,7 +993,9 @@ class Choices {
     if (this.initialised === true) {
       if (this.isSelectElement) {
         // Show loading text
-        this._handleLoadingState(true);
+        requestAnimationFrame(() => {
+          this._handleLoadingState(true)
+        });
         // Run callback
         fn(this._ajaxCallback());
       }
@@ -1093,7 +1119,12 @@ class Choices {
       const canAddItem = this._canAddItem(activeItems, choice.value);
 
       if (canAddItem.response) {
-        this._addItem(choice.value, choice.label, choice.id, choice.groupId);
+        this._addItem(
+          choice.value,
+          choice.label,
+          choice.id,
+          choice.groupId
+        );
         this._triggerChange(choice.value);
       }
     }
@@ -1203,7 +1234,7 @@ class Choices {
    */
   _handleLoadingState(isLoading = true) {
     let placeholderItem = this.itemList.querySelector(`.${this.config.classNames.placeholder}`);
-    if(isLoading) {
+    if (isLoading) {
       this.containerOuter.classList.add(this.config.classNames.loadingState);
       this.containerOuter.setAttribute('aria-busy', 'true');
       if (this.passedElement.type === 'select-one') {
@@ -1219,7 +1250,11 @@ class Choices {
     } else {
       // Remove loading states/text
       this.containerOuter.classList.remove(this.config.classNames.loadingState);
-      const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+      const placeholder = this.config.placeholder ?
+        this.config.placeholderValue ||
+        this.passedElement.getAttribute('placeholder') :
+        false;
+
       if (this.passedElement.type === 'select-one') {
         placeholderItem.innerHTML = placeholder || '';
       } else {
@@ -1246,12 +1281,21 @@ class Choices {
         this._handleLoadingState(false);
         // Add each result as a choice
         parsedResults.forEach((result, index) => {
-          const isSelected = result.selected ? result.selected : false;
-          const isDisabled = result.disabled ? result.disabled : false;
           if (result.choices) {
-            this._addGroup(result, (result.id || null), value, label);
+            const groupId = (result.id || null);
+            this._addGroup(
+              result,
+              groupId,
+              value,
+              label
+            );
           } else {
-            this._addChoice(isSelected, isDisabled, result[value], result[label]);
+            this._addChoice(
+              result[value],
+              result[label],
+              result.selected,
+              result.disabled
+            );
           }
         });
       } else {
@@ -1685,7 +1729,7 @@ class Choices {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
-      if(foundTarget = findAncestorByAttrName(target, 'data-button')) {
+      if (foundTarget = findAncestorByAttrName(target, 'data-button')) {
         this._handleButtonAction(activeItems, foundTarget);
       } else if (foundTarget = findAncestorByAttrName(target, 'data-item')) {
         this._handleItemAction(activeItems, foundTarget, hasShiftKey);
@@ -2035,7 +2079,7 @@ class Choices {
     }
 
     // Trigger change event
-    if(group && group.value) {
+    if (group && group.value) {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
@@ -2077,7 +2121,7 @@ class Choices {
 
     this.store.dispatch(removeItem(id, choiceId));
 
-    if(group && group.value) {
+    if (group && group.value) {
       triggerEvent(this.passedElement, 'removeItem', {
         id,
         value,
@@ -2105,7 +2149,7 @@ class Choices {
    * @return
    * @private
    */
-  _addChoice(isSelected, isDisabled, value, label, groupId = -1) {
+  _addChoice(value, label, isSelected = false, isDisabled = false, groupId = -1) {
     if (typeof value === 'undefined' || value === null) {
       return;
     }
@@ -2116,7 +2160,14 @@ class Choices {
     const choiceId = choices ? choices.length + 1 : 1;
     const choiceElementId = `${this.baseId}-${this.idNames.itemChoice}-${choiceId}`;
 
-    this.store.dispatch(addChoice(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
+    this.store.dispatch(addChoice(
+      value,
+      choiceLabel,
+      choiceId,
+      groupId,
+      isDisabled,
+      choiceElementId
+    ));
 
     if (isSelected) {
       this._addItem(value, choiceLabel, choiceId);
@@ -2147,23 +2198,35 @@ class Choices {
     const isDisabled = group.disabled ? group.disabled : false;
 
     if (groupChoices) {
-      this.store.dispatch(addGroup(group.label, groupId, true, isDisabled));
+      this.store.dispatch(addGroup(
+        group.label,
+        groupId,
+        true,
+        isDisabled
+      ));
 
       groupChoices.forEach((option) => {
-        const isOptDisabled = (option.disabled || (option.parentNode && option.parentNode.disabled)) || false;
-        const isOptSelected = option.selected ? option.selected : false;
-        let label;
+        const isOptDisabled = option.disabled ||
+          (option.parentNode && option.parentNode.disabled);
+        let label = isType('Object', option) ?
+          option[labelKey] :
+          option.innerHTML;
 
-        if (isType('Object', option)) {
-          label = option[labelKey] || option[valueKey];
-        } else {
-          label = option.innerHTML;
-        }
-
-        this._addChoice(isOptSelected, isOptDisabled, option[valueKey], label, groupId);
+        this._addChoice(
+          option[valueKey],
+          label,
+          option.selected,
+          isOptDisabled,
+          groupId
+        );
       });
     } else {
-      this.store.dispatch(addGroup(group.label, group.id, false, group.disabled));
+      this.store.dispatch(addGroup(
+        group.label,
+        group.id,
+        false,
+        group.disabled
+      ));
     }
   }
 
@@ -2535,20 +2598,33 @@ class Choices {
 
         // Add each choice
         allChoices.forEach((choice, index) => {
-          const isDisabled = choice.disabled ? choice.disabled : false;
-          const isSelected = choice.selected ? choice.selected : false;
           // Pre-select first choice if it's a single select
           if (this.passedElement.type === 'select-one') {
             if (hasSelectedChoice || (!hasSelectedChoice && index > 0)) {
               // If there is a selected choice already or the choice is not
               // the first in the array, add each choice normally
-              this._addChoice(isSelected, isDisabled, choice.value, choice.label);
+              this._addChoice(
+                choice.value,
+                choice.label,
+                choice.selected,
+                choice.disabled
+              );
             } else {
               // Otherwise pre-select the first choice in the array
-              this._addChoice(true, false, choice.value, choice.label);
+              this._addChoice(
+                choice.value,
+                choice.label,
+                true,
+                false
+              );
             }
           } else {
-            this._addChoice(isSelected, isDisabled, choice.value, choice.label);
+            this._addChoice(
+              choice.value,
+              choice.label,
+              choice.selected,
+              choice.disabled
+            );
           }
         });
       }

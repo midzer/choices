@@ -317,14 +317,14 @@
         maxItemCount: 5,
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-        .then(function(response) {
-          response.json().then(function(data) {
-            callback(data.releases, 'title', 'title');
+          .then(function(response) {
+            response.json().then(function(data) {
+              callback(data.releases, 'title', 'title');
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
       });
 
       var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
@@ -358,15 +358,15 @@
         placeholderValue: 'Pick an Arctic Monkeys record'
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-        .then(function(response) {
-          response.json().then(function(data) {
-            callback(data.releases, 'title', 'title');
-            singleFetch.setValueByChoice('Fake Tales Of San Francisco');
+          .then(function(response) {
+            response.json().then(function(data) {
+              callback(data.releases, 'title', 'title');
+              singleFetch.setValueByChoice('Fake Tales Of San Francisco');
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
       });
 
       var singleXhrRemove = new Choices('#choices-single-remove-xhr', {

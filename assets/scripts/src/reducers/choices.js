@@ -11,7 +11,7 @@ const choices = (state = [], action) => {
         elementId: action.elementId,
         groupId: action.groupId,
         value: action.value,
-        label: action.label,
+        label: (action.label || action.value),
         disabled: action.disabled,
         selected: false,
         active: true,
