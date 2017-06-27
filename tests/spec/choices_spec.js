@@ -78,6 +78,7 @@ describe('Choices', () => {
       expect(this.choices.config.searchEnabled).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.searchChoices).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.searchFloor).toEqual(jasmine.any(Number));
+      expect(this.choices.config.searchChoiceLimit).toEqual(jasmine.any(Number));
       expect(this.choices.config.searchFields).toEqual(jasmine.any(Array) || jasmine.any(String));
       expect(this.choices.config.position).toEqual(jasmine.any(String));
       expect(this.choices.config.regexFilter).toEqual(null);

@@ -65,6 +65,7 @@ class Choices {
       searchEnabled: true,
       searchChoices: true,
       searchFloor: 1,
+      searchChoiceLimit: 4,
       searchFields: ['label', 'value'],
       position: 'auto',
       resetScrollPosition: true,
@@ -335,19 +336,31 @@ class Choices {
     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
     const choicesFragment = fragment || document.createDocumentFragment();
     const filter = this.isSearching ? sortByScore : this.config.sortFilter;
+    const appendChoice = (choice) => {
+      const dropdownItem = this._getTemplate('choice', choice);
+      const shouldRender = this.passedElement.type === 'select-one' || !choice.selected;
+      if (shouldRender) {
+        choicesFragment.appendChild(dropdownItem);
+      }
+    };
 
     // If sorting is enabled or the user is searching, filter choices
     if (this.config.shouldSort || this.isSearching) {
       choices.sort(filter);
     }
 
-    choices.forEach((choice) => {
-      const dropdownItem = this._getTemplate('choice', choice);
-      const shouldRender = this.passedElement.type === 'select-one' || !choice.selected;
-      if (shouldRender) {
-        choicesFragment.appendChild(dropdownItem);
+    if (this.isSearching) {
+      for (var i = 0; i < this.config.searchChoiceLimit; i++) {
+        const choice = choices[i];
+        if (choice) {
+          appendChoice(choice);
+        }
       }
-    });
+    } else {
+      choices.forEach((choice) => {
+        appendChoice(choice);
+      });
+    }
 
     return choicesFragment;
   }

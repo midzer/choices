@@ -12,7 +12,7 @@ const choices = (state = [], action) => {
         groupId: action.groupId,
         value: action.value,
         label: (action.label || action.value),
-        disabled: action.disabled,
+        disabled: (action.disabled || false),
         selected: false,
         active: true,
         score: 9999,
