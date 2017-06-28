@@ -1,6 +1,9 @@
 import 'whatwg-fetch';
 import 'es6-promise';
 import Choices from '../../assets/scripts/src/choices.js';
+import itemReducer from '../../assets/scripts/src/reducers/items.js';
+import choiceReducer from '../../assets/scripts/src/reducers/choices.js';
+import { addItem as addItemAction, addChoice as addChoiceAction } from '../../assets/scripts/src/actions/index.js';
 
 if (typeof Object.assign != 'function') {
   Object.assign = function (target, varArgs) { // .length of function is 2
@@ -28,10 +31,6 @@ if (typeof Object.assign != 'function') {
 
 describe('Choices', () => {
 
-  afterEach(function() {
-    this.choices.destroy();
-  });
-
   describe('should initialize Choices', () => {
 
     beforeEach(function() {
@@ -41,6 +40,10 @@ describe('Choices', () => {
 
       document.body.appendChild(this.input);
       this.choices = new Choices(this.input);
+    });
+
+    afterEach(function() {
+      this.choices.destroy();
     });
 
     it('should be defined', function() {
@@ -164,6 +167,10 @@ describe('Choices', () => {
       document.body.appendChild(this.input);
     });
 
+    afterEach(function() {
+      this.choices.destroy();
+    });
+
     it('should accept a user inputted value', function() {
       this.choices = new Choices(this.input);
 
@@ -270,6 +277,10 @@ describe('Choices', () => {
       }
 
       document.body.appendChild(this.input);
+    });
+
+    afterEach(function() {
+      this.choices.destroy();
     });
 
     it('should open the choice list on focussing', function() {
@@ -567,6 +578,10 @@ describe('Choices', () => {
       });
     });
 
+    afterEach(function() {
+      this.choices.destroy();
+    });
+
     it('should add any pre-defined values', function() {
       expect(this.choices.currentState.items.length).toBeGreaterThan(1);
     });
@@ -602,6 +617,10 @@ describe('Choices', () => {
 
       document.body.appendChild(this.input);
       this.choices = new Choices(this.input);
+    });
+
+    afterEach(function() {
+      this.choices.destroy();
     });
 
     it('should handle highlightItem()', function() {
@@ -839,6 +858,10 @@ describe('Choices', () => {
       this.choices = new Choices(this.input);
     });
 
+    afterEach(function() {
+      this.choices.destroy();
+    });
+
     it('should handle disable()', function() {
       this.choices.disable();
 
@@ -861,6 +884,10 @@ describe('Choices', () => {
 
       document.body.appendChild(this.input);
       this.choices = new Choices(this.input);
+    });
+
+    afterEach(function() {
+      this.choices.destroy();
     });
 
     it('should handle clearInput()', function() {
@@ -899,6 +926,10 @@ describe('Choices', () => {
       document.body.appendChild(this.input);
     });
 
+    afterEach(function() {
+      this.choices.destroy();
+    });
+
     it('should flip the dropdown', function() {
       this.choices = new Choices(this.input, {
         position: 'top'
@@ -919,4 +950,66 @@ describe('Choices', () => {
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
     });
   });
+
+  describe('should allow custom properties provided by the user on items or choices', function() {
+      it('should allow the user to supply custom properties for an item', function() {
+        var randomItem = {
+          id: 8999,
+          choiceId: 9000,
+          groupId: 9001,
+          value: 'value',
+          label: 'label',
+          customProperties: {
+            foo: 'bar'
+          }
+        }
+
+        var expectedState = [{
+          id: randomItem.id,
+          choiceId: randomItem.choiceId,
+          groupId: randomItem.groupId,
+          value: randomItem.value,
+          label: randomItem.label,
+          active: true,
+          highlighted: false,
+          customProperties: randomItem.customProperties
+        }];
+
+        var action = addItemAction(randomItem.value, randomItem.label, randomItem.id, randomItem.choiceId, randomItem.groupId, randomItem.customProperties);
+
+        expect(itemReducer([], action)).toEqual(expectedState);
+      });
+
+      it('should allow the user to supply custom properties for a choice', function() {
+        var randomChoice = {
+          id: 123,
+          elementId: 321,
+          groupId: 213,
+          value: 'value',
+          label: 'label',
+          disabled: false,
+          customProperties: {
+            foo: 'bar'
+          }
+        }
+
+        var expectedState = [{
+          id: randomChoice.id,
+          elementId: randomChoice.elementId,
+          groupId: randomChoice.groupId,
+          value: randomChoice.value,
+          label: randomChoice.label,
+          disabled: randomChoice.disabled,
+          selected: false,
+          active: true,
+          score: 9999,
+          customProperties: randomChoice.customProperties
+        }];
+
+        var action = addChoiceAction(randomChoice.value, randomChoice.label, randomChoice.id, randomChoice.groupId, randomChoice.disabled, randomChoice.elementId, randomChoice.customProperties);
+
+        expect(choiceReducer([], action)).toEqual(expectedState);
+      });
+    });
+
 });
