@@ -2369,7 +2369,7 @@ class Choices {
                 type="button"
                 class="${globalClasses.button}"
                 data-button
-                aria-label="Remove item '${data.value}'"
+                aria-label="Remove item: '${data.value}'"
                 >
                 Remove item
               </button>
