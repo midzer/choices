@@ -1012,4 +1012,39 @@ describe('Choices', () => {
       });
     });
 
+    describe('should allow custom properties provided by the user on items or choices', function() {
+      beforeEach(function() {
+        this.input = document.createElement('select');
+        this.input.className = 'js-choices';
+        this.input.setAttribute('multiple', '');
+
+        document.body.appendChild(this.input);
+      });
+
+      afterEach(function() {
+        this.choices.destroy();
+      });
+
+      it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', function() {
+
+        var expectedCustomProperties = {
+            isBestOptionEver: true
+        };
+
+        this.choices = new Choices(this.input);
+        this.choices.setChoices([{
+            value: '42',
+            label: 'My awesome choice',
+            selected: false,
+            disabled: false,
+            customProperties: expectedCustomProperties
+        }], 'value', 'label', true);
+
+        this.choices.setValueByChoice('42');
+        var selectedItems = this.choices.getValue();
+
+        expect(selectedItems.length).toBe(1);
+        expect(selectedItems[0].customProperties).toBe(expectedCustomProperties);
+      });
+    });
 });
