@@ -871,7 +871,13 @@ class Choices {
 
         if (foundChoice) {
           if (!foundChoice.selected) {
-            this._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties);
+            this._addItem(
+              foundChoice.value,
+              foundChoice.label,
+              foundChoice.id,
+              foundChoice.groupId,
+              foundChoice.customProperties
+            );
           } else if (!this.config.silent) {
             console.warn('Attempting to select choice already selected');
           }
@@ -2673,7 +2679,13 @@ class Choices {
           if (!item.value) {
             return;
           }
-          this._addItem(item.value, item.label, item.id);
+          this._addItem(
+            item.value,
+            item.label,
+            item.id,
+            undefined,
+            item.customProperties
+          );
         } else if (itemType === 'String') {
           this._addItem(item);
         }

@@ -1,38 +1,16 @@
 import 'whatwg-fetch';
 import 'es6-promise';
+import 'core-js/fn/object/assign';
 import Choices from '../../assets/scripts/src/choices.js';
 import itemReducer from '../../assets/scripts/src/reducers/items.js';
 import choiceReducer from '../../assets/scripts/src/reducers/choices.js';
-import { addItem as addItemAction, addChoice as addChoiceAction } from '../../assets/scripts/src/actions/index.js';
-
-if (typeof Object.assign != 'function') {
-  Object.assign = function (target, varArgs) { // .length of function is 2
-    if (target == null) { // TypeError if undefined or null
-      throw new TypeError('Cannot convert undefined or null to object');
-    }
-
-    var to = Object(target);
-
-    for (var index = 1; index < arguments.length; index++) {
-      var nextSource = arguments[index];
-
-      if (nextSource != null) { // Skip over if undefined or null
-        for (var nextKey in nextSource) {
-          // Avoid bugs when hasOwnProperty is shadowed
-          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-            to[nextKey] = nextSource[nextKey];
-          }
-        }
-      }
-    }
-    return to;
-  };
-}
+import {
+  addItem as addItemAction,
+  addChoice as addChoiceAction
+} from '../../assets/scripts/src/actions/index.js';
 
 describe('Choices', () => {
-
   describe('should initialize Choices', () => {
-
     beforeEach(function() {
       this.input = document.createElement('input');
       this.input.type = 'text';
@@ -952,99 +930,113 @@ describe('Choices', () => {
   });
 
   describe('should allow custom properties provided by the user on items or choices', function() {
-      it('should allow the user to supply custom properties for an item', function() {
-        var randomItem = {
-          id: 8999,
-          choiceId: 9000,
-          groupId: 9001,
-          value: 'value',
-          label: 'label',
-          customProperties: {
-            foo: 'bar'
-          }
+    it('should allow the user to supply custom properties for an item', function() {
+      const randomItem = {
+        id: 8999,
+        choiceId: 9000,
+        groupId: 9001,
+        value: 'value',
+        label: 'label',
+        customProperties: {
+          foo: 'bar'
         }
+      }
 
-        var expectedState = [{
-          id: randomItem.id,
-          choiceId: randomItem.choiceId,
-          groupId: randomItem.groupId,
-          value: randomItem.value,
-          label: randomItem.label,
-          active: true,
-          highlighted: false,
-          customProperties: randomItem.customProperties
-        }];
+      const expectedState = [{
+        id: randomItem.id,
+        choiceId: randomItem.choiceId,
+        groupId: randomItem.groupId,
+        value: randomItem.value,
+        label: randomItem.label,
+        active: true,
+        highlighted: false,
+        customProperties: randomItem.customProperties
+      }];
 
-        var action = addItemAction(randomItem.value, randomItem.label, randomItem.id, randomItem.choiceId, randomItem.groupId, randomItem.customProperties);
+      const action = addItemAction(
+        randomItem.value,
+        randomItem.label,
+        randomItem.id,
+        randomItem.choiceId,
+        randomItem.groupId,
+        randomItem.customProperties
+      );
 
-        expect(itemReducer([], action)).toEqual(expectedState);
-      });
-
-      it('should allow the user to supply custom properties for a choice', function() {
-        var randomChoice = {
-          id: 123,
-          elementId: 321,
-          groupId: 213,
-          value: 'value',
-          label: 'label',
-          disabled: false,
-          customProperties: {
-            foo: 'bar'
-          }
-        }
-
-        var expectedState = [{
-          id: randomChoice.id,
-          elementId: randomChoice.elementId,
-          groupId: randomChoice.groupId,
-          value: randomChoice.value,
-          label: randomChoice.label,
-          disabled: randomChoice.disabled,
-          selected: false,
-          active: true,
-          score: 9999,
-          customProperties: randomChoice.customProperties
-        }];
-
-        var action = addChoiceAction(randomChoice.value, randomChoice.label, randomChoice.id, randomChoice.groupId, randomChoice.disabled, randomChoice.elementId, randomChoice.customProperties);
-
-        expect(choiceReducer([], action)).toEqual(expectedState);
-      });
+      expect(itemReducer([], action)).toEqual(expectedState);
     });
 
-    describe('should allow custom properties provided by the user on items or choices', function() {
-      beforeEach(function() {
-        this.input = document.createElement('select');
-        this.input.className = 'js-choices';
-        this.input.setAttribute('multiple', '');
+    it('should allow the user to supply custom properties for a choice', function() {
+      const randomChoice = {
+        id: 123,
+        elementId: 321,
+        groupId: 213,
+        value: 'value',
+        label: 'label',
+        disabled: false,
+        customProperties: {
+          foo: 'bar'
+        }
+      }
 
-        document.body.appendChild(this.input);
-      });
+      const expectedState = [{
+        id: randomChoice.id,
+        elementId: randomChoice.elementId,
+        groupId: randomChoice.groupId,
+        value: randomChoice.value,
+        label: randomChoice.label,
+        disabled: randomChoice.disabled,
+        selected: false,
+        active: true,
+        score: 9999,
+        customProperties: randomChoice.customProperties
+      }];
 
-      afterEach(function() {
-        this.choices.destroy();
-      });
+      const action = addChoiceAction(
+        randomChoice.value,
+        randomChoice.label,
+        randomChoice.id,
+        randomChoice.groupId,
+        randomChoice.disabled,
+        randomChoice.elementId,
+        randomChoice.customProperties
+      );
 
-      it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', function() {
-
-        var expectedCustomProperties = {
-            isBestOptionEver: true
-        };
-
-        this.choices = new Choices(this.input);
-        this.choices.setChoices([{
-            value: '42',
-            label: 'My awesome choice',
-            selected: false,
-            disabled: false,
-            customProperties: expectedCustomProperties
-        }], 'value', 'label', true);
-
-        this.choices.setValueByChoice('42');
-        var selectedItems = this.choices.getValue();
-
-        expect(selectedItems.length).toBe(1);
-        expect(selectedItems[0].customProperties).toBe(expectedCustomProperties);
-      });
+      expect(choiceReducer([], action)).toEqual(expectedState);
     });
+  });
+
+  describe('should allow custom properties provided by the user on items or choices', function() {
+    beforeEach(function() {
+      this.input = document.createElement('select');
+      this.input.className = 'js-choices';
+      this.input.setAttribute('multiple', '');
+
+      document.body.appendChild(this.input);
+    });
+
+    afterEach(function() {
+      this.choices.destroy();
+    });
+
+    it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', function() {
+      const expectedCustomProperties = {
+        isBestOptionEver: true
+      };
+
+      this.choices = new Choices(this.input);
+      this.choices.setChoices([{
+        value: '42',
+        label: 'My awesome choice',
+        selected: false,
+        disabled: false,
+        customProperties: expectedCustomProperties
+      }], 'value', 'label', true);
+
+      this.choices.setValueByChoice('42');
+      const selectedItems = this.choices.getValue();
+
+      expect(selectedItems.length).toBe(1);
+      expect(selectedItems[0].customProperties).toBe(expectedCustomProperties);
+    });
+  });
 });
