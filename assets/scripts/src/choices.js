@@ -812,13 +812,16 @@ class Choices {
                 item.label,
                 true,
                 false,
-                -1
+                -1,
+                item.customProperties
               );
             } else {
               this._addItem(
                 item.value,
                 item.label,
-                item.id
+                item.id,
+                undefined,
+                item.customProperties
               );
             }
           } else if (itemType === 'String') {
@@ -868,7 +871,13 @@ class Choices {
 
         if (foundChoice) {
           if (!foundChoice.selected) {
-            this._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
+            this._addItem(
+              foundChoice.value,
+              foundChoice.label,
+              foundChoice.id,
+              foundChoice.groupId,
+              foundChoice.customProperties
+            );
           } else if (!this.config.silent) {
             console.warn('Attempting to select choice already selected');
           }
@@ -915,7 +924,9 @@ class Choices {
                 result[value],
                 result[label],
                 result.selected,
-                result.disabled
+                result.disabled,
+                undefined,
+                result['customProperties']
               );
             }
           });
@@ -1134,7 +1145,8 @@ class Choices {
           choice.value,
           choice.label,
           choice.id,
-          choice.groupId
+          choice.groupId,
+          choice.customProperties
         );
         this._triggerChange(choice.value);
       }
@@ -1305,7 +1317,9 @@ class Choices {
               result[value],
               result[label],
               result.selected,
-              result.disabled
+              result.disabled,
+              undefined,
+              result['customProperties']
             );
           }
         });
@@ -2058,10 +2072,13 @@ class Choices {
    * Add item to store with correct value
    * @param {String} value Value to add to store
    * @param {String} label Label to add to store
+   * @param {Number} choiceId ID of the associated choice that was selected
+   * @param {Number} groupId ID of group choice is within. Negative number indicates no group
+   * @param {Object} customProperties Object containing user defined properties
    * @return {Object} Class instance
    * @public
    */
-  _addItem(value, label, choiceId = -1, groupId = -1) {
+  _addItem(value, label, choiceId = -1, groupId = -1, customProperties = null) {
     let passedValue = isType('String', value) ? value.trim() : value;
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
@@ -2083,7 +2100,7 @@ class Choices {
       passedValue += this.config.appendValue.toString();
     }
 
-    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId));
+    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId, customProperties));
 
     if (this.passedElement.type === 'select-one') {
       this.removeActiveItems(id);
@@ -2152,15 +2169,16 @@ class Choices {
 
   /**
    * Add choice to dropdown
-   * @param {Boolean} isSelected Whether choice is selected
-   * @param {Boolean} isDisabled Whether choice is disabled
    * @param {String} value Value of choice
    * @param {String} Label Label of choice
+   * @param {Boolean} isSelected Whether choice is selected
+   * @param {Boolean} isDisabled Whether choice is disabled
    * @param {Number} groupId ID of group choice is within. Negative number indicates no group
+   * @param {Object} customProperties Object containing user defined properties
    * @return
    * @private
    */
-  _addChoice(value, label, isSelected = false, isDisabled = false, groupId = -1) {
+  _addChoice(value, label, isSelected = false, isDisabled = false, groupId = -1, customProperties = null) {
     if (typeof value === 'undefined' || value === null) {
       return;
     }
@@ -2177,11 +2195,19 @@ class Choices {
       choiceId,
       groupId,
       isDisabled,
-      choiceElementId
+      choiceElementId,
+      customProperties
     ));
 
     if (isSelected) {
-      this._addItem(value, choiceLabel, choiceId);
+      this._addItem(
+        value,
+        choiceLabel,
+        choiceId,
+        undefined,
+        undefined,
+        customProperties
+      );
     }
   }
 
@@ -2349,7 +2375,7 @@ class Choices {
                 type="button"
                 class="${globalClasses.button}"
                 data-button
-                aria-label="Remove item '${data.value}'"
+                aria-label="Remove item: '${data.value}'"
                 >
                 Remove item
               </button>
@@ -2618,7 +2644,9 @@ class Choices {
                 choice.value,
                 choice.label,
                 choice.selected,
-                choice.disabled
+                choice.disabled,
+                undefined,
+                choice.customProperties
               );
             } else {
               // Otherwise pre-select the first choice in the array
@@ -2626,7 +2654,9 @@ class Choices {
                 choice.value,
                 choice.label,
                 true,
-                false
+                false,
+                undefined,
+                choice.customProperties
               );
             }
           } else {
@@ -2634,7 +2664,9 @@ class Choices {
               choice.value,
               choice.label,
               choice.selected,
-              choice.disabled
+              choice.disabled,
+              undefined,
+              choice.customProperties
             );
           }
         });
@@ -2647,7 +2679,13 @@ class Choices {
           if (!item.value) {
             return;
           }
-          this._addItem(item.value, item.label, item.id);
+          this._addItem(
+            item.value,
+            item.label,
+            item.id,
+            undefined,
+            item.customProperties
+          );
         } else if (itemType === 'String') {
           this._addItem(item);
         }
