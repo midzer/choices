@@ -167,7 +167,7 @@ Pass an array of objects:
   label: 'Label 2',
   id: 2,
   customProperties: {
-  	random: 'I am a custom property'
+    random: 'I am a custom property'
   }
 }]
 ```
