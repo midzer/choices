@@ -737,7 +737,7 @@ example.setValue(['Four','Five','Six']);
 ### setValueByChoice(value);
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Set value of input based on existing Choice.
+**Usage:** Set value of input based on existing Choice. `value` can be either a single string or an array of strings
 
 **Example:**
 
