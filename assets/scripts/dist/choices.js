@@ -1,4 +1,4 @@
-/*! choices.js v2.8.5 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.6 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -947,9 +947,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // If we are dealing with a select input, we need to create an option first
 	            // that is then selected. For text inputs we can just add items normally.
 	            if (passedElementType !== 'text') {
-	              _this11._addChoice(item.value, item.label, true, false, -1);
+	              _this11._addChoice(item.value, item.label, true, false, -1, item.customProperties);
 	            } else {
-	              _this11._addItem(item.value, item.label, item.id);
+	              _this11._addItem(item.value, item.label, item.id, undefined, item.customProperties);
 	            }
 	          } else if (itemType === 'String') {
 	            if (passedElementType !== 'text') {
@@ -997,7 +997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          if (foundChoice) {
 	            if (!foundChoice.selected) {
-	              _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId);
+	              _this12._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties);
 	            } else if (!_this12.config.silent) {
 	              console.warn('Attempting to select choice already selected');
 	            }
@@ -1042,7 +1042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (result.choices) {
 	                _this13._addGroup(result, result.id || null, value, label);
 	              } else {
-	                _this13._addChoice(result[value], result[label], result.selected, result.disabled);
+	                _this13._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties']);
 	              }
 	            });
 	          }
@@ -1290,7 +1290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var canAddItem = this._canAddItem(activeItems, choice.value);
 
 	        if (canAddItem.response) {
-	          this._addItem(choice.value, choice.label, choice.id, choice.groupId);
+	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties);
 	          this._triggerChange(choice.value);
 	        }
 	      }
@@ -1455,7 +1455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var groupId = result.id || null;
 	              _this16._addGroup(result, groupId, value, label);
 	            } else {
-	              _this16._addChoice(result[value], result[label], result.selected, result.disabled);
+	              _this16._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties']);
 	            }
 	          });
 	        } else {
@@ -2267,6 +2267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Add item to store with correct value
 	     * @param {String} value Value to add to store
 	     * @param {String} label Label to add to store
+	     * @param {Number} choiceId ID of the associated choice that was selected
+	     * @param {Number} groupId ID of group choice is within. Negative number indicates no group
+	     * @param {Object} customProperties Object containing user defined properties
 	     * @return {Object} Class instance
 	     * @public
 	     */
@@ -2276,6 +2279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _addItem(value, label) {
 	      var choiceId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
 	      var groupId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
+	      var customProperties = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
 	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
 	      var items = this.store.getItems();
@@ -2298,7 +2302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        passedValue += this.config.appendValue.toString();
 	      }
 
-	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId));
+	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties));
 
 	      if (this.passedElement.type === 'select-one') {
 	        this.removeActiveItems(id);
@@ -2370,11 +2374,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Add choice to dropdown
-	     * @param {Boolean} isSelected Whether choice is selected
-	     * @param {Boolean} isDisabled Whether choice is disabled
 	     * @param {String} value Value of choice
 	     * @param {String} Label Label of choice
+	     * @param {Boolean} isSelected Whether choice is selected
+	     * @param {Boolean} isDisabled Whether choice is disabled
 	     * @param {Number} groupId ID of group choice is within. Negative number indicates no group
+	     * @param {Object} customProperties Object containing user defined properties
 	     * @return
 	     * @private
 	     */
@@ -2385,6 +2390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 	      var isDisabled = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
+	      var customProperties = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
 	      if (typeof value === 'undefined' || value === null) {
 	        return;
@@ -2396,10 +2402,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceId = choices ? choices.length + 1 : 1;
 	      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
-	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId));
+	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties));
 
 	      if (isSelected) {
-	        this._addItem(value, choiceLabel, choiceId);
+	        this._addItem(value, choiceLabel, choiceId, undefined, undefined, customProperties);
 	      }
 	    }
 
@@ -2513,7 +2519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _classNames3));
 
-	            return (0, _utils.strToEl)('\n            <div\n              class="' + localClasses + '"\n              data-item\n              data-id="' + data.id + '"\n              data-value="' + data.value + '"\n              data-deletable\n              ' + (data.active ? 'aria-selected="true"' : '') + '\n              ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n              >\n              ' + data.label + '<!--\n           --><button\n                type="button"\n                class="' + globalClasses.button + '"\n                data-button\n                aria-label="Remove item \'' + data.value + '\'"\n                >\n                Remove item\n              </button>\n            </div>\n          ');
+	            return (0, _utils.strToEl)('\n            <div\n              class="' + localClasses + '"\n              data-item\n              data-id="' + data.id + '"\n              data-value="' + data.value + '"\n              data-deletable\n              ' + (data.active ? 'aria-selected="true"' : '') + '\n              ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n              >\n              ' + data.label + '<!--\n           --><button\n                type="button"\n                class="' + globalClasses.button + '"\n                data-button\n                aria-label="Remove item: \'' + data.value + '\'"\n                >\n                Remove item\n              </button>\n            </div>\n          ');
 	          }
 
 	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-item\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.active ? 'aria-selected="true"' : '') + '\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
@@ -2672,13 +2678,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
 	                // If there is a selected choice already or the choice is not
 	                // the first in the array, add each choice normally
-	                _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled);
+	                _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
 	              } else {
 	                // Otherwise pre-select the first choice in the array
-	                _this24._addChoice(choice.value, choice.label, true, false);
+	                _this24._addChoice(choice.value, choice.label, true, false, undefined, choice.customProperties);
 	              }
 	            } else {
-	              _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled);
+	              _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
 	            }
 	          });
 	        }
@@ -2690,7 +2696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!item.value) {
 	              return;
 	            }
-	            _this24._addItem(item.value, item.label, item.id);
+	            _this24._addItem(item.value, item.label, item.id, undefined, item.customProperties);
 	          } else if (itemType === 'String') {
 	            _this24._addItem(item);
 	          }
@@ -4926,7 +4932,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          value: action.value,
 	          label: action.label,
 	          active: true,
-	          highlighted: false
+	          highlighted: false,
+	          customProperties: action.customProperties
 	        }]);
 
 	        return newState.map(function (item) {
@@ -5041,7 +5048,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          disabled: action.disabled || false,
 	          selected: false,
 	          active: true,
-	          score: 9999
+	          score: 9999,
+	          customProperties: action.customProperties
 	        }]);
 	      }
 
@@ -5138,14 +5146,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId) {
+	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties) {
 	  return {
 	    type: 'ADD_ITEM',
 	    value: value,
 	    label: label,
 	    id: id,
 	    choiceId: choiceId,
-	    groupId: groupId
+	    groupId: groupId,
+	    customProperties: customProperties
 	  };
 	};
 
@@ -5165,7 +5174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
-	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId) {
+	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties) {
 	  return {
 	    type: 'ADD_CHOICE',
 	    value: value,
@@ -5173,7 +5182,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    id: id,
 	    groupId: groupId,
 	    disabled: disabled,
-	    elementId: elementId
+	    elementId: elementId,
+	    customProperties: customProperties
 	  };
 	};
 
