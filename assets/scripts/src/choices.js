@@ -2205,7 +2205,6 @@ class Choices {
         choiceLabel,
         choiceId,
         undefined,
-        undefined,
         customProperties
       );
     }
@@ -2254,7 +2253,8 @@ class Choices {
           label,
           option.selected,
           isOptDisabled,
-          groupId
+          groupId,
+          option.customProperties
         );
       });
     } else {
