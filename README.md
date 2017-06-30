@@ -768,7 +768,7 @@ example.setValueByChoice('Two'); // Choice with value of 'Two' has now been sele
 ### disable();
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Disables input from accepting new value/sselecting further choices.
+**Usage:** Disables input from accepting new value/selecting further choices.
 
 ### enable();
 **Input types affected:** `text`, `select-one`, `select-multiple`
