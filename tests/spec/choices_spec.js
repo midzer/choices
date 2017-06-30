@@ -1038,5 +1038,23 @@ describe('Choices', () => {
       expect(selectedItems.length).toBe(1);
       expect(selectedItems[0].customProperties).toBe(expectedCustomProperties);
     });
+
+    it('should allow the user to supply custom properties when directly creating a selected item', function() {
+      const expectedCustomProperties = {
+        isBestOptionEver: true
+      };
+
+      this.choices = new Choices(this.input);
+
+      this.choices.setValue([{
+          value: 'bar',
+          label: 'foo',
+          customProperties: expectedCustomProperties
+      }]);
+      const selectedItems = this.choices.getValue();
+
+      expect(selectedItems.length).toBe(1);
+      expect(selectedItems[0].customProperties).toBe(expectedCustomProperties);
+    });
   });
 });
