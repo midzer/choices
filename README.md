@@ -835,9 +835,6 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 | `npm run css:watch`  | Watch SCSS files for changes. On a change, run build process |
 | `npm run css:build`  | Compile, minify and prefix SCSS files to CSS                 |
 
-## Contributions
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using npm scripts...bla bla bla
-
 ## License
 MIT License
 
