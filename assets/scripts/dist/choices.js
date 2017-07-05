@@ -1,4 +1,4 @@
-/*! choices.js v2.8.6 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.7 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -2405,7 +2405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties));
 
 	      if (isSelected) {
-	        this._addItem(value, choiceLabel, choiceId, undefined, undefined, customProperties);
+	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties);
 	      }
 	    }
 
@@ -2450,7 +2450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var isOptDisabled = option.disabled || option.parentNode && option.parentNode.disabled;
 	          var label = (0, _utils.isType)('Object', option) ? option[labelKey] : option.innerHTML;
 
-	          _this22._addChoice(option[valueKey], label, option.selected, isOptDisabled, groupId);
+	          _this22._addChoice(option[valueKey], label, option.selected, isOptDisabled, groupId, option.customProperties);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
