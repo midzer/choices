@@ -1,10 +1,10 @@
-// Example usage: npm --newVersion=2.7.2 run version
+// Example usage: npm --newVersion=2.8.7 run version
 
-const fs = require('fs'),
-  path = require('path'),
-  config = {
-    files: ['bower.json', 'package.json', 'index.html']
-  };
+const fs = require('fs');
+const path = require('path');
+const config = {
+  files: ['bower.json', 'package.json', 'index.html', 'version.js']
+};
 
 /**
  * Convert node arguments into an object
@@ -30,11 +30,17 @@ const argvToObject = () => {
   return args;
 };
 
+/**
+ * Loop through files updating the current version
+ * @param  {Object} config
+ */
 const updateVersion = (config) => {
   const args = argvToObject();
   const currentVersion = args.current;
   const newVersion = args.new;
+
   console.log(`Updating version from ${currentVersion} to ${newVersion}`);
+
   config.files.forEach((file) => {
     const filePath = path.join(__dirname, file);
     const regex = new RegExp(currentVersion, 'g');

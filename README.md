@@ -70,6 +70,7 @@ Or include Choices directly:
     searchEnabled: true,
     searchChoices: true,
     searchFloor: 1,
+    searchResultLimit: 4,
     searchFields: ['label', 'value'],
     position: 'auto',
     resetScrollPosition: true,
@@ -91,29 +92,29 @@ Or include Choices directly:
       return `Only ${maxItemCount} values can be added.`;
     },
     classNames: {
-        containerOuter: 'choices',
-        containerInner: 'choices__inner',
-        input: 'choices__input',
-        inputCloned: 'choices__input--cloned',
-        list: 'choices__list',
-        listItems: 'choices__list--multiple',
-        listSingle: 'choices__list--single',
-        listDropdown: 'choices__list--dropdown',
-        item: 'choices__item',
-        itemSelectable: 'choices__item--selectable',
-        itemDisabled: 'choices__item--disabled',
-        itemChoice: 'choices__item--choice',
-        group: 'choices__group',
-        groupHeading : 'choices__heading',
-        button: 'choices__button',
-        activeState: 'is-active',
-        focusState: 'is-focused',
-        openState: 'is-open',
-        disabledState: 'is-disabled',
-        highlightedState: 'is-highlighted',
-        hiddenState: 'is-hidden',
-        flippedState: 'is-flipped',
-        loadingState: 'is-loading',
+      containerOuter: 'choices',
+      containerInner: 'choices__inner',
+      input: 'choices__input',
+      inputCloned: 'choices__input--cloned',
+      list: 'choices__list',
+      listItems: 'choices__list--multiple',
+      listSingle: 'choices__list--single',
+      listDropdown: 'choices__list--dropdown',
+      item: 'choices__item',
+      itemSelectable: 'choices__item--selectable',
+      itemDisabled: 'choices__item--disabled',
+      itemChoice: 'choices__item--choice',
+      group: 'choices__group',
+      groupHeading : 'choices__heading',
+      button: 'choices__button',
+      activeState: 'is-active',
+      focusState: 'is-focused',
+      openState: 'is-open',
+      disabledState: 'is-disabled',
+      highlightedState: 'is-highlighted',
+      hiddenState: 'is-hidden',
+      flippedState: 'is-flipped',
+      loadingState: 'is-loading',
     },
     // Choices uses the great Fuse library for searching. You
     // can find more options here: https://github.com/krisk/Fuse#options
@@ -164,7 +165,10 @@ Pass an array of objects:
 {
   value: 'Value 2',
   label: 'Label 2',
-  id: 2
+  id: 2,
+  customProperties: {
+    random: 'I am a custom property'
+  }
 }]
 ```
 
@@ -189,6 +193,10 @@ Pass an array of objects:
   label: 'Option 2',
   selected: false,
   disabled: true,
+  customProperties: {
+    description: 'Custom description about Option 2',
+    random: 'Another random custom property'
+  },
 }]
 ```
 
@@ -268,7 +276,7 @@ Pass an array of objects:
 
 **Input types affected:**`select-one`, `select-multiple`
 
-**Usage:** Specify which fields should be used when a user is searching.
+**Usage:** Specify which fields should be used when a user is searching. If you have added custom properties to your choices, you can add these values thus: `['label', 'value', 'customProperties.example']`.
 
 ### searchFloor
 **Type:** `Number` **Default:** `1`
@@ -276,6 +284,13 @@ Pass an array of objects:
 **Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** The minimum length a search value should be before choices are searched.
+
+### searchResultLimit: 4,
+**Type:** `Number` **Default:** `4`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** The maximum amount of search results to show.
 
 ### position
 **Type:** `String` **Default:** `auto`
@@ -317,9 +332,9 @@ Pass an array of objects:
 ```js
 // Sorting via length of label from largest to smallest
 const example = new Choices(element, {
-    sortFilter: function(a, b) {
-        return b.label.length - a.label.length;
-    },
+  sortFilter: function(a, b) {
+    return b.label.length - a.label.length;
+  },
 };
 ```
 
@@ -398,29 +413,29 @@ const example = new Choices(element, {
 
 ```
 classNames: {
-    containerOuter: 'choices',
-    containerInner: 'choices__inner',
-    input: 'choices__input',
-    inputCloned: 'choices__input--cloned',
-    list: 'choices__list',
-    listItems: 'choices__list--multiple',
-    listSingle: 'choices__list--single',
-    listDropdown: 'choices__list--dropdown',
-    item: 'choices__item',
-    itemSelectable: 'choices__item--selectable',
-    itemDisabled: 'choices__item--disabled',
-    itemOption: 'choices__item--choice',
-    group: 'choices__group',
-    groupHeading : 'choices__heading',
-    button: 'choices__button',
-    activeState: 'is-active',
-    focusState: 'is-focused',
-    openState: 'is-open',
-    disabledState: 'is-disabled',
-    highlightedState: 'is-highlighted',
-    hiddenState: 'is-hidden',
-    flippedState: 'is-flipped',
-    selectedState: 'is-highlighted',
+  containerOuter: 'choices',
+  containerInner: 'choices__inner',
+  input: 'choices__input',
+  inputCloned: 'choices__input--cloned',
+  list: 'choices__list',
+  listItems: 'choices__list--multiple',
+  listSingle: 'choices__list--single',
+  listDropdown: 'choices__list--dropdown',
+  item: 'choices__item',
+  itemSelectable: 'choices__item--selectable',
+  itemDisabled: 'choices__item--disabled',
+  itemOption: 'choices__item--choice',
+  group: 'choices__group',
+  groupHeading : 'choices__heading',
+  button: 'choices__button',
+  activeState: 'is-active',
+  focusState: 'is-focused',
+  openState: 'is-open',
+  disabledState: 'is-disabled',
+  highlightedState: 'is-highlighted',
+  hiddenState: 'is-hidden',
+  flippedState: 'is-flipped',
+  selectedState: 'is-highlighted',
 }
 ```
 
@@ -457,14 +472,14 @@ const example = new Choices(element, {
           <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
             <span>&bigstar;</span> ${data.label}
           </div>
-          `);
+        `);
       },
       choice: (data) => {
         return template(`
           <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-              <span>&bigstar;</span> ${data.label}
-            </div>
-          `);
+            <span>&bigstar;</span> ${data.label}
+          </div>
+        `);
       },
     };
   }
@@ -498,7 +513,6 @@ example.passedElement.addEventListener('addItem', function(event) {
   console.log(event.detail.label);
   console.log(event.detail.groupValue);
 }, false);
-
 ```
 
 ### addItem
@@ -566,12 +580,14 @@ Methods can be called either directly or by chaining:
 const choices = new Choices(element, {
     addItems: false,
     removeItems: false,
-}).setValue(['Set value 1', 'Set value 2']).disable();
+  })
+  .setValue(['Set value 1', 'Set value 2'])
+  .disable();
 
 // Calling a method directly
 const choices = new Choices(element, {
-    addItems: false,
-    removeItems: false,
+  addItems: false,
+  removeItems: false,
 });
 
 choices.setValue(['Set value 1', 'Set value 2'])
@@ -640,7 +656,7 @@ choices.disable();
 ### setChoices(choices, value, label, replaceChoices);
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Set choices of select input via an array of objects, a value name and a label name. This behaves the same as passing items via the `choices` option but can be called after initialising Choices. This can also be used to add groups of choices (see example 2); Optionally pass a true `replaceChoices` value to remove any existing choices.
+**Usage:** Set choices of select input via an array of objects, a value name and a label name. This behaves the same as passing items via the `choices` option but can be called after initialising Choices. This can also be used to add groups of choices (see example 2); Optionally pass a true `replaceChoices` value to remove any existing choices. Optionally pass a `customProperties` object to add additional data to your choices (useful when searching/filtering etc).
 
 **Example 1:**
 
@@ -648,9 +664,9 @@ choices.disable();
 const example = new Choices(element);
 
 example.setChoices([
-    {value: 'One', label: 'Label One', disabled: true},
-    {value: 'Two', label: 'Label Two', selected: true},
-    {value: 'Three', label: 'Label Three'},
+  {value: 'One', label: 'Label One', disabled: true},
+  {value: 'Two', label: 'Label Two', selected: true},
+  {value: 'Three', label: 'Label Three'},
 ], 'value', 'label', false);
 ```
 
@@ -660,24 +676,27 @@ example.setChoices([
 const example = new Choices(element);
 
 example.setChoices([{
-    label: 'Group one',
-    id: 1,
-    disabled: false,
-    choices: [
-        {value: 'Child One', label: 'Child One', selected: true},
-        {value: 'Child Two', label: 'Child Two',  disabled: true},
-        {value: 'Child Three', label: 'Child Three'},
-    ]
+  label: 'Group one',
+  id: 1,
+  disabled: false,
+  choices: [
+    {value: 'Child One', label: 'Child One', selected: true},
+    {value: 'Child Two', label: 'Child Two',  disabled: true},
+    {value: 'Child Three', label: 'Child Three'},
+  ]
 },
 {
-    label: 'Group two',
-    id: 2,
-    disabled: false,
-    choices: [
-        {value: 'Child Four', label: 'Child Four', disabled: true},
-        {value: 'Child Five', label: 'Child Five'},
-        {value: 'Child Six', label: 'Child Six'},
-    ]
+  label: 'Group two',
+  id: 2,
+  disabled: false,
+  choices: [
+    {value: 'Child Four', label: 'Child Four', disabled: true},
+    {value: 'Child Five', label: 'Child Five'},
+    {value: 'Child Six', label: 'Child Six', customProperties: {
+      description: 'Custom description about child six',
+      random: 'Another random custom property'
+    }},
+  ]
 }], 'value', 'label', false);
 ```
 
@@ -706,9 +725,9 @@ const example = new Choices(element);
 
 // via an array of objects
 example.setValue([
-    {value: 'One', label: 'Label One'},
-    {value: 'Two', label: 'Label Two'},
-    {value: 'Three', label: 'Label Three'},
+  {value: 'One', label: 'Label One'},
+  {value: 'Two', label: 'Label Two'},
+  {value: 'Three', label: 'Label Three'},
 ]);
 
 // or via an array of strings
@@ -718,17 +737,17 @@ example.setValue(['Four','Five','Six']);
 ### setValueByChoice(value);
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Set value of input based on existing Choice.
+**Usage:** Set value of input based on existing Choice. `value` can be either a single string or an array of strings
 
 **Example:**
 
 ```js
 const example = new Choices(element, {
-    choices: [
-        {value: 'One', label: 'Label One'},
-        {value: 'Two', label: 'Label Two', disabled: true},
-        {value: 'Three', label: 'Label Three'},
-    ],
+  choices: [
+    {value: 'One', label: 'Label One'},
+    {value: 'Two', label: 'Label Two', disabled: true},
+    {value: 'Three', label: 'Label Three'},
+  ],
 });
 
 example.setValueByChoice('Two'); // Choice with value of 'Two' has now been selected.
@@ -749,7 +768,7 @@ example.setValueByChoice('Two'); // Choice with value of 'Two' has now been sele
 ### disable();
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Disables input from accepting new value/sselecting further choices.
+**Usage:** Disables input from accepting new value/selecting further choices.
 
 ### enable();
 **Input types affected:** `text`, `select-one`, `select-multiple`
@@ -768,15 +787,15 @@ example.setValueByChoice('Two'); // Choice with value of 'Two' has now been sele
 var example = new Choices(element);
 
 example.ajax(function(callback) {
-    fetch(url)
-        .then(function(response) {
-            response.json().then(function(data) {
-                callback(data, 'value', 'label');
-            });
-        })
-        .catch(function(error) {
-            console.log(error);
-        });
+  fetch(url)
+    .then(function(response) {
+      response.json().then(function(data) {
+        callback(data, 'value', 'label');
+      });
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 });
 ```
 
@@ -807,15 +826,14 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 ```npm install```
 
 ### NPM tasks
-| Task                | Usage                                                        |
-| ------------------- | ------------------------------------------------------------ |
-| `npm start`         | Fire up local server for development                         |
-| `npm run js:build`  | Compile Choices to an uglified JavaScript file               |
-| `npm run css:watch` | Watch SCSS files for changes. On a change, run build process |
-| `npm run css:build` | Compile, minify and prefix SCSS files to CSS                 |
-
-## Contributions
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using npm scripts...bla bla bla
+| Task                 | Usage                                                        |
+| -------------------- | ------------------------------------------------------------ |
+| `npm run start`      | Fire up local server for development                         |
+| `npm run test`       | Run sequence of tests once                                   |
+| `npm run test:watch` | Fire up test server and re-test on file change               |
+| `npm run js:build`   | Compile Choices to an uglified JavaScript file               |
+| `npm run css:watch`  | Watch SCSS files for changes. On a change, run build process |
+| `npm run css:build`  | Compile, minify and prefix SCSS files to CSS                 |
 
 ## License
 MIT License

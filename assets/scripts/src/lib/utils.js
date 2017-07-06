@@ -477,10 +477,11 @@ export const getRandomNumber = function(min, max) {
  * @return {HTMLElement}   Converted node element
  */
 export const strToEl = (function() {
-  var tmpEl = document.createElement('div');
+  let tmpEl = document.createElement('div');
   return function(str) {
-    var r;
-    tmpEl.innerHTML = str;
+    let cleanedInput = str.trim();
+    let r;
+    tmpEl.innerHTML = cleanedInput;
     r = tmpEl.children[0];
 
     while (tmpEl.firstChild) {

@@ -15,7 +15,7 @@
   <meta name="theme-color" content="#ffffff">
 
   <!-- Ignore these -->
-  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.8.4">
+  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.8.7">
   <!-- End ignore these -->
 
   <!-- Optional includes -->
@@ -23,8 +23,8 @@
   <!-- End optional includes -->
 
   <!-- Choices includes -->
-  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.8.4">
-  <script src="assets/scripts/dist/choices.min.js?version=2.8.4"></script>
+  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.8.7">
+  <script src="assets/scripts/dist/choices.min.js?version=2.8.7"></script>
   <!-- End Choices includes -->
 
   <!--[if lt IE 9]>
@@ -63,7 +63,7 @@
       <input class="form-control" id="choices-text-prepend-append-value" type="text" value="preset-1, preset-2" placeholder="This is a placeholder">
 
       <label for="choices-text-preset-values">Preset values passed through options</label>
-      <input class="form-control" id="choices-text-preset-values" type="text" value="olivia@benson.com" placeholder="This is a placeholder">
+      <input class="form-control" id="choices-text-preset-values" type="text" value="Michael Smith" placeholder="This is a placeholder">
 
       <label for="choices-text-i18n">I18N labels</label>
       <input class="form-control" data-trigger id="choices-text-i18n" type="text">
@@ -208,7 +208,8 @@
       <label for="choices-single-preset-options">Option and option groups added via config</label>
       <select class="form-control" name="choices-single-preset-options" id="choices-single-preset-options" placeholder="This is a placeholder"></select>
 
-      <label for="choices-single-selected-option">Option selected via config</label>
+      <label for="choices-single-selected-option">Option selected via config with custom properties</label>
+      <p><small>Try searching for 'fantastic'</small></p>
       <select class="form-control" name="choices-single-selected-option" id="choices-single-selected-option" placeholder="This is a placeholder"></select>
 
       <label for="choices-single-no-sorting">Options without sorting</label>
@@ -306,7 +307,13 @@
       }).removeActiveItems();
 
       var textPresetVal = new Choices('#choices-text-preset-values', {
-        items: ['josh@joshuajohnson.co.uk', { value: 'joe@bloggs.co.uk', label: 'Joe Bloggs' } ],
+        items: ['Josh Johnson', {
+          value: 'joe@bloggs.co.uk',
+          label: 'Joe Bloggs',
+          customProperties: {
+            description: 'Joe Blogg is such a generic name'
+          }
+        }],
       });
 
       var multipleDefault = new Choices(document.getElementById('choices-multiple-groups'));
@@ -317,14 +324,14 @@
         maxItemCount: 5,
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-        .then(function(response) {
-          response.json().then(function(data) {
-            callback(data.releases, 'title', 'title');
+          .then(function(response) {
+            response.json().then(function(data) {
+              callback(data.releases, 'title', 'title');
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
       });
 
       var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
@@ -358,15 +365,15 @@
         placeholderValue: 'Pick an Arctic Monkeys record'
       }).ajax(function(callback) {
         fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-        .then(function(response) {
-          response.json().then(function(data) {
-            callback(data.releases, 'title', 'title');
-            singleFetch.setValueByChoice('Fake Tales Of San Francisco');
+          .then(function(response) {
+            response.json().then(function(data) {
+              callback(data.releases, 'title', 'title');
+              singleFetch.setValueByChoice('Fake Tales Of San Francisco');
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        })
-        .catch(function(error) {
-          console.error(error);
-        });
       });
 
       var singleXhrRemove = new Choices('#choices-single-remove-xhr', {
@@ -433,10 +440,13 @@
       }], 'value', 'label');
 
       var singleSelectedOpt = new Choices('#choices-single-selected-option', {
+        searchFields: ['label', 'value', 'customProperties.description'],
         choices: [
           {value: 'One', label: 'Label One', selected: true},
           {value: 'Two', label: 'Label Two', disabled: true},
-          {value: 'Three', label: 'Label Three'},
+          {value: 'Three', label: 'Label Three', customProperties: {
+            description: 'This option is fantastic'
+          }},
         ],
       }).setValueByChoice('Two');
 

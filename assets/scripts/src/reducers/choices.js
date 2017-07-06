@@ -11,11 +11,12 @@ const choices = (state = [], action) => {
         elementId: action.elementId,
         groupId: action.groupId,
         value: action.value,
-        label: action.label,
-        disabled: action.disabled,
+        label: (action.label || action.value),
+        disabled: (action.disabled || false),
         selected: false,
         active: true,
         score: 9999,
+        customProperties: action.customProperties
       }];
     }
 
