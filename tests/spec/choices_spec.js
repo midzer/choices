@@ -36,7 +36,7 @@ describe('Choices', () => {
       const reinitialise = new Choices(this.choices.passedElement);
       spyOn(reinitialise, '_createTemplates');
       expect(reinitialise._createTemplates).not.toHaveBeenCalled();
-    })
+    });
 
     it('should have a blank state', function() {
       expect(this.choices.currentState.items.length).toEqual(0);
@@ -263,7 +263,7 @@ describe('Choices', () => {
       this.choices.destroy();
     });
 
-    it('should open the choice list on focussing', function() {
+    it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
       this.choices.input.focus();
       expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
@@ -278,7 +278,7 @@ describe('Choices', () => {
       this.choices = new Choices(this.input);
       this.choices.input.focus();
 
-      for (var i = 0; i < 2; i++) {
+      for (let i = 0; i < 2; i++) {
         // Key down to third choice
         this.choices._onKeyDown({
           target: this.choices.input,
@@ -500,7 +500,7 @@ describe('Choices', () => {
       expect(this.choices.currentState.choices[0].value).toEqual('Value 5');
     });
 
-    it('should sort choices if shouldSort is false', function() {
+    it('should sort choices if shouldSort is true', function() {
       this.choices = new Choices(this.input, {
         shouldSort: true,
         choices: [{
@@ -942,7 +942,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         }
-      }
+      };
 
       const expectedState = [{
         id: randomItem.id,
@@ -978,7 +978,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         }
-      }
+      };
 
       const expectedState = [{
         id: randomChoice.id,
