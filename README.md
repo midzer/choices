@@ -76,11 +76,13 @@ Or include Choices directly:
     resetScrollPosition: true,
     regexFilter: null,
     shouldSort: true,
+    shouldSortItems: false,
     sortFilter: () => {...},
     placeholder: true,
     placeholderValue: null,
     prependValue: null,
     appendValue: null,
+    renderSelectedChoices: 'auto',
     loadingText: 'Loading...',
     noResultsText: 'No results found',
     noChoicesText: 'No choices to choose from',
@@ -320,12 +322,19 @@ Pass an array of objects:
 
 **Usage:** Whether choices should be sorted. If false, choices will appear in the order they were given.
 
+### shouldSortItems
+**Type:** `Boolean` **Default:** `false`
+
+**Input types affected:** `text`, `select-multiple`
+
+**Usage:** Whether items should be sorted. If false, items will appear in the order they were selected.
+
 ### sortFilter
 **Type:** `Function` **Default:** sortByAlpha
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** The function that will sort choices before they are displayed (unless a user is searching). By default choices are sorted by alphabetical order.
+**Usage:** The function that will sort choices and items before they are displayed (unless a user is searching). By default choices and items are sorted by alphabetical order.
 
 **Example:**
 
@@ -365,6 +374,13 @@ const example = new Choices(element, {
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Append a value to each item added/selected.
+
+### renderSelectedChoices
+**Type:** `String/Boolean` **Default:** `auto`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** Whether selected choices should be removed from the list. By default choices are only removed when they are selected in multiple select box.
 
 ### loadingText
 **Type:** `String` **Default:** `Loading...`

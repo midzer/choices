@@ -65,10 +65,12 @@ describe('Choices', () => {
       expect(this.choices.config.regexFilter).toEqual(null);
       expect(this.choices.config.sortFilter).toEqual(jasmine.any(Function));
       expect(this.choices.config.shouldSort).toEqual(jasmine.any(Boolean));
+      expect(this.choices.config.shouldSortItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholderValue).toEqual(null);
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
+      expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String) || jasmine.any(Boolean));
       expect(this.choices.config.loadingText).toEqual(jasmine.any(String));
       expect(this.choices.config.noResultsText).toEqual(jasmine.any(String));
       expect(this.choices.config.noChoicesText).toEqual(jasmine.any(String));
@@ -1047,9 +1049,9 @@ describe('Choices', () => {
       this.choices = new Choices(this.input);
 
       this.choices.setValue([{
-          value: 'bar',
-          label: 'foo',
-          customProperties: expectedCustomProperties
+        value: 'bar',
+        label: 'foo',
+        customProperties: expectedCustomProperties
       }]);
       const selectedItems = this.choices.getValue();
 
