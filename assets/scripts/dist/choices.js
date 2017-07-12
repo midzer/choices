@@ -195,9 +195,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Merge options with user options
 	    this.config = (0, _utils.extend)(defaultConfig, userConfig);
 
-	    if (this.config.renderSelectedChoices !== 'auto' && !(0, _utils.isType)('Boolean', this.config.renderSelectedChoices)) {
+	    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
 	      if (!this.config.silent) {
-	        console.warn('renderSelectedChoices: Possible values are \'auto\', true or false. Falling back to \'auto\'.');
+	        console.warn('renderSelectedChoices: Possible values are \'auto\' and \'always\'. Falling back to \'auto\'.');
 	      }
 	      this.config.renderSelectedChoices = 'auto';
 	    }
@@ -436,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var renderSelectedChoices = this.config.renderSelectedChoices;
 
 	      var appendChoice = function appendChoice(choice) {
-	        var shouldRender = renderSelectedChoices === 'auto' ? _this3.passedElement.type === 'select-one' || !choice.selected : renderSelectedChoices;
+	        var shouldRender = renderSelectedChoices === 'auto' ? _this3.passedElement.type === 'select-one' || !choice.selected : true;
 	        if (shouldRender) {
 	          var dropdownItem = _this3._getTemplate('choice', choice);
 	          choicesFragment.appendChild(dropdownItem);
