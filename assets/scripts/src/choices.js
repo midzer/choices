@@ -634,9 +634,6 @@ class Choices {
    */
   removeItemsByValue(value) {
     if (!value || !isType('String', value)) {
-      if (!this.config.silent) {
-        console.error('removeItemsByValue: No value was passed to be removed');
-      }
       return;
     }
 
@@ -2157,9 +2154,6 @@ class Choices {
    */
   _removeItem(item) {
     if (!item || !isType('Object', item)) {
-      if (!this.config.silent) {
-        console.error('removeItem: No item object was passed to be removed');
-      }
       return;
     }
 
