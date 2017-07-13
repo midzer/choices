@@ -129,9 +129,9 @@ class Choices {
     // Merge options with user options
     this.config = extend(defaultConfig, userConfig);
 
-    if (this.config.renderSelectedChoices !== 'auto' && !isType('Boolean', this.config.renderSelectedChoices)) {
+    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
       if (!this.config.silent) {
-        console.warn('renderSelectedChoices: Possible values are \'auto\', true or false. Falling back to \'auto\'.');
+        console.warn('renderSelectedChoices: Possible values are \'auto\' and \'always\'. Falling back to \'auto\'.');
       }
       this.config.renderSelectedChoices = 'auto';
     }
@@ -355,7 +355,7 @@ class Choices {
     const appendChoice = (choice) => {
       const shouldRender = renderSelectedChoices === 'auto'
         ? this.passedElement.type === 'select-one' || !choice.selected
-        : renderSelectedChoices;
+        : true;
       if (shouldRender) {
         const dropdownItem = this._getTemplate('choice', choice);
         choicesFragment.appendChild(dropdownItem);

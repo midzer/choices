@@ -70,7 +70,7 @@ describe('Choices', () => {
       expect(this.choices.config.placeholderValue).toEqual(null);
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
-      expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String) || jasmine.any(Boolean));
+      expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String));
       expect(this.choices.config.loadingText).toEqual(jasmine.any(String));
       expect(this.choices.config.noResultsText).toEqual(jasmine.any(String));
       expect(this.choices.config.noChoicesText).toEqual(jasmine.any(String));
@@ -928,6 +928,22 @@ describe('Choices', () => {
       const container = this.choices.containerOuter;
       this.choices.input.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
+    });
+
+    it('should render selected choices', function() {
+      this.choices = new Choices(this.input, {
+        renderSelectedChoices: 'always'
+      });
+      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      expect(renderedChoices.length).toEqual(3);
+    });
+
+    it('shouldn\'t render selected choices', function() {
+      this.choices = new Choices(this.input, {
+        renderSelectedChoices: 'auto'
+      });
+      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      expect(renderedChoices.length).toEqual(1);
     });
   });
 
