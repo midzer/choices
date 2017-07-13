@@ -320,7 +320,7 @@ Pass an array of objects:
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** Whether choices should be sorted. If false, choices will appear in the order they were given.
+**Usage:** Whether choices and groups should be sorted. If false, choices/groups will appear in the order they were given.
 
 ### shouldSortItems
 **Type:** `Boolean` **Default:** `false`
