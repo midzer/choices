@@ -1,8 +1,8 @@
 var path = require('path');
-var package = require('./package.json');
+var pkg = require('./package.json');
 var webpack = require('webpack');
 var wrapperPlugin = require('wrapper-webpack-plugin');
-var banner = `/*! ${ package.name } v${ package.version } | (c) ${ new Date().getFullYear() } ${ package.author } | ${ package.homepage } */ \n`;
+var banner = `/*! ${ pkg.name } v${ pkg.version } | (c) ${ new Date().getFullYear() } ${ pkg.author } | ${ pkg.homepage } */ \n`;
 var minimize = process.argv.indexOf('--minimize') !== -1;
 
 var config = {
