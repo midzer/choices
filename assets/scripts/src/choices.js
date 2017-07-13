@@ -71,11 +71,13 @@ class Choices {
       resetScrollPosition: true,
       regexFilter: null,
       shouldSort: true,
+      shouldSortItems: false,
       sortFilter: sortByAlpha,
       placeholder: true,
       placeholderValue: null,
       prependValue: null,
       appendValue: null,
+      renderSelectedChoices: 'auto',
       loadingText: 'Loading...',
       noResultsText: 'No results found',
       noChoicesText: 'No choices to choose from',
@@ -127,6 +129,13 @@ class Choices {
     // Merge options with user options
     this.config = extend(defaultConfig, userConfig);
 
+    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
+      if (!this.config.silent) {
+        console.warn('renderSelectedChoices: Possible values are \'auto\' and \'always\'. Falling back to \'auto\'.');
+      }
+      this.config.renderSelectedChoices = 'auto';
+    }
+
     // Create data store
     this.store = new Store(this.render);
 
@@ -150,10 +159,16 @@ class Choices {
       return;
     }
 
+    if (this.config.shouldSortItems === true && this.passedElement.type === 'select-one') {
+      if (!this.config.silent) {
+        console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
+      }
+    }
+
     this.highlightPosition = 0;
     this.canSearch = this.config.searchEnabled;
 
-    // Assing preset choices from passed object
+    // Assign preset choices from passed object
     this.presetChoices = this.config.choices;
 
     // Assign preset items from passed object first
@@ -336,10 +351,13 @@ class Choices {
     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
     const choicesFragment = fragment || document.createDocumentFragment();
     const filter = this.isSearching ? sortByScore : this.config.sortFilter;
+    const { renderSelectedChoices } = this.config;
     const appendChoice = (choice) => {
-      const dropdownItem = this._getTemplate('choice', choice);
-      const shouldRender = this.passedElement.type === 'select-one' || !choice.selected;
+      const shouldRender = renderSelectedChoices === 'auto'
+        ? this.passedElement.type === 'select-one' || !choice.selected
+        : true;
       if (shouldRender) {
+        const dropdownItem = this._getTemplate('choice', choice);
         choicesFragment.appendChild(dropdownItem);
       }
     };
@@ -373,6 +391,11 @@ class Choices {
   renderItems(items, fragment) {
     // Create fragment to add elements to
     const itemListFragment = fragment || document.createDocumentFragment();
+
+    // If sorting is enabled, filter items
+    if (this.config.shouldSortItems && this.passedElement.type !== 'select-one') {
+      items.sort(this.config.sortFilter);
+    }
 
     if (this.isTextElement) {
       // Simplify store data to just values
@@ -611,9 +634,6 @@ class Choices {
    */
   removeItemsByValue(value) {
     if (!value || !isType('String', value)) {
-      if (!this.config.silent) {
-        console.error('removeItemsByValue: No value was passed to be removed');
-      }
       return;
     }
 
@@ -2134,9 +2154,6 @@ class Choices {
    */
   _removeItem(item) {
     if (!item || !isType('Object', item)) {
-      if (!this.config.silent) {
-        console.error('removeItem: No item object was passed to be removed');
-      }
       return;
     }
 

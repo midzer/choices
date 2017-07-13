@@ -36,7 +36,7 @@ describe('Choices', () => {
       const reinitialise = new Choices(this.choices.passedElement);
       spyOn(reinitialise, '_createTemplates');
       expect(reinitialise._createTemplates).not.toHaveBeenCalled();
-    })
+    });
 
     it('should have a blank state', function() {
       expect(this.choices.currentState.items.length).toEqual(0);
@@ -65,10 +65,12 @@ describe('Choices', () => {
       expect(this.choices.config.regexFilter).toEqual(null);
       expect(this.choices.config.sortFilter).toEqual(jasmine.any(Function));
       expect(this.choices.config.shouldSort).toEqual(jasmine.any(Boolean));
+      expect(this.choices.config.shouldSortItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholderValue).toEqual(null);
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
+      expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String));
       expect(this.choices.config.loadingText).toEqual(jasmine.any(String));
       expect(this.choices.config.noResultsText).toEqual(jasmine.any(String));
       expect(this.choices.config.noChoicesText).toEqual(jasmine.any(String));
@@ -261,7 +263,7 @@ describe('Choices', () => {
       this.choices.destroy();
     });
 
-    it('should open the choice list on focussing', function() {
+    it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
       this.choices.input.focus();
       expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
@@ -276,7 +278,7 @@ describe('Choices', () => {
       this.choices = new Choices(this.input);
       this.choices.input.focus();
 
-      for (var i = 0; i < 2; i++) {
+      for (let i = 0; i < 2; i++) {
         // Key down to third choice
         this.choices._onKeyDown({
           target: this.choices.input,
@@ -498,7 +500,7 @@ describe('Choices', () => {
       expect(this.choices.currentState.choices[0].value).toEqual('Value 5');
     });
 
-    it('should sort choices if shouldSort is false', function() {
+    it('should sort choices if shouldSort is true', function() {
       this.choices = new Choices(this.input, {
         shouldSort: true,
         choices: [{
@@ -927,6 +929,22 @@ describe('Choices', () => {
       this.choices.input.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
     });
+
+    it('should render selected choices', function() {
+      this.choices = new Choices(this.input, {
+        renderSelectedChoices: 'always'
+      });
+      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      expect(renderedChoices.length).toEqual(3);
+    });
+
+    it('shouldn\'t render selected choices', function() {
+      this.choices = new Choices(this.input, {
+        renderSelectedChoices: 'auto'
+      });
+      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      expect(renderedChoices.length).toEqual(1);
+    });
   });
 
   describe('should allow custom properties provided by the user on items or choices', function() {
@@ -940,7 +958,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         }
-      }
+      };
 
       const expectedState = [{
         id: randomItem.id,
@@ -976,7 +994,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         }
-      }
+      };
 
       const expectedState = [{
         id: randomChoice.id,
@@ -1047,9 +1065,9 @@ describe('Choices', () => {
       this.choices = new Choices(this.input);
 
       this.choices.setValue([{
-          value: 'bar',
-          label: 'foo',
-          customProperties: expectedCustomProperties
+        value: 'bar',
+        label: 'foo',
+        customProperties: expectedCustomProperties
       }]);
       const selectedItems = this.choices.getValue();
 
