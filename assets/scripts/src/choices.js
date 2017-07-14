@@ -281,7 +281,9 @@ class Choices {
     // Reinstate passed element
     this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
     this.passedElement.removeAttribute('tabindex');
-    this.passedElement.removeAttribute('style');
+    // restore original styles if any
+    this.passedElement.setAttribute('style', this.passedElement.getAttribute('data-choices-js-orig-style'));
+    this.passedElement.removeAttribute('data-choices-js-orig-style');
     this.passedElement.removeAttribute('aria-hidden');
     this.passedElement.removeAttribute('data-choice');
 
@@ -1027,7 +1029,7 @@ class Choices {
 
   /**
    * Populate options via ajax callback
-   * @param  {Function} fn Passed
+   * @param  {Function} fn Function that actually makes an AJAX request
    * @return {Object} Class instance
    * @public
    */
@@ -2577,6 +2579,8 @@ class Choices {
     );
 
     this.passedElement.tabIndex = '-1';
+    // persist original styles if any
+    this.passedElement.setAttribute('data-choices-js-orig-style', this.passedElement.getAttribute('style'));
     this.passedElement.setAttribute('style', 'display:none;');
     this.passedElement.setAttribute('aria-hidden', 'true');
     this.passedElement.setAttribute('data-choice', 'active');
