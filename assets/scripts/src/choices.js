@@ -282,8 +282,13 @@ class Choices {
     this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
     this.passedElement.removeAttribute('tabindex');
     // restore original styles if any
-    this.passedElement.setAttribute('style', this.passedElement.getAttribute('data-choices-js-orig-style'));
-    this.passedElement.removeAttribute('data-choices-js-orig-style');
+    const oldStyle = this.passedElement.getAttribute('data-choices-js-orig-style');
+    if (Boolean(oldStyle)) {
+      this.passedElement.removeAttribute('data-choices-js-orig-style');
+      this.passedElement.setAttribute('style', oldStyle);
+    } else {
+      this.passedElement.removeAttribute('style');
+    }
     this.passedElement.removeAttribute('aria-hidden');
     this.passedElement.removeAttribute('data-choice');
 
@@ -2580,7 +2585,10 @@ class Choices {
 
     this.passedElement.tabIndex = '-1';
     // persist original styles if any
-    this.passedElement.setAttribute('data-choices-js-orig-style', this.passedElement.getAttribute('style'));
+    const oldStyle = this.passedElement.getAttribute('style');
+    if (Boolean(oldStyle)) {
+      this.passedElement.setAttribute('data-choices-js-orig-style', oldStyle);
+    }
     this.passedElement.setAttribute('style', 'display:none;');
     this.passedElement.setAttribute('aria-hidden', 'true');
     this.passedElement.setAttribute('data-choice', 'active');
