@@ -281,11 +281,11 @@ class Choices {
     // Reinstate passed element
     this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
     this.passedElement.removeAttribute('tabindex');
-    // restore original styles if any
-    const oldStyle = this.passedElement.getAttribute('data-choices-js-orig-style');
-    if (Boolean(oldStyle)) {
-      this.passedElement.removeAttribute('data-choices-js-orig-style');
-      this.passedElement.setAttribute('style', oldStyle);
+    // Recover original styles if any
+    const origStyle = this.passedElement.getAttribute('data-choice-orig-style');
+    if (Boolean(origStyle)) {
+      this.passedElement.removeAttribute('data-choice-orig-style');
+      this.passedElement.setAttribute('style', origStyle);
     } else {
       this.passedElement.removeAttribute('style');
     }
@@ -2584,10 +2584,10 @@ class Choices {
     );
 
     this.passedElement.tabIndex = '-1';
-    // persist original styles if any
-    const oldStyle = this.passedElement.getAttribute('style');
-    if (Boolean(oldStyle)) {
-      this.passedElement.setAttribute('data-choices-js-orig-style', oldStyle);
+    // Backup original styles if any
+    const origStyle = this.passedElement.getAttribute('style');
+    if (Boolean(origStyle)) {
+      this.passedElement.setAttribute('data-choice-orig-style', origStyle);
     }
     this.passedElement.setAttribute('style', 'display:none;');
     this.passedElement.setAttribute('aria-hidden', 'true');

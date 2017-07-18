@@ -28,7 +28,7 @@ describe('Choices', () => {
       expect(this.choices).toBeDefined();
     });
 
-    it('should have initalised', function() {
+    it('should have initialised', function() {
       expect(this.choices.initialised).toBe(true);
     });
 
@@ -134,6 +134,24 @@ describe('Choices', () => {
 
     it('should create a dropdown', function() {
       expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
+    });
+
+    it('should backup and recover original styles', function () {
+      const origStyle = 'background-color: #ccc; margin: 5px padding: 10px;';
+
+      this.choices.destroy();
+      this.input.setAttribute('style', origStyle);
+      this.choices = new Choices(this.input);
+
+      let style = this.input.getAttribute('data-choice-orig-style');
+      expect(style).toEqual(origStyle);
+
+      this.choices.destroy();
+      style = this.input.getAttribute('data-choice-orig-style');
+      expect(style).toBeNull();
+
+      style = this.input.getAttribute('style');
+      expect(style).toEqual(origStyle);
     });
   });
 
