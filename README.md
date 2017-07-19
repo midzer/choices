@@ -532,7 +532,7 @@ example.passedElement.addEventListener('addItem', function(event) {
 ```
 
 ### addItem
-**Arguments:** `id, value, label, groupValue`
+**Arguments:** `id, value, label, groupValue, keyCode`
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
@@ -560,7 +560,7 @@ example.passedElement.addEventListener('addItem', function(event) {
 **Usage:** Triggered each time an item is unhighlighted.
 
 ### choice
-**Arguments:** `value`
+**Arguments:** `value, keyCode`
 
 **Input types affected:** `select-one`, `select-multiple`
 
