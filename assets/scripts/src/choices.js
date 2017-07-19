@@ -186,10 +186,7 @@ class Choices {
     this.baseId = generateId(this.passedElement, 'choices-');
 
     // Bind methods
-    this.init = this.init.bind(this);
     this.render = this.render.bind(this);
-    this.destroy = this.destroy.bind(this);
-    this.disable = this.disable.bind(this);
 
     // Bind event handlers
     this._onFocus = this._onFocus.bind(this);
