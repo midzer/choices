@@ -838,7 +838,8 @@ class Choices {
                 true,
                 false,
                 -1,
-                item.customProperties
+                item.customProperties,
+                null
               );
             } else {
               this._addItem(
@@ -846,7 +847,8 @@ class Choices {
                 item.label,
                 item.id,
                 undefined,
-                item.customProperties
+                item.customProperties,
+                null
               );
             }
           } else if (itemType === 'String') {
@@ -856,7 +858,8 @@ class Choices {
                 item,
                 true,
                 false,
-                -1
+                -1,
+                null
               );
             } else {
               this._addItem(item);
@@ -901,7 +904,8 @@ class Choices {
               foundChoice.label,
               foundChoice.id,
               foundChoice.groupId,
-              foundChoice.customProperties
+              foundChoice.customProperties,
+              foundChoice.keyCode
             );
           } else if (!this.config.silent) {
             console.warn('Attempting to select choice already selected');
@@ -951,7 +955,8 @@ class Choices {
                 result.selected,
                 result.disabled,
                 undefined,
-                result['customProperties']
+                result['customProperties'],
+                null
               );
             }
           });
@@ -1158,7 +1163,11 @@ class Choices {
     // If we are clicking on an option
     const id = element.getAttribute('data-id');
     const choice = this.store.getChoiceById(id);
+    const passedKeyCode  = activeItems[0].keyCode !== null ? activeItems[0].keyCode : null
     const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+    // Update choice keyCode
+    choice.keyCode = passedKeyCode
 
     triggerEvent(this.passedElement, 'choice', {
       choice,
@@ -1173,7 +1182,8 @@ class Choices {
           choice.label,
           choice.id,
           choice.groupId,
-          choice.customProperties
+          choice.customProperties,
+          choice.keyCode
         );
         this._triggerChange(choice.value);
       }
@@ -1346,7 +1356,8 @@ class Choices {
               result.selected,
               result.disabled,
               undefined,
-              result['customProperties']
+              result['customProperties'],
+              null
             );
           }
         });
@@ -1542,7 +1553,7 @@ class Choices {
       if (this.isTextElement && target.value) {
         const value = this.input.value;
         const canAddItem = this._canAddItem(activeItems, value);
-
+        
         // All is good, add
         if (canAddItem.response) {
           if (hasActiveDropdown) {
@@ -1565,6 +1576,8 @@ class Choices {
 
         // If we have a highlighted choice
         if (highlighted) {
+          // add enter keyCode value
+          activeItems[0].keyCode = enterKey
           this._handleChoiceAction(activeItems, highlighted);
         }
 
@@ -2102,8 +2115,9 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null) {
+  _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null, keyCode = null) {
     let passedValue = isType('String', value) ? value.trim() : value;
+    let passedKeyCode = keyCode
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
@@ -2124,7 +2138,7 @@ class Choices {
       passedValue += this.config.appendValue.toString();
     }
 
-    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId, customProperties));
+    this.store.dispatch(addItem(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, passedKeyCode));
 
     if (this.isSelectOneElement) {
       this.removeActiveItems(id);
@@ -2137,12 +2151,14 @@ class Choices {
         value: passedValue,
         label: passedLabel,
         groupValue: group.value,
+        keyCode: passedKeyCode
       });
     } else {
       triggerEvent(this.passedElement, 'addItem', {
         id,
         value: passedValue,
         label: passedLabel,
+        keyCode: passedKeyCode
       });
     }
 
@@ -2198,7 +2214,7 @@ class Choices {
    * @return
    * @private
    */
-  _addChoice(value, label = null, isSelected = false, isDisabled = false, groupId = -1, customProperties = null) {
+  _addChoice(value, label = null, isSelected = false, isDisabled = false, groupId = -1, customProperties = null, keyCode = null) {
     if (typeof value === 'undefined' || value === null) {
       return;
     }
@@ -2216,7 +2232,8 @@ class Choices {
       groupId,
       isDisabled,
       choiceElementId,
-      customProperties
+      customProperties,
+      keyCode
     ));
 
     if (isSelected) {
@@ -2225,7 +2242,8 @@ class Choices {
         choiceLabel,
         choiceId,
         undefined,
-        customProperties
+        customProperties,
+        keyCode
       );
     }
   }

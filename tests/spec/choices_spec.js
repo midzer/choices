@@ -975,7 +975,8 @@ describe('Choices', () => {
         label: 'label',
         customProperties: {
           foo: 'bar'
-        }
+        },
+        keyCode: null
       };
 
       const expectedState = [{
@@ -986,7 +987,8 @@ describe('Choices', () => {
         label: randomItem.label,
         active: true,
         highlighted: false,
-        customProperties: randomItem.customProperties
+        customProperties: randomItem.customProperties,
+        keyCode: randomItem.keyCode
       }];
 
       const action = addItemAction(
@@ -995,7 +997,8 @@ describe('Choices', () => {
         randomItem.id,
         randomItem.choiceId,
         randomItem.groupId,
-        randomItem.customProperties
+        randomItem.customProperties,
+        randomItem.keyCode
       );
 
       expect(itemReducer([], action)).toEqual(expectedState);
@@ -1011,7 +1014,8 @@ describe('Choices', () => {
         disabled: false,
         customProperties: {
           foo: 'bar'
-        }
+        },
+        keyCode: null
       };
 
       const expectedState = [{
@@ -1024,7 +1028,8 @@ describe('Choices', () => {
         selected: false,
         active: true,
         score: 9999,
-        customProperties: randomChoice.customProperties
+        customProperties: randomChoice.customProperties,
+        keyCode: randomChoice.keyCode
       }];
 
       const action = addChoiceAction(
@@ -1034,7 +1039,8 @@ describe('Choices', () => {
         randomChoice.groupId,
         randomChoice.disabled,
         randomChoice.elementId,
-        randomChoice.customProperties
+        randomChoice.customProperties,
+        randomChoice.keyCode
       );
 
       expect(choiceReducer([], action)).toEqual(expectedState);

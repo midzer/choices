@@ -14,7 +14,8 @@
     "css:min": "csso assets/styles/css/base.css assets/styles/css/base.min.css && csso assets/styles/css/choices.css assets/styles/css/choices.min.css",
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",
     "version": "node version.js --current $npm_package_version --new $npm_config_newVersion",
-    "postversion": "npm run js:build"
+    "postversion": "npm run js:build",
+    "dev": "dev"
   },
   "repository": {
     "type": "git",
