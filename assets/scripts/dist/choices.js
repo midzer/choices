@@ -972,13 +972,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // If we are dealing with a select input, we need to create an option first
 	            // that is then selected. For text inputs we can just add items normally.
 	            if (!_this10.isTextElement) {
-	              _this10._addChoice(item.value, item.label, true, false, -1, item.customProperties);
+	              _this10._addChoice(item.value, item.label, true, false, -1, item.customProperties, null);
 	            } else {
-	              _this10._addItem(item.value, item.label, item.id, undefined, item.customProperties);
+	              _this10._addItem(item.value, item.label, item.id, undefined, item.customProperties, null);
 	            }
 	          } else if (itemType === 'String') {
 	            if (!_this10.isTextElement) {
-	              _this10._addChoice(item, item, true, false, -1);
+	              _this10._addChoice(item, item, true, false, -1, null);
 	            } else {
 	              _this10._addItem(item);
 	            }
@@ -1022,7 +1022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          if (foundChoice) {
 	            if (!foundChoice.selected) {
-	              _this11._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties);
+	              _this11._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties, foundChoice.keyCode);
 	            } else if (!_this11.config.silent) {
 	              console.warn('Attempting to select choice already selected');
 	            }
@@ -1067,7 +1067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (result.choices) {
 	                _this12._addGroup(result, result.id || null, value, label);
 	              } else {
-	                _this12._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties']);
+	                _this12._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties'], null);
 	              }
 	            });
 	          }
@@ -1307,7 +1307,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // If we are clicking on an option
 	      var id = element.getAttribute('data-id');
 	      var choice = this.store.getChoiceById(id);
+	      var passedKeyCode = activeItems[0].keyCode !== null ? activeItems[0].keyCode : null;
 	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+	      // Update choice keyCode
+	      choice.keyCode = passedKeyCode;
 
 	      (0, _utils.triggerEvent)(this.passedElement, 'choice', {
 	        choice: choice
@@ -1317,7 +1321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var canAddItem = this._canAddItem(activeItems, choice.value);
 
 	        if (canAddItem.response) {
-	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties);
+	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties, choice.keyCode);
 	          this._triggerChange(choice.value);
 	        }
 	      }
@@ -1482,7 +1486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var groupId = result.id || null;
 	              _this15._addGroup(result, groupId, value, label);
 	            } else {
-	              _this15._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties']);
+	              _this15._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties'], null);
 	            }
 	          });
 	        } else {
@@ -1721,6 +1725,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          // If we have a highlighted choice
 	          if (highlighted) {
+	            // add enter keyCode value
+	            activeItems[0].keyCode = enterKey;
 	            _this16._handleChoiceAction(activeItems, highlighted);
 	          }
 	        } else if (_this16.isSelectOneElement) {
@@ -2307,8 +2313,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
 	      var groupId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
 	      var customProperties = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+	      var keyCode = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
 	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
+	      var passedKeyCode = keyCode;
 	      var items = this.store.getItems();
 	      var passedLabel = label || passedValue;
 	      var passedOptionId = parseInt(choiceId, 10) || -1;
@@ -2329,7 +2337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        passedValue += this.config.appendValue.toString();
 	      }
 
-	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties));
+	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, passedKeyCode));
 
 	      if (this.isSelectOneElement) {
 	        this.removeActiveItems(id);
@@ -2341,13 +2349,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	          id: id,
 	          value: passedValue,
 	          label: passedLabel,
-	          groupValue: group.value
+	          groupValue: group.value,
+	          keyCode: passedKeyCode
 	        });
 	      } else {
 	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
 	          id: id,
 	          value: passedValue,
-	          label: passedLabel
+	          label: passedLabel,
+	          keyCode: passedKeyCode
 	        });
 	      }
 
@@ -2415,6 +2425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var isDisabled = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 	      var customProperties = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+	      var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
 	      if (typeof value === 'undefined' || value === null) {
 	        return;
@@ -2426,10 +2437,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceId = choices ? choices.length + 1 : 1;
 	      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
-	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties));
+	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, keyCode));
 
 	      if (isSelected) {
-	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties);
+	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties, keyCode);
 	      }
 	    }
 
@@ -4961,7 +4972,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          label: action.label,
 	          active: true,
 	          highlighted: false,
-	          customProperties: action.customProperties
+	          customProperties: action.customProperties,
+	          keyCode: null
 	        }]);
 
 	        return newState.map(function (item) {
@@ -5077,7 +5089,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          selected: false,
 	          active: true,
 	          score: 9999,
-	          customProperties: action.customProperties
+	          customProperties: action.customProperties,
+	          keyCode: null
 	        }]);
 	      }
 
@@ -5174,7 +5187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties) {
+	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, keyCode) {
 	  return {
 	    type: 'ADD_ITEM',
 	    value: value,
@@ -5182,7 +5195,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    id: id,
 	    choiceId: choiceId,
 	    groupId: groupId,
-	    customProperties: customProperties
+	    customProperties: customProperties,
+	    keyCode: keyCode
 	  };
 	};
 
@@ -5202,7 +5216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
-	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties) {
+	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, keyCode) {
 	  return {
 	    type: 'ADD_CHOICE',
 	    value: value,
@@ -5211,7 +5225,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    groupId: groupId,
 	    disabled: disabled,
 	    elementId: elementId,
-	    customProperties: customProperties
+	    customProperties: customProperties,
+	    keyCode: keyCode
 	  };
 	};
 

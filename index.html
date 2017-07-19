@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
@@ -24,7 +25,7 @@
 
   <!-- Choices includes -->
   <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.8.8">
-  <script src="assets/scripts/dist/choices.min.js?version=2.8.8"></script>
+  <script src="assets/scripts/dist/choices.js?version=2.8.8"></script>
   <!-- End Choices includes -->
 
   <!--[if lt IE 9]>
@@ -34,6 +35,7 @@
     </style>
     <![endif]-->
 </head>
+
 <body>
   <div class="container">
     <div class="section">
@@ -41,7 +43,8 @@
         <img src="assets/images/logo.svg" alt="Choices.js logo" class="logo__img hidden-ie">
         <h1 class="visible-ie">Choices.js</h1>
       </a>
-      <p>Choices.js is a lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.</p>
+      <p>Choices.js is a lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without
+        the jQuery dependency.</p>
       <p>For all config options, visit the <a href="https://github.com/jshjohnson/Choices">GitHub repo</a>.</p>
 
       <hr>
@@ -51,7 +54,8 @@
       <input class="form-control" id="choices-text-remove-button" type="text" value="preset-1,preset-2" placeholder="Enter something">
 
       <label for="choices-text-unique-values">Unique values only, no pasting</label>
-      <input class="form-control" id="choices-text-unique-values" type="text" value="preset-1, preset-2" placeholder="This is a placeholder" class="custom class">
+      <input class="form-control" id="choices-text-unique-values" type="text" value="preset-1, preset-2" placeholder="This is a placeholder"
+        class="custom class">
 
       <label for="choices-text-email-filter">Email addresses only</label>
       <input class="form-control" id="choices-text-email-filter" type="text" placeholder="This is a placeholder">
@@ -75,7 +79,8 @@
 
       <h2>Multiple select input</h2>
       <label for="choices-multiple-default">Default</label>
-      <select class="form-control" data-trigger name="choices-multiple-default" id="choices-multiple-default" placeholder="This is a placeholder" multiple>
+      <select class="form-control" data-trigger name="choices-multiple-default" id="choices-multiple-default" placeholder="This is a placeholder"
+        multiple>
         <option value="Dropdown item 1" selected>Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -83,7 +88,8 @@
       </select>
 
       <label for="choices-multiple-remove-button">With remove button</label>
-      <select class="form-control" name="choices-multiple-remove-button" id="choices-multiple-remove-button" placeholder="This is a placeholder" multiple>
+      <select class="form-control" name="choices-multiple-remove-button" id="choices-multiple-remove-button" placeholder="This is a placeholder"
+        multiple>
         <option value="Dropdown item 1" selected>Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -91,7 +97,8 @@
       </select>
 
       <label for="choices-multiple-groups">Option groups</label>
-      <select class="form-control" name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder" multiple>
+      <select class="form-control" name="choices-multiple-groups" id="choices-multiple-groups" placeholder="This is a placeholder"
+        multiple>
         <optgroup label="UK">
           <option value="London">London</option>
           <option value="Manchester">Manchester</option>
@@ -130,7 +137,8 @@
       <select class="form-control" name="choices-multiple-remote-fetch" id="choices-multiple-remote-fetch" multiple></select>
 
       <label for="choices-multiple-rtl">Right-to-left</label>
-      <select class="form-control" data-trigger name="choices-multiple-rtl" id="choices-multiple-rtl" placeholder="This is a placeholder" multiple dir="rtl">
+      <select class="form-control" data-trigger name="choices-multiple-rtl" id="choices-multiple-rtl" placeholder="This is a placeholder"
+        multiple dir="rtl">
         <option value="Dropdown item 1" selected>Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -194,7 +202,8 @@
       </select>
 
       <label for="choices-single-rtl">Right-to-left</label>
-      <select class="form-control" data-trigger name="choices-single-rtl" id="choices-single-rtl" placeholder="This is a placeholder" dir="rtl">
+      <select class="form-control" data-trigger name="choices-single-rtl" id="choices-single-rtl" placeholder="This is a placeholder"
+        dir="rtl">
         <option value="Dropdown item 1">Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -242,7 +251,8 @@
         <option value="Vue">Vue</option>
       </select>
 
-      <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if the value of 'States' is 'New York'</p>
+      <p>Below is an example of how you could have two select inputs depend on eachother. 'Boroughs' will only be enabled if
+        the value of 'States' is 'New York'</p>
       <label for="states">States</label>
       <select class="form-control" name="states" id="states" placeholder="Choose a state">
         <option value="Michigan">Michigan</option>
@@ -263,7 +273,7 @@
     </div>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       var textRemove = new Choices(document.getElementById('choices-text-remove-button'), {
         delimiter: ',',
         editItems: true,
@@ -282,10 +292,10 @@
         duplicateItems: false,
         editItems: true,
         maxItemCount: 5,
-        addItemText: function(value) {
+        addItemText: function (value) {
           return 'Appuyez sur Entrée pour ajouter <b>"' + String(value) + '"</b>';
         },
-        maxItemText: function(maxItemCount) {
+        maxItemText: function (maxItemCount) {
           return String(maxItemCount) + 'valeurs peuvent être ajoutées';
         },
         uniqueItemText: 'Cette valeur est déjà présente',
@@ -322,14 +332,14 @@
         placeholder: true,
         placeholderValue: 'Pick an Strokes record',
         maxItemCount: 5,
-      }).ajax(function(callback) {
+      }).ajax(function (callback) {
         fetch('https://api.discogs.com/artists/55980/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-          .then(function(response) {
-            response.json().then(function(data) {
+          .then(function (response) {
+            response.json().then(function (data) {
               callback(data.releases, 'title', 'title');
             });
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.error(error);
           });
       });
@@ -342,46 +352,46 @@
       var choicesSelect = new Choices('#choices-multiple-labels', {
         removeItemButton: true,
         choices: [
-          {value: 'One', label: 'Label One'},
-          {value: 'Two', label: 'Label Two', disabled: true},
-          {value: 'Three', label: 'Label Three'},
+          { value: 'One', label: 'Label One' },
+          { value: 'Two', label: 'Label Two', disabled: true },
+          { value: 'Three', label: 'Label Three' },
         ],
       }).setChoices([
-        {value: 'Four', label: 'Label Four', disabled: true},
-        {value: 'Five', label: 'Label Five'},
-        {value: 'Six', label: 'Label Six', selected: true},
+        { value: 'Four', label: 'Label Four', disabled: true },
+        { value: 'Five', label: 'Label Five' },
+        { value: 'Six', label: 'Label Six', selected: true },
       ], 'value', 'label', false);
 
-      choicesSelect.passedElement.addEventListener('addItem', function(event) {
+      choicesSelect.passedElement.addEventListener('addItem', function (event) {
         document.getElementById('message').innerHTML = 'You just added "' + event.detail.label + '"';
       });
 
-      choicesSelect.passedElement.addEventListener('removeItem', function(event) {
+      choicesSelect.passedElement.addEventListener('removeItem', function (event) {
         document.getElementById('message').innerHTML = 'You just removed "' + event.detail.label + '"';
       });
 
       var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
         placeholderValue: 'Pick an Arctic Monkeys record'
-      }).ajax(function(callback) {
+      }).ajax(function (callback) {
         fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
-          .then(function(response) {
-            response.json().then(function(data) {
+          .then(function (response) {
+            response.json().then(function (data) {
               callback(data.releases, 'title', 'title');
               singleFetch.setValueByChoice('Fake Tales Of San Francisco');
             });
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.error(error);
           });
       });
 
       var singleXhrRemove = new Choices('#choices-single-remove-xhr', {
         removeItemButton: true,
-      }).ajax(function(callback) {
+      }).ajax(function (callback) {
         var request = new XMLHttpRequest();
         request.open('get', 'https://api.discogs.com/artists/83080/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW', true);
-        request.onreadystatechange = function() {
+        request.onreadystatechange = function () {
           var status;
           var data;
           if (request.readyState === 4) {
@@ -406,14 +416,14 @@
         searchEnabled: false,
         removeItemButton: true,
         choices: [
-          {value: 'One', label: 'Label One'},
-          {value: 'Two', label: 'Label Two', disabled: true},
-          {value: 'Three', label: 'Label Three'},
+          { value: 'One', label: 'Label One' },
+          { value: 'Two', label: 'Label Two', disabled: true },
+          { value: 'Three', label: 'Label Three' },
         ],
       }).setChoices([
-        {value: 'Four', label: 'Label Four', disabled: true},
-        {value: 'Five', label: 'Label Five'},
-        {value: 'Six', label: 'Label Six', selected: true},
+        { value: 'Four', label: 'Label Four', disabled: true },
+        { value: 'Five', label: 'Label Five' },
+        { value: 'Six', label: 'Label Six', selected: true },
       ], 'value', 'label', false);
 
       var singlePresetOpts = new Choices('#choices-single-preset-options', {
@@ -423,9 +433,9 @@
         id: 1,
         disabled: false,
         choices: [
-          {value: 'Child One', label: 'Child One', selected: true},
-          {value: 'Child Two', label: 'Child Two',  disabled: true},
-          {value: 'Child Three', label: 'Child Three'},
+          { value: 'Child One', label: 'Child One', selected: true },
+          { value: 'Child Two', label: 'Child Two', disabled: true },
+          { value: 'Child Three', label: 'Child Three' },
         ]
       },
       {
@@ -433,20 +443,22 @@
         id: 2,
         disabled: false,
         choices: [
-          {value: 'Child Four', label: 'Child Four', disabled: true},
-          {value: 'Child Five', label: 'Child Five'},
-          {value: 'Child Six', label: 'Child Six'},
+          { value: 'Child Four', label: 'Child Four', disabled: true },
+          { value: 'Child Five', label: 'Child Five' },
+          { value: 'Child Six', label: 'Child Six' },
         ]
       }], 'value', 'label');
 
       var singleSelectedOpt = new Choices('#choices-single-selected-option', {
         searchFields: ['label', 'value', 'customProperties.description'],
         choices: [
-          {value: 'One', label: 'Label One', selected: true},
-          {value: 'Two', label: 'Label Two', disabled: true},
-          {value: 'Three', label: 'Label Three', customProperties: {
-            description: 'This option is fantastic'
-          }},
+          { value: 'One', label: 'Label One', selected: true },
+          { value: 'Two', label: 'Label Two', disabled: true },
+          {
+            value: 'Three', label: 'Label Three', customProperties: {
+              description: 'This option is fantastic'
+            }
+          },
         ],
       }).setValueByChoice('Two');
 
@@ -456,8 +468,8 @@
 
       var states = new Choices(document.getElementById('states'));
 
-      states.passedElement.addEventListener('change', function(e) {
-        if(e.detail.value === 'New York') {
+      states.passedElement.addEventListener('change', function (e) {
+        if (e.detail.value === 'New York') {
           boroughs.enable();
         } else {
           boroughs.disable();
@@ -469,13 +481,13 @@
           var classNames = this.config.classNames;
           var itemSelectText = this.config.itemSelectText;
           return {
-            item: function(data) {
+            item: function (data) {
               return strToEl('\
                 <div\
                   class="'+ String(classNames.item) + ' ' + String(data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"\
                   data-item\
                   data-id="'+ String(data.id) + '"\
-                  data-value="'+ String(data.value) +'"\
+                  data-value="'+ String(data.value) + '"\
                   '+ String(data.active ? 'aria-selected="true"' : '') + '\
                   '+ String(data.disabled ? 'aria-disabled="true"' : '') + '\
                   >\
@@ -483,15 +495,15 @@
                 </div>\
               ');
             },
-            choice: function(data) {
+            choice: function (data) {
               return strToEl('\
                 <div\
                   class="'+ String(classNames.item) + ' ' + String(classNames.itemChoice) + ' ' + String(data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '"\
-                  data-select-text="'+ String(itemSelectText) +'"\
+                  data-select-text="'+ String(itemSelectText) + '"\
                   data-choice \
                   '+ String(data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\
-                  data-id="'+ String(data.id) +'"\
-                  data-value="'+ String(data.value) +'"\
+                  data-id="'+ String(data.id) + '"\
+                  data-value="'+ String(data.value) + '"\
                   '+ String(data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\
                   >\
                   <span style="margin-right:10px;">👉🏽</span> ' + String(data.label) + '\
@@ -504,15 +516,20 @@
 
       var boroughs = new Choices(document.getElementById('boroughs')).disable();
     });
+
+    document.getElementById('choices-single-default').addEventListener('addItem', function (e) {
+      console.log(e)
+    })
   </script>
 
   <!-- Google Analytics - Ignore me -->
   <script>
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
     ga('create', 'UA-31575166-1', 'auto');
     ga('send', 'pageview');
   </script>
   <script async src='https://www.google-analytics.com/analytics.js'></script>
   <!-- End Google Analytics -->
 </body>
+
 </html>

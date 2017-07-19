@@ -16,7 +16,8 @@ const choices = (state = [], action) => {
         selected: false,
         active: true,
         score: 9999,
-        customProperties: action.customProperties
+        customProperties: action.customProperties,
+        keyCode: null
       }];
     }
 
