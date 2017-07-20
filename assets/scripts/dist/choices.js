@@ -1,4 +1,4 @@
-/*! choices.js v2.8.9 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.10 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1306,7 +1306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // If we are clicking on an option
 	      var id = element.getAttribute('data-id');
 	      var choice = this.store.getChoiceById(id);
-	      var passedKeyCode = activeItems[0].keyCode !== null ? activeItems[0].keyCode : null;
+	      var passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
 	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
 	      // Update choice keyCode
@@ -1725,7 +1725,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // If we have a highlighted choice
 	          if (highlighted) {
 	            // add enter keyCode value
-	            activeItems[0].keyCode = enterKey;
+	            if (activeItems[0]) {
+	              activeItems[0].keyCode = enterKey;
+	            }
 	            _this16._handleChoiceAction(activeItems, highlighted);
 	          }
 	        } else if (_this16.isSelectOneElement) {
