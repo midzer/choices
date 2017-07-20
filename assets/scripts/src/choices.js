@@ -1172,11 +1172,11 @@ class Choices {
     // If we are clicking on an option
     const id = element.getAttribute('data-id');
     const choice = this.store.getChoiceById(id);
-    const passedKeyCode  = activeItems[0].keyCode !== null ? activeItems[0].keyCode : null
+    const passedKeyCode  = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
     const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 
     // Update choice keyCode
-    choice.keyCode = passedKeyCode
+    choice.keyCode = passedKeyCode;
 
     triggerEvent(this.passedElement, 'choice', {
       choice,
@@ -1590,7 +1590,9 @@ class Choices {
         // If we have a highlighted choice
         if (highlighted) {
           // add enter keyCode value
-          activeItems[0].keyCode = enterKey
+          if (activeItems[0]) {
+            activeItems[0].keyCode = enterKey;
+          }
           this._handleChoiceAction(activeItems, highlighted);
         }
 
@@ -2132,7 +2134,7 @@ class Choices {
    */
   _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null, keyCode = null) {
     let passedValue = isType('String', value) ? value.trim() : value;
-    let passedKeyCode = keyCode
+    let passedKeyCode = keyCode;
     const items = this.store.getItems();
     const passedLabel = label || passedValue;
     const passedOptionId = parseInt(choiceId, 10) || -1;
