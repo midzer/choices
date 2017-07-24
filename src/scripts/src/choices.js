@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js';
 import classNames from 'classnames';
-import Store from './store/index';
+import Store from './store/store';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
@@ -15,7 +15,7 @@ import {
   addGroup,
   clearAll,
   clearChoices,
-} from './actions/index';
+} from './actions/actions';
 import {
   isScrolledIntoView,
   getAdjacentEl,
