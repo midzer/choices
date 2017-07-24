@@ -53,6 +53,7 @@ class Choices {
       silent: false,
       items: [],
       choices: [],
+      renderChoiceLimit: -1,
       maxItemCount: -1,
       addItems: true,
       removeItems: true,
@@ -338,7 +339,7 @@ class Choices {
       if (groupChoices.length >= 1) {
         const dropdownGroup = this._getTemplate('choiceGroup', group);
         groupFragment.appendChild(dropdownGroup);
-        this.renderChoices(groupChoices, groupFragment);
+        this.renderChoices(groupChoices, groupFragment, true);
       }
     });
 
@@ -352,36 +353,44 @@ class Choices {
    * @return {DocumentFragment} Populated choices fragment
    * @private
    */
-  renderChoices(choices, fragment) {
+  renderChoices(choices, fragment, withinGroup = false) {
     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
     const choicesFragment = fragment || document.createDocumentFragment();
+    const { renderSelectedChoices, searchResultLimit, renderChoiceLimit } = this.config;
     const filter = this.isSearching ? sortByScore : this.config.sortFilter;
-    const { renderSelectedChoices } = this.config;
     const appendChoice = (choice) => {
-      const shouldRender = renderSelectedChoices === 'auto'
-        ? this.isSelectOneElement || !choice.selected
-        : true;
+      const shouldRender = renderSelectedChoices === 'auto' ?
+        (this.isSelectOneElement || !choice.selected) :
+        true;
       if (shouldRender) {
         const dropdownItem = this._getTemplate('choice', choice);
         choicesFragment.appendChild(dropdownItem);
       }
     };
 
-    // If sorting is enabled or the user is searching, filter choices
-    if (this.config.shouldSort || this.isSearching) {
-      choices.sort(filter);
+    let rendererableChoices = choices;
+
+    if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
+      rendererableChoices = choices.filter(choice => !choice.selected);
     }
 
-    if (this.isSearching) {
-      for (let i = 0; i < this.config.searchResultLimit; i++) {
-        const choice = choices[i];
-        if (choice) {
-          appendChoice(choice);
-        }
-      }
-    } else {
-      choices.forEach(choice => appendChoice(choice));
+    // If sorting is enabled or the user is searching, filter choices
+    if (this.config.shouldSort || this.isSearching) {
+      rendererableChoices.sort(filter);
     }
+
+    let choiceLimit = rendererableChoices.length;
+
+    if (this.isSearching) {
+      choiceLimit = Math.min(searchResultLimit, rendererableChoices.length - 1);
+    } else if (renderChoiceLimit > 0 && !withinGroup) {
+      choiceLimit = Math.min(renderChoiceLimit, rendererableChoices.length - 1);
+    }
+
+    // Add each choice to dropdown within range
+    for (let i = 0; i < choiceLimit; i++) {
+      appendChoice(rendererableChoices[i]);
+    };
 
     return choicesFragment;
   }
@@ -447,8 +456,11 @@ class Choices {
     // Only render if our state has actually changed
     if (this.currentState !== this.prevState) {
       // Choices
-      if (this.currentState.choices !== this.prevState.choices ||
-        this.currentState.groups !== this.prevState.groups) {
+      if (
+        this.currentState.choices !== this.prevState.choices ||
+        this.currentState.groups !== this.prevState.groups ||
+        this.currentState.items !== this.prevState.items
+      ) {
         if (this.isSelectElement) {
           // Get active groups/choices
           const activeGroups = this.store.getGroupsFilteredByActive();

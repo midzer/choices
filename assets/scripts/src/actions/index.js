@@ -35,7 +35,7 @@ export const addChoice = (value, label, id, groupId, disabled, elementId, custom
     id,
     groupId,
     disabled,
-    elementId: elementId,
+    elementId,
     customProperties,
     keyCode
   };

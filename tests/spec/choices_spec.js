@@ -48,6 +48,7 @@ describe('Choices', () => {
       expect(this.choices.config.silent).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.items).toEqual(jasmine.any(Array));
       expect(this.choices.config.choices).toEqual(jasmine.any(Array));
+      expect(this.choices.config.renderChoiceLimit).toEqual(jasmine.any(Number));
       expect(this.choices.config.maxItemCount).toEqual(jasmine.any(Number));
       expect(this.choices.config.addItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.removeItems).toEqual(jasmine.any(Boolean));
@@ -293,7 +294,9 @@ describe('Choices', () => {
     });
 
     it('should highlight the choices on keydown', function() {
-      this.choices = new Choices(this.input);
+      this.choices = new Choices(this.input, {
+        renderChoiceLimit: -1
+      });
       this.choices.input.focus();
 
       for (let i = 0; i < 2; i++) {
@@ -930,7 +933,7 @@ describe('Choices', () => {
 
     it('should flip the dropdown', function() {
       this.choices = new Choices(this.input, {
-        position: 'top'
+        position: 'top',
       });
 
       const container = this.choices.containerOuter;
@@ -950,7 +953,8 @@ describe('Choices', () => {
 
     it('should render selected choices', function() {
       this.choices = new Choices(this.input, {
-        renderSelectedChoices: 'always'
+        renderSelectedChoices: 'always',
+        renderChoiceLimit: -1
       });
       const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(3);
@@ -958,10 +962,48 @@ describe('Choices', () => {
 
     it('shouldn\'t render selected choices', function() {
       this.choices = new Choices(this.input, {
-        renderSelectedChoices: 'auto'
+        renderSelectedChoices: 'auto',
+        renderChoiceLimit: -1
       });
       const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(1);
+    });
+
+    it('shouldn\'t render choices up to a render limit', function() {
+      // Remove existing choices (to make test simpler)
+      while (this.input.firstChild) {
+        this.input.removeChild(this.input.firstChild);
+      }
+
+      this.choices = new Choices(this.input, {
+        choices: [
+          {
+            value: 'Option 1',
+            selected: false,
+          },
+          {
+            value: 'Option 2',
+            selected: false,
+          },
+          {
+            value: 'Option 3',
+            selected: false,
+          },
+          {
+            value: 'Option 4',
+            selected: false,
+          },
+          {
+            value: 'Option 5',
+            selected: false,
+          },
+        ],
+        renderSelectedChoices: 'auto',
+        renderChoiceLimit: 4
+      });
+
+      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      expect(renderedChoices.length).toEqual(4);
     });
   });
 
