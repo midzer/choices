@@ -216,7 +216,7 @@ class Choices {
     const canInit = isElement(this.passedElement) && this.isValidElementType;
 
     if (canInit) {
-      // If element has already been initalised with Choices
+      // If element has already been initialised with Choices
       if (this.passedElement.getAttribute('data-choice') === 'active') {
         return;
       }

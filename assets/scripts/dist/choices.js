@@ -1,4 +1,4 @@
-/*! choices.js v2.8.10 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.10 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -276,7 +276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var canInit = (0, _utils.isElement)(this.passedElement) && this.isValidElementType;
 
 	    if (canInit) {
-	      // If element has already been initalised with Choices
+	      // If element has already been initialised with Choices
 	      if (this.passedElement.getAttribute('data-choice') === 'active') {
 	        return;
 	      }
