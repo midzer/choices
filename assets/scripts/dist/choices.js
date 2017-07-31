@@ -1,4 +1,4 @@
-/*! choices.js v2.8.10 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v2.8.11 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -118,6 +118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      silent: false,
 	      items: [],
 	      choices: [],
+	      renderChoiceLimit: -1,
 	      maxItemCount: -1,
 	      addItems: true,
 	      removeItems: true,
@@ -411,7 +412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (groupChoices.length >= 1) {
 	          var dropdownGroup = _this._getTemplate('choiceGroup', group);
 	          groupFragment.appendChild(dropdownGroup);
-	          _this.renderChoices(groupChoices, groupFragment);
+	          _this.renderChoices(groupChoices, groupFragment, true);
 	        }
 	      });
 
@@ -431,11 +432,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function renderChoices(choices, fragment) {
 	      var _this2 = this;
 
+	      var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
 	      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
 	      var choicesFragment = fragment || document.createDocumentFragment();
-	      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
-	      var renderSelectedChoices = this.config.renderSelectedChoices;
+	      var _config = this.config,
+	          renderSelectedChoices = _config.renderSelectedChoices,
+	          searchResultLimit = _config.searchResultLimit,
+	          renderChoiceLimit = _config.renderChoiceLimit;
 
+	      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
 	      var appendChoice = function appendChoice(choice) {
 	        var shouldRender = renderSelectedChoices === 'auto' ? _this2.isSelectOneElement || !choice.selected : true;
 	        if (shouldRender) {
@@ -444,23 +450,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      };
 
-	      // If sorting is enabled or the user is searching, filter choices
-	      if (this.config.shouldSort || this.isSearching) {
-	        choices.sort(filter);
-	      }
+	      var rendererableChoices = choices;
 
-	      if (this.isSearching) {
-	        for (var i = 0; i < this.config.searchResultLimit; i++) {
-	          var choice = choices[i];
-	          if (choice) {
-	            appendChoice(choice);
-	          }
-	        }
-	      } else {
-	        choices.forEach(function (choice) {
-	          return appendChoice(choice);
+	      if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
+	        rendererableChoices = choices.filter(function (choice) {
+	          return !choice.selected;
 	        });
 	      }
+
+	      // If sorting is enabled or the user is searching, filter choices
+	      if (this.config.shouldSort || this.isSearching) {
+	        rendererableChoices.sort(filter);
+	      }
+
+	      var choiceLimit = rendererableChoices.length;
+
+	      if (this.isSearching) {
+	        choiceLimit = Math.min(searchResultLimit, rendererableChoices.length - 1);
+	      } else if (renderChoiceLimit > 0 && !withinGroup) {
+	        choiceLimit = Math.min(renderChoiceLimit, rendererableChoices.length - 1);
+	      }
+
+	      // Add each choice to dropdown within range
+	      for (var i = 0; i < choiceLimit; i++) {
+	        appendChoice(rendererableChoices[i]);
+	      };
 
 	      return choicesFragment;
 	    }
@@ -536,7 +550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Only render if our state has actually changed
 	      if (this.currentState !== this.prevState) {
 	        // Choices
-	        if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups) {
+	        if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups || this.currentState.items !== this.prevState.items) {
 	          if (this.isSelectElement) {
 	            // Get active groups/choices
 	            var activeGroups = this.store.getGroupsFilteredByActive();
@@ -1523,7 +1537,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.highlightPosition = 0;
 	        this.isSearching = true;
 	        this.store.dispatch((0, _index3.filterChoices)(results));
+
+	        return results.length;
 	      }
+
+	      return 0;
 	    }
 
 	    /**
@@ -1549,14 +1567,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.input === document.activeElement) {
 	        // Check that we have a value to search and the input was an alphanumeric character
 	        if (value && value.length >= this.config.searchFloor) {
+	          var resultCount = 0;
 	          // Check flag to filter search input
 	          if (this.config.searchChoices) {
 	            // Filter available choices
-	            this._searchChoices(value);
+	            resultCount = this._searchChoices(value);
 	          }
 	          // Trigger search event
 	          (0, _utils.triggerEvent)(this.passedElement, 'search', {
-	            value: value
+	            value: value,
+	            resultCount: resultCount
 	          });
 	        } else if (hasUnactiveChoices) {
 	          // Otherwise reset choices to active

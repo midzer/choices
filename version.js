@@ -1,4 +1,4 @@
-// Example usage: npm --newVersion=2.8.10 run version
+// Example usage: npm --newVersion=2.8.11 run version
 
 const fs = require('fs');
 const path = require('path');
