@@ -574,17 +574,23 @@ example.passedElement.addEventListener('addItem', function(event) {
 **Usage:** Triggered each time an item is added/removed **by a user**.
 
 ### search
-**Arguments:** `value` **Input types affected:** `select-one`, `select-multiple`
+**Arguments:** `value` 
+
+**Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** Triggered when a user types into an input to search choices.
 
 ### showDropdown
-**Arguments:** - **Input types affected:** `select-one`, `select-multiple`
+**Arguments:** - 
+
+**Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** Triggered when the dropdown is shown.
 
 ### hideDropdown
-**Arguments:** - **Input types affected:** `select-one`, `select-multiple`
+**Arguments:** -
+
+**Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** Triggered when the dropdown is hidden.
 
