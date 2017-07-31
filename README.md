@@ -59,6 +59,7 @@ Or include Choices directly:
     silent: false,
     items: [],
     choices: [],
+    renderChoiceLimit: -1,
     maxItemCount: -1,
     addItems: true,
     removeItems: true,
@@ -201,6 +202,13 @@ Pass an array of objects:
   },
 }]
 ```
+
+### renderChoiceLimit
+**Type:** `Number` **Default:** `-1`
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** The amount of choices to be rendered within the dropdown list ("-1" indicates no limit). This is useful if you have a lot of choices where it is easier for a user to use the search area to find a choice.
 
 ### maxItemCount
 **Type:** `Number` **Default:** `-1`
