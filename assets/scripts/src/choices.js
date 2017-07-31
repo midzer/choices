@@ -1416,7 +1416,11 @@ class Choices {
       this.store.dispatch(
         filterChoices(results)
       );
+
+      return results.length;
     }
+
+    return 0;
   }
 
   /**
@@ -1437,14 +1441,16 @@ class Choices {
     if (this.input === document.activeElement) {
       // Check that we have a value to search and the input was an alphanumeric character
       if (value && value.length >= this.config.searchFloor) {
+        let resultCount = 0;
         // Check flag to filter search input
         if (this.config.searchChoices) {
           // Filter available choices
-          this._searchChoices(value);
+          resultCount = this._searchChoices(value);
         }
         // Trigger search event
         triggerEvent(this.passedElement, 'search', {
           value,
+          resultCount
         });
       } else if (hasUnactiveChoices) {
         // Otherwise reset choices to active

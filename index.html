@@ -352,6 +352,10 @@
         removeItemButton: true,
       });
 
+      multipleCancelButton.passedElement.addEventListener('search', (e) => {
+        console.log(e.detail);
+      });
+
       /* Use label on event */
       var choicesSelect = new Choices('#choices-multiple-labels', {
         removeItemButton: true,
