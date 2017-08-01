@@ -155,6 +155,7 @@ class Choices {
     this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
     this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
     this.isValidElementType = this.isTextElement || this.isSelectElement;
+    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
 
     if (!this.passedElement) {
       if (!this.config.silent) {
@@ -1476,6 +1477,10 @@ class Choices {
     document.addEventListener('mousedown', this._onMouseDown);
     document.addEventListener('mouseover', this._onMouseOver);
 
+    if (this.isIe11) {
+      document.addEventListener('focus', this._onDocumentFocus);
+    }
+
     if (this.isSelectOneElement) {
       this.containerOuter.addEventListener('focus', this._onFocus);
       this.containerOuter.addEventListener('blur', this._onBlur);
@@ -1500,6 +1505,10 @@ class Choices {
     document.removeEventListener('touchend', this._onTouchEnd);
     document.removeEventListener('mousedown', this._onMouseDown);
     document.removeEventListener('mouseover', this._onMouseOver);
+
+    if (this.isIe11) {
+      document.removeEventListener('focus', this._onDocumentFocus);
+    }
 
     if (this.isSelectOneElement) {
       this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1902,6 +1911,43 @@ class Choices {
     if (e.target === this.dropdown || this.dropdown.contains(e.target)) {
       if (e.target.hasAttribute('data-choice')) this._highlightChoice(e.target);
     }
+  }
+
+  /**
+   * Focus event on everything in the document
+   * @param  {Object} e Event
+   * @return
+   * @private
+   */
+  _onDocumentFocus (e) {
+    const target = e.target;
+    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+
+    const blurActions = {
+      text: () => {
+        if (target !== this.input) {
+          if (hasActiveDropdown) {
+            this.hideDropdown();
+          }
+        }
+      },
+      'select-one': () => {
+        if (target !== this.containerOuter) {
+          if (hasActiveDropdown && !this.canSearch) {
+            this.hideDropdown();
+          }
+        }
+      },
+      'select-multiple': () => {
+        if (target !== this.input) {
+          if (hasActiveDropdown) {
+            this.hideDropdown();
+          }
+        }
+      },
+    };
+
+    blurActions[this.passedElement.type]();
   }
 
   /**
