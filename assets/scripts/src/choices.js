@@ -2737,6 +2737,7 @@ class Choices {
     const dropdown = this._getTemplate('dropdown');
     const placeholder = this.config.placeholder ?
       this.config.placeholderValue ||
+      this.config.searchPlaceholderValue ||
       this.passedElement.getAttribute('placeholder') :
       false;
 
@@ -2782,7 +2783,7 @@ class Choices {
         // If select one element with a search placeholder value
         if (this.config.searchPlaceholderValue) {
           input.placeholder = this.config.searchPlaceholderValue;
-        } else {
+        } else if (this.placeholder) {
           const placeholderItem = this._getTemplate('placeholder', this.placeholder);
           this.itemList.appendChild(placeholderItem);
         }

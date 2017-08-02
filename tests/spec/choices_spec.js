@@ -523,7 +523,7 @@ describe('Choices', () => {
         ctrlKey: false
       });
 
-      const activeOptions = this.choices.currentState.choices.filter(function (choice) {
+      const activeOptions = this.choices.currentState.choices.filter(function(choice) {
         return choice.active;
       });
 
@@ -565,6 +565,15 @@ describe('Choices', () => {
       });
 
       expect(this.choices.currentState.choices[0].value).toEqual('Value 1');
+    });
+
+    it('should set searchPlaceholderValue if set', function() {
+      const dummyPlaceholder = 'Test placeholder';
+      this.choices = new Choices(this.input, {
+        searchPlaceholderValue: dummyPlaceholder
+      });
+
+      expect(this.choices.input.placeholder).toEqual(dummyPlaceholder);
     });
   });
 
