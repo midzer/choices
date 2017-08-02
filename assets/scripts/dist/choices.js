@@ -1,4 +1,4 @@
-/*! choices.js v2.8.11 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v2.8.12 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -219,6 +219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
 	    this.isValidElementType = this.isTextElement || this.isSelectElement;
 	    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+	    this.isScrollingOnIe = false;
 
 	    if (!this.passedElement) {
 	      if (!this.config.silent) {
@@ -1604,10 +1605,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.addEventListener('mousedown', this._onMouseDown);
 	      document.addEventListener('mouseover', this._onMouseOver);
 
-	      if (this.isIe11) {
-	        document.addEventListener('focus', this._onDocumentFocus);
-	      }
-
 	      if (this.isSelectOneElement) {
 	        this.containerOuter.addEventListener('focus', this._onFocus);
 	        this.containerOuter.addEventListener('blur', this._onBlur);
@@ -1635,10 +1632,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      document.removeEventListener('touchend', this._onTouchEnd);
 	      document.removeEventListener('mousedown', this._onMouseDown);
 	      document.removeEventListener('mouseover', this._onMouseOver);
-
-	      if (this.isIe11) {
-	        document.removeEventListener('focus', this._onDocumentFocus);
-	      }
 
 	      if (this.isSelectOneElement) {
 	        this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1969,6 +1962,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_onMouseDown',
 	    value: function _onMouseDown(e) {
 	      var target = e.target;
+
+	      // If we have our mouse down on the scrollbar and are on IE11...
+	      if (target === this.choiceList && this.isIe11) {
+	        this.isScrollingOnIe = true;
+	      }
+
 	      if (this.containerOuter.contains(target) && target !== this.input) {
 	        var foundTarget = void 0;
 	        var activeItems = this.store.getItemsFilteredByActive();
@@ -2060,48 +2059,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Focus event on everything in the document
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onDocumentFocus',
-	    value: function _onDocumentFocus(e) {
-	      var _this17 = this;
-
-	      var target = e.target;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-	      var blurActions = {
-	        text: function text() {
-	          if (target !== _this17.input) {
-	            if (hasActiveDropdown) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        },
-	        'select-one': function selectOne() {
-	          if (target !== _this17.containerOuter) {
-	            if (hasActiveDropdown && !_this17.canSearch) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        },
-	        'select-multiple': function selectMultiple() {
-	          if (target !== _this17.input) {
-	            if (hasActiveDropdown) {
-	              _this17.hideDropdown();
-	            }
-	          }
-	        }
-	      };
-
-	      blurActions[this.passedElement.type]();
-	    }
-
-	    /**
 	     * Paste event
 	     * @param  {Object} e Event
 	     * @return
@@ -2127,7 +2084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onFocus',
 	    value: function _onFocus(e) {
-	      var _this18 = this;
+	      var _this17 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
@@ -2135,27 +2092,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 	        var focusActions = {
 	          text: function text() {
-	            if (target === _this18.input) {
-	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
+	            if (target === _this17.input) {
+	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
-	            if (target === _this18.input) {
+	            _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
+	            if (target === _this17.input) {
 	              // Show dropdown if it isn't already showing
 	              if (!hasActiveDropdown) {
-	                _this18.showDropdown();
+	                _this17.showDropdown();
 	              }
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this18.input) {
+	            if (target === _this17.input) {
 	              // If element is a select box, the focused element is the container and the dropdown
 	              // isn't already open, focus and show dropdown
-	              _this18.containerOuter.classList.add(_this18.config.classNames.focusState);
+	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
 
 	              if (!hasActiveDropdown) {
-	                _this18.showDropdown(true);
+	                _this17.showDropdown(true);
 	              }
 	            }
 	          }
@@ -2175,11 +2132,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onBlur',
 	    value: function _onBlur(e) {
-	      var _this19 = this;
+	      var _this18 = this;
 
 	      var target = e.target;
 	      // If target is something that concerns us
-	      if (this.containerOuter.contains(target)) {
+	      if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
 	        var activeItems = this.store.getItemsFilteredByActive();
 	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
 	        var hasHighlightedItems = activeItems.some(function (item) {
@@ -2187,49 +2144,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        var blurActions = {
 	          text: function text() {
-	            if (target === _this19.input) {
+	            if (target === _this18.input) {
 	              // Remove the focus state
-	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
+	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this19.unhighlightAll();
+	                _this18.unhighlightAll();
 	              }
 	              // Hide dropdown if it is showing
 	              if (hasActiveDropdown) {
-	                _this19.hideDropdown();
+	                _this18.hideDropdown();
 	              }
 	            }
 	          },
 	          'select-one': function selectOne() {
-	            _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
-	            if (target === _this19.containerOuter) {
+	            _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
+	            if (target === _this18.containerOuter) {
 	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown && !_this19.canSearch) {
-	                _this19.hideDropdown();
+	              if (hasActiveDropdown && !_this18.canSearch) {
+	                _this18.hideDropdown();
 	              }
 	            }
-	            if (target === _this19.input && hasActiveDropdown) {
+	            if (target === _this18.input && hasActiveDropdown) {
 	              // Hide dropdown if it is showing
-	              _this19.hideDropdown();
+	              _this18.hideDropdown();
 	            }
 	          },
 	          'select-multiple': function selectMultiple() {
-	            if (target === _this19.input) {
+	            if (target === _this18.input) {
 	              // Remove the focus state
-	              _this19.containerOuter.classList.remove(_this19.config.classNames.focusState);
+	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
 	              // Hide dropdown if it is showing
 	              if (hasActiveDropdown) {
-	                _this19.hideDropdown();
+	                _this18.hideDropdown();
 	              }
 	              // De-select any highlighted items
 	              if (hasHighlightedItems) {
-	                _this19.unhighlightAll();
+	                _this18.unhighlightAll();
 	              }
 	            }
 	          }
 	        };
 
 	        blurActions[this.passedElement.type]();
+	      } else {
+	        // On IE11, clicking the scollbar blurs our input and thus
+	        // closes the dropdown. To stop this, we refocus our input
+	        // if we know we are on IE *and* are scrolling.
+	        this.isScrollingOnIe = false;
+	        this.input.focus();
 	      }
 	    }
 
@@ -2263,7 +2226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_scrollToChoice',
 	    value: function _scrollToChoice(choice, direction) {
-	      var _this20 = this;
+	      var _this19 = this;
 
 	      if (!choice) {
 	        return;
@@ -2280,7 +2243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var animateScroll = function animateScroll() {
 	        var strength = 4;
-	        var choiceListScrollTop = _this20.choiceList.scrollTop;
+	        var choiceListScrollTop = _this19.choiceList.scrollTop;
 	        var continueAnimation = false;
 	        var easing = void 0;
 	        var distance = void 0;
@@ -2289,7 +2252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (endPoint - choiceListScrollTop) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this20.choiceList.scrollTop = choiceListScrollTop + distance;
+	          _this19.choiceList.scrollTop = choiceListScrollTop + distance;
 	          if (choiceListScrollTop < endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2297,7 +2260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          easing = (choiceListScrollTop - endPoint) / strength;
 	          distance = easing > 1 ? easing : 1;
 
-	          _this20.choiceList.scrollTop = choiceListScrollTop - distance;
+	          _this19.choiceList.scrollTop = choiceListScrollTop - distance;
 	          if (choiceListScrollTop > endPoint) {
 	            continueAnimation = true;
 	          }
@@ -2325,7 +2288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_highlightChoice',
 	    value: function _highlightChoice() {
-	      var _this21 = this;
+	      var _this20 = this;
 
 	      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
@@ -2338,7 +2301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Remove any highlighted choices
 	        highlightedChoices.forEach(function (choice) {
-	          choice.classList.remove(_this21.config.classNames.highlightedState);
+	          choice.classList.remove(_this20.config.classNames.highlightedState);
 	          choice.setAttribute('aria-selected', 'false');
 	        });
 
@@ -2541,7 +2504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addGroup',
 	    value: function _addGroup(group, id) {
-	      var _this22 = this;
+	      var _this21 = this;
 
 	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
 	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
@@ -2557,7 +2520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var isOptDisabled = option.disabled || option.parentNode && option.parentNode.disabled;
 	          var label = (0, _utils.isType)('Object', option) ? option[labelKey] : option.innerHTML;
 
-	          _this22._addChoice(option[valueKey], label, option.selected, isOptDisabled, groupId, option.customProperties);
+	          _this21._addChoice(option[valueKey], label, option.selected, isOptDisabled, groupId, option.customProperties);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -2596,12 +2559,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createTemplates',
 	    value: function _createTemplates() {
-	      var _this23 = this;
+	      var _this22 = this;
 
 	      var globalClasses = this.config.classNames;
 	      var templates = {
 	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.containerOuter + '"\n            ' + (_this23.isSelectElement ? _this23.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + '\n            data-type="' + _this23.passedElement.type + '"\n            ' + (_this23.isSelectOneElement ? 'tabindex="0"' : '') + '\n            aria-haspopup="true"\n            aria-expanded="false"\n            dir="' + direction + '"\n            >\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.containerOuter + '"\n            ' + (_this22.isSelectElement ? _this22.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + '\n            data-type="' + _this22.passedElement.type + '"\n            ' + (_this22.isSelectOneElement ? 'tabindex="0"' : '') + '\n            aria-haspopup="true"\n            aria-expanded="false"\n            dir="' + direction + '"\n            >\n          </div>\n        ');
 	        },
 	        containerInner: function containerInner() {
 	          return (0, _utils.strToEl)('\n          <div class="' + globalClasses.containerInner + '"></div>\n        ');
@@ -2609,7 +2572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        itemList: function itemList() {
 	          var _classNames;
 
-	          var localClasses = (0, _classnames2.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, _this23.isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !_this23.isSelectOneElement), _classNames));
+	          var localClasses = (0, _classnames2.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, _this22.isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !_this22.isSelectOneElement), _classNames));
 
 	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '"></div>\n        ');
 	        },
@@ -2621,7 +2584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _classNames2));
 
-	          if (_this23.config.removeItemButton) {
+	          if (_this22.config.removeItemButton) {
 	            var _classNames3;
 
 	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _classNames3));
@@ -2632,7 +2595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-item\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.active ? 'aria-selected="true"' : '') + '\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.list + '"\n            dir="ltr"\n            role="listbox"\n            ' + (!_this23.isSelectOneElement ? 'aria-multiselectable="true"' : '') + '\n            >\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.list + '"\n            dir="ltr"\n            role="listbox"\n            ' + (!_this22.isSelectOneElement ? 'aria-multiselectable="true"' : '') + '\n            >\n          </div>\n        ');
 	        },
 	        choiceGroup: function choiceGroup(data) {
 	          var localClasses = (0, _classnames2.default)(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
@@ -2644,7 +2607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _classNames5));
 
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-select-text="' + _this23.config.itemSelectText + '"\n            data-choice\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n            id="' + data.elementId + '"\n            ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
+	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-select-text="' + _this22.config.itemSelectText + '"\n            data-choice\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n            id="' + data.elementId + '"\n            ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
 	        },
 	        input: function input() {
 	          var localClasses = (0, _classnames2.default)(globalClasses.input, globalClasses.inputCloned);
@@ -2685,7 +2648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createInput',
 	    value: function _createInput() {
-	      var _this24 = this;
+	      var _this23 = this;
 
 	      var direction = this.passedElement.getAttribute('dir') || 'ltr';
 	      var containerOuter = this._getTemplate('containerOuter', direction);
@@ -2760,7 +2723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (passedGroups && passedGroups.length) {
 	          passedGroups.forEach(function (group) {
-	            _this24._addGroup(group, group.id || null);
+	            _this23._addGroup(group, group.id || null);
 	          });
 	        } else {
 	          var passedOptions = Array.from(this.passedElement.options);
@@ -2790,17 +2753,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // Add each choice
 	          allChoices.forEach(function (choice, index) {
 	            // Pre-select first choice if it's a single select
-	            if (_this24.isSelectOneElement) {
+	            if (_this23.isSelectOneElement) {
 	              if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
 	                // If there is a selected choice already or the choice is not
 	                // the first in the array, add each choice normally
-	                _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
+	                _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
 	              } else {
 	                // Otherwise pre-select the first choice in the array
-	                _this24._addChoice(choice.value, choice.label, true, false, undefined, choice.customProperties);
+	                _this23._addChoice(choice.value, choice.label, true, false, undefined, choice.customProperties);
 	              }
 	            } else {
-	              _this24._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
+	              _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
 	            }
 	          });
 	        }
@@ -2812,9 +2775,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!item.value) {
 	              return;
 	            }
-	            _this24._addItem(item.value, item.label, item.id, undefined, item.customProperties);
+	            _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties);
 	          } else if (itemType === 'String') {
-	            _this24._addItem(item);
+	            _this23._addItem(item);
 	          }
 	        });
 	      }
