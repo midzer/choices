@@ -1912,43 +1912,6 @@ class Choices {
   }
 
   /**
-   * Focus event on everything in the document
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
-  _onDocumentFocus (e) {
-    const target = e.target;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-    const blurActions = {
-      text: () => {
-        if (target !== this.input) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
-        }
-      },
-      'select-one': () => {
-        if (target !== this.containerOuter) {
-          if (hasActiveDropdown && !this.canSearch) {
-            this.hideDropdown();
-          }
-        }
-      },
-      'select-multiple': () => {
-        if (target !== this.input) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
-        }
-      },
-    };
-
-    blurActions[this.passedElement.type]();
-  }
-
-  /**
    * Paste event
    * @param  {Object} e Event
    * @return
