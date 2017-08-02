@@ -383,8 +383,8 @@ describe('Choices', () => {
 
     it('should close the dropdown on double click', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter,
-        openState = this.choices.config.classNames.openState;
+      const container = this.choices.containerOuter;
+      const openState = this.choices.config.classNames.openState;
 
       this.choices._onClick({
         target: container,
@@ -399,6 +399,33 @@ describe('Choices', () => {
       });
 
       expect(document.activeElement === this.choices.input && container.classList.contains(openState)).toBe(false);
+    });
+
+    it('should set scrolling flag and not hide dropdown when scrolling on IE', function() {
+      this.choices = new Choices(this.input);
+      this.choices.isIe11 = true;
+
+      spyOn(this.choices, 'hideDropdown');
+
+      const container = this.choices.containerOuter;
+      const choiceList = this.choices.choiceList;
+
+      // Click to open dropdown
+      this.choices._onClick({
+        target: container,
+        ctrlKey: false,
+        preventDefault: () => {}
+      });
+
+      // Hold mouse on scrollbar
+      this.choices._onMouseDown({
+        target: choiceList,
+        ctrlKey: false,
+        preventDefault: () => {}
+      });
+
+      expect(this.choices.isScrollingOnIe).toBe(true);
+      expect(this.choices.hideDropdown).not.toHaveBeenCalled();
     });
 
     it('should trigger showDropdown on dropdown opening', function() {
