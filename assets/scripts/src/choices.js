@@ -75,6 +75,7 @@ class Choices {
       sortFilter: sortByAlpha,
       placeholder: true,
       placeholderValue: null,
+      searchPlaceholderValue: null,
       prependValue: null,
       appendValue: null,
       renderSelectedChoices: 'auto',
@@ -173,6 +174,11 @@ class Choices {
 
     this.highlightPosition = 0;
     this.canSearch = this.config.searchEnabled;
+
+    this.placeholder = false;
+    if (!this.isSelectOneElement) {
+      this.placeholder = (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) || false;
+    }
 
     // Assign preset choices from passed object
     this.presetChoices = this.config.choices;
@@ -376,22 +382,35 @@ class Choices {
       rendererableChoices = choices.filter(choice => !choice.selected);
     }
 
+    // Split array into placeholders and "normal" choices
+    const { placeholderChoices, normalChoices } = rendererableChoices.reduce((acc, choice) => {
+      if (choice.placeholder) {
+        acc.placeholderChoices.push(choice);
+      } else {
+        acc.normalChoices.push(choice);
+      }
+      return acc;
+    }, { placeholderChoices: [], normalChoices: [] });
+
     // If sorting is enabled or the user is searching, filter choices
     if (this.config.shouldSort || this.isSearching) {
-      rendererableChoices.sort(filter);
+      normalChoices.sort(filter);
     }
 
     let choiceLimit = rendererableChoices.length;
 
+    // Prepend placeholeder
+    const sortedChoices = [...placeholderChoices, ...normalChoices];
+
     if (this.isSearching) {
-      choiceLimit = Math.min(searchResultLimit, rendererableChoices.length - 1);
+      choiceLimit = Math.min(searchResultLimit, sortedChoices.length - 1);
     } else if (renderChoiceLimit > 0 && !withinGroup) {
-      choiceLimit = Math.min(renderChoiceLimit, rendererableChoices.length - 1);
+      choiceLimit = Math.min(renderChoiceLimit, sortedChoices.length - 1);
     }
 
     // Add each choice to dropdown within range
     for (let i = 0; i < choiceLimit; i++) {
-      appendChoice(rendererableChoices[i]);
+      appendChoice(sortedChoices[i]);
     };
 
     return choicesFragment;
@@ -525,14 +544,16 @@ class Choices {
 
       // Items
       if (this.currentState.items !== this.prevState.items) {
+        // Get active items (items that can be selected)
         const activeItems = this.store.getItemsFilteredByActive();
-        if (activeItems) {
+
+        // Clear list
+        this.itemList.innerHTML = '';
+
+        if (activeItems && activeItems) {
           // Create a fragment to store our list items
           // (so we don't have to update the DOM for each item)
           const itemListFragment = this.renderItems(activeItems);
-
-          // Clear list
-          this.itemList.innerHTML = '';
 
           // If we have items to add
           if (itemListFragment.childNodes) {
@@ -858,7 +879,7 @@ class Choices {
                 false,
                 -1,
                 item.customProperties,
-                null
+                item.placeholder
               );
             } else {
               this._addItem(
@@ -867,7 +888,7 @@ class Choices {
                 item.id,
                 undefined,
                 item.customProperties,
-                null
+                item.placeholder
               );
             }
           } else if (itemType === 'String') {
@@ -924,6 +945,7 @@ class Choices {
               foundChoice.id,
               foundChoice.groupId,
               foundChoice.customProperties,
+              foundChoice.placeholder,
               foundChoice.keyCode
             );
           } else if (!this.config.silent) {
@@ -974,8 +996,8 @@ class Choices {
                 result.selected,
                 result.disabled,
                 undefined,
-                result['customProperties'],
-                null
+                result.customProperties,
+                result.placeholder
               );
             }
           });
@@ -1124,7 +1146,8 @@ class Choices {
       this._triggerChange(itemToRemove.value);
 
       if (this.isSelectOneElement) {
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
+        const placeholder = this.config.placeholder ?
+          (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) :
           false;
         if (placeholder) {
           const placeholderItem = this._getTemplate('placeholder', placeholder);
@@ -1206,6 +1229,7 @@ class Choices {
           choice.id,
           choice.groupId,
           choice.customProperties,
+          choice.placeholder,
           choice.keyCode
         );
         this._triggerChange(choice.value);
@@ -1379,9 +1403,25 @@ class Choices {
               result.selected,
               result.disabled,
               undefined,
-              result['customProperties'],
-              null
+              result.customProperties,
+              result.placeholder
             );
+          }
+
+          if (this.passedElement.type === 'select-one') {
+            const placeholderChoice = this.store.getPlaceholderChoice();
+
+            if (placeholderChoice) {
+              this._addItem(
+                placeholderChoice.value,
+                placeholderChoice.label,
+                placeholderChoice.id,
+                placeholderChoice.groupId,
+                null,
+                placeholderChoice.placeholder
+              );
+              this._triggerChange(placeholderChoice.value);
+            }
           }
         });
       } else {
@@ -1405,7 +1445,7 @@ class Choices {
 
     // If new value matches the desired length and is not the same as the current value with a space
     if (newValue.length >= 1 && newValue !== `${currentValue} `) {
-      const haystack = this.store.getChoicesFilteredBySelectable();
+      const haystack = this.store.getSearchableChoices();
       const needle = newValue;
       const keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
       const options = Object.assign(this.config.fuseOptions, { keys });
@@ -2200,7 +2240,7 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null, keyCode = null) {
+  _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null, placeholder = false, keyCode = null) {
     let passedValue = isType('String', value) ? value.trim() : value;
     let passedKeyCode = keyCode;
     const items = this.store.getItems();
@@ -2231,6 +2271,7 @@ class Choices {
         passedOptionId,
         groupId,
         customProperties,
+        placeholder,
         passedKeyCode
       )
     );
@@ -2311,7 +2352,7 @@ class Choices {
    * @return
    * @private
    */
-  _addChoice(value, label = null, isSelected = false, isDisabled = false, groupId = -1, customProperties = null, keyCode = null) {
+  _addChoice(value, label = null, isSelected = false, isDisabled = false, groupId = -1, customProperties = null, placeholder = false, keyCode = null) {
     if (typeof value === 'undefined' || value === null) {
       return;
     }
@@ -2331,6 +2372,7 @@ class Choices {
         isDisabled,
         choiceElementId,
         customProperties,
+        placeholder,
         keyCode
       )
     );
@@ -2342,6 +2384,7 @@ class Choices {
         choiceId,
         undefined,
         customProperties,
+        placeholder,
         keyCode
       );
     }
@@ -2395,7 +2438,8 @@ class Choices {
           option.selected,
           isOptDisabled,
           groupId,
-          option.customProperties
+          option.customProperties,
+          option.placeholder
         );
       });
     } else {
@@ -2484,7 +2528,8 @@ class Choices {
           globalClasses.item,
           {
             [globalClasses.highlightedState]: data.highlighted,
-            [globalClasses.itemSelectable]: !data.highlighted
+            [globalClasses.itemSelectable]: !data.highlighted,
+            [globalClasses.placeholder]: data.placeholder
           }
         );
 
@@ -2493,7 +2538,8 @@ class Choices {
             globalClasses.item,
             {
               [globalClasses.highlightedState]: data.highlighted,
-              [globalClasses.itemSelectable]: !data.disabled
+              [globalClasses.itemSelectable]: !data.disabled,
+              [globalClasses.placeholder]: data.placeholder
             }
           );
 
@@ -2589,7 +2635,8 @@ class Choices {
           globalClasses.itemChoice,
           {
             [globalClasses.itemDisabled]: data.disabled,
-            [globalClasses.itemSelectable]: !data.disabled
+            [globalClasses.itemSelectable]: !data.disabled,
+            [globalClasses.placeholder]: data.placeholder
           }
         );
 
@@ -2731,6 +2778,14 @@ class Choices {
       input.placeholder = placeholder;
       if (!this.isSelectOneElement) {
         input.style.width = getWidthOfInput(input);
+      } else {
+        // If select one element with a search placeholder value
+        if (this.config.searchPlaceholderValue) {
+          input.placeholder = this.config.searchPlaceholderValue;
+        } else {
+          const placeholderItem = this._getTemplate('placeholder', this.placeholder);
+          this.itemList.appendChild(placeholderItem);
+        }
       }
     }
 
@@ -2774,6 +2829,7 @@ class Choices {
             label: o.innerHTML,
             selected: o.selected,
             disabled: o.disabled || o.parentNode.disabled,
+            placeholder: o.hasAttribute('placeholder')
           });
         });
 
@@ -2798,7 +2854,8 @@ class Choices {
                 choice.selected,
                 choice.disabled,
                 undefined,
-                choice.customProperties
+                choice.customProperties,
+                choice.placeholder
               );
             } else {
               // Otherwise pre-select the first choice in the array
@@ -2808,7 +2865,8 @@ class Choices {
                 true,
                 false,
                 undefined,
-                choice.customProperties
+                choice.customProperties,
+                choice.placeholder
               );
             }
           } else {
@@ -2818,7 +2876,8 @@ class Choices {
               choice.selected,
               choice.disabled,
               undefined,
-              choice.customProperties
+              choice.customProperties,
+              choice.placeholder
             );
           }
         });
@@ -2836,7 +2895,8 @@ class Choices {
             item.label,
             item.id,
             undefined,
-            item.customProperties
+            item.customProperties,
+            item.placeholder
           );
         } else if (itemType === 'String') {
           this._addItem(item);

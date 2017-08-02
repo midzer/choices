@@ -132,13 +132,13 @@ export const extend = function() {
  */
 export const whichTransitionEvent = function() {
   var t,
-  el = document.createElement("fakeelement");
+  el = document.createElement('fakeelement');
 
   var transitions = {
-    "transition": "transitionend",
-    "OTransition": "oTransitionEnd",
-    "MozTransition": "transitionend",
-    "WebkitTransition": "webkitTransitionEnd"
+    'transition': 'transitionend',
+    'OTransition': 'oTransitionEnd',
+    'MozTransition': 'transitionend',
+    'WebkitTransition': 'webkitTransitionEnd'
   }
 
   for (t in transitions) {
@@ -508,6 +508,20 @@ export const getWidthOfInput = (input) => {
     testEl.style.left = '-9999px';
     testEl.style.width = 'auto';
     testEl.style.whiteSpace = 'pre';
+
+    if (document.body.contains(input) && window.getComputedStyle) {
+      const inputStyle = window.getComputedStyle(input);
+
+      if (inputStyle) {
+        testEl.style.fontSize = inputStyle.fontSize;
+        testEl.style.fontFamily = inputStyle.fontFamily;
+        testEl.style.fontWeight = inputStyle.fontWeight;
+        testEl.style.fontStyle = inputStyle.fontStyle;
+        testEl.style.letterSpacing = inputStyle.letterSpacing;
+        testEl.style.textTransform = inputStyle.textTransform;
+        testEl.style.padding = inputStyle.padding;
+      }
+    }
 
     document.body.appendChild(testEl);
 

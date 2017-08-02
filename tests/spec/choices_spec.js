@@ -69,6 +69,7 @@ describe('Choices', () => {
       expect(this.choices.config.shouldSortItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholderValue).toEqual(null);
+      expect(this.choices.config.searchPlaceholderValue).toEqual(null);
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
       expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String));
@@ -1045,6 +1046,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         },
+        placeholder: false,
         keyCode: null
       };
 
@@ -1057,6 +1059,7 @@ describe('Choices', () => {
         active: true,
         highlighted: false,
         customProperties: randomItem.customProperties,
+        placeholder: false,
         keyCode: randomItem.keyCode
       }];
 
@@ -1084,6 +1087,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar'
         },
+        placeholder: false,
         keyCode: null
       };
 
@@ -1098,6 +1102,7 @@ describe('Choices', () => {
         active: true,
         score: 9999,
         customProperties: randomChoice.customProperties,
+        placeholder: randomChoice.placeholder,
         keyCode: randomChoice.keyCode
       }];
 

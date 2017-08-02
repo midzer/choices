@@ -85,9 +85,7 @@ export default class Store {
    */
   getChoicesFilteredByActive() {
     const choices = this.getChoices();
-    const values = choices.filter((choice) => {
-      return choice.active === true;
-    }, []);
+    const values = choices.filter(choice => choice.active === true);
 
     return values;
   }
@@ -98,11 +96,18 @@ export default class Store {
    */
   getChoicesFilteredBySelectable() {
     const choices = this.getChoices();
-    const values = choices.filter((choice) => {
-      return choice.disabled !== true;
-    }, []);
+    const values = choices.filter(choice => choice.disabled !== true);
 
     return values;
+  }
+
+  /**
+   * Get choices that can be searched (excluding placeholders)
+   * @return {Array} Option objects
+   */
+  getSearchableChoices() {
+    const filtered = this.getChoicesFilteredBySelectable();
+    return filtered.filter(choice => choice.placeholder !== true);
   }
 
   /**
@@ -158,6 +163,19 @@ export default class Store {
     });
 
     return foundGroup;
+  }
+
+  /**
+   * Get placeholder choice from store
+   * @return {Object} Found placeholder
+   */
+  getPlaceholderChoice() {
+    const choices = this.getChoices();
+    const values = choices.filter((choice) => {
+      return choice.placeholder === true;
+    }, []);
+
+    return values[0];
   }
 }
 
