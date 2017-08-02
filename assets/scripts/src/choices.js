@@ -156,6 +156,7 @@ class Choices {
     this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
     this.isValidElementType = this.isTextElement || this.isSelectElement;
     this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+    this.isScrollingOnIe = false;
 
     if (!this.passedElement) {
       if (!this.config.silent) {
@@ -1477,10 +1478,6 @@ class Choices {
     document.addEventListener('mousedown', this._onMouseDown);
     document.addEventListener('mouseover', this._onMouseOver);
 
-    if (this.isIe11) {
-      document.addEventListener('focus', this._onDocumentFocus);
-    }
-
     if (this.isSelectOneElement) {
       this.containerOuter.addEventListener('focus', this._onFocus);
       this.containerOuter.addEventListener('blur', this._onBlur);
@@ -1505,10 +1502,6 @@ class Choices {
     document.removeEventListener('touchend', this._onTouchEnd);
     document.removeEventListener('mousedown', this._onMouseDown);
     document.removeEventListener('mouseover', this._onMouseOver);
-
-    if (this.isIe11) {
-      document.removeEventListener('focus', this._onDocumentFocus);
-    }
 
     if (this.isSelectOneElement) {
       this.containerOuter.removeEventListener('focus', this._onFocus);
@@ -1830,6 +1823,11 @@ class Choices {
    */
   _onMouseDown(e) {
     const target = e.target;
+
+    if (target === this.choiceList && this.isIe11) {
+      this.isScrollingOnIe = true;
+    }
+
     if (this.containerOuter.contains(target) && target !== this.input) {
       let foundTarget;
       const activeItems = this.store.getItemsFilteredByActive();
@@ -1857,7 +1855,6 @@ class Choices {
     const target = e.target;
     const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
     const activeItems = this.store.getItemsFilteredByActive();
-
 
     // If target is something that concerns us
     if (this.containerOuter.contains(target)) {
@@ -2015,7 +2012,7 @@ class Choices {
   _onBlur(e) {
     const target = e.target;
     // If target is something that concerns us
-    if (this.containerOuter.contains(target)) {
+    if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
@@ -2064,6 +2061,9 @@ class Choices {
       };
 
       blurActions[this.passedElement.type]();
+    } else {
+      this.input.focus();
+      this.isScrollingOnIe = false;
     }
   }
 
