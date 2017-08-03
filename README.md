@@ -358,7 +358,7 @@ const example = new Choices(element, {
 ### placeholder
 **Type:** `Boolean` **Default:** `true`
 
-**Input types affected:** `text`, `select-one`, `select-multiple`
+**Input types affected:** `text`, `select-multiple`
 
 **Usage:** Whether the input should show a placeholder. Used in conjunction with `placeholderValue`. If `placeholder` is set to true and no value is passed to `placeholderValue`, the passed input's placeholder attribute will be used as the  placeholder value.
 
@@ -368,6 +368,13 @@ const example = new Choices(element, {
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** The value of the inputs placeholder.
+
+### searchPlaceholderValue
+**Type:** `String` **Default:** `null`
+
+**Input types affected:** `select-one`
+
+**Usage:** The value of the search inputs placeholder.
 
 ### prependValue
 **Type:** `String` **Default:** `null`

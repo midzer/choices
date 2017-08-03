@@ -16,7 +16,7 @@
   <meta name="theme-color" content="#ffffff">
 
   <!-- Ignore these -->
-  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.8.11">
+  <link rel="stylesheet" href="assets/styles/css/base.min.css?version=2.8.12">
   <!-- End ignore these -->
 
   <!-- Optional includes -->
@@ -24,7 +24,7 @@
   <!-- End optional includes -->
 
   <!-- Choices includes -->
-  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.8.11">
+  <link rel="stylesheet" href="assets/styles/css/choices.min.css?version=2.8.12">
   <script src="assets/scripts/dist/choices.min.js?version=2.8.8"></script>
   <!-- End Choices includes -->
 
@@ -157,7 +157,6 @@
       <h2>Single select input</h2>
       <label for="choices-single-default">Default</label>
       <select class="form-control" data-trigger name="choices-single-default" id="choices-single-default" placeholder="This is a search placeholder">
-        <option selected disabled>This is a placeholder</option>
         <option value="Dropdown item 1">Dropdown item 1</option>
         <option value="Dropdown item 2">Dropdown item 2</option>
         <option value="Dropdown item 3">Dropdown item 3</option>
@@ -376,7 +375,8 @@
 
       var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
-        placeholderValue: 'Pick an Arctic Monkeys record'
+        placeholderValue: 'Pick an Arctic Monkeys record',
+        searchPlaceholderValue: 'Search for an Arctic Monkeys record',
       }).ajax(function (callback) {
         fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
           .then(function (response) {
@@ -413,7 +413,8 @@
       });
 
       var genericExamples = new Choices('[data-trigger]', {
-        placeholderValue: 'This is a placeholder set in the config'
+        placeholderValue: 'This is a placeholder set in the config',
+        searchPlaceholderValue: 'This is a search placeholder'
       });
 
       var singleNoSearch = new Choices('#choices-single-no-search', {
