@@ -2195,7 +2195,6 @@ class Choices {
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
       this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
-      this.input.setAttribute('aria-activedescendant', passedEl.id);
     }
   }
 
