@@ -365,7 +365,7 @@ const example = new Choices(element, {
 ### placeholderValue
 **Type:** `String` **Default:** `null`
 
-**Input types affected:** `text`, `select-one`, `select-multiple`
+**Input types affected:** `text`, `select-multiple`
 
 **Usage:** The value of the inputs placeholder.
 
