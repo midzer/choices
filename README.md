@@ -107,25 +107,28 @@ Or include Choices directly:
       itemSelectable: 'choices__item--selectable',
       itemDisabled: 'choices__item--disabled',
       itemChoice: 'choices__item--choice',
+      placeholder: 'choices__placeholder',
       group: 'choices__group',
-      groupHeading : 'choices__heading',
+      groupHeading: 'choices__heading',
       button: 'choices__button',
       activeState: 'is-active',
       focusState: 'is-focused',
       openState: 'is-open',
-      disabledState: 'is-disabled',
+      disabledState: 'is-disaqbled',
       highlightedState: 'is-highlighted',
       hiddenState: 'is-hidden',
       flippedState: 'is-flipped',
       loadingState: 'is-loading',
+      noResults: 'has-no-results',
+      noChoices: 'has-no-choices'
     },
     // Choices uses the great Fuse library for searching. You
     // can find more options here: https://github.com/krisk/Fuse#options
     fuseOptions: {
-      include: 'score',
+      include: 'score'
     },
     callbackOnInit: null,
-    callbackOnCreateTemplates: null,
+    callbackOnCreateTemplates: null
   });
 ```
 

@@ -115,12 +115,14 @@ class Choices {
         hiddenState: 'is-hidden',
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
+        noResults: 'has-no-results',
+        noChoices: 'has-no-choices'
       },
       fuseOptions: {
-        include: 'score',
+        include: 'score'
       },
       callbackOnInit: null,
-      callbackOnCreateTemplates: null,
+      callbackOnCreateTemplates: null
     };
 
     this.idNames = {
@@ -534,13 +536,13 @@ class Choices {
                 this.config.noResultsText() :
                 this.config.noResultsText;
 
-              dropdownItem = this._getTemplate('notice', notice);
+              dropdownItem = this._getTemplate('notice', notice, 'no-results');
             } else {
               notice = isType('Function', this.config.noChoicesText) ?
                 this.config.noChoicesText() :
                 this.config.noChoicesText;
 
-              dropdownItem = this._getTemplate('notice', notice);
+              dropdownItem = this._getTemplate('notice', notice, 'no-choices');
             }
 
             this.choiceList.appendChild(dropdownItem);
@@ -2655,10 +2657,14 @@ class Choices {
           </div>
         `);
       },
-      notice: (label) => {
+      notice: (label, type) => {
         let localClasses = classNames(
           globalClasses.item,
-          globalClasses.itemChoice
+          globalClasses.itemChoice,
+          {
+            [globalClasses.noResults]: (type === 'no-results'),
+            [globalClasses.noChoices]: (type === 'no-choices'),
+          }
         );
 
         return strToEl(`
