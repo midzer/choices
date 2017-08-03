@@ -388,14 +388,16 @@ class Choices {
     let choiceLimit = rendererableChoices.length;
 
     if (this.isSearching) {
-      choiceLimit = Math.min(searchResultLimit, rendererableChoices.length - 1);
+      choiceLimit = searchResultLimit;
     } else if (renderChoiceLimit > 0 && !withinGroup) {
-      choiceLimit = Math.min(renderChoiceLimit, rendererableChoices.length - 1);
+      choiceLimit = renderChoiceLimit;
     }
 
     // Add each choice to dropdown within range
     for (let i = 0; i < choiceLimit; i++) {
-      appendChoice(rendererableChoices[i]);
+      if (rendererableChoices[i]) {
+        appendChoice(rendererableChoices[i]);
+      }
     };
 
     return choicesFragment;
