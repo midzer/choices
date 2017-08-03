@@ -2657,7 +2657,7 @@ class Choices {
           </div>
         `);
       },
-      notice: (label, type) => {
+      notice: (label, type = '') => {
         let localClasses = classNames(
           globalClasses.item,
           globalClasses.itemChoice,
