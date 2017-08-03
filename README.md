@@ -369,7 +369,7 @@ const example = new Choices(element, {
 
 **Usage:** The value of the inputs placeholder.
 
-### selectPlaceholderValue
+### searchPlaceholderValue
 **Type:** `String` **Default:** `null`
 
 **Input types affected:** `select-one`

@@ -174,6 +174,9 @@ class Choices {
 
     this.highlightPosition = 0;
     this.canSearch = this.config.searchEnabled;
+    this.placeholder = this.config.placeholder ?
+      (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) :
+      false;
 
     // Assign preset choices from passed object
     this.presetChoices = this.config.choices;
@@ -1124,16 +1127,9 @@ class Choices {
       this._removeItem(itemToRemove);
       this._triggerChange(itemToRemove.value);
 
-      if (this.isSelectOneElement) {
-        const placeholder = this.config.placeholder ?
-          this.config.placeholderValue ||
-          this.passedElement.getAttribute('placeholder') :
-          false;
-
-        if (placeholder) {
-          const placeholderItem = this._getTemplate('placeholder', placeholder);
-          this.itemList.appendChild(placeholderItem);
-        }
+      if (this.isSelectOneElement && this.placeholder) {
+        const placeholderItem = this._getTemplate('placeholder', this.placeholder);
+        this.itemList.appendChild(placeholderItem);
       }
     }
   }
@@ -1337,15 +1333,11 @@ class Choices {
     } else {
       // Remove loading states/text
       this.containerOuter.classList.remove(this.config.classNames.loadingState);
-      const placeholder = this.config.placeholder ?
-        this.config.placeholderValue ||
-        this.passedElement.getAttribute('placeholder') :
-        false;
 
       if (this.isSelectOneElement) {
-        placeholderItem.innerHTML = placeholder || '';
+        placeholderItem.innerHTML = (this.placeholder || '');
       } else {
-        this.input.placeholder = placeholder || '';
+        this.input.placeholder = (this.placeholder || '');
       }
     }
   }
@@ -1524,13 +1516,10 @@ class Choices {
    * @return
    */
   _setInputWidth() {
-    if ((this.config.placeholderValue || this.passedElement.getAttribute('placeholder') &&
-      this.config.placeholder)) {
+    if (this.placeholder) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
-      const placeholder = this.config.placeholder ? this.config.placeholderValue ||
-        this.passedElement.getAttribute('placeholder') : false;
-      if (this.input.value && this.input.value.length >= (placeholder.length / 1.25)) {
+      if (this.input.value && this.input.value.length >= (this.placeholder.length / 1.25)) {
         this.input.style.width = getWidthOfInput(this.input);
       }
     } else {
@@ -2651,10 +2640,6 @@ class Choices {
     const choiceList = this._getTemplate('choiceList');
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
-    const placeholder = this.config.placeholder ?
-      this.config.placeholderValue ||
-      this.passedElement.getAttribute('placeholder') :
-      false;
 
     this.containerOuter = containerOuter;
     this.containerInner = containerInner;
@@ -2692,8 +2677,8 @@ class Choices {
     // If placeholder has been enabled and we have a value
     if (this.isSelectOneElement) {
       input.placeholder = this.config.searchPlaceholderValue || '';
-    } else if (placeholder) {
-      input.placeholder = placeholder;
+    } else if (this.placeholder) {
+      input.placeholder = this.placeholder;
       input.style.width = getWidthOfInput(input);
     }
 
