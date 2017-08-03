@@ -1,4 +1,4 @@
-/*! choices.js v3.0.0 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v3.0.1 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -179,7 +179,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        highlightedState: 'is-highlighted',
 	        hiddenState: 'is-hidden',
 	        flippedState: 'is-flipped',
-	        loadingState: 'is-loading'
+	        loadingState: 'is-loading',
+	        noResults: 'has-no-results',
+	        noChoices: 'has-no-choices'
 	      },
 	      fuseOptions: {
 	        include: 'score'
@@ -624,11 +626,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (this.isSearching) {
 	                notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
 
-	                dropdownItem = this._getTemplate('notice', notice);
+	                dropdownItem = this._getTemplate('notice', notice, 'no-results');
 	              } else {
 	                notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
 
-	                dropdownItem = this._getTemplate('notice', notice);
+	                dropdownItem = this._getTemplate('notice', notice, 'no-choices');
 	              }
 
 	              this.choiceList.appendChild(dropdownItem);
@@ -2666,7 +2668,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            aria-expanded="false"\n            >\n          </div>\n        ');
 	        },
 	        notice: function notice(label) {
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice);
+	          var _classNames6;
+
+	          var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
 
 	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '">\n            ' + label + '\n          </div>\n        ');
 	        },
