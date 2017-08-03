@@ -375,7 +375,8 @@
 
       var singleFetch = new Choices('#choices-single-remote-fetch', {
         placeholder: true,
-        placeholderValue: 'Pick an Arctic Monkeys record'
+        placeholderValue: 'Pick an Arctic Monkeys record',
+        searchPlaceholderValue: 'Search for an Arctic Monkeys record',
       }).ajax(function (callback) {
         fetch('https://api.discogs.com/artists/391170/releases?token=QBRmstCkwXEvCjTclCpumbtNwvVkEzGAdELXyRyW')
           .then(function (response) {
