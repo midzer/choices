@@ -69,6 +69,7 @@ describe('Choices', () => {
       expect(this.choices.config.shouldSortItems).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholder).toEqual(jasmine.any(Boolean));
       expect(this.choices.config.placeholderValue).toEqual(null);
+      expect(this.choices.config.searchPlaceholderValue).toEqual(null);
       expect(this.choices.config.prependValue).toEqual(null);
       expect(this.choices.config.appendValue).toEqual(null);
       expect(this.choices.config.renderSelectedChoices).toEqual(jasmine.any(String));
@@ -168,6 +169,16 @@ describe('Choices', () => {
 
     afterEach(function() {
       this.choices.destroy();
+    });
+
+    it('should apply placeholderValue to input', function() {
+      this.choices = new Choices(this.input);
+      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+    });
+
+    it('should not apply searchPlaceholderValue to input', function() {
+      this.choices = new Choices(this.input);
+      expect(this.choices.input.placeholder).not.toEqual('Test');
     });
 
     it('should accept a user inputted value', function() {
@@ -280,6 +291,22 @@ describe('Choices', () => {
 
     afterEach(function() {
       this.choices.destroy();
+    });
+
+    it('should not apply placeholderValue to input', function() {
+      this.choices = new Choices(this.input, {
+        placeholderValue: 'Placeholder'
+      });
+
+      expect(this.choices.input.placeholder).not.toEqual('Placeholder');
+    });
+
+    it('should apply searchPlaceholderValue to input', function() {
+      this.choices = new Choices(this.input, {
+        searchPlaceholderValue: 'Placeholder'
+      });
+
+      expect(this.choices.input.placeholder).toEqual('Placeholder');
     });
 
     it('should open the choice list on focusing', function() {
@@ -590,6 +617,7 @@ describe('Choices', () => {
 
       this.choices = new Choices(this.input, {
         placeholderValue: 'Placeholder text',
+        searchPlaceholderValue: 'Test',
         choices: [{
           value: 'One',
           label: 'Label One',
@@ -608,6 +636,14 @@ describe('Choices', () => {
 
     afterEach(function() {
       this.choices.destroy();
+    });
+
+    it('should apply placeholderValue to input', function() {
+      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+    });
+
+    it('should not apply searchPlaceholderValue to input', function() {
+      expect(this.choices.input.placeholder).not.toEqual('Test');
     });
 
     it('should add any pre-defined values', function() {

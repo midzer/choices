@@ -75,6 +75,7 @@ class Choices {
       sortFilter: sortByAlpha,
       placeholder: true,
       placeholderValue: null,
+      searchPlaceholderValue: null,
       prependValue: null,
       appendValue: null,
       renderSelectedChoices: 'auto',
@@ -1124,8 +1125,11 @@ class Choices {
       this._triggerChange(itemToRemove.value);
 
       if (this.isSelectOneElement) {
-        const placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') :
+        const placeholder = this.config.placeholder ?
+          this.config.placeholderValue ||
+          this.passedElement.getAttribute('placeholder') :
           false;
+
         if (placeholder) {
           const placeholderItem = this._getTemplate('placeholder', placeholder);
           this.itemList.appendChild(placeholderItem);
@@ -2346,15 +2350,11 @@ class Choices {
       );
 
       groupChoices.forEach((option) => {
-        const isOptDisabled = option.disabled ||
-          (option.parentNode && option.parentNode.disabled);
-        let label = isType('Object', option) ?
-          option[labelKey] :
-          option.innerHTML;
+        const isOptDisabled = option.disabled || (option.parentNode && option.parentNode.disabled);
 
         this._addChoice(
           option[valueKey],
-          label,
+          (isType('Object', option)) ? option[labelKey] : option.innerHTML,
           option.selected,
           isOptDisabled,
           groupId,
@@ -2690,11 +2690,11 @@ class Choices {
     wrap(containerInner, containerOuter);
 
     // If placeholder has been enabled and we have a value
-    if (placeholder) {
+    if (this.isSelectOneElement) {
+      input.placeholder = this.config.searchPlaceholderValue || '';
+    } else if (placeholder) {
       input.placeholder = placeholder;
-      if (!this.isSelectOneElement) {
-        input.style.width = getWidthOfInput(input);
-      }
+      input.style.width = getWidthOfInput(input);
     }
 
     if (!this.config.addItems) {
@@ -2752,28 +2752,17 @@ class Choices {
         allChoices.forEach((choice, index) => {
           // Pre-select first choice if it's a single select
           if (this.isSelectOneElement) {
-            if (hasSelectedChoice || (!hasSelectedChoice && index > 0)) {
-              // If there is a selected choice already or the choice is not
-              // the first in the array, add each choice normally
-              this._addChoice(
-                choice.value,
-                choice.label,
-                choice.selected,
-                choice.disabled,
-                undefined,
-                choice.customProperties
-              );
-            } else {
-              // Otherwise pre-select the first choice in the array
-              this._addChoice(
-                choice.value,
-                choice.label,
-                true,
-                false,
-                undefined,
-                choice.customProperties
-              );
-            }
+            // If there is a selected choice already or the choice is not
+            // the first in the array, add each choice normally
+            // Otherwise pre-select the first choice in the array
+            this._addChoice(
+              choice.value,
+              choice.label,
+              (hasSelectedChoice || index > 0) ? choice.selected : true,
+              (hasSelectedChoice || index > 0) ? choice.disabled : false,
+              undefined,
+              choice.customProperties
+            );
           } else {
             this._addChoice(
               choice.value,
