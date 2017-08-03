@@ -158,9 +158,7 @@ export default class Store {
    */
   getGroupById(id) {
     const groups = this.getGroups();
-    const foundGroup = groups.find((group) => {
-      return group.id === id;
-    });
+    const foundGroup = groups.find(group => group.id === id);
 
     return foundGroup;
   }
@@ -171,11 +169,13 @@ export default class Store {
    */
   getPlaceholderChoice() {
     const choices = this.getChoices();
-    const values = choices.filter((choice) => {
-      return choice.placeholder === true;
-    }, []);
+    const placeholderChoice = [...choices]
+      .reverse()
+      .find((choice) => {
+        return choice.placeholder === true;
+      });
 
-    return values[0];
+    return placeholderChoice;
   }
 }
 
