@@ -174,13 +174,12 @@ class Choices {
 
     this.highlightPosition = 0;
     this.canSearch = this.config.searchEnabled;
-    this.placeholder = this.config.placeholder ?
-      (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) :
-      false;
 
     this.placeholder = false;
     if (!this.isSelectOneElement) {
-      this.placeholder = (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) || false;
+      this.placeholder = this.config.placeholder ?
+      (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) :
+      false;
     }
 
     // Assign preset choices from passed object
@@ -406,14 +405,16 @@ class Choices {
     const sortedChoices = [...placeholderChoices, ...normalChoices];
 
     if (this.isSearching) {
-      choiceLimit = Math.min(searchResultLimit, sortedChoices.length - 1);
+      choiceLimit = searchResultLimit;
     } else if (renderChoiceLimit > 0 && !withinGroup) {
-      choiceLimit = Math.min(renderChoiceLimit, sortedChoices.length - 1);
+      choiceLimit = renderChoiceLimit;
     }
 
     // Add each choice to dropdown within range
     for (let i = 0; i < choiceLimit; i++) {
-      appendChoice(sortedChoices[i]);
+      if (sortedChoices[i]) {
+        appendChoice(sortedChoices[i]);
+      }
     };
 
     return choicesFragment;
@@ -1148,10 +1149,28 @@ class Choices {
       this._removeItem(itemToRemove);
       this._triggerChange(itemToRemove.value);
 
-      if (this.isSelectOneElement && this.placeholder) {
-        const placeholderItem = this._getTemplate('placeholder', this.placeholder);
-        this.itemList.appendChild(placeholderItem);
+      if (this.isSelectOneElement) {
+        this._selectPlaceholderChoice();
       }
+    }
+  }
+
+  /**
+   * Select placeholder choice
+   */
+  _selectPlaceholderChoice() {
+    const placeholderChoice = this.store.getPlaceholderChoice();
+
+    if (placeholderChoice) {
+      this._addItem(
+        placeholderChoice.value,
+        placeholderChoice.label,
+        placeholderChoice.id,
+        placeholderChoice.groupId,
+        null,
+        placeholderChoice.placeholder
+      );
+      this._triggerChange(placeholderChoice.value);
     }
   }
 
@@ -1402,20 +1421,8 @@ class Choices {
             );
           }
 
-          if (this.passedElement.type === 'select-one') {
-            const placeholderChoice = this.store.getPlaceholderChoice();
-
-            if (placeholderChoice) {
-              this._addItem(
-                placeholderChoice.value,
-                placeholderChoice.label,
-                placeholderChoice.id,
-                placeholderChoice.groupId,
-                null,
-                placeholderChoice.placeholder
-              );
-              this._triggerChange(placeholderChoice.value);
-            }
+          if (this.isSelectOneElement) {
+            this._selectPlaceholderChoice();
           }
         });
       } else {
