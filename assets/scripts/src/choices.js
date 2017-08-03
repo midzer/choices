@@ -151,6 +151,14 @@ class Choices {
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     this.element = element;
     this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+
+    if (!this.passedElement) {
+      if (!this.config.silent) {
+        console.error('Passed element not found');
+      }
+      return;
+    }
+
     this.isTextElement = this.passedElement.type === 'text';
     this.isSelectOneElement = this.passedElement.type === 'select-one';
     this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
@@ -159,12 +167,6 @@ class Choices {
     this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
     this.isScrollingOnIe = false;
 
-    if (!this.passedElement) {
-      if (!this.config.silent) {
-        console.error('Passed element not found');
-      }
-      return;
-    }
 
     if (this.config.shouldSortItems === true && this.isSelectOneElement) {
       if (!this.config.silent) {
@@ -1050,16 +1052,18 @@ class Choices {
    * @return {Object} Class instance
    */
   enable() {
-    this.passedElement.disabled = false;
-    const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
-    if (this.initialised && isDisabled) {
-      this._addEventListeners();
-      this.passedElement.removeAttribute('disabled');
-      this.input.removeAttribute('disabled');
-      this.containerOuter.classList.remove(this.config.classNames.disabledState);
-      this.containerOuter.removeAttribute('aria-disabled');
-      if (this.isSelectOneElement) {
-        this.containerOuter.setAttribute('tabindex', '0');
+    if (this.initialised) {
+      this.passedElement.disabled = false;
+      const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
+      if (isDisabled) {
+        this._addEventListeners();
+        this.passedElement.removeAttribute('disabled');
+        this.input.removeAttribute('disabled');
+        this.containerOuter.classList.remove(this.config.classNames.disabledState);
+        this.containerOuter.removeAttribute('aria-disabled');
+        if (this.isSelectOneElement) {
+          this.containerOuter.setAttribute('tabindex', '0');
+        }
       }
     }
     return this;
@@ -1071,16 +1075,18 @@ class Choices {
    * @public
    */
   disable() {
-    this.passedElement.disabled = true;
-    const isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
-    if (this.initialised && isEnabled) {
-      this._removeEventListeners();
-      this.passedElement.setAttribute('disabled', '');
-      this.input.setAttribute('disabled', '');
-      this.containerOuter.classList.add(this.config.classNames.disabledState);
-      this.containerOuter.setAttribute('aria-disabled', 'true');
-      if (this.isSelectOneElement) {
-        this.containerOuter.setAttribute('tabindex', '-1');
+    if (this.initialised) {
+      this.passedElement.disabled = true;
+      const isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
+      if (isEnabled) {
+        this._removeEventListeners();
+        this.passedElement.setAttribute('disabled', '');
+        this.input.setAttribute('disabled', '');
+        this.containerOuter.classList.add(this.config.classNames.disabledState);
+        this.containerOuter.setAttribute('aria-disabled', 'true');
+        if (this.isSelectOneElement) {
+          this.containerOuter.setAttribute('tabindex', '-1');
+        }
       }
     }
     return this;
@@ -1097,7 +1103,7 @@ class Choices {
       if (this.isSelectElement) {
         // Show loading text
         requestAnimationFrame(() => {
-          this._handleLoadingState(true)
+          this._handleLoadingState(true);
         });
         // Run callback
         fn(this._ajaxCallback());
@@ -2388,7 +2394,6 @@ class Choices {
 
       groupChoices.forEach((option) => {
         const isOptDisabled = option.disabled || (option.parentNode && option.parentNode.disabled);
-
         this._addChoice(
           option[valueKey],
           (isType('Object', option)) ? option[labelKey] : option.innerHTML,
