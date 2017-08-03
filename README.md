@@ -81,6 +81,7 @@ Or include Choices directly:
     sortFilter: () => {...},
     placeholder: true,
     placeholderValue: null,
+    searchPlaceholderValue: null,
     prependValue: null,
     appendValue: null,
     renderSelectedChoices: 'auto',
