@@ -1420,11 +1420,11 @@ class Choices {
               result.placeholder
             );
           }
-
-          if (this.isSelectOneElement) {
-            this._selectPlaceholderChoice();
-          }
         });
+
+        if (this.isSelectOneElement) {
+          this._selectPlaceholderChoice();
+        }
       } else {
         // No results, remove loading state
         this._handleLoadingState(false);
@@ -2792,11 +2792,12 @@ class Choices {
             // If there is a selected choice already or the choice is not
             // the first in the array, add each choice normally
             // Otherwise pre-select the first choice in the array
+            const shouldPreselect = (hasSelectedChoice || (!hasSelectedChoice && index > 0));
             this._addChoice(
               choice.value,
               choice.label,
-              (hasSelectedChoice || index > 0) ? choice.selected : true,
-              (hasSelectedChoice || index > 0) ? choice.disabled : false,
+              (shouldPreselect) ? choice.selected : true,
+              (shouldPreselect) ? choice.disabled : false,
               undefined,
               choice.customProperties,
               choice.placeholder
