@@ -580,3 +580,18 @@ export const triggerEvent = (element, type, customArgs = null) => {
 
   return element.dispatchEvent(event);
 };
+
+/**
+ * Tests value against a regular expression
+ * @param  {string} value   Value to test
+ * @return {Boolean}        Whether test passed/failed
+ * @private
+ */
+export const regexFilter = (value, regex) => {
+  if (!value || !regex) {
+    return false;
+  }
+
+  const expression = new RegExp(regex.source, 'i');
+  return expression.test(value);
+}

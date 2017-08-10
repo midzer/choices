@@ -27,7 +27,8 @@ import {
   sortByScore,
   generateId,
   triggerEvent,
-  findAncestorByAttrName
+  findAncestorByAttrName,
+  regexFilter
 }
 from './lib/utils.js';
 import './lib/polyfills.js';
@@ -1321,13 +1322,11 @@ class Choices {
       }
     }
 
-    if (this.isTextElement && this.config.addItems && canAddItem) {
+    if (this.isTextElement && this.config.addItems && canAddItem && this.config.regexFilter) {
       // If a user has supplied a regular expression filter
-      if (this.config.regexFilter) {
-        // Determine whether we can update based on whether
-        // our regular expression passes
-        canAddItem = this._regexFilter(value);
-      }
+      // determine whether we can update based on whether
+      // our regular expression passes
+      canAddItem = regexFilter(value, this.config.regexFilter);
     }
 
     // If no duplicates are allowed, and the value already exists
@@ -2078,22 +2077,6 @@ class Choices {
       this.isScrollingOnIe = false;
       this.input.focus();
     }
-  }
-
-  /**
-   * Tests value against a regular expression
-   * @param  {string} value   Value to test
-   * @return {Boolean}        Whether test passed/failed
-   * @private
-   */
-  _regexFilter(value) {
-    if (!value) {
-      return false;
-    }
-
-    const regex = this.config.regexFilter;
-    const expression = new RegExp(regex.source, 'i');
-    return expression.test(value);
   }
 
   /**
