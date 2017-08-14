@@ -419,7 +419,7 @@ class Choices {
       if (sortedChoices[i]) {
         appendChoice(sortedChoices[i]);
       }
-    };
+    }
 
     return choicesFragment;
   }
@@ -592,7 +592,7 @@ class Choices {
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(
-      highlightItem(id, true)
+      highlightItem(id, true),
     );
 
     if (runEvent) {
@@ -601,7 +601,7 @@ class Choices {
           id,
           value: item.value,
           label: item.label,
-          groupValue: group.value
+          groupValue: group.value,
         });
       } else {
         triggerEvent(this.passedElement, 'highlightItem', {
@@ -631,7 +631,7 @@ class Choices {
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(
-      highlightItem(id, false)
+      highlightItem(id, false),
     );
 
     if (group && group.value) {
@@ -639,7 +639,7 @@ class Choices {
         id,
         value: item.value,
         label: item.label,
-        groupValue: group.value
+        groupValue: group.value,
       });
     } else {
       triggerEvent(this.passedElement, 'unhighlightItem', {
@@ -768,7 +768,8 @@ class Choices {
     const dimensions = this.dropdown.getBoundingClientRect();
     const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
 
-    // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
+    // If flip is enabled and the dropdown bottom position is
+    // greater than the window height flip the dropdown.
     let shouldFlip = false;
     if (this.config.position === 'auto') {
       shouldFlip = dropdownPos >= winHeight;
@@ -837,7 +838,8 @@ class Choices {
   /**
    * Get value(s) of input (i.e. inputted items (text) or selected choices (select))
    * @param {Boolean} valueOnly Get only values of selected items, otherwise return selected items
-   * @return {Array/String} selected value (select-one) or array of selected items (inputs & select-multiple)
+   * @return {Array/String} selected value (select-one) or
+   *                        array of selected items (inputs & select-multiple)
    * @public
    */
   getValue(valueOnly = false) {
@@ -860,8 +862,8 @@ class Choices {
   }
 
   /**
-   * Set value of input. If the input is a select box, a choice will be created and selected otherwise
-   * an item will created directly.
+   * Set value of input. If the input is a select box, a choice will
+   * be created and selected otherwise an item will created directly.
    * @param  {Array}   args  Array of value objects or value strings
    * @return {Object} Class instance
    * @public
@@ -869,51 +871,51 @@ class Choices {
   setValue(args) {
     if (this.initialised === true) {
       // Convert args to an iterable array
-      const values = [...args],
-        handleValue = (item) => {
-          const itemType = getType(item);
-          if (itemType === 'Object') {
-            if (!item.value) {
-              return;
-            }
-
-            // If we are dealing with a select input, we need to create an option first
-            // that is then selected. For text inputs we can just add items normally.
-            if (!this.isTextElement) {
-              this._addChoice(
-                item.value,
-                item.label,
-                true,
-                false,
-                -1,
-                item.customProperties,
-                item.placeholder
-              );
-            } else {
-              this._addItem(
-                item.value,
-                item.label,
-                item.id,
-                undefined,
-                item.customProperties,
-                item.placeholder
-              );
-            }
-          } else if (itemType === 'String') {
-            if (!this.isTextElement) {
-              this._addChoice(
-                item,
-                item,
-                true,
-                false,
-                -1,
-                null
-              );
-            } else {
-              this._addItem(item);
-            }
+      const values = [...args];
+      const handleValue = (item) => {
+        const itemType = getType(item);
+        if (itemType === 'Object') {
+          if (!item.value) {
+            return;
           }
-        };
+
+          // If we are dealing with a select input, we need to create an option first
+          // that is then selected. For text inputs we can just add items normally.
+          if (!this.isTextElement) {
+            this._addChoice(
+              item.value,
+              item.label,
+              true,
+              false,
+              -1,
+              item.customProperties,
+              item.placeholder
+            );
+          } else {
+            this._addItem(
+              item.value,
+              item.label,
+              item.id,
+              undefined,
+              item.customProperties,
+              item.placeholder
+            );
+          }
+        } else if (itemType === 'String') {
+          if (!this.isTextElement) {
+            this._addChoice(
+              item,
+              item,
+              true,
+              false,
+              -1,
+              null,
+            );
+          } else {
+            this._addItem(item);
+          }
+        }
+      };
 
       if (values.length > 1) {
         values.forEach((value) => {
@@ -940,10 +942,8 @@ class Choices {
 
       // Loop through each value and
       choiceValue.forEach((val) => {
-        const foundChoice = choices.find((choice) => {
-          // Check 'value' property exists and the choice isn't already selected
-          return choice.value === val;
-        });
+        // Check 'value' property exists and the choice isn't already selected
+        const foundChoice = choices.find(choice => choice.value === val);
 
         if (foundChoice) {
           if (!foundChoice.selected) {
@@ -954,7 +954,7 @@ class Choices {
               foundChoice.groupId,
               foundChoice.customProperties,
               foundChoice.placeholder,
-              foundChoice.keyCode
+              foundChoice.keyCode,
             );
           } else if (!this.config.silent) {
             console.warn('Attempting to select choice already selected');
@@ -995,7 +995,7 @@ class Choices {
                 result,
                 (result.id || null),
                 value,
-                label
+                label,
               );
             } else {
               this._addChoice(
@@ -1005,7 +1005,7 @@ class Choices {
                 result.disabled,
                 undefined,
                 result.customProperties,
-                result.placeholder
+                result.placeholder,
               );
             }
           });
@@ -1043,7 +1043,7 @@ class Choices {
     if (!this.isTextElement && this.config.searchEnabled) {
       this.isSearching = false;
       this.store.dispatch(
-        activateChoices(true)
+        activateChoices(true),
       );
     }
     return this;
@@ -1056,7 +1056,9 @@ class Choices {
   enable() {
     if (this.initialised) {
       this.passedElement.disabled = false;
-      const isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
+      const isDisabled = this.containerOuter.classList.contains(
+        this.config.classNames.disabledState,
+      );
       if (isDisabled) {
         this._addEventListeners();
         this.passedElement.removeAttribute('disabled');
@@ -1079,7 +1081,9 @@ class Choices {
   disable() {
     if (this.initialised) {
       this.passedElement.disabled = true;
-      const isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
+      const isEnabled = !this.containerOuter.classList.contains(
+        this.config.classNames.disabledState,
+      );
       if (isEnabled) {
         this._removeEventListeners();
         this.passedElement.setAttribute('disabled', '');
