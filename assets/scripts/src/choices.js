@@ -28,10 +28,10 @@ import {
   generateId,
   triggerEvent,
   findAncestorByAttrName,
-  regexFilter
+  regexFilter,
 }
-from './lib/utils.js';
-import './lib/polyfills.js';
+from './lib/utils';
+import './lib/polyfills';
 
 /**
  * Choices
@@ -84,12 +84,8 @@ class Choices {
       noResultsText: 'No results found',
       noChoicesText: 'No choices to choose from',
       itemSelectText: 'Press to select',
-      addItemText: (value) => {
-        return `Press Enter to add <b>"${value}"</b>`;
-      },
-      maxItemText: (maxItemCount) => {
-        return `Only ${maxItemCount} values can be added.`;
-      },
+      addItemText: value => `Press Enter to add <b>"${value}"</b>`,
+      maxItemText: maxItemCount => `Only ${maxItemCount} values can be added.`,
       uniqueItemText: 'Only unique values can be added.',
       classNames: {
         containerOuter: 'choices',
@@ -117,17 +113,17 @@ class Choices {
         flippedState: 'is-flipped',
         loadingState: 'is-loading',
         noResults: 'has-no-results',
-        noChoices: 'has-no-choices'
+        noChoices: 'has-no-choices',
       },
       fuseOptions: {
-        include: 'score'
+        include: 'score',
       },
       callbackOnInit: null,
-      callbackOnCreateTemplates: null
+      callbackOnCreateTemplates: null,
     };
 
     this.idNames = {
-      itemChoice: 'item-choice'
+      itemChoice: 'item-choice',
     };
 
     // Merge options with user options
@@ -196,7 +192,7 @@ class Choices {
     // Then add any values passed from attribute
     if (this.passedElement.value) {
       this.presetItems = this.presetItems.concat(
-        this.passedElement.value.split(this.config.delimiter)
+        this.passedElement.value.split(this.config.delimiter),
       );
     }
 
@@ -243,9 +239,9 @@ class Choices {
     }
   }
 
-  /*========================================
+  /* ========================================
   =            Public functions            =
-  ========================================*/
+  ======================================== */
 
   /**
    * Initialise Choices
@@ -294,11 +290,14 @@ class Choices {
     this._removeEventListeners();
 
     // Reinstate passed element
-    this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
+    this.passedElement.classList.remove(
+      this.config.classNames.input,
+      this.config.classNames.hiddenState,
+    );
     this.passedElement.removeAttribute('tabindex');
     // Recover original styles if any
     const origStyle = this.passedElement.getAttribute('data-choice-orig-style');
-    if (Boolean(origStyle)) {
+    if (origStyle) {
       this.passedElement.removeAttribute('data-choice-orig-style');
       this.passedElement.setAttribute('style', origStyle);
     } else {
@@ -1115,11 +1114,11 @@ class Choices {
     return this;
   }
 
-  /*=====  End of Public functions  ======*/
+  /* =====  End of Public functions  ======*/
 
-  /*=============================================
+  /* =============================================
   =                Private functions            =
-  =============================================*/
+  ============================================= */
 
   /**
    * Call change callback
@@ -2426,60 +2425,54 @@ class Choices {
   _createTemplates() {
     const globalClasses = this.config.classNames;
     const templates = {
-      containerOuter: (direction) => {
-        return strToEl(`
-          <div
-            class="${globalClasses.containerOuter}"
-            ${this.isSelectElement ? (this.config.searchEnabled ?
-              'role="combobox" aria-autocomplete="list"' :
-              'role="listbox"') :
-              ''
-            }
-            data-type="${this.passedElement.type}"
-            ${this.isSelectOneElement ?
-              'tabindex="0"' :
-              ''
-            }
-            aria-haspopup="true"
-            aria-expanded="false"
-            dir="${direction}"
-            >
-          </div>
-        `);
-      },
-      containerInner: () => {
-        return strToEl(`
-          <div class="${globalClasses.containerInner}"></div>
-        `);
-      },
+      containerOuter: direction => strToEl(`
+        <div
+          class="${globalClasses.containerOuter}"
+          ${this.isSelectElement ? (this.config.searchEnabled ?
+            'role="combobox" aria-autocomplete="list"' :
+            'role="listbox"') :
+            ''
+          }
+          data-type="${this.passedElement.type}"
+          ${this.isSelectOneElement ?
+            'tabindex="0"' :
+            ''
+          }
+          aria-haspopup="true"
+          aria-expanded="false"
+          dir="${direction}"
+          >
+        </div>
+      `),
+      containerInner: () => strToEl(`
+        <div class="${globalClasses.containerInner}"></div>
+      `),
       itemList: () => {
         const localClasses = classNames(
           globalClasses.list,
           {
             [globalClasses.listSingle]: (this.isSelectOneElement),
-            [globalClasses.listItems]: (!this.isSelectOneElement)
-          }
+            [globalClasses.listItems]: (!this.isSelectOneElement),
+          },
         );
 
         return strToEl(`
           <div class="${localClasses}"></div>
         `);
       },
-      placeholder: (value) => {
-        return strToEl(`
-          <div class="${globalClasses.placeholder}">
-            ${value}
-          </div>
-        `);
-      },
+      placeholder: value => strToEl(`
+        <div class="${globalClasses.placeholder}">
+          ${value}
+        </div>
+      `),
       item: (data) => {
         let localClasses = classNames(
           globalClasses.item,
           {
             [globalClasses.highlightedState]: data.highlighted,
             [globalClasses.itemSelectable]: !data.highlighted,
-            [globalClasses.placeholder]: data.placeholder
-          }
+            [globalClasses.placeholder]: data.placeholder,
+          },
         );
 
         if (this.config.removeItemButton) {
@@ -2488,8 +2481,8 @@ class Choices {
             {
               [globalClasses.highlightedState]: data.highlighted,
               [globalClasses.itemSelectable]: !data.disabled,
-              [globalClasses.placeholder]: data.placeholder
-            }
+              [globalClasses.placeholder]: data.placeholder,
+            },
           );
 
           return strToEl(`
@@ -2540,26 +2533,24 @@ class Choices {
           </div>
         `);
       },
-      choiceList: () => {
-        return strToEl(`
-          <div
-            class="${globalClasses.list}"
-            dir="ltr"
-            role="listbox"
-            ${!this.isSelectOneElement ?
-              'aria-multiselectable="true"' :
-              ''
-            }
-            >
-          </div>
-        `);
-      },
+      choiceList: () => strToEl(`
+        <div
+          class="${globalClasses.list}"
+          dir="ltr"
+          role="listbox"
+          ${!this.isSelectOneElement ?
+            'aria-multiselectable="true"' :
+            ''
+          }
+          >
+        </div>
+      `),
       choiceGroup: (data) => {
-        let localClasses = classNames(
+        const localClasses = classNames(
           globalClasses.group,
           {
-            [globalClasses.itemDisabled]: data.disabled
-          }
+            [globalClasses.itemDisabled]: data.disabled,
+          },
         );
 
         return strToEl(`
@@ -2579,14 +2570,14 @@ class Choices {
         `);
       },
       choice: (data) => {
-        let localClasses = classNames(
+        const localClasses = classNames(
           globalClasses.item,
           globalClasses.itemChoice,
           {
             [globalClasses.itemDisabled]: data.disabled,
             [globalClasses.itemSelectable]: !data.disabled,
-            [globalClasses.placeholder]: data.placeholder
-          }
+            [globalClasses.placeholder]: data.placeholder,
+          },
         );
 
         return strToEl(`
@@ -2611,9 +2602,9 @@ class Choices {
         `);
       },
       input: () => {
-        let localClasses = classNames(
+        const localClasses = classNames(
           globalClasses.input,
-          globalClasses.inputCloned
+          globalClasses.inputCloned,
         );
 
         return strToEl(`
@@ -2629,9 +2620,9 @@ class Choices {
         `);
       },
       dropdown: () => {
-        let localClasses = classNames(
+        const localClasses = classNames(
           globalClasses.list,
-          globalClasses.listDropdown
+          globalClasses.listDropdown,
         );
 
         return strToEl(`
@@ -2643,13 +2634,13 @@ class Choices {
         `);
       },
       notice: (label, type = '') => {
-        let localClasses = classNames(
+        const localClasses = classNames(
           globalClasses.item,
           globalClasses.itemChoice,
           {
             [globalClasses.noResults]: (type === 'no-results'),
             [globalClasses.noChoices]: (type === 'no-choices'),
-          }
+          },
         );
 
         return strToEl(`
@@ -2658,11 +2649,9 @@ class Choices {
           </div>
         `);
       },
-      option: (data) => {
-        return strToEl(`
-          <option value="${data.value}" selected>${data.label}</option>
-        `);
-      },
+      option: data => strToEl(`
+        <option value="${data.value}" selected>${data.label}</option>
+      `),
     };
 
     // User's custom templates
@@ -2769,7 +2758,7 @@ class Choices {
             label: o.innerHTML,
             selected: o.selected,
             disabled: o.disabled || o.parentNode.disabled,
-            placeholder: o.hasAttribute('placeholder')
+            placeholder: o.hasAttribute('placeholder'),
           });
         });
 
@@ -2806,7 +2795,7 @@ class Choices {
               choice.disabled,
               undefined,
               choice.customProperties,
-              choice.placeholder
+              choice.placeholder,
             );
           }
         });
@@ -2825,7 +2814,7 @@ class Choices {
             item.id,
             undefined,
             item.customProperties,
-            item.placeholder
+            item.placeholder,
           );
         } else if (itemType === 'String') {
           this._addItem(item);
@@ -2834,7 +2823,7 @@ class Choices {
     }
   }
 
-  /*=====  End of Private functions  ======*/
+  /* =====  End of Private functions  ======*/
 }
 
 module.exports = Choices;
