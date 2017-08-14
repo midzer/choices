@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js';
 import classNames from 'classnames';
-import Store from './store/index.js';
+import Store from './store/index';
 import {
   addItem,
   removeItem,
@@ -1875,16 +1875,19 @@ class Choices {
     }
 
     if (this.containerOuter.contains(target) && target !== this.input) {
-      let foundTarget;
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
-      if (foundTarget = findAncestorByAttrName(target, 'data-button')) {
-        this._handleButtonAction(activeItems, foundTarget);
-      } else if (foundTarget = findAncestorByAttrName(target, 'data-item')) {
-        this._handleItemAction(activeItems, foundTarget, hasShiftKey);
-      } else if (foundTarget = findAncestorByAttrName(target, 'data-choice')) {
-        this._handleChoiceAction(activeItems, foundTarget);
+      const buttonTarget = findAncestorByAttrName(target, 'data-button');
+      const itemTarget = findAncestorByAttrName(target, 'data-item');
+      const choiceTarget = findAncestorByAttrName(target, 'data-choice');
+
+      if (buttonTarget) {
+        this._handleButtonAction(activeItems, buttonTarget);
+      } else if (itemTarget) {
+        this._handleItemAction(activeItems, itemTarget, hasShiftKey);
+      } else if (choiceTarget) {
+        this._handleChoiceAction(activeItems, choiceTarget);
       }
 
       e.preventDefault();
