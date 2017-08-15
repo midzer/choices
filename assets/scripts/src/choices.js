@@ -2793,12 +2793,15 @@ class Choices {
             // If there is a selected choice already or the choice is not
             // the first in the array, add each choice normally
             // Otherwise pre-select the first choice in the array
-            const shouldPreselect = (hasSelectedChoice || (!hasSelectedChoice && index > 0));
+            const shouldPreselect = (!hasSelectedChoice || (hasSelectedChoice && index === 0));
+            const isSelected = shouldPreselect ? true : choice.selected;
+            const isDisabled = shouldPreselect ? false : choice.disabled;
+
             this._addChoice(
               choice.value,
               choice.label,
-              (shouldPreselect) ? choice.selected : true,
-              (shouldPreselect) ? choice.disabled : false,
+              isSelected,
+              isDisabled,
               undefined,
               choice.customProperties,
               choice.placeholder,
