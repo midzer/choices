@@ -293,6 +293,7 @@ class Choices {
       this.config.classNames.hiddenState,
     );
     this.passedElement.removeAttribute('tabindex');
+
     // Recover original styles if any
     const origStyle = this.passedElement.getAttribute('data-choice-orig-style');
     if (origStyle) {
@@ -657,10 +658,7 @@ class Choices {
    */
   highlightAll() {
     const items = this.store.getItems();
-    items.forEach((item) => {
-      this.highlightItem(item);
-    });
-
+    items.forEach(item => this.highlightItem(item));
     return this;
   }
 
@@ -671,10 +669,7 @@ class Choices {
    */
   unhighlightAll() {
     const items = this.store.getItems();
-    items.forEach((item) => {
-      this.unhighlightItem(item);
-    });
-
+    items.forEach(item => this.unhighlightItem(item));
     return this;
   }
 
@@ -867,60 +862,61 @@ class Choices {
    * @public
    */
   setValue(args) {
-    if (this.initialised === true) {
-      // Convert args to an iterable array
-      const values = [...args];
-      const handleValue = (item) => {
-        const itemType = getType(item);
-        if (itemType === 'Object') {
-          if (!item.value) {
-            return;
-          }
-
-          // If we are dealing with a select input, we need to create an option first
-          // that is then selected. For text inputs we can just add items normally.
-          if (!this.isTextElement) {
-            this._addChoice(
-              item.value,
-              item.label,
-              true,
-              false, -1,
-              item.customProperties,
-              item.placeholder,
-            );
-          } else {
-            this._addItem(
-              item.value,
-              item.label,
-              item.id,
-              undefined,
-              item.customProperties,
-              item.placeholder,
-            );
-          }
-        } else if (itemType === 'String') {
-          if (!this.isTextElement) {
-            this._addChoice(
-              item,
-              item,
-              true,
-              false, -1,
-              null,
-            );
-          } else {
-            this._addItem(item);
-          }
-        }
-      };
-
-      if (values.length > 1) {
-        values.forEach((value) => {
-          handleValue(value);
-        });
-      } else {
-        handleValue(values[0]);
-      }
+    if (!this.initialised) {
+      return this;
     }
+
+    // Convert args to an iterable array
+    const values = [...args];
+    const handleValue = (item) => {
+      const itemType = getType(item);
+      if (itemType === 'Object') {
+        if (!item.value) {
+          return;
+        }
+
+        // If we are dealing with a select input, we need to create an option first
+        // that is then selected. For text inputs we can just add items normally.
+        if (!this.isTextElement) {
+          this._addChoice(
+            item.value,
+            item.label,
+            true,
+            false, -1,
+            item.customProperties,
+            item.placeholder,
+          );
+        } else {
+          this._addItem(
+            item.value,
+            item.label,
+            item.id,
+            undefined,
+            item.customProperties,
+            item.placeholder,
+          );
+        }
+      } else if (itemType === 'String') {
+        if (!this.isTextElement) {
+          this._addChoice(
+            item,
+            item,
+            true,
+            false, -1,
+            null,
+          );
+        } else {
+          this._addItem(item);
+        }
+      }
+    };
+
+    if (values.length > 1) {
+      values.forEach(value => handleValue(value));
+    } else {
+      handleValue(values[0]);
+    }
+
     return this;
   }
 
@@ -931,35 +927,37 @@ class Choices {
    * @public
    */
   setValueByChoice(value) {
-    if (!this.isTextElement) {
-      const choices = this.store.getChoices();
-      // If only one value has been passed, convert to array
-      const choiceValue = isType('Array', value) ? value : [value];
-
-      // Loop through each value and
-      choiceValue.forEach((val) => {
-        // Check 'value' property exists and the choice isn't already selected
-        const foundChoice = choices.find(choice => choice.value === val);
-
-        if (foundChoice) {
-          if (!foundChoice.selected) {
-            this._addItem(
-              foundChoice.value,
-              foundChoice.label,
-              foundChoice.id,
-              foundChoice.groupId,
-              foundChoice.customProperties,
-              foundChoice.placeholder,
-              foundChoice.keyCode,
-            );
-          } else if (!this.config.silent) {
-            console.warn('Attempting to select choice already selected');
-          }
-        } else if (!this.config.silent) {
-          console.warn('Attempting to select choice that does not exist');
-        }
-      });
+    if (this.isTextElement) {
+      return this;
     }
+
+    const choices = this.store.getChoices();
+    // If only one value has been passed, convert to array
+    const choiceValue = isType('Array', value) ? value : [value];
+
+    // Loop through each value and
+    choiceValue.forEach((val) => {
+      // Check 'value' property exists and the choice isn't already selected
+      const foundChoice = choices.find(choice => choice.value === val);
+
+      if (foundChoice) {
+        if (!foundChoice.selected) {
+          this._addItem(
+            foundChoice.value,
+            foundChoice.label,
+            foundChoice.id,
+            foundChoice.groupId,
+            foundChoice.customProperties,
+            foundChoice.placeholder,
+            foundChoice.keyCode,
+          );
+        } else if (!this.config.silent) {
+          console.warn('Attempting to select choice already selected');
+        }
+      } else if (!this.config.silent) {
+        console.warn('Attempting to select choice that does not exist');
+      }
+    });
     return this;
   }
 
@@ -973,41 +971,45 @@ class Choices {
    * @public
    */
   setChoices(choices, value, label, replaceChoices = false) {
-    if (this.initialised === true) {
-      if (this.isSelectElement) {
-        if (!isType('Array', choices) || !value) {
-          return this;
-        }
-        // Clear choices if needed
-        if (replaceChoices) {
-          this._clearChoices();
-        }
-        // Add choices if passed
-        if (choices && choices.length) {
-          this.containerOuter.classList.remove(this.config.classNames.loadingState);
-          choices.forEach((result) => {
-            if (result.choices) {
-              this._addGroup(
-                result,
-                (result.id || null),
-                value,
-                label,
-              );
-            } else {
-              this._addChoice(
-                result[value],
-                result[label],
-                result.selected,
-                result.disabled,
-                undefined,
-                result.customProperties,
-                result.placeholder,
-              );
-            }
-          });
-        }
-      }
+    if (
+      !this.initialised ||
+      !this.isSelectElement ||
+      !isType('Array', choices) ||
+      !value
+    ) {
+      return this;
     }
+
+    // Clear choices if needed
+    if (replaceChoices) {
+      this._clearChoices();
+    }
+
+    // Add choices if passed
+    if (choices && choices.length) {
+      this.containerOuter.classList.remove(this.config.classNames.loadingState);
+      choices.forEach((result) => {
+        if (result.choices) {
+          this._addGroup(
+            result,
+            (result.id || null),
+            value,
+            label,
+          );
+        } else {
+          this._addChoice(
+            result[value],
+            result[label],
+            result.selected,
+            result.disabled,
+            undefined,
+            result.customProperties,
+            result.placeholder,
+          );
+        }
+      });
+    }
+
     return this;
   }
 
@@ -1033,15 +1035,18 @@ class Choices {
     if (this.input.value) {
       this.input.value = '';
     }
+
     if (!this.isSelectOneElement) {
       this._setInputWidth();
     }
+
     if (!this.isTextElement && this.config.searchEnabled) {
       this.isSearching = false;
       this.store.dispatch(
         activateChoices(true),
       );
     }
+
     return this;
   }
 
@@ -1050,22 +1055,26 @@ class Choices {
    * @return {Object} Class instance
    */
   enable() {
-    if (this.initialised) {
-      this.passedElement.disabled = false;
-      const isDisabled = this.containerOuter.classList.contains(
-        this.config.classNames.disabledState,
-      );
-      if (isDisabled) {
-        this._addEventListeners();
-        this.passedElement.removeAttribute('disabled');
-        this.input.removeAttribute('disabled');
-        this.containerOuter.classList.remove(this.config.classNames.disabledState);
-        this.containerOuter.removeAttribute('aria-disabled');
-        if (this.isSelectOneElement) {
-          this.containerOuter.setAttribute('tabindex', '0');
-        }
+    if (!this.initialised) {
+      return this;
+    }
+
+    this.passedElement.disabled = false;
+    const isDisabled = this.containerOuter.classList.contains(
+      this.config.classNames.disabledState,
+    );
+
+    if (isDisabled) {
+      this._addEventListeners();
+      this.passedElement.removeAttribute('disabled');
+      this.input.removeAttribute('disabled');
+      this.containerOuter.classList.remove(this.config.classNames.disabledState);
+      this.containerOuter.removeAttribute('aria-disabled');
+      if (this.isSelectOneElement) {
+        this.containerOuter.setAttribute('tabindex', '0');
       }
     }
+
     return this;
   }
 
@@ -1075,22 +1084,26 @@ class Choices {
    * @public
    */
   disable() {
-    if (this.initialised) {
-      this.passedElement.disabled = true;
-      const isEnabled = !this.containerOuter.classList.contains(
-        this.config.classNames.disabledState,
-      );
-      if (isEnabled) {
-        this._removeEventListeners();
-        this.passedElement.setAttribute('disabled', '');
-        this.input.setAttribute('disabled', '');
-        this.containerOuter.classList.add(this.config.classNames.disabledState);
-        this.containerOuter.setAttribute('aria-disabled', 'true');
-        if (this.isSelectOneElement) {
-          this.containerOuter.setAttribute('tabindex', '-1');
-        }
+    if (!this.initialised) {
+      return this;
+    }
+
+    this.passedElement.disabled = true;
+    const isEnabled = !this.containerOuter.classList.contains(
+      this.config.classNames.disabledState,
+    );
+
+    if (isEnabled) {
+      this._removeEventListeners();
+      this.passedElement.setAttribute('disabled', '');
+      this.input.setAttribute('disabled', '');
+      this.containerOuter.classList.add(this.config.classNames.disabledState);
+      this.containerOuter.setAttribute('aria-disabled', 'true');
+      if (this.isSelectOneElement) {
+        this.containerOuter.setAttribute('tabindex', '-1');
       }
     }
+
     return this;
   }
 
@@ -1101,16 +1114,15 @@ class Choices {
    * @public
    */
   ajax(fn) {
-    if (this.initialised === true) {
-      if (this.isSelectElement) {
-        // Show loading text
-        requestAnimationFrame(() => {
-          this._handleLoadingState(true);
-        });
-        // Run callback
-        fn(this._ajaxCallback());
-      }
+    if (!this.initialised || !this.isSelectElement) {
+      return this;
     }
+
+    // Show loading text
+    requestAnimationFrame(() => this._handleLoadingState(true));
+    // Run callback
+    fn(this._ajaxCallback());
+
     return this;
   }
 
