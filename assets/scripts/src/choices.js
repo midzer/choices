@@ -1763,7 +1763,10 @@ class Choices {
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this.isTextElement) {
-      const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+      const hasActiveDropdown = this.dropdown.classList.contains(
+        this.config.classNames.activeState,
+      );
+
       if (value) {
         if (canAddItem.notice) {
           const dropdownItem = this._getTemplate('notice', canAddItem.notice);
@@ -1836,7 +1839,10 @@ class Choices {
     // If a user tapped within our container...
     if (this.wasTap === true && this.containerOuter.contains(target)) {
       // ...and we aren't dealing with a single select box, show dropdown/focus input
-      if ((target === this.containerOuter || target === this.containerInner) && !this.isSelectOneElement) {
+      if (
+        (target === this.containerOuter || target === this.containerInner) &&
+        !this.isSelectOneElement
+      ) {
         if (this.isTextElement) {
           // If text element, we only want to focus the input (if it isn't already)
           if (document.activeElement !== this.input) {
@@ -1917,7 +1923,11 @@ class Choices {
           this.showDropdown();
           this.containerOuter.focus();
         }
-      } else if (this.isSelectOneElement && target !== this.input && !this.dropdown.contains(target)) {
+      } else if (
+        this.isSelectOneElement &&
+        target !== this.input &&
+        !this.dropdown.contains(target)
+      ) {
         this.hideDropdown(true);
       }
     } else {
@@ -1974,7 +1984,9 @@ class Choices {
     const target = e.target;
     // If target is something that concerns us
     if (this.containerOuter.contains(target)) {
-      const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+      const hasActiveDropdown = this.dropdown.classList.contains(
+        this.config.classNames.activeState,
+      );
       const focusActions = {
         text: () => {
           if (target === this.input) {
@@ -2018,7 +2030,9 @@ class Choices {
     // If target is something that concerns us
     if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
-      const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+      const hasActiveDropdown = this.dropdown.classList.contains(
+        this.config.classNames.activeState,
+      );
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
@@ -2188,7 +2202,15 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  _addItem(value, label = null, choiceId = -1, groupId = -1, customProperties = null, placeholder = false, keyCode = null) {
+  _addItem(
+    value,
+    label = null,
+    choiceId = -1,
+    groupId = -1,
+    customProperties = null,
+    placeholder = false,
+    keyCode = null,
+  ) {
     let passedValue = isType('String', value) ? value.trim() : value;
     const passedKeyCode = keyCode;
     const items = this.store.getItems();
@@ -2300,7 +2322,16 @@ class Choices {
    * @return
    * @private
    */
-  _addChoice(value, label = null, isSelected = false, isDisabled = false, groupId = -1, customProperties = null, placeholder = false, keyCode = null) {
+  _addChoice(
+    value,
+    label = null,
+    isSelected = false,
+    isDisabled = false,
+    groupId = -1,
+    customProperties = null,
+    placeholder = false,
+    keyCode = null,
+  ) {
     if (typeof value === 'undefined' || value === null) {
       return;
     }
@@ -2420,25 +2451,30 @@ class Choices {
   _createTemplates() {
     const globalClasses = this.config.classNames;
     const templates = {
-      containerOuter: direction => strToEl(`
-        <div
-          class="${globalClasses.containerOuter}"
-          ${this.isSelectElement ? (this.config.searchEnabled ?
-            'role="combobox" aria-autocomplete="list"' :
-            'role="listbox"') :
-            ''
-          }
-          data-type="${this.passedElement.type}"
-          ${this.isSelectOneElement ?
-            'tabindex="0"' :
-            ''
-          }
-          aria-haspopup="true"
-          aria-expanded="false"
-          dir="${direction}"
-          >
-        </div>
-      `),
+      containerOuter: (direction) => {
+        const tabIndex = this.isSelectOneElement ? 'tabindex="0"' : '';
+        let role = this.isSelectElement ? 'role="listbox"' : '';
+        let ariaAutoComplete = '';
+
+        if (this.config.searchEnabled && this.isSelectElement) {
+          role = 'role="combobox"';
+          ariaAutoComplete = 'aria-autocomplete="list"';
+        }
+
+        return strToEl(`
+          <div
+            class="${globalClasses.containerOuter}"
+            data-type="${this.passedElement.type}"
+            ${role}
+            ${tabIndex}
+            ${ariaAutoComplete}
+            aria-haspopup="true"
+            aria-expanded="false"
+            dir="${direction}"
+            >
+          </div>
+        `);
+      },
       containerInner: () => strToEl(`
         <div class="${globalClasses.containerInner}"></div>
       `),
@@ -2460,6 +2496,9 @@ class Choices {
         </div>
       `),
       item: (data) => {
+        const ariaSelected = data.active ? 'aria-selected="true"' : '';
+        const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
+
         let localClasses = classNames(
           globalClasses.item, {
             [globalClasses.highlightedState]: data.highlighted,
@@ -2484,14 +2523,8 @@ class Choices {
               data-id="${data.id}"
               data-value="${data.value}"
               data-deletable
-              ${data.active ?
-                'aria-selected="true"' :
-                ''
-              }
-              ${data.disabled ?
-                'aria-disabled="true"' :
-                ''
-              }
+              ${ariaSelected}
+              ${ariaDisabled}
               >
               ${data.label}<!--
            --><button
@@ -2512,32 +2545,30 @@ class Choices {
             data-item
             data-id="${data.id}"
             data-value="${data.value}"
-            ${data.active ?
-              'aria-selected="true"' :
-              ''
-            }
-            ${data.disabled ?
-              'aria-disabled="true"' :
-              ''
-            }
+            ${ariaSelected}
+            ${ariaDisabled}
             >
             ${data.label}
           </div>
         `);
       },
-      choiceList: () => strToEl(`
-        <div
-          class="${globalClasses.list}"
-          dir="ltr"
-          role="listbox"
-          ${!this.isSelectOneElement ?
-            'aria-multiselectable="true"' :
-            ''
-          }
-          >
-        </div>
-      `),
+      choiceList: () => {
+        const ariaMultiSelectable = !this.isSelectOneElement ?
+          'aria-multiselectable="true"' :
+          '';
+
+        return strToEl(`
+          <div
+            class="${globalClasses.list}"
+            dir="ltr"
+            role="listbox"
+            ${ariaMultiSelectable}
+            >
+          </div>
+        `);
+      },
       choiceGroup: (data) => {
+        const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
         const localClasses = classNames(
           globalClasses.group, {
             [globalClasses.itemDisabled]: data.disabled,
@@ -2551,16 +2582,14 @@ class Choices {
             data-id="${data.id}"
             data-value="${data.value}"
             role="group"
-            ${data.disabled ?
-              'aria-disabled="true"' :
-              ''
-            }
+            ${ariaDisabled}
             >
             <div class="${globalClasses.groupHeading}">${data.value}</div>
           </div>
         `);
       },
       choice: (data) => {
+        const role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
         const localClasses = classNames(
           globalClasses.item,
           globalClasses.itemChoice, {
@@ -2582,10 +2611,7 @@ class Choices {
               'data-choice-selectable'
             }
             id="${data.elementId}"
-            ${data.groupId > 0 ?
-              'role="treeitem"' :
-              'role="option"'
-            }
+            ${role}
             >
             ${data.label}
           </div>

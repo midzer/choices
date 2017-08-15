@@ -1,4 +1,13 @@
-export const addItem = (value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) => ({
+export const addItem = (
+  value,
+  label,
+  id,
+  choiceId,
+  groupId,
+  customProperties,
+  placeholder,
+  keyCode,
+) => ({
   type: 'ADD_ITEM',
   value,
   label,
@@ -22,7 +31,17 @@ export const highlightItem = (id, highlighted) => ({
   highlighted,
 });
 
-export const addChoice = (value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) => ({
+export const addChoice = (
+  value,
+  label,
+  id,
+  groupId,
+  disabled,
+  elementId,
+  customProperties,
+  placeholder,
+  keyCode,
+) => ({
   type: 'ADD_CHOICE',
   value,
   label,
