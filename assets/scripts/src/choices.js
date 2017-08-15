@@ -167,7 +167,6 @@ class Choices {
     this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
     this.isScrollingOnIe = false;
 
-
     if (this.config.shouldSortItems === true && this.isSelectOneElement) {
       if (!this.config.silent) {
         console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
