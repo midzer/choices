@@ -45,7 +45,8 @@ class Choices {
       if (elements.length > 1) {
         for (let i = 1; i < elements.length; i += 1) {
           const el = elements[i];
-          return new Choices(el, userConfig);
+          /* eslint-disable no-new */
+          new Choices(el, userConfig);
         }
       }
     }
