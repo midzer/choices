@@ -2456,7 +2456,7 @@ class Choices {
         let role = this.isSelectElement ? 'role="listbox"' : '';
         let ariaAutoComplete = '';
 
-        if (this.config.searchEnabled && this.isSelectElement) {
+        if (this.isSelectElement && this.config.searchEnabled) {
           role = 'role="combobox"';
           ariaAutoComplete = 'aria-autocomplete="list"';
         }
