@@ -269,10 +269,8 @@ class Choices {
     this._addEventListeners();
 
     // Run callback if it is a function
-    if (callback) {
-      if (isType('Function', callback)) {
-        callback.call(this);
-      }
+    if (callback && isType('Function', callback)) {
+      callback.call(this);
     }
   }
 
