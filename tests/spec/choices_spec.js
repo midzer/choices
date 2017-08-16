@@ -135,7 +135,7 @@ describe('Choices', () => {
     });
 
     it('should create a dropdown', function() {
-      expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.dropdown.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should backup and recover original styles', function () {
@@ -312,7 +312,7 @@ describe('Choices', () => {
     it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
       this.choices.input.focus();
-      expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
+      expect(this.choices.dropdown.element.classList).toContain(this.choices.config.classNames.activeState);
     });
 
     it('should select the first choice', function() {
@@ -748,7 +748,7 @@ describe('Choices', () => {
       this.choices.showDropdown();
       const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
       const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+      const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
       expect(hasOpenState && hasAttr && hasActiveState).toBe(true);
     });
 
@@ -757,7 +757,7 @@ describe('Choices', () => {
       this.choices.hideDropdown();
       const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
       const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+      const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
 
       expect(hasOpenState && hasAttr && hasActiveState).toBe(false);
     });

@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import classNames from 'classnames';
 import Store from './store/index';
+import Dropdown from './components/dropdown';
 import {
   addItem,
   removeItem,
@@ -11,8 +12,7 @@ import {
   addGroup,
   clearAll,
   clearChoices,
-}
-from './actions/index';
+} from './actions/index';
 import {
   isScrolledIntoView,
   getAdjacentEl,
@@ -29,8 +29,7 @@ import {
   triggerEvent,
   findAncestorByAttrName,
   regexFilter,
-}
-from './lib/utils';
+} from './lib/utils';
 import './lib/polyfills';
 
 /**
@@ -755,10 +754,10 @@ class Choices {
 
     this.containerOuter.classList.add(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'true');
-    this.dropdown.classList.add(this.config.classNames.activeState);
-    this.dropdown.setAttribute('aria-expanded', 'true');
+    this.dropdown.element.classList.add(this.config.classNames.activeState);
+    this.dropdown.element.setAttribute('aria-expanded', 'true');
 
-    const dimensions = this.dropdown.getBoundingClientRect();
+    const dimensions = this.dropdown.element.getBoundingClientRect();
     const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
 
     // If flip is enabled and the dropdown bottom position is
@@ -795,8 +794,8 @@ class Choices {
 
     this.containerOuter.classList.remove(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'false');
-    this.dropdown.classList.remove(this.config.classNames.activeState);
-    this.dropdown.setAttribute('aria-expanded', 'false');
+    this.dropdown.element.classList.remove(this.config.classNames.activeState);
+    this.dropdown.element.setAttribute('aria-expanded', 'false');
 
     if (isFlipped) {
       this.containerOuter.classList.remove(this.config.classNames.flippedState);
@@ -818,7 +817,7 @@ class Choices {
    * @public
    */
   toggleDropdown() {
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
     if (hasActiveDropdown) {
       this.hideDropdown();
     } else {
@@ -1247,7 +1246,7 @@ class Choices {
     const id = element.getAttribute('data-id');
     const choice = this.store.getChoiceById(id);
     const passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
 
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
@@ -1603,7 +1602,7 @@ class Choices {
     const target = e.target;
     const activeItems = this.store.getItemsFilteredByActive();
     const hasFocusedInput = this.input === document.activeElement;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
     const hasItems = this.itemList && this.itemList.children;
     const keyString = String.fromCharCode(e.keyCode);
 
@@ -1660,7 +1659,7 @@ class Choices {
 
       if (hasActiveDropdown) {
         e.preventDefault();
-        const highlighted = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
+        const highlighted = this.dropdown.element.querySelector(`.${this.config.classNames.highlightedState}`);
 
         // If we have a highlighted choice
         if (highlighted) {
@@ -1700,16 +1699,16 @@ class Choices {
         let nextEl;
         if (skipKey) {
           if (directionInt > 0) {
-            nextEl = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]')).pop();
+            nextEl = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]')).pop();
           } else {
-            nextEl = this.dropdown.querySelector('[data-choice-selectable]');
+            nextEl = this.dropdown.element.querySelector('[data-choice-selectable]');
           }
         } else {
-          const currentEl = this.dropdown.querySelector(`.${this.config.classNames.highlightedState}`);
+          const currentEl = this.dropdown.element.querySelector(`.${this.config.classNames.highlightedState}`);
           if (currentEl) {
             nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
           } else {
-            nextEl = this.dropdown.querySelector('[data-choice-selectable]');
+            nextEl = this.dropdown.element.querySelector('[data-choice-selectable]');
           }
         }
 
@@ -1773,7 +1772,7 @@ class Choices {
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this.isTextElement) {
-      const hasActiveDropdown = this.dropdown.classList.contains(
+      const hasActiveDropdown = this.dropdown.element.classList.contains(
         this.config.classNames.activeState,
       );
 
@@ -1844,7 +1843,7 @@ class Choices {
    */
   _onTouchEnd(e) {
     const target = e.target || e.touches[0].target;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
 
     // If a user tapped within our container...
     if (this.wasTap === true && this.containerOuter.contains(target)) {
@@ -1912,7 +1911,7 @@ class Choices {
    */
   _onClick(e) {
     const target = e.target;
-    const hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
     const activeItems = this.store.getItemsFilteredByActive();
 
     // If target is something that concerns us
@@ -1936,7 +1935,7 @@ class Choices {
       } else if (
         this.isSelectOneElement &&
         target !== this.input &&
-        !this.dropdown.contains(target)
+        !this.dropdown.element.contains(target)
       ) {
         this.hideDropdown(true);
       }
@@ -1966,7 +1965,7 @@ class Choices {
    */
   _onMouseOver(e) {
     // If the dropdown is either the target or one of its children is the target
-    if (e.target === this.dropdown || this.dropdown.contains(e.target)) {
+    if (e.target === this.dropdown || this.dropdown.element.contains(e.target)) {
       if (e.target.hasAttribute('data-choice')) this._highlightChoice(e.target);
     }
   }
@@ -1994,7 +1993,7 @@ class Choices {
     const target = e.target;
     // If target is something that concerns us
     if (this.containerOuter.contains(target)) {
-      const hasActiveDropdown = this.dropdown.classList.contains(
+      const hasActiveDropdown = this.dropdown.element.classList.contains(
         this.config.classNames.activeState,
       );
       const focusActions = {
@@ -2040,7 +2039,7 @@ class Choices {
     // If target is something that concerns us
     if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
-      const hasActiveDropdown = this.dropdown.classList.contains(
+      const hasActiveDropdown = this.dropdown.element.classList.contains(
         this.config.classNames.activeState,
       );
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
@@ -2166,11 +2165,11 @@ class Choices {
    */
   _highlightChoice(el = null) {
     // Highlight first element in dropdown
-    const choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
+    const choices = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]'));
     let passedEl = el;
 
     if (choices && choices.length) {
-      const highlightedChoices = Array.from(this.dropdown.querySelectorAll(`.${this.config.classNames.highlightedState}`));
+      const highlightedChoices = Array.from(this.dropdown.element.querySelectorAll(`.${this.config.classNames.highlightedState}`));
 
       // Remove any highlighted choices
       highlightedChoices.forEach((choice) => {
@@ -2708,7 +2707,7 @@ class Choices {
     this.input = input;
     this.choiceList = choiceList;
     this.itemList = itemList;
-    this.dropdown = dropdown;
+    this.dropdown = new Dropdown(this, dropdown);
 
     // Hide passed input
     this.passedElement.classList.add(
@@ -2748,7 +2747,7 @@ class Choices {
     }
 
     containerOuter.appendChild(containerInner);
-    containerOuter.appendChild(dropdown);
+    containerOuter.appendChild(this.dropdown.element);
     containerInner.appendChild(itemList);
 
     if (!this.isTextElement) {
