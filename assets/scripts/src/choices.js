@@ -1764,9 +1764,7 @@ class Choices {
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this.isTextElement) {
-      const hasActiveDropdown = this.dropdown.element.classList.contains(
-        this.config.classNames.activeState,
-      );
+      const hasActiveDropdown = this.dropdown.isActive;
 
       if (value) {
         if (canAddItem.notice) {
@@ -1985,9 +1983,7 @@ class Choices {
     const target = e.target;
     // If target is something that concerns us
     if (this.containerOuter.contains(target)) {
-      const hasActiveDropdown = this.dropdown.element.classList.contains(
-        this.config.classNames.activeState,
-      );
+      const hasActiveDropdown = this.dropdown.isActive;
       const focusActions = {
         text: () => {
           if (target === this.input) {
@@ -2031,9 +2027,7 @@ class Choices {
     // If target is something that concerns us
     if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
-      const hasActiveDropdown = this.dropdown.element.classList.contains(
-        this.config.classNames.activeState,
-      );
+      const hasActiveDropdown = this.dropdown.isActive;
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
