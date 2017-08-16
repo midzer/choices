@@ -1,7 +1,8 @@
 export default class Dropdown {
-  constructor(instance, element) {
+  constructor(instance, element, classNames) {
     this.instance = instance;
     this.element = element;
+    this.classNames = classNames;
     this.dimensions = this.element.getBoundingClientRect();
     this.position = Math.ceil(this.dimensions.top + window.scrollY + this.element.offsetHeight);
     this.isActive = false;
@@ -14,9 +15,9 @@ export default class Dropdown {
    */
   toggle() {
     if (this.isActive) {
-      this.hideDropdown();
+      this.hide();
     } else {
-      this.showDropdown();
+      this.show();
     }
 
     return this.instance;
@@ -28,8 +29,8 @@ export default class Dropdown {
    * @public
    */
   show() {
-    this.dropdown.classList.add(this.config.classNames.activeState);
-    this.dropdown.setAttribute('aria-expanded', 'true');
+    this.element.classList.add(this.classNames.activeState);
+    this.element.setAttribute('aria-expanded', 'true');
     this.isActive = true;
     return this.instance;
   }
@@ -40,7 +41,7 @@ export default class Dropdown {
    * @public
    */
   hide() {
-    this.element.classList.remove(this.config.classNames.activeState);
+    this.element.classList.remove(this.classNames.activeState);
     this.element.setAttribute('aria-expanded', 'false');
     this.isActive = false;
     return this.instance;

@@ -754,8 +754,7 @@ class Choices {
 
     this.containerOuter.classList.add(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'true');
-    this.dropdown.element.classList.add(this.config.classNames.activeState);
-    this.dropdown.element.setAttribute('aria-expanded', 'true');
+    this.dropdown.show();
 
     const dimensions = this.dropdown.element.getBoundingClientRect();
     const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
@@ -794,8 +793,7 @@ class Choices {
 
     this.containerOuter.classList.remove(this.config.classNames.openState);
     this.containerOuter.setAttribute('aria-expanded', 'false');
-    this.dropdown.element.classList.remove(this.config.classNames.activeState);
-    this.dropdown.element.setAttribute('aria-expanded', 'false');
+    this.dropdown.hide();
 
     if (isFlipped) {
       this.containerOuter.classList.remove(this.config.classNames.flippedState);
@@ -817,13 +815,7 @@ class Choices {
    * @public
    */
   toggleDropdown() {
-    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
-    if (hasActiveDropdown) {
-      this.hideDropdown();
-    } else {
-      this.showDropdown(true);
-    }
-
+    this.dropdown.toggle();
     return this;
   }
 
@@ -1246,7 +1238,7 @@ class Choices {
     const id = element.getAttribute('data-id');
     const choice = this.store.getChoiceById(id);
     const passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
-    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.isActive;
 
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
@@ -1602,7 +1594,7 @@ class Choices {
     const target = e.target;
     const activeItems = this.store.getItemsFilteredByActive();
     const hasFocusedInput = this.input === document.activeElement;
-    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList && this.itemList.children;
     const keyString = String.fromCharCode(e.keyCode);
 
@@ -1678,7 +1670,7 @@ class Choices {
 
     const onEscapeKey = () => {
       if (hasActiveDropdown) {
-        this.toggleDropdown();
+        this.dropdown.hide();
         this.containerOuter.focus();
       }
     };
@@ -1843,7 +1835,7 @@ class Choices {
    */
   _onTouchEnd(e) {
     const target = e.target || e.touches[0].target;
-    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.isActive;
 
     // If a user tapped within our container...
     if (this.wasTap === true && this.containerOuter.contains(target)) {
@@ -1911,7 +1903,7 @@ class Choices {
    */
   _onClick(e) {
     const target = e.target;
-    const hasActiveDropdown = this.dropdown.element.classList.contains(this.config.classNames.activeState);
+    const hasActiveDropdown = this.dropdown.isActive;
     const activeItems = this.store.getItemsFilteredByActive();
 
     // If target is something that concerns us
@@ -2707,7 +2699,7 @@ class Choices {
     this.input = input;
     this.choiceList = choiceList;
     this.itemList = itemList;
-    this.dropdown = new Dropdown(this, dropdown);
+    this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
 
     // Hide passed input
     this.passedElement.classList.add(

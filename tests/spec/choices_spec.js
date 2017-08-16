@@ -763,10 +763,10 @@ describe('Choices', () => {
     });
 
     it('should handle toggleDropdown()', function() {
-      spyOn(this.choices, 'hideDropdown');
-      this.choices.showDropdown();
-      this.choices.toggleDropdown();
-      expect(this.choices.hideDropdown).toHaveBeenCalled();
+      spyOn(this.choices.dropdown, 'hide');
+      this.choices.dropdown.show();
+      this.choices.dropdown.toggle();
+      expect(this.choices.dropdown.hide).toHaveBeenCalled();
     });
 
     it('should handle hideDropdown()', function() {
