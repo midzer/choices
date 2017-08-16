@@ -1,3 +1,6 @@
+/**
+ * Dropdown
+ */
 export default class Dropdown {
   constructor(instance, element, classNames) {
     this.instance = instance;

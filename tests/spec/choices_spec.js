@@ -115,11 +115,11 @@ describe('Choices', () => {
     });
 
     it('should create an outer container', function() {
-      expect(this.choices.containerOuter).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.containerOuter.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an inner container', function() {
-      expect(this.choices.containerInner).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.containerInner.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create a choice list', function() {
@@ -398,7 +398,7 @@ describe('Choices', () => {
 
     it('should open the dropdown on click', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       this.choices._onClick({
         target: container,
         ctrlKey: false,
@@ -410,7 +410,7 @@ describe('Choices', () => {
 
     it('should close the dropdown on double click', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       const openState = this.choices.config.classNames.openState;
 
       this.choices._onClick({
@@ -434,7 +434,7 @@ describe('Choices', () => {
 
       spyOn(this.choices, 'hideDropdown');
 
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       const choiceList = this.choices.choiceList;
 
       // Click to open dropdown
@@ -457,7 +457,7 @@ describe('Choices', () => {
 
     it('should trigger showDropdown on dropdown opening', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
 
       const showDropdownSpy = jasmine.createSpy('showDropdownSpy');
       const passedElement = this.choices.passedElement;
@@ -477,7 +477,7 @@ describe('Choices', () => {
 
     it('should trigger hideDropdown on dropdown closing', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
 
       const hideDropdownSpy = jasmine.createSpy('hideDropdownSpy');
       const passedElement = this.choices.passedElement;
@@ -742,8 +742,8 @@ describe('Choices', () => {
 
     it('should handle showDropdown()', function() {
       this.choices.showDropdown();
-      const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
-      const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.openState);
+      const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
       const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
       expect(hasOpenState && hasAttr && hasActiveState).toBe(true);
     });
@@ -751,8 +751,8 @@ describe('Choices', () => {
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
       this.choices.hideDropdown();
-      const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
-      const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.openState);
+      const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
       const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
 
       expect(hasOpenState && hasAttr && hasActiveState).toBe(false);
@@ -767,7 +767,7 @@ describe('Choices', () => {
 
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
-      expect(this.choices.containerOuter.classList).toContain(this.choices.config.classNames.openState);
+      expect(this.choices.containerOuter.element.classList).toContain(this.choices.config.classNames.openState);
     });
 
     it('should handle getValue()', function() {
@@ -873,16 +873,16 @@ describe('Choices', () => {
       this.choices.disable();
 
       expect(this.choices.input.disabled).toBe(true);
-      expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
-      expect(this.choices.containerOuter.getAttribute('aria-disabled')).toBe('true');
+      expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
+      expect(this.choices.containerOuter.element.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('should handle enable()', function() {
       this.choices.enable();
 
       expect(this.choices.input.disabled).toBe(false);
-      expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
-      expect(this.choices.containerOuter.hasAttribute('aria-disabled')).toBe(false);
+      expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
+      expect(this.choices.containerOuter.element.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('should handle ajax()', function() {
@@ -934,13 +934,13 @@ describe('Choices', () => {
     it('should handle disable()', function() {
       this.choices.disable();
 
-      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('-1');
+      expect(this.choices.containerOuter.element.getAttribute('tabindex')).toBe('-1');
     });
 
     it('should handle enable()', function() {
       this.choices.enable();
 
-      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('0');
+      expect(this.choices.containerOuter.element.getAttribute('tabindex')).toBe('0');
     });
   });
 
@@ -1004,7 +1004,7 @@ describe('Choices', () => {
         position: 'top',
       });
 
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       this.choices.input.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(true);
     });
@@ -1014,7 +1014,7 @@ describe('Choices', () => {
         position: 'bottom',
       });
 
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       this.choices.input.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
     });

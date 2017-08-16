@@ -2,6 +2,7 @@ import Fuse from 'fuse.js';
 import classNames from 'classnames';
 import Store from './store/index';
 import Dropdown from './components/dropdown';
+import Container from './components/container';
 import {
   addItem,
   removeItem,
@@ -308,9 +309,13 @@ class Choices {
     this.passedElement.value = this.passedElement.value;
 
     // Move passed element back to original position
-    this.containerOuter.parentNode.insertBefore(this.passedElement, this.containerOuter);
+    this.containerOuter.element.parentNode.insertBefore(
+      this.passedElement,
+      this.containerOuter.element,
+    );
+
     // Remove added elements
-    this.containerOuter.parentNode.removeChild(this.containerOuter);
+    this.containerOuter.element.parentNode.removeChild(this.containerOuter.element);
 
     // Clear data store
     this.clearStore();
@@ -752,8 +757,8 @@ class Choices {
       html.offsetHeight,
     );
 
-    this.containerOuter.classList.add(this.config.classNames.openState);
-    this.containerOuter.setAttribute('aria-expanded', 'true');
+    this.containerOuter.element.classList.add(this.config.classNames.openState);
+    this.containerOuter.element.setAttribute('aria-expanded', 'true');
     this.dropdown.show();
 
     const dimensions = this.dropdown.element.getBoundingClientRect();
@@ -769,7 +774,7 @@ class Choices {
     }
 
     if (shouldFlip) {
-      this.containerOuter.classList.add(this.config.classNames.flippedState);
+      this.containerOuter.element.classList.add(this.config.classNames.flippedState);
     }
 
     // Optionally focus the input if we have a search input
@@ -789,14 +794,16 @@ class Choices {
    */
   hideDropdown(blurInput = false) {
     // A dropdown flips if it does not have space within the page
-    const isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
+    const isFlipped = this.containerOuter.element.classList.contains(
+      this.config.classNames.flippedState,
+    );
 
-    this.containerOuter.classList.remove(this.config.classNames.openState);
-    this.containerOuter.setAttribute('aria-expanded', 'false');
+    this.containerOuter.element.classList.remove(this.config.classNames.openState);
+    this.containerOuter.element.setAttribute('aria-expanded', 'false');
     this.dropdown.hide();
 
     if (isFlipped) {
-      this.containerOuter.classList.remove(this.config.classNames.flippedState);
+      this.containerOuter.element.classList.remove(this.config.classNames.flippedState);
     }
 
     // Optionally blur the input if we have a search input
@@ -978,7 +985,7 @@ class Choices {
 
     // Add choices if passed
     if (choices && choices.length) {
-      this.containerOuter.classList.remove(this.config.classNames.loadingState);
+      this.containerOuter.element.classList.remove(this.config.classNames.loadingState);
       choices.forEach((result) => {
         if (result.choices) {
           this._addGroup(
@@ -1051,7 +1058,7 @@ class Choices {
     }
 
     this.passedElement.disabled = false;
-    const isDisabled = this.containerOuter.classList.contains(
+    const isDisabled = this.containerOuter.element.classList.contains(
       this.config.classNames.disabledState,
     );
 
@@ -1059,10 +1066,10 @@ class Choices {
       this._addEventListeners();
       this.passedElement.removeAttribute('disabled');
       this.input.removeAttribute('disabled');
-      this.containerOuter.classList.remove(this.config.classNames.disabledState);
-      this.containerOuter.removeAttribute('aria-disabled');
+      this.containerOuter.element.classList.remove(this.config.classNames.disabledState);
+      this.containerOuter.element.removeAttribute('aria-disabled');
       if (this.isSelectOneElement) {
-        this.containerOuter.setAttribute('tabindex', '0');
+        this.containerOuter.element.setAttribute('tabindex', '0');
       }
     }
 
@@ -1080,7 +1087,7 @@ class Choices {
     }
 
     this.passedElement.disabled = true;
-    const isEnabled = !this.containerOuter.classList.contains(
+    const isEnabled = !this.containerOuter.element.classList.contains(
       this.config.classNames.disabledState,
     );
 
@@ -1088,10 +1095,10 @@ class Choices {
       this._removeEventListeners();
       this.passedElement.setAttribute('disabled', '');
       this.input.setAttribute('disabled', '');
-      this.containerOuter.classList.add(this.config.classNames.disabledState);
-      this.containerOuter.setAttribute('aria-disabled', 'true');
+      this.containerOuter.element.classList.add(this.config.classNames.disabledState);
+      this.containerOuter.element.setAttribute('aria-disabled', 'true');
       if (this.isSelectOneElement) {
-        this.containerOuter.setAttribute('tabindex', '-1');
+        this.containerOuter.element.setAttribute('tabindex', '-1');
       }
     }
 
@@ -1269,7 +1276,7 @@ class Choices {
     // We wont to close the dropdown if we are dealing with a single select box
     if (hasActiveDropdown && this.isSelectOneElement) {
       this.hideDropdown();
-      this.containerOuter.focus();
+      this.containerOuter.element.focus();
     }
   }
 
@@ -1367,8 +1374,8 @@ class Choices {
   _handleLoadingState(isLoading = true) {
     let placeholderItem = this.itemList.querySelector(`.${this.config.classNames.placeholder}`);
     if (isLoading) {
-      this.containerOuter.classList.add(this.config.classNames.loadingState);
-      this.containerOuter.setAttribute('aria-busy', 'true');
+      this.containerOuter.element.classList.add(this.config.classNames.loadingState);
+      this.containerOuter.element.setAttribute('aria-busy', 'true');
       if (this.isSelectOneElement) {
         if (!placeholderItem) {
           placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
@@ -1381,7 +1388,7 @@ class Choices {
       }
     } else {
       // Remove loading states/text
-      this.containerOuter.classList.remove(this.config.classNames.loadingState);
+      this.containerOuter.element.classList.remove(this.config.classNames.loadingState);
 
       if (this.isSelectOneElement) {
         placeholderItem.innerHTML = (this.placeholder || '');
@@ -1438,7 +1445,7 @@ class Choices {
         this._handleLoadingState(false);
       }
 
-      this.containerOuter.removeAttribute('aria-busy');
+      this.containerOuter.element.removeAttribute('aria-busy');
     };
   }
 
@@ -1528,8 +1535,8 @@ class Choices {
     document.addEventListener('mouseover', this._onMouseOver);
 
     if (this.isSelectOneElement) {
-      this.containerOuter.addEventListener('focus', this._onFocus);
-      this.containerOuter.addEventListener('blur', this._onBlur);
+      this.containerOuter.element.addEventListener('focus', this._onFocus);
+      this.containerOuter.element.addEventListener('blur', this._onBlur);
     }
 
     this.input.addEventListener('input', this._onInput);
@@ -1553,8 +1560,8 @@ class Choices {
     document.removeEventListener('mouseover', this._onMouseOver);
 
     if (this.isSelectOneElement) {
-      this.containerOuter.removeEventListener('focus', this._onFocus);
-      this.containerOuter.removeEventListener('blur', this._onBlur);
+      this.containerOuter.element.removeEventListener('focus', this._onFocus);
+      this.containerOuter.element.removeEventListener('blur', this._onBlur);
     }
 
     this.input.removeEventListener('input', this._onInput);
@@ -1587,7 +1594,7 @@ class Choices {
    * @return
    */
   _onKeyDown(e) {
-    if (e.target !== this.input && !this.containerOuter.contains(e.target)) {
+    if (e.target !== this.input && !this.containerOuter.element.contains(e.target)) {
       return;
     }
 
@@ -1671,7 +1678,7 @@ class Choices {
     const onEscapeKey = () => {
       if (hasActiveDropdown) {
         this.dropdown.hide();
-        this.containerOuter.focus();
+        this.containerOuter.element.focus();
       }
     };
 
@@ -1836,10 +1843,10 @@ class Choices {
     const hasActiveDropdown = this.dropdown.isActive;
 
     // If a user tapped within our container...
-    if (this.wasTap === true && this.containerOuter.contains(target)) {
+    if (this.wasTap === true && this.containerOuter.element.contains(target)) {
       // ...and we aren't dealing with a single select box, show dropdown/focus input
       if (
-        (target === this.containerOuter || target === this.containerInner) &&
+        (target === this.containerOuter.element || target === this.containerInner.element) &&
         !this.isSelectOneElement
       ) {
         if (this.isTextElement) {
@@ -1873,7 +1880,7 @@ class Choices {
       this.isScrollingOnIe = true;
     }
 
-    if (this.containerOuter.contains(target) && target !== this.input) {
+    if (this.containerOuter.element.contains(target) && target !== this.input) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
@@ -1905,7 +1912,7 @@ class Choices {
     const activeItems = this.store.getItemsFilteredByActive();
 
     // If target is something that concerns us
-    if (this.containerOuter.contains(target)) {
+    if (this.containerOuter.element.contains(target)) {
       // Handle button delete
       if (target.hasAttribute('data-button')) {
         this._handleButtonAction(activeItems, target);
@@ -1920,7 +1927,7 @@ class Choices {
           this.showDropdown(true);
         } else {
           this.showDropdown();
-          this.containerOuter.focus();
+          this.containerOuter.element.focus();
         }
       } else if (
         this.isSelectOneElement &&
@@ -1938,7 +1945,7 @@ class Choices {
       }
 
       // Remove focus state
-      this.containerOuter.classList.remove(this.config.classNames.focusState);
+      this.containerOuter.element.classList.remove(this.config.classNames.focusState);
 
       // Close all other dropdowns
       if (hasActiveDropdown) {
@@ -1982,16 +1989,16 @@ class Choices {
   _onFocus(e) {
     const target = e.target;
     // If target is something that concerns us
-    if (this.containerOuter.contains(target)) {
+    if (this.containerOuter.element.contains(target)) {
       const hasActiveDropdown = this.dropdown.isActive;
       const focusActions = {
         text: () => {
           if (target === this.input) {
-            this.containerOuter.classList.add(this.config.classNames.focusState);
+            this.containerOuter.element.classList.add(this.config.classNames.focusState);
           }
         },
         'select-one': () => {
-          this.containerOuter.classList.add(this.config.classNames.focusState);
+          this.containerOuter.element.classList.add(this.config.classNames.focusState);
           if (target === this.input) {
             // Show dropdown if it isn't already showing
             if (!hasActiveDropdown) {
@@ -2003,7 +2010,7 @@ class Choices {
           if (target === this.input) {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
-            this.containerOuter.classList.add(this.config.classNames.focusState);
+            this.containerOuter.element.classList.add(this.config.classNames.focusState);
 
             if (!hasActiveDropdown) {
               this.showDropdown(true);
@@ -2025,7 +2032,7 @@ class Choices {
   _onBlur(e) {
     const target = e.target;
     // If target is something that concerns us
-    if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
+    if (this.containerOuter.element.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasActiveDropdown = this.dropdown.isActive;
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
@@ -2033,7 +2040,7 @@ class Choices {
         text: () => {
           if (target === this.input) {
             // Remove the focus state
-            this.containerOuter.classList.remove(this.config.classNames.focusState);
+            this.containerOuter.element.classList.remove(this.config.classNames.focusState);
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
@@ -2045,8 +2052,8 @@ class Choices {
           }
         },
         'select-one': () => {
-          this.containerOuter.classList.remove(this.config.classNames.focusState);
-          if (target === this.containerOuter) {
+          this.containerOuter.element.classList.remove(this.config.classNames.focusState);
+          if (target === this.containerOuter.element) {
             // Hide dropdown if it is showing
             if (hasActiveDropdown && !this.canSearch) {
               this.hideDropdown();
@@ -2060,7 +2067,7 @@ class Choices {
         'select-multiple': () => {
           if (target === this.input) {
             // Remove the focus state
-            this.containerOuter.classList.remove(this.config.classNames.focusState);
+            this.containerOuter.element.classList.remove(this.config.classNames.focusState);
             // Hide dropdown if it is showing
             if (hasActiveDropdown) {
               this.hideDropdown();
@@ -2183,7 +2190,7 @@ class Choices {
       // Highlight given option, and set accessiblity attributes
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
-      this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+      this.containerOuter.element.setAttribute('aria-activedescendant', passedEl.id);
     }
   }
 
@@ -2688,8 +2695,8 @@ class Choices {
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
 
-    this.containerOuter = containerOuter;
-    this.containerInner = containerInner;
+    this.containerOuter = new Container(this, containerOuter, this.config.classNames);
+    this.containerInner = new Container(this, containerInner, this.config.classNames);
     this.input = input;
     this.choiceList = choiceList;
     this.itemList = itemList;
@@ -2716,10 +2723,10 @@ class Choices {
     this.passedElement.setAttribute('data-choice', 'active');
 
     // Wrap input in container preserving DOM ordering
-    wrap(this.passedElement, containerInner);
+    wrap(this.passedElement, this.containerInner.element);
 
     // Wrapper inner container with outer container
-    wrap(containerInner, containerOuter);
+    wrap(this.containerInner.element, this.containerOuter.element);
 
     if (this.isSelectOneElement) {
       input.placeholder = this.config.searchPlaceholderValue || '';
@@ -2732,16 +2739,16 @@ class Choices {
       this.disable();
     }
 
-    containerOuter.appendChild(containerInner);
-    containerOuter.appendChild(this.dropdown.element);
-    containerInner.appendChild(itemList);
+    this.containerOuter.element.appendChild(this.containerInner.element);
+    this.containerOuter.element.appendChild(this.dropdown.element);
+    this.containerInner.element.appendChild(itemList);
 
     if (!this.isTextElement) {
       dropdown.appendChild(choiceList);
     }
 
     if (this.isSelectMultipleElement || this.isTextElement) {
-      containerInner.appendChild(input);
+      this.containerInner.element.appendChild(input);
     } else if (this.canSearch) {
       dropdown.insertBefore(input, dropdown.firstChild);
     }
