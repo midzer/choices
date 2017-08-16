@@ -1,13 +1,13 @@
 import 'whatwg-fetch';
 import 'es6-promise';
 import 'core-js/fn/object/assign';
-import Choices from '../../assets/scripts/src/choices.js';
-import itemReducer from '../../assets/scripts/src/reducers/items.js';
-import choiceReducer from '../../assets/scripts/src/reducers/choices.js';
+import Choices from '../../assets/scripts/src/choices';
+import itemReducer from '../../assets/scripts/src/reducers/items';
+import choiceReducer from '../../assets/scripts/src/reducers/choices';
 import {
   addItem as addItemAction,
-  addChoice as addChoiceAction
-} from '../../assets/scripts/src/actions/index.js';
+  addChoice as addChoiceAction,
+} from '../../assets/scripts/src/actions/index';
 
 describe('Choices', () => {
   describe('should initialize Choices', () => {
@@ -157,7 +157,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept text inputs', function() {
+  describe('should accept text inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('input');
       this.input.type = 'text';
@@ -190,7 +190,7 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       expect(this.choices.currentState.items[0].value).toContain(this.choices.input.value);
@@ -214,7 +214,7 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.value);
@@ -231,7 +231,7 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       this.choices.input.focus();
@@ -240,7 +240,7 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
@@ -261,7 +261,7 @@ describe('Choices', () => {
       this.choices._onKeyDown({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
@@ -271,7 +271,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept single select inputs', function() {
+  describe('should accept single select inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -295,7 +295,7 @@ describe('Choices', () => {
 
     it('should not apply placeholderValue to input', function() {
       this.choices = new Choices(this.input, {
-        placeholderValue: 'Placeholder'
+        placeholderValue: 'Placeholder',
       });
 
       expect(this.choices.input.placeholder).not.toEqual('Placeholder');
@@ -303,7 +303,7 @@ describe('Choices', () => {
 
     it('should apply searchPlaceholderValue to input', function() {
       this.choices = new Choices(this.input, {
-        searchPlaceholderValue: 'Placeholder'
+        searchPlaceholderValue: 'Placeholder',
       });
 
       expect(this.choices.input.placeholder).toEqual('Placeholder');
@@ -322,7 +322,7 @@ describe('Choices', () => {
 
     it('should highlight the choices on keydown', function() {
       this.choices = new Choices(this.input, {
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
       this.choices.input.focus();
 
@@ -332,7 +332,7 @@ describe('Choices', () => {
           target: this.choices.input,
           keyCode: 40,
           ctrlKey: false,
-          preventDefault: () => {}
+          preventDefault: () => {},
         });
       }
 
@@ -348,7 +348,7 @@ describe('Choices', () => {
         target: this.choices.input,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
@@ -356,7 +356,7 @@ describe('Choices', () => {
         target: this.choices.input,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(this.choices.currentState.items.length).toBe(2);
@@ -379,7 +379,7 @@ describe('Choices', () => {
         target: this.choices.input,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
@@ -387,7 +387,7 @@ describe('Choices', () => {
         target: this.choices.input,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       const returnValue = changeSpy.calls.mostRecent().args[0].detail.value;
@@ -402,7 +402,7 @@ describe('Choices', () => {
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(true);
@@ -416,13 +416,13 @@ describe('Choices', () => {
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(document.activeElement === this.choices.input && container.classList.contains(openState)).toBe(false);
@@ -441,14 +441,14 @@ describe('Choices', () => {
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Hold mouse on scrollbar
       this.choices._onMouseDown({
         target: choiceList,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(this.choices.isScrollingOnIe).toBe(true);
@@ -469,7 +469,7 @@ describe('Choices', () => {
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(showDropdownSpy).toHaveBeenCalled();
@@ -489,13 +489,13 @@ describe('Choices', () => {
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(hideDropdownSpy).toHaveBeenCalled();
@@ -516,12 +516,10 @@ describe('Choices', () => {
       this.choices._onKeyUp({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const mostAccurateResult = this.choices.currentState.choices.filter(function (choice) {
-        return choice.active;
-      });
+      const mostAccurateResult = this.choices.currentState.choices.filter((choice) => choice.active);
 
       expect(this.choices.isSearching && mostAccurateResult[0].value === 'Value 3').toBe(true);
       expect(searchSpy).toHaveBeenCalled();
@@ -529,7 +527,7 @@ describe('Choices', () => {
 
     it('shouldn\'t filter choices when searching', function() {
       this.choices = new Choices(this.input, {
-        searchChoices: false
+        searchChoices: false,
       });
 
       this.choices.setValue(['Javascript', 'HTML', 'Jasmine']);
@@ -546,12 +544,10 @@ describe('Choices', () => {
       this.choices._onKeyUp({
         target: this.choices.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const activeOptions = this.choices.currentState.choices.filter(function(choice) {
-        return choice.active;
-      });
+      const activeOptions = this.choices.currentState.choices.filter((choice) => choice.active);
 
       expect(activeOptions.length).toEqual(this.choices.currentState.choices.length);
       expect(searchSpy).toHaveBeenCalled();
@@ -562,14 +558,14 @@ describe('Choices', () => {
         shouldSort: false,
         choices: [{
           value: 'Value 5',
-          label: 'Label Five'
+          label: 'Label Five',
         }, {
           value: 'Value 6',
-          label: 'Label Six'
+          label: 'Label Six',
         }, {
           value: 'Value 7',
-          label: 'Label Seven'
-        }, ],
+          label: 'Label Seven',
+        }],
       });
 
       expect(this.choices.currentState.choices[0].value).toEqual('Value 5');
@@ -580,14 +576,14 @@ describe('Choices', () => {
         shouldSort: true,
         choices: [{
           value: 'Value 5',
-          label: 'Label Five'
+          label: 'Label Five',
         }, {
           value: 'Value 6',
-          label: 'Label Six'
+          label: 'Label Six',
         }, {
           value: 'Value 7',
-          label: 'Label Seven'
-        }, ],
+          label: 'Label Seven',
+        }],
       });
 
       expect(this.choices.currentState.choices[0].value).toEqual('Value 1');
@@ -596,14 +592,14 @@ describe('Choices', () => {
     it('should set searchPlaceholderValue if set', function() {
       const dummyPlaceholder = 'Test placeholder';
       this.choices = new Choices(this.input, {
-        searchPlaceholderValue: dummyPlaceholder
+        searchPlaceholderValue: dummyPlaceholder,
       });
 
       expect(this.choices.input.placeholder).toEqual(dummyPlaceholder);
     });
   });
 
-  describe('should accept multiple select inputs', function() {
+  describe('should accept multiple select inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -631,15 +627,15 @@ describe('Choices', () => {
           value: 'One',
           label: 'Label One',
           selected: true,
-          disabled: false
+          disabled: false,
         }, {
           value: 'Two',
           label: 'Label Two',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Three',
-          label: 'Label Three'
-        }, ],
+          label: 'Label Three',
+        }],
       });
     });
 
@@ -668,7 +664,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should handle public methods on select input types', function() {
+  describe('should handle public methods on select input types', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -719,7 +715,7 @@ describe('Choices', () => {
 
       this.choices.highlightAll();
 
-      const unhighlightedItems = items.some((item) => item.highlighted === false);
+      const unhighlightedItems = items.some(item => item.highlighted === false);
 
       expect(unhighlightedItems).toBe(false);
     });
@@ -729,7 +725,7 @@ describe('Choices', () => {
 
       this.choices.unhighlightAll();
 
-      const highlightedItems = items.some((item) => item.highlighted === true);
+      const highlightedItems = items.some(item => item.highlighted === true);
 
       expect(highlightedItems).toBe(false);
     });
@@ -739,7 +735,7 @@ describe('Choices', () => {
       this.choices.highlightAll();
       this.choices.removeHighlightedItems();
 
-      const activeItems = items.some((item) => item.active === true);
+      const activeItems = items.some(item => item.active === true);
 
       expect(activeItems).toBe(false);
     });
@@ -814,15 +810,15 @@ describe('Choices', () => {
         choices: [{
           value: 'Child One',
           label: 'Child One',
-          selected: true
+          selected: true,
         }, {
           value: 'Child Two',
           label: 'Child Two',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Child Three',
-          label: 'Child Three'
-        }, ]
+          label: 'Child Three',
+        }],
       }, {
         label: 'Group two',
         id: 2,
@@ -830,14 +826,14 @@ describe('Choices', () => {
         choices: [{
           value: 'Child Four',
           label: 'Child Four',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Child Five',
-          label: 'Child Five'
+          label: 'Child Five',
         }, {
           value: 'Child Six',
-          label: 'Child Six'
-        }, ]
+          label: 'Child Six',
+        }],
       }], 'value', 'label');
 
 
@@ -853,10 +849,10 @@ describe('Choices', () => {
     it('should handle setChoices() with blank values', function() {
       this.choices.setChoices([{
         label: 'Choice one',
-        value: 'one'
+        value: 'one',
       }, {
         label: 'Choice two',
-        value: ''
+        value: '',
       }], 'value', 'label', true);
 
 
@@ -908,7 +904,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should handle public methods on select-one input types', function() {
+  describe('should handle public methods on select-one input types', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -948,7 +944,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should handle public methods on text input types', function() {
+  describe('should handle public methods on text input types', () => {
     beforeEach(function() {
       this.input = document.createElement('input');
       this.input.type = 'text';
@@ -977,7 +973,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should react to config options', function() {
+  describe('should react to config options', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -1015,7 +1011,7 @@ describe('Choices', () => {
 
     it('shouldn\'t flip the dropdown', function() {
       this.choices = new Choices(this.input, {
-        position: 'bottom'
+        position: 'bottom',
       });
 
       const container = this.choices.containerOuter;
@@ -1026,7 +1022,7 @@ describe('Choices', () => {
     it('should render selected choices', function() {
       this.choices = new Choices(this.input, {
         renderSelectedChoices: 'always',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
       const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(3);
@@ -1035,7 +1031,7 @@ describe('Choices', () => {
     it('shouldn\'t render selected choices', function() {
       this.choices = new Choices(this.input, {
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
       const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(1);
@@ -1071,7 +1067,7 @@ describe('Choices', () => {
           },
         ],
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: 4
+        renderChoiceLimit: 4,
       });
 
       const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
@@ -1079,8 +1075,8 @@ describe('Choices', () => {
     });
   });
 
-  describe('should allow custom properties provided by the user on items or choices', function() {
-    it('should allow the user to supply custom properties for an item', function() {
+  describe('should allow custom properties provided by the user on items or choices', () => {
+    it('should allow the user to supply custom properties for an item', () => {
       const randomItem = {
         id: 8999,
         choiceId: 9000,
@@ -1088,10 +1084,10 @@ describe('Choices', () => {
         value: 'value',
         label: 'label',
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
         placeholder: false,
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1104,7 +1100,7 @@ describe('Choices', () => {
         highlighted: false,
         customProperties: randomItem.customProperties,
         placeholder: false,
-        keyCode: randomItem.keyCode
+        keyCode: randomItem.keyCode,
       }];
 
       const action = addItemAction(
@@ -1114,13 +1110,13 @@ describe('Choices', () => {
         randomItem.choiceId,
         randomItem.groupId,
         randomItem.customProperties,
-        randomItem.keyCode
+        randomItem.keyCode,
       );
 
       expect(itemReducer([], action)).toEqual(expectedState);
     });
 
-    it('should allow the user to supply custom properties for a choice', function() {
+    it('should allow the user to supply custom properties for a choice', () => {
       const randomChoice = {
         id: 123,
         elementId: 321,
@@ -1129,10 +1125,10 @@ describe('Choices', () => {
         label: 'label',
         disabled: false,
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
         placeholder: false,
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1147,7 +1143,7 @@ describe('Choices', () => {
         score: 9999,
         customProperties: randomChoice.customProperties,
         placeholder: randomChoice.placeholder,
-        keyCode: randomChoice.keyCode
+        keyCode: randomChoice.keyCode,
       }];
 
       const action = addChoiceAction(
@@ -1158,14 +1154,14 @@ describe('Choices', () => {
         randomChoice.disabled,
         randomChoice.elementId,
         randomChoice.customProperties,
-        randomChoice.keyCode
+        randomChoice.keyCode,
       );
 
       expect(choiceReducer([], action)).toEqual(expectedState);
     });
   });
 
-  describe('should allow custom properties provided by the user on items or choices', function() {
+  describe('should allow custom properties provided by the user on items or choices', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -1180,7 +1176,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', function() {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       this.choices = new Choices(this.input);
@@ -1189,7 +1185,7 @@ describe('Choices', () => {
         label: 'My awesome choice',
         selected: false,
         disabled: false,
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }], 'value', 'label', true);
 
       this.choices.setValueByChoice('42');
@@ -1201,7 +1197,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties when directly creating a selected item', function() {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       this.choices = new Choices(this.input);
@@ -1209,7 +1205,7 @@ describe('Choices', () => {
       this.choices.setValue([{
         value: 'bar',
         label: 'foo',
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }]);
       const selectedItems = this.choices.getValue();
 
