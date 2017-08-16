@@ -6,9 +6,15 @@ export default class Dropdown {
     this.instance = instance;
     this.element = element;
     this.classNames = classNames;
+    this.dimensions = null;
+    this.position = null;
+    this.isActive = false;
+  }
+
+  getPosition() {
     this.dimensions = this.element.getBoundingClientRect();
     this.position = Math.ceil(this.dimensions.top + window.scrollY + this.element.offsetHeight);
-    this.isActive = false;
+    return this.position;
   }
 
   /**

@@ -747,35 +747,8 @@ class Choices {
    * @public
    */
   showDropdown(focusInput = false) {
-    const body = document.body;
-    const html = document.documentElement;
-    const winHeight = Math.max(
-      body.scrollHeight,
-      body.offsetHeight,
-      html.clientHeight,
-      html.scrollHeight,
-      html.offsetHeight,
-    );
-
-    this.containerOuter.element.classList.add(this.config.classNames.openState);
-    this.containerOuter.element.setAttribute('aria-expanded', 'true');
+    this.containerOuter.open(this.dropdown.getPosition());
     this.dropdown.show();
-
-    const dimensions = this.dropdown.element.getBoundingClientRect();
-    const dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
-
-    // If flip is enabled and the dropdown bottom position is
-    // greater than the window height flip the dropdown.
-    let shouldFlip = false;
-    if (this.config.position === 'auto') {
-      shouldFlip = dropdownPos >= winHeight;
-    } else if (this.config.position === 'top') {
-      shouldFlip = true;
-    }
-
-    if (shouldFlip) {
-      this.containerOuter.element.classList.add(this.config.classNames.flippedState);
-    }
 
     // Optionally focus the input if we have a search input
     if (focusInput && this.canSearch && document.activeElement !== this.input) {
@@ -793,18 +766,8 @@ class Choices {
    * @public
    */
   hideDropdown(blurInput = false) {
-    // A dropdown flips if it does not have space within the page
-    const isFlipped = this.containerOuter.element.classList.contains(
-      this.config.classNames.flippedState,
-    );
-
-    this.containerOuter.element.classList.remove(this.config.classNames.openState);
-    this.containerOuter.element.setAttribute('aria-expanded', 'false');
+    this.containerOuter.close();
     this.dropdown.hide();
-
-    if (isFlipped) {
-      this.containerOuter.element.classList.remove(this.config.classNames.flippedState);
-    }
 
     // Optionally blur the input if we have a search input
     if (blurInput && this.canSearch && document.activeElement === this.input) {
@@ -812,7 +775,6 @@ class Choices {
     }
 
     triggerEvent(this.passedElement, 'hideDropdown', {});
-
     return this;
   }
 
@@ -822,7 +784,12 @@ class Choices {
    * @public
    */
   toggleDropdown() {
-    this.dropdown.toggle();
+    if (this.dropdown.isActive) {
+      this.hideDropdown();
+    } else {
+      this.showDropdown(true);
+    }
+
     return this;
   }
 
@@ -1945,7 +1912,7 @@ class Choices {
       }
 
       // Remove focus state
-      this.containerOuter.element.classList.remove(this.config.classNames.focusState);
+      this.containerOuter.blur()
 
       // Close all other dropdowns
       if (hasActiveDropdown) {
@@ -1962,8 +1929,11 @@ class Choices {
    */
   _onMouseOver(e) {
     // If the dropdown is either the target or one of its children is the target
-    if (e.target === this.dropdown || this.dropdown.element.contains(e.target)) {
-      if (e.target.hasAttribute('data-choice')) this._highlightChoice(e.target);
+    if (
+      (e.target === this.dropdown || this.dropdown.element.contains(e.target)) &&
+      e.target.hasAttribute('data-choice')
+    ) {
+      this._highlightChoice(e.target);
     }
   }
 
@@ -1994,11 +1964,11 @@ class Choices {
       const focusActions = {
         text: () => {
           if (target === this.input) {
-            this.containerOuter.element.classList.add(this.config.classNames.focusState);
+            this.containerOuter.focus();
           }
         },
         'select-one': () => {
-          this.containerOuter.element.classList.add(this.config.classNames.focusState);
+          this.containerOuter.focus();
           if (target === this.input) {
             // Show dropdown if it isn't already showing
             if (!hasActiveDropdown) {
@@ -2010,7 +1980,7 @@ class Choices {
           if (target === this.input) {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
-            this.containerOuter.element.classList.add(this.config.classNames.focusState);
+            this.containerOuter.focus();
 
             if (!hasActiveDropdown) {
               this.showDropdown(true);
@@ -2040,7 +2010,7 @@ class Choices {
         text: () => {
           if (target === this.input) {
             // Remove the focus state
-            this.containerOuter.element.classList.remove(this.config.classNames.focusState);
+            this.containerOuter.blur();
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
@@ -2052,7 +2022,7 @@ class Choices {
           }
         },
         'select-one': () => {
-          this.containerOuter.element.classList.remove(this.config.classNames.focusState);
+          this.containerOuter.blur();
           if (target === this.containerOuter.element) {
             // Hide dropdown if it is showing
             if (hasActiveDropdown && !this.canSearch) {
@@ -2067,7 +2037,7 @@ class Choices {
         'select-multiple': () => {
           if (target === this.input) {
             // Remove the focus state
-            this.containerOuter.element.classList.remove(this.config.classNames.focusState);
+            this.containerOuter.blur();
             // Hide dropdown if it is showing
             if (hasActiveDropdown) {
               this.hideDropdown();
@@ -2695,8 +2665,8 @@ class Choices {
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
 
-    this.containerOuter = new Container(this, containerOuter, this.config.classNames);
-    this.containerInner = new Container(this, containerInner, this.config.classNames);
+    this.containerOuter = new Container(this, containerOuter);
+    this.containerInner = new Container(this, containerInner);
     this.input = input;
     this.choiceList = choiceList;
     this.itemList = itemList;
