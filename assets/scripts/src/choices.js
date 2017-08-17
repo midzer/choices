@@ -756,7 +756,6 @@ class Choices {
     }
 
     triggerEvent(this.passedElement, 'showDropdown', {});
-
     return this;
   }
 
@@ -805,10 +804,11 @@ class Choices {
     const selectedItems = [];
 
     items.forEach((item) => {
+      const itemValue = valueOnly ? item.value : item;
       if (this.isTextElement) {
-        selectedItems.push(valueOnly ? item.value : item);
+        selectedItems.push(itemValue);
       } else if (item.active) {
-        selectedItems.push(valueOnly ? item.value : item);
+        selectedItems.push(itemValue);
       }
     });
 
