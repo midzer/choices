@@ -10,6 +10,7 @@ export default class Container {
     this.isOpen = false;
     this.isFlipped = false;
     this.isFocussed = false;
+    this.isDisabled = false;
   }
 
   shouldFlip(dropdownPos) {
@@ -53,6 +54,7 @@ export default class Container {
   close() {
     this.element.classList.remove(this.classNames.openState);
     this.element.setAttribute('aria-expanded', 'false');
+    this.element.removeAttribute('aria-activedescendant');
     this.isOpen = false;
 
     // A dropdown flips if it does not have space within the page
@@ -70,5 +72,23 @@ export default class Container {
   blur() {
     this.element.classList.remove(this.classNames.focusState);
     this.isFocussed = false;
+  }
+
+  enable() {
+    this.element.classList.remove(this.config.classNames.disabledState);
+    this.element.removeAttribute('aria-disabled');
+    if (this.instance.isSelectOneElement) {
+      this.element.setAttribute('tabindex', '0');
+    }
+    this.isDisabled = false;
+  }
+
+  disable() {
+    this.element.classList.add(this.config.classNames.disabledState);
+    this.element.setAttribute('aria-disabled', 'true');
+    if (this.instance.isSelectOneElement) {
+      this.element.setAttribute('tabindex', '-1');
+    }
+    this.isDisabled = true;
   }
 }

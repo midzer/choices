@@ -768,6 +768,10 @@ class Choices {
     this.containerOuter.close();
     this.dropdown.hide();
 
+    // IE11 ignores aria-label and blocks virtual keyboard
+    // if aria-activedescendant is set without a dropdown
+    this.input.removeAttribute('aria-activedescendant');
+
     // Optionally blur the input if we have a search input
     if (blurInput && this.canSearch && document.activeElement === this.input) {
       this.input.blur();
@@ -1025,19 +1029,13 @@ class Choices {
     }
 
     this.passedElement.disabled = false;
-    const isDisabled = this.containerOuter.element.classList.contains(
-      this.config.classNames.disabledState,
-    );
+    const isDisabled = this.containerOuter.isDisabled;
 
     if (isDisabled) {
       this._addEventListeners();
       this.passedElement.removeAttribute('disabled');
       this.input.removeAttribute('disabled');
-      this.containerOuter.element.classList.remove(this.config.classNames.disabledState);
-      this.containerOuter.element.removeAttribute('aria-disabled');
-      if (this.isSelectOneElement) {
-        this.containerOuter.element.setAttribute('tabindex', '0');
-      }
+      this.containerOuter.enable();
     }
 
     return this;
@@ -1054,19 +1052,13 @@ class Choices {
     }
 
     this.passedElement.disabled = true;
-    const isEnabled = !this.containerOuter.element.classList.contains(
-      this.config.classNames.disabledState,
-    );
+    const isEnabled = !this.containerOuter.isDisabled;
 
     if (isEnabled) {
       this._removeEventListeners();
       this.passedElement.setAttribute('disabled', '');
       this.input.setAttribute('disabled', '');
-      this.containerOuter.element.classList.add(this.config.classNames.disabledState);
-      this.containerOuter.element.setAttribute('aria-disabled', 'true');
-      if (this.isSelectOneElement) {
-        this.containerOuter.element.setAttribute('tabindex', '-1');
-      }
+      this.containerOuter.disable();
     }
 
     return this;
@@ -1912,7 +1904,7 @@ class Choices {
       }
 
       // Remove focus state
-      this.containerOuter.blur()
+      this.containerOuter.blur();
 
       // Close all other dropdowns
       if (hasActiveDropdown) {
@@ -2132,7 +2124,10 @@ class Choices {
     let passedEl = el;
 
     if (choices && choices.length) {
-      const highlightedChoices = Array.from(this.dropdown.element.querySelectorAll(`.${this.config.classNames.highlightedState}`));
+      const highlightedChoices = Array.from(
+        this.dropdown.element.querySelectorAll(`.${this.config.classNames.highlightedState}`),
+      );
+      const hasActiveDropdown = this.dropdown.isActive;
 
       // Remove any highlighted choices
       highlightedChoices.forEach((choice) => {
@@ -2160,7 +2155,13 @@ class Choices {
       // Highlight given option, and set accessiblity attributes
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
-      this.containerOuter.element.setAttribute('aria-activedescendant', passedEl.id);
+
+      if (hasActiveDropdown) {
+        // IE11 ignores aria-label and blocks virtual keyboard
+        // if aria-activedescendant is set without a dropdown
+        this.input.setAttribute('aria-activedescendant', passedEl.id);
+        this.containerOuter.element.setAttribute('aria-activedescendant', passedEl.id);
+      }
     }
   }
 
