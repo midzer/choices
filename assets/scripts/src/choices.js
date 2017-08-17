@@ -797,6 +797,10 @@ class Choices {
     this.containerOuter.setAttribute('aria-expanded', 'false');
     this.dropdown.classList.remove(this.config.classNames.activeState);
     this.dropdown.setAttribute('aria-expanded', 'false');
+    // IE11 ignores aria-label and blocks virtual keyboard
+    // if aria-activedescendant is set without a dropdown
+    this.input.removeAttribute('aria-activedescendant');
+    this.containerOuter.removeAttribute('aria-activedescendant');
 
     if (isFlipped) {
       this.containerOuter.classList.remove(this.config.classNames.flippedState);
@@ -2198,7 +2202,16 @@ class Choices {
       // Highlight given option, and set accessiblity attributes
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
-      this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+
+      const hasActiveDropdown = this.dropdown.classList.contains(
+        this.config.classNames.activeState
+      );
+      if (hasActiveDropdown) {
+        // IE11 ignores aria-label and blocks virtual keyboard
+        // if aria-activedescendant is set without a dropdown
+        this.input.setAttribute('aria-activedescendant', passedEl.id);
+        this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
+      }
     }
   }
 
