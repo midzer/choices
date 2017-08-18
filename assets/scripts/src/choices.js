@@ -2204,7 +2204,7 @@ class Choices {
       passedEl.setAttribute('aria-selected', 'true');
 
       const hasActiveDropdown = this.dropdown.classList.contains(
-        this.config.classNames.activeState
+        this.config.classNames.activeState,
       );
       if (hasActiveDropdown) {
         // IE11 ignores aria-label and blocks virtual keyboard
