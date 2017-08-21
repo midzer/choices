@@ -259,7 +259,7 @@ describe('Choices', () => {
       this.choices.input.element.value = 'test';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
@@ -329,7 +329,7 @@ describe('Choices', () => {
       for (let i = 0; i < 2; i++) {
         // Key down to third choice
         this.choices._onKeyDown({
-          target: this.choices.input,
+          target: this.choices.input.element,
           keyCode: 40,
           ctrlKey: false,
           preventDefault: () => {},
@@ -345,7 +345,7 @@ describe('Choices', () => {
 
       // Key down to second choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 40,
         ctrlKey: false,
         preventDefault: () => {},
@@ -405,7 +405,7 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(true);
+      expect(document.activeElement === this.choices.input.element && container.classList.contains('is-open')).toBe(true);
     });
 
     it('should close the dropdown on double click', function() {
@@ -425,7 +425,7 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input && container.classList.contains(openState)).toBe(false);
+      expect(document.activeElement === this.choices.input.element && container.classList.contains(openState)).toBe(false);
     });
 
     it('should set scrolling flag and not hide dropdown when scrolling on IE', function() {

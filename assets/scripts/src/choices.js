@@ -1526,24 +1526,6 @@ class Choices {
   }
 
   /**
-   * Set the correct input width based on placeholder
-   * value or input value
-   * @return
-   */
-  _setInputWidth() {
-    if (this.placeholder) {
-      // If there is a placeholder, we only want to set the width of the input when it is a greater
-      // length than 75% of the placeholder. This stops the input jumping around.
-      if (this.input.element.value && this.input.element.value.length >= (this.placeholder.length / 1.25)) {
-        this.input.element.style.width = getWidthOfInput(this.input.element);
-      }
-    } else {
-      // If there is no placeholder, resize input to contents
-      this.input.element.style.width = getWidthOfInput(this.input.element);
-    }
-  }
-
-  /**
    * Key down event
    * @param  {Object} e Event
    * @return
@@ -1582,7 +1564,11 @@ class Choices {
       // If CTRL + A or CMD + A have been pressed and there are items to select
       if (ctrlDownKey && hasItems) {
         this.canSearch = false;
-        if (this.config.removeItems && !this.input.element.value && this.input.element === document.activeElement) {
+        if (
+          this.config.removeItems &&
+          !this.input.element.value &&
+          this.input.element === document.activeElement
+        ) {
           // Highlight items
           this.highlightAll();
         }
