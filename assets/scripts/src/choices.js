@@ -1250,7 +1250,7 @@ class Choices {
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
         this.input.element.value = lastItem.value;
-        this._setInputWidth();
+        this.input.setWidth();
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
       } else {
@@ -1717,7 +1717,7 @@ class Choices {
       if (value) {
         if (canAddItem.notice) {
           const dropdownItem = this._getTemplate('notice', canAddItem.notice);
-          this.dropdown.innerHTML = dropdownItem.outerHTML;
+          this.dropdown.element.innerHTML = dropdownItem.outerHTML;
         }
 
         if (canAddItem.response === true) {
@@ -1758,7 +1758,7 @@ class Choices {
    */
   _onInput() {
     if (!this.isSelectOneElement) {
-      this._setInputWidth();
+      this.input.setWidth();
     }
   }
 
@@ -2682,10 +2682,10 @@ class Choices {
     wrap(this.containerInner.element, this.containerOuter.element);
 
     if (this.isSelectOneElement) {
-      input.placeholder = this.config.searchPlaceholderValue || '';
+      this.input.element.placeholder = this.config.searchPlaceholderValue || '';
     } else if (this.placeholder) {
-      input.placeholder = this.placeholder;
-      input.style.width = getWidthOfInput(input);
+      this.input.element.placeholder = this.placeholder;
+      this.input.element.style.width = getWidthOfInput(this.input.element);
     }
 
     if (!this.config.addItems) {
@@ -2701,7 +2701,7 @@ class Choices {
     }
 
     if (this.isSelectMultipleElement || this.isTextElement) {
-      this.containerInner.element.appendChild(input);
+      this.containerInner.element.appendChild(this.input.element);
     } else if (this.canSearch) {
       dropdown.insertBefore(input, dropdown.firstChild);
     }
