@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import Store from './store/index';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
+import Input from './components/input';
 import {
   addItem,
   removeItem,
@@ -516,7 +517,7 @@ class Choices {
           }
 
           const activeItems = this.store.getItemsFilteredByActive();
-          const canAddItem = this._canAddItem(activeItems, this.input.value);
+          const canAddItem = this._canAddItem(activeItems, this.input.element.value);
 
           // If we have choices to show
           if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
@@ -751,8 +752,8 @@ class Choices {
     this.dropdown.show();
 
     // Optionally focus the input if we have a search input
-    if (focusInput && this.canSearch && document.activeElement !== this.input) {
-      this.input.focus();
+    if (focusInput && this.canSearch && document.activeElement !== this.input.element) {
+      this.input.element.focus();
     }
 
     triggerEvent(this.passedElement, 'showDropdown', {});
@@ -770,11 +771,11 @@ class Choices {
 
     // IE11 ignores aria-label and blocks virtual keyboard
     // if aria-activedescendant is set without a dropdown
-    this.input.removeAttribute('aria-activedescendant');
+    this.input.element.removeAttribute('aria-activedescendant');
 
     // Optionally blur the input if we have a search input
-    if (blurInput && this.canSearch && document.activeElement === this.input) {
-      this.input.blur();
+    if (blurInput && this.canSearch && document.activeElement === this.input.element) {
+      this.input.element.blur();
     }
 
     triggerEvent(this.passedElement, 'hideDropdown', {});
@@ -1001,13 +1002,8 @@ class Choices {
    * @public
    */
   clearInput() {
-    if (this.input.value) {
-      this.input.value = '';
-    }
-
-    if (!this.isSelectOneElement) {
-      this._setInputWidth();
-    }
+    const shouldSetInputWidth = !this.isSelectOneElement;
+    this.input.clear(shouldSetInputWidth);
 
     if (!this.isTextElement && this.config.searchEnabled) {
       this.isSearching = false;
@@ -1034,7 +1030,7 @@ class Choices {
     if (isDisabled) {
       this._addEventListeners();
       this.passedElement.removeAttribute('disabled');
-      this.input.removeAttribute('disabled');
+      this.input.element.removeAttribute('disabled');
       this.containerOuter.enable();
     }
 
@@ -1057,7 +1053,7 @@ class Choices {
     if (isEnabled) {
       this._removeEventListeners();
       this.passedElement.setAttribute('disabled', '');
-      this.input.setAttribute('disabled', '');
+      this.input.element.setAttribute('disabled', '');
       this.containerOuter.disable();
     }
 
@@ -1183,8 +1179,8 @@ class Choices {
 
       // Focus input as without focus, a user cannot do anything with a
       // highlighted item
-      if (document.activeElement !== this.input) {
-        this.input.focus();
+      if (document.activeElement !== this.input.element) {
+        this.input.element.focus();
       }
     }
   }
@@ -1253,7 +1249,7 @@ class Choices {
       // If editing the last item is allowed and there are not other selected items,
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
-        this.input.value = lastItem.value;
+        this.input.element.value = lastItem.value;
         this._setInputWidth();
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
@@ -1343,7 +1339,7 @@ class Choices {
           placeholderItem.innerHTML = this.config.loadingText;
         }
       } else {
-        this.input.placeholder = this.config.loadingText;
+        this.input.element.placeholder = this.config.loadingText;
       }
     } else {
       // Remove loading states/text
@@ -1352,7 +1348,7 @@ class Choices {
       if (this.isSelectOneElement) {
         placeholderItem.innerHTML = (this.placeholder || '');
       } else {
-        this.input.placeholder = (this.placeholder || '');
+        this.input.element.placeholder = (this.placeholder || '');
       }
     }
   }
@@ -1455,7 +1451,7 @@ class Choices {
     const hasUnactiveChoices = choices.some(option => !option.active);
 
     // Run callback if it is a function
-    if (this.input === document.activeElement) {
+    if (this.input.element === document.activeElement) {
       // Check that we have a value to search and the input was an alphanumeric character
       if (value && value.length >= this.config.searchFloor) {
         let resultCount = 0;
@@ -1498,10 +1494,10 @@ class Choices {
       this.containerOuter.element.addEventListener('blur', this._onBlur);
     }
 
-    this.input.addEventListener('input', this._onInput);
-    this.input.addEventListener('paste', this._onPaste);
-    this.input.addEventListener('focus', this._onFocus);
-    this.input.addEventListener('blur', this._onBlur);
+    this.input.element.addEventListener('input', this._onInput);
+    this.input.element.addEventListener('paste', this._onPaste);
+    this.input.element.addEventListener('focus', this._onFocus);
+    this.input.element.addEventListener('blur', this._onBlur);
   }
 
   /**
@@ -1523,10 +1519,10 @@ class Choices {
       this.containerOuter.element.removeEventListener('blur', this._onBlur);
     }
 
-    this.input.removeEventListener('input', this._onInput);
-    this.input.removeEventListener('paste', this._onPaste);
-    this.input.removeEventListener('focus', this._onFocus);
-    this.input.removeEventListener('blur', this._onBlur);
+    this.input.element.removeEventListener('input', this._onInput);
+    this.input.element.removeEventListener('paste', this._onPaste);
+    this.input.element.removeEventListener('focus', this._onFocus);
+    this.input.element.removeEventListener('blur', this._onBlur);
   }
 
   /**
@@ -1538,12 +1534,12 @@ class Choices {
     if (this.placeholder) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
-      if (this.input.value && this.input.value.length >= (this.placeholder.length / 1.25)) {
-        this.input.style.width = getWidthOfInput(this.input);
+      if (this.input.element.value && this.input.element.value.length >= (this.placeholder.length / 1.25)) {
+        this.input.element.style.width = getWidthOfInput(this.input.element);
       }
     } else {
       // If there is no placeholder, resize input to contents
-      this.input.style.width = getWidthOfInput(this.input);
+      this.input.element.style.width = getWidthOfInput(this.input.element);
     }
   }
 
@@ -1553,13 +1549,13 @@ class Choices {
    * @return
    */
   _onKeyDown(e) {
-    if (e.target !== this.input && !this.containerOuter.element.contains(e.target)) {
+    if (e.target !== this.input.element && !this.containerOuter.element.contains(e.target)) {
       return;
     }
 
     const target = e.target;
     const activeItems = this.store.getItemsFilteredByActive();
-    const hasFocusedInput = this.input === document.activeElement;
+    const hasFocusedInput = this.input.element === document.activeElement;
     const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList && this.itemList.children;
     const keyString = String.fromCharCode(e.keyCode);
@@ -1586,7 +1582,7 @@ class Choices {
       // If CTRL + A or CMD + A have been pressed and there are items to select
       if (ctrlDownKey && hasItems) {
         this.canSearch = false;
-        if (this.config.removeItems && !this.input.value && this.input === document.activeElement) {
+        if (this.config.removeItems && !this.input.element.value && this.input.element === document.activeElement) {
           // Highlight items
           this.highlightAll();
         }
@@ -1596,7 +1592,7 @@ class Choices {
     const onEnterKey = () => {
       // If enter key is pressed and the input has a value
       if (this.isTextElement && target.value) {
-        const value = this.input.value;
+        const value = this.input.element.value;
         const canAddItem = this._canAddItem(activeItems, value);
 
         // All is good, add
@@ -1719,11 +1715,11 @@ class Choices {
    * @private
    */
   _onKeyUp(e) {
-    if (e.target !== this.input) {
+    if (e.target !== this.input.element) {
       return;
     }
 
-    const value = this.input.value;
+    const value = this.input.element.value;
     const activeItems = this.store.getItemsFilteredByActive();
     const canAddItem = this._canAddItem(activeItems, value);
 
@@ -1762,7 +1758,7 @@ class Choices {
           );
         }
       } else if (this.canSearch && canAddItem.response) {
-        this._handleSearch(this.input.value);
+        this._handleSearch(this.input.element.value);
       }
     }
     // Re-establish canSearch value from changes in _onKeyDown
@@ -1810,8 +1806,8 @@ class Choices {
       ) {
         if (this.isTextElement) {
           // If text element, we only want to focus the input (if it isn't already)
-          if (document.activeElement !== this.input) {
-            this.input.focus();
+          if (document.activeElement !== this.input.element) {
+            this.input.element.focus();
           }
         } else if (!hasActiveDropdown) {
             // If a select box, we want to show the dropdown
@@ -1839,7 +1835,7 @@ class Choices {
       this.isScrollingOnIe = true;
     }
 
-    if (this.containerOuter.element.contains(target) && target !== this.input) {
+    if (this.containerOuter.element.contains(target) && target !== this.input.element) {
       const activeItems = this.store.getItemsFilteredByActive();
       const hasShiftKey = e.shiftKey;
 
@@ -1879,8 +1875,8 @@ class Choices {
 
       if (!hasActiveDropdown) {
         if (this.isTextElement) {
-          if (document.activeElement !== this.input) {
-            this.input.focus();
+          if (document.activeElement !== this.input.element) {
+            this.input.element.focus();
           }
         } else if (this.canSearch) {
           this.showDropdown(true);
@@ -1890,7 +1886,7 @@ class Choices {
         }
       } else if (
         this.isSelectOneElement &&
-        target !== this.input &&
+        target !== this.input.element &&
         !this.dropdown.element.contains(target)
       ) {
         this.hideDropdown(true);
@@ -1937,7 +1933,7 @@ class Choices {
    */
   _onPaste(e) {
     // Disable pasting into the input if option has been set
-    if (e.target === this.input && !this.config.paste) {
+    if (e.target === this.input.element && !this.config.paste) {
       e.preventDefault();
     }
   }
@@ -1955,13 +1951,13 @@ class Choices {
       const hasActiveDropdown = this.dropdown.isActive;
       const focusActions = {
         text: () => {
-          if (target === this.input) {
+          if (target === this.input.element) {
             this.containerOuter.focus();
           }
         },
         'select-one': () => {
           this.containerOuter.focus();
-          if (target === this.input) {
+          if (target === this.input.element) {
             // Show dropdown if it isn't already showing
             if (!hasActiveDropdown) {
               this.showDropdown();
@@ -1969,7 +1965,7 @@ class Choices {
           }
         },
         'select-multiple': () => {
-          if (target === this.input) {
+          if (target === this.input.element) {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
             this.containerOuter.focus();
@@ -2000,7 +1996,7 @@ class Choices {
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
-          if (target === this.input) {
+          if (target === this.input.element) {
             // Remove the focus state
             this.containerOuter.blur();
             // De-select any highlighted items
@@ -2021,13 +2017,13 @@ class Choices {
               this.hideDropdown();
             }
           }
-          if (target === this.input && hasActiveDropdown) {
+          if (target === this.input.element && hasActiveDropdown) {
             // Hide dropdown if it is showing
             this.hideDropdown();
           }
         },
         'select-multiple': () => {
-          if (target === this.input) {
+          if (target === this.input.element) {
             // Remove the focus state
             this.containerOuter.blur();
             // Hide dropdown if it is showing
@@ -2048,7 +2044,7 @@ class Choices {
       // closes the dropdown. To stop this, we refocus our input
       // if we know we are on IE *and* are scrolling.
       this.isScrollingOnIe = false;
-      this.input.focus();
+      this.input.element.focus();
     }
   }
 
@@ -2159,7 +2155,7 @@ class Choices {
       if (hasActiveDropdown) {
         // IE11 ignores aria-label and blocks virtual keyboard
         // if aria-activedescendant is set without a dropdown
-        this.input.setAttribute('aria-activedescendant', passedEl.id);
+        this.input.element.setAttribute('aria-activedescendant', passedEl.id);
         this.containerOuter.element.setAttribute('aria-activedescendant', passedEl.id);
       }
     }
@@ -2668,7 +2664,7 @@ class Choices {
 
     this.containerOuter = new Container(this, containerOuter);
     this.containerInner = new Container(this, containerInner);
-    this.input = input;
+    this.input = new Input(this, input);
     this.choiceList = choiceList;
     this.itemList = itemList;
     this.dropdown = new Dropdown(this, dropdown, this.config.classNames);

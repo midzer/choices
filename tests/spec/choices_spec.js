@@ -131,7 +131,7 @@ describe('Choices', () => {
     });
 
     it('should create an input', function() {
-      expect(this.choices.input).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.input.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create a dropdown', function() {
@@ -173,33 +173,33 @@ describe('Choices', () => {
 
     it('should apply placeholderValue to input', function() {
       this.choices = new Choices(this.input);
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
 
     it('should not apply searchPlaceholderValue to input', function() {
       this.choices = new Choices(this.input);
-      expect(this.choices.input.placeholder).not.toEqual('Test');
+      expect(this.choices.input.element.placeholder).not.toEqual('Test');
     });
 
     it('should accept a user inputted value', function() {
       this.choices = new Choices(this.input);
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      expect(this.choices.currentState.items[0].value).toContain(this.choices.input.value);
+      expect(this.choices.currentState.items[0].value).toContain(this.choices.input.element.value);
     });
 
     it('should copy the passed placeholder to the cloned input', function() {
       this.choices = new Choices(this.input);
 
-      expect(this.choices.input.placeholder).toEqual(this.input.placeholder);
+      expect(this.choices.input.element.placeholder).toEqual(this.input.placeholder);
     });
 
     it('should not allow duplicates if duplicateItems is false', function() {
@@ -208,16 +208,16 @@ describe('Choices', () => {
         items: ['test 1'],
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test 1';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test 1';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.value);
+      expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.element.value);
     });
 
     it('should filter input if regexFilter is passed', function() {
@@ -225,20 +225,20 @@ describe('Choices', () => {
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'josh@joshuajohnson.co.uk';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'josh@joshuajohnson.co.uk';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'not an email address';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'not an email address';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
@@ -255,8 +255,8 @@ describe('Choices', () => {
         appendValue: '-value',
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test';
 
       this.choices._onKeyDown({
         target: this.choices.input,
@@ -298,7 +298,7 @@ describe('Choices', () => {
         placeholderValue: 'Placeholder',
       });
 
-      expect(this.choices.input.placeholder).not.toEqual('Placeholder');
+      expect(this.choices.input.element.placeholder).not.toEqual('Placeholder');
     });
 
     it('should apply searchPlaceholderValue to input', function() {
@@ -306,12 +306,12 @@ describe('Choices', () => {
         searchPlaceholderValue: 'Placeholder',
       });
 
-      expect(this.choices.input.placeholder).toEqual('Placeholder');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder');
     });
 
     it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
-      this.choices.input.focus();
+      this.choices.input.element.focus();
       expect(this.choices.dropdown.element.classList).toContain(this.choices.config.classNames.activeState);
     });
 
@@ -324,7 +324,7 @@ describe('Choices', () => {
       this.choices = new Choices(this.input, {
         renderChoiceLimit: -1,
       });
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       for (let i = 0; i < 2; i++) {
         // Key down to third choice
@@ -341,7 +341,7 @@ describe('Choices', () => {
 
     it('should select choice on enter key press', function() {
       this.choices = new Choices(this.input);
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       // Key down to second choice
       this.choices._onKeyDown({
@@ -353,7 +353,7 @@ describe('Choices', () => {
 
       // Key down to select choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
         preventDefault: () => {},
@@ -372,11 +372,11 @@ describe('Choices', () => {
       passedElement.addEventListener('change', changeSpy);
       passedElement.addEventListener('addItem', addSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       // Key down to second choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 40,
         ctrlKey: false,
         preventDefault: () => {},
@@ -384,7 +384,7 @@ describe('Choices', () => {
 
       // Key down to select choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
         preventDefault: () => {},
@@ -464,7 +464,7 @@ describe('Choices', () => {
 
       passedElement.addEventListener('showDropdown', showDropdownSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       this.choices._onClick({
         target: container,
@@ -484,7 +484,7 @@ describe('Choices', () => {
 
       passedElement.addEventListener('hideDropdown', hideDropdownSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       this.choices._onClick({
         target: container,
@@ -509,17 +509,17 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', searchSpy);
 
-      this.choices.input.focus();
-      this.choices.input.value = '3 ';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = '3 ';
 
       // Key down to search
       this.choices._onKeyUp({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      const mostAccurateResult = this.choices.currentState.choices.filter((choice) => choice.active);
+      const mostAccurateResult = this.choices.currentState.choices.filter(choice => choice.active);
 
       expect(this.choices.isSearching && mostAccurateResult[0].value === 'Value 3').toBe(true);
       expect(searchSpy).toHaveBeenCalled();
@@ -537,17 +537,17 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', searchSpy);
 
-      this.choices.input.focus();
-      this.choices.input.value = 'Javascript';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'Javascript';
 
       // Key down to search
       this.choices._onKeyUp({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      const activeOptions = this.choices.currentState.choices.filter((choice) => choice.active);
+      const activeOptions = this.choices.currentState.choices.filter(choice => choice.active);
 
       expect(activeOptions.length).toEqual(this.choices.currentState.choices.length);
       expect(searchSpy).toHaveBeenCalled();
@@ -595,7 +595,7 @@ describe('Choices', () => {
         searchPlaceholderValue: dummyPlaceholder,
       });
 
-      expect(this.choices.input.placeholder).toEqual(dummyPlaceholder);
+      expect(this.choices.input.element.placeholder).toEqual(dummyPlaceholder);
     });
   });
 
@@ -644,11 +644,11 @@ describe('Choices', () => {
     });
 
     it('should apply placeholderValue to input', function() {
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
 
     it('should not apply searchPlaceholderValue to input', function() {
-      expect(this.choices.input.placeholder).not.toEqual('Test');
+      expect(this.choices.input.element.placeholder).not.toEqual('Test');
     });
 
     it('should add any pre-defined values', function() {
@@ -660,7 +660,7 @@ describe('Choices', () => {
     });
 
     it('should add a placeholder defined in the config to the search input', function() {
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
   });
 
@@ -872,7 +872,7 @@ describe('Choices', () => {
     it('should handle disable()', function() {
       this.choices.disable();
 
-      expect(this.choices.input.disabled).toBe(true);
+      expect(this.choices.input.element.disabled).toBe(true);
       expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
       expect(this.choices.containerOuter.element.getAttribute('aria-disabled')).toBe('true');
     });
@@ -880,7 +880,7 @@ describe('Choices', () => {
     it('should handle enable()', function() {
       this.choices.enable();
 
-      expect(this.choices.input.disabled).toBe(false);
+      expect(this.choices.input.element.disabled).toBe(false);
       expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
       expect(this.choices.containerOuter.element.hasAttribute('aria-disabled')).toBe(false);
     });
@@ -961,7 +961,7 @@ describe('Choices', () => {
 
     it('should handle clearInput()', function() {
       this.choices.clearInput();
-      expect(this.choices.input.value).toBe('');
+      expect(this.choices.input.element.value).toBe('');
     });
 
     it('should handle removeItemsByValue()', function() {
@@ -1005,7 +1005,7 @@ describe('Choices', () => {
       });
 
       const container = this.choices.containerOuter.element;
-      this.choices.input.focus();
+      this.choices.input.element.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(true);
     });
 
@@ -1015,7 +1015,7 @@ describe('Choices', () => {
       });
 
       const container = this.choices.containerOuter.element;
-      this.choices.input.focus();
+      this.choices.input.element.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
     });
 
