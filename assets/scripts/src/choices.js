@@ -748,11 +748,7 @@ class Choices {
   showDropdown(focusInput = false) {
     this.containerOuter.open(this.dropdown.getPosition());
     this.dropdown.show();
-
-    // Optionally focus the input if we have a search input
-    if (focusInput && this.canSearch && document.activeElement !== this.input.element) {
-      this.input.element.focus();
-    }
+    this.input.activate(focusInput);
 
     triggerEvent(this.passedElement, 'showDropdown', {});
     return this;
@@ -766,15 +762,7 @@ class Choices {
   hideDropdown(blurInput = false) {
     this.containerOuter.close();
     this.dropdown.hide();
-
-    // IE11 ignores aria-label and blocks virtual keyboard
-    // if aria-activedescendant is set without a dropdown
-    this.input.element.removeAttribute('aria-activedescendant');
-
-    // Optionally blur the input if we have a search input
-    if (blurInput && this.canSearch && document.activeElement === this.input.element) {
-      this.input.element.blur();
-    }
+    this.input.deactivate(blurInput);
 
     triggerEvent(this.passedElement, 'hideDropdown', {});
     return this;
@@ -1028,7 +1016,7 @@ class Choices {
     if (isDisabled) {
       this._addEventListeners();
       this.passedElement.removeAttribute('disabled');
-      this.input.element.removeAttribute('disabled');
+      this.input.enable();
       this.containerOuter.enable();
     }
 
@@ -1051,7 +1039,7 @@ class Choices {
     if (isEnabled) {
       this._removeEventListeners();
       this.passedElement.setAttribute('disabled', '');
-      this.input.element.setAttribute('disabled', '');
+      this.input.disable();
       this.containerOuter.disable();
     }
 
@@ -1337,7 +1325,7 @@ class Choices {
           placeholderItem.innerHTML = this.config.loadingText;
         }
       } else {
-        this.input.element.placeholder = this.config.loadingText;
+        this.input.setPlaceholder(this.config.loadingText);
       }
     } else {
       // Remove loading states/text
@@ -1346,7 +1334,7 @@ class Choices {
       if (this.isSelectOneElement) {
         placeholderItem.innerHTML = (this.placeholder || '');
       } else {
-        this.input.element.placeholder = (this.placeholder || '');
+        this.input.setPlaceholder(this.placeholder || '');
       }
     }
   }

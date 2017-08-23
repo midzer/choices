@@ -48,6 +48,32 @@ export default class Input {
     }
   }
 
+  activate(focusInput) {
+    // Optionally focus the input if we have a search input
+    if (focusInput && this.instance.canSearch && document.activeElement !== this.element) {
+      this.element.focus();
+    }
+  }
+
+  deactivate(blurInput) {
+    // IE11 ignores aria-label and blocks virtual keyboard
+    // if aria-activedescendant is set without a dropdown
+    this.element.removeAttribute('aria-activedescendant');
+
+    // Optionally blur the input if we have a search input
+    if (blurInput && this.instance.canSearch && document.activeElement === this.element) {
+      this.element.blur();
+    }
+  }
+
+  enable() {
+    this.element.removeAttribute('disabled');
+  }
+
+  disable() {
+    this.element.setAttribute('disabled', '');
+  }
+
   /**
    * Set value of input to blank
    * @return {Object} Class instance
@@ -84,5 +110,9 @@ export default class Input {
       // If there is no placeholder, resize input to contents
       this.element.style.width = getWidthOfInput(this.element);
     }
+  }
+
+  setPlaceholder(placeholder) {
+    this.element.placeholder = placeholder;
   }
 }
