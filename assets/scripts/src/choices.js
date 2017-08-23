@@ -213,8 +213,6 @@ class Choices {
     this._onTouchEnd = this._onTouchEnd.bind(this);
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
-    this._onPaste = this._onPaste.bind(this);
-    this._onInput = this._onInput.bind(this);
 
     // Monitor touch taps/scrolls
     this.wasTap = true;
@@ -1494,10 +1492,10 @@ class Choices {
       this.containerOuter.element.addEventListener('blur', this._onBlur);
     }
 
-    this.input.element.addEventListener('input', this._onInput);
-    this.input.element.addEventListener('paste', this._onPaste);
     this.input.element.addEventListener('focus', this._onFocus);
     this.input.element.addEventListener('blur', this._onBlur);
+
+    this.input.addEventListeners();
   }
 
   /**
@@ -1519,10 +1517,10 @@ class Choices {
       this.containerOuter.element.removeEventListener('blur', this._onBlur);
     }
 
-    this.input.element.removeEventListener('input', this._onInput);
-    this.input.element.removeEventListener('paste', this._onPaste);
     this.input.element.removeEventListener('focus', this._onFocus);
     this.input.element.removeEventListener('blur', this._onBlur);
+
+    this.input.removeEventListeners();
   }
 
   /**
@@ -1752,17 +1750,6 @@ class Choices {
   }
 
   /**
-   * Input event
-   * @return
-   * @private
-   */
-  _onInput() {
-    if (!this.isSelectOneElement) {
-      this.input.setWidth();
-    }
-  }
-
-  /**
    * Touch move event
    * @return
    * @private
@@ -1908,19 +1895,6 @@ class Choices {
       e.target.hasAttribute('data-choice')
     ) {
       this._highlightChoice(e.target);
-    }
-  }
-
-  /**
-   * Paste event
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
-  _onPaste(e) {
-    // Disable pasting into the input if option has been set
-    if (e.target === this.input.element && !this.config.paste) {
-      e.preventDefault();
     }
   }
 

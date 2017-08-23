@@ -8,6 +8,44 @@ export default class Input {
     this.instance = instance;
     this.element = element;
     this.classNames = classNames;
+
+    // Bind event listeners
+    this.onPaste = this.onPaste.bind(this);
+    this.onInput = this.onInput.bind(this);
+  }
+
+  addEventListeners() {
+    this.element.addEventListener('input', this.onInput);
+    this.element.addEventListener('paste', this.onPaste);
+  }
+
+  removeEventListeners() {
+    this.element.removeEventListener('input', this.onInput);
+    this.element.removeEventListener('paste', this.onPaste);
+  }
+
+  /**
+   * Input event
+   * @return
+   * @private
+   */
+  onInput() {
+    if (!this.instance.isSelectOneElement) {
+      this.setWidth();
+    }
+  }
+
+  /**
+   * Paste event
+   * @param  {Object} e Event
+   * @return
+   * @private
+   */
+  onPaste(e) {
+    // Disable pasting into the input if option has been set
+    if (e.target === this.element && !this.instance.config.paste) {
+      e.preventDefault();
+    }
   }
 
   /**
