@@ -1,4 +1,4 @@
-var webpack = require('karma-webpack');
+let webpack = require('karma-webpack');
 
 module.exports = function(config) {
   config.set({
@@ -13,35 +13,35 @@ module.exports = function(config) {
       'karma-coverage',
       'karma-spec-reporter',
       'karma-htmlfile-reporter',
-      'es6-shim'
+      'es6-shim',
     ],
     browsers: ['PhantomJS'],
     preprocessors: {
       '**/*_spec.js': ['webpack'],
-      'src/**/*.js': ['webpack']
+      'src/**/*.js': ['webpack'],
     },
     reporters: ['spec', 'coverage', 'html'],
     coverageReporter: {
       dir: '../tests/reports/coverage',
       reporters: [{
         type: 'html',
-      }]
+      }],
     },
     webpack: {
       module: {
         loaders: [{
           test: /\.(js|jsx)$/,
           exclude: /(bower_components|node_modules)/,
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         }],
-      }
+      },
     },
     colors: true,
     webpackMiddleware: {
-      noInfo: true
+      noInfo: true,
     },
     htmlReporter: {
-      outputFile: 'results/unit-tests.html'
-    }
+      outputFile: 'results/unit-tests.html',
+    },
   });
 };

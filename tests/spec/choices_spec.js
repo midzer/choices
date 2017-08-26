@@ -1,6 +1,7 @@
 import 'whatwg-fetch';
 import 'es6-promise';
 import 'core-js/fn/object/assign';
+import 'core-js/fn/array/includes';
 import Choices from '../../assets/scripts/src/choices';
 import itemReducer from '../../assets/scripts/src/reducers/items';
 import choiceReducer from '../../assets/scripts/src/reducers/choices';
@@ -217,7 +218,9 @@ describe('Choices', () => {
         ctrlKey: false,
       });
 
-      expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.element.value);
+      expect(
+        this.choices.currentState.items[this.choices.currentState.items.length - 1]
+      ).not.toContain(this.choices.input.element.value);
     });
 
     it('should filter input if regexFilter is passed', function() {
@@ -312,7 +315,9 @@ describe('Choices', () => {
     it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
       this.choices.input.element.focus();
-      expect(this.choices.dropdown.element.classList).toContain(this.choices.config.classNames.activeState);
+      expect(
+        this.choices.dropdown.element.classList,
+      ).toContain(this.choices.config.classNames.activeState);
     });
 
     it('should select the first choice', function() {
@@ -405,7 +410,10 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input.element && container.classList.contains('is-open')).toBe(true);
+      expect(
+        document.activeElement === this.choices.input.element &&
+        container.classList.contains('is-open'),
+      ).toBe(true);
     });
 
     it('should close the dropdown on double click', function() {
@@ -425,7 +433,10 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input.element && container.classList.contains(openState)).toBe(false);
+      expect(
+        document.activeElement === this.choices.input.element &&
+        container.classList.contains(openState)
+      ).toBe(false);
     });
 
     it('should set scrolling flag and not hide dropdown when scrolling on IE', function() {
@@ -742,18 +753,26 @@ describe('Choices', () => {
 
     it('should handle showDropdown()', function() {
       this.choices.showDropdown();
-      const hasOpenState = this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.openState);
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(
+        this.choices.config.classNames.openState,
+      );
       const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
+      const hasActiveState = this.choices.dropdown.element.classList.contains(
+        this.choices.config.classNames.activeState,
+      );
       expect(hasOpenState && hasAttr && hasActiveState).toBe(true);
     });
 
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
       this.choices.hideDropdown();
-      const hasOpenState = this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.openState);
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(
+        this.choices.config.classNames.openState,
+      );
       const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.element.classList.contains(this.choices.config.classNames.activeState);
+      const hasActiveState = this.choices.dropdown.element.classList.contains(
+        this.choices.config.classNames.activeState,
+      );
 
       expect(hasOpenState && hasAttr && hasActiveState).toBe(false);
     });
@@ -767,7 +786,9 @@ describe('Choices', () => {
 
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
-      expect(this.choices.containerOuter.element.classList).toContain(this.choices.config.classNames.openState);
+      expect(
+        this.choices.containerOuter.element.classList,
+      ).toContain(this.choices.config.classNames.openState);
     });
 
     it('should handle getValue()', function() {
@@ -873,7 +894,11 @@ describe('Choices', () => {
       this.choices.disable();
 
       expect(this.choices.input.element.disabled).toBe(true);
-      expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
+      expect(
+        this.choices.containerOuter.element.classList.contains(
+          this.choices.config.classNames.disabledState
+        ),
+      ).toBe(true);
       expect(this.choices.containerOuter.element.getAttribute('aria-disabled')).toBe('true');
     });
 
@@ -881,7 +906,11 @@ describe('Choices', () => {
       this.choices.enable();
 
       expect(this.choices.input.element.disabled).toBe(false);
-      expect(this.choices.containerOuter.element.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
+      expect(
+        this.choices.containerOuter.element.classList.contains(
+          this.choices.config.classNames.disabledState,
+        ),
+      ).toBe(false);
       expect(this.choices.containerOuter.element.hasAttribute('aria-disabled')).toBe(false);
     });
 

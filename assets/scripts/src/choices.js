@@ -131,12 +131,7 @@ class Choices {
     // Merge options with user options
     this.config = extend(defaultConfig, userConfig);
 
-    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
-      if (!this.config.silent) {
-        console.warn(
-          'renderSelectedChoices: Possible values are \'auto\' and \'always\'. Falling back to \'auto\'.',
-        );
-      }
+    if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
     }
 
@@ -170,7 +165,9 @@ class Choices {
 
     if (this.config.shouldSortItems === true && this.isSelectOneElement) {
       if (!this.config.silent) {
-        console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
+        console.warn(
+          'shouldSortElements: Type of passed element is \'select-one\', falling back to false.',
+        );
       }
     }
 
@@ -1398,13 +1395,17 @@ class Choices {
    */
   _searchChoices(value) {
     const newValue = isType('String', value) ? value.trim() : value;
-    const currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+    const currentValue = isType('String', this.currentValue) ?
+      this.currentValue.trim() :
+      this.currentValue;
 
     // If new value matches the desired length and is not the same as the current value with a space
     if (newValue.length >= 1 && newValue !== `${currentValue} `) {
       const haystack = this.store.getSearchableChoices();
       const needle = newValue;
-      const keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
+      const keys = isType('Array', this.config.searchFields) ?
+        this.config.searchFields :
+        [this.config.searchFields];
       const options = Object.assign(this.config.fuseOptions, { keys });
       const fuse = new Fuse(haystack, options);
       const results = fuse.search(needle);
@@ -1585,7 +1586,9 @@ class Choices {
 
       if (hasActiveDropdown) {
         e.preventDefault();
-        const highlighted = this.dropdown.element.querySelector(`.${this.config.classNames.highlightedState}`);
+        const highlighted = this.dropdown.element.querySelector(
+          `.${this.config.classNames.highlightedState}`,
+        );
 
         // If we have a highlighted choice
         if (highlighted) {
@@ -1625,12 +1628,16 @@ class Choices {
         let nextEl;
         if (skipKey) {
           if (directionInt > 0) {
-            nextEl = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]')).pop();
+            nextEl = Array.from(
+              this.dropdown.element.querySelectorAll('[data-choice-selectable]'),
+            ).pop();
           } else {
             nextEl = this.dropdown.element.querySelector('[data-choice-selectable]');
           }
         } else {
-          const currentEl = this.dropdown.element.querySelector(`.${this.config.classNames.highlightedState}`);
+          const currentEl = this.dropdown.element.querySelector(
+            `.${this.config.classNames.highlightedState}`,
+          );
           if (currentEl) {
             nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
           } else {
@@ -2307,7 +2314,9 @@ class Choices {
    * @private
    */
   _addGroup(group, id, valueKey = 'value', labelKey = 'label') {
-    const groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
+    const groupChoices = isType('Object', group) ?
+      group.choices :
+      Array.from(group.getElementsByTagName('OPTION'));
     const groupId = id || Math.floor(new Date().valueOf() * Math.random());
     const isDisabled = group.disabled ? group.disabled : false;
 
