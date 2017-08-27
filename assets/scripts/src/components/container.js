@@ -11,6 +11,26 @@ export default class Container {
     this.isFlipped = false;
     this.isFocussed = false;
     this.isDisabled = false;
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+
+  addEventListeners() {
+    this.element.addEventListener('focus', this.onFocus);
+    this.element.addEventListener('blur', this.onBlur);
+  }
+
+  removeEventListeners() {
+    this.element.removeEventListener('focus', this.onFocus);
+    this.element.removeEventListener('blur', this.onBlur);
+  }
+
+  onFocus() {
+    this.isFocussed = true;
+  }
+
+  onBlur() {
+    this.isFocussed = false;
   }
 
   shouldFlip(dropdownPos) {
@@ -40,6 +60,14 @@ export default class Container {
     return shouldFlip;
   }
 
+  setActiveDescendant(activeDescendant) {
+    this.element.setAttribute('aria-activedescendant', activeDescendant);
+  }
+
+  removeActiveDescendant() {
+    this.element.removeAttribute('aria-activedescendant');
+  }
+
   open(dropdownPos) {
     this.element.classList.add(this.classNames.openState);
     this.element.setAttribute('aria-expanded', 'true');
@@ -54,7 +82,7 @@ export default class Container {
   close() {
     this.element.classList.remove(this.classNames.openState);
     this.element.setAttribute('aria-expanded', 'false');
-    this.element.removeAttribute('aria-activedescendant');
+    this.removeActiveDescendant();
     this.isOpen = false;
 
     // A dropdown flips if it does not have space within the page
@@ -65,13 +93,17 @@ export default class Container {
   }
 
   focus() {
-    this.element.classList.add(this.classNames.focusState);
-    this.isFocussed = true;
+    if (!this.isFocussed) {
+      this.element.focus();
+    }
   }
 
-  blur() {
+  addFocusState() {
+    this.element.classList.add(this.classNames.focusState);
+  }
+
+  removeFocusState() {
     this.element.classList.remove(this.classNames.focusState);
-    this.isFocussed = false;
   }
 
   enable() {
@@ -90,5 +122,15 @@ export default class Container {
       this.element.setAttribute('tabindex', '-1');
     }
     this.isDisabled = true;
+  }
+
+  addLoadingState() {
+    this.element.classList.add(this.classNames.loadingState);
+    this.element.setAttribute('aria-busy', 'true');
+  }
+
+  removeLoadingState() {
+    this.element.classList.remove(this.classNames.loadingState);
+    this.element.removeAttribute('aria-busy');
   }
 }

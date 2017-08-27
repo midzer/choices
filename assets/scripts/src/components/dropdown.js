@@ -17,19 +17,10 @@ export default class Dropdown {
     return this.position;
   }
 
-  /**
-   * Determine whether to hide or show dropdown based on its current state
-   * @return {Object} Class instance
-   * @public
-   */
-  toggle() {
-    if (this.isActive) {
-      this.hide();
-    } else {
-      this.show();
-    }
-
-    return this.instance;
+  getHighlightedChildren() {
+    return this.element.querySelector(
+      `.${this.classNames.highlightedState}`,
+    );
   }
 
   /**

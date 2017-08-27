@@ -24,7 +24,6 @@ import {
   isElement,
   strToEl,
   extend,
-  getWidthOfInput,
   sortByAlpha,
   sortByScore,
   generateId,
@@ -512,7 +511,7 @@ class Choices {
           }
 
           const activeItems = this.store.getItemsFilteredByActive();
-          const canAddItem = this._canAddItem(activeItems, this.input.element.value);
+          const canAddItem = this._canAddItem(activeItems, this.input.getValue());
 
           // If we have choices to show
           if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
@@ -940,7 +939,8 @@ class Choices {
 
     // Add choices if passed
     if (choices && choices.length) {
-      this.containerOuter.element.classList.remove(this.config.classNames.loadingState);
+      this.containerOuter.removeLoadingState();
+
       choices.forEach((result) => {
         if (result.choices) {
           this._addGroup(
@@ -1162,9 +1162,7 @@ class Choices {
 
       // Focus input as without focus, a user cannot do anything with a
       // highlighted item
-      if (document.activeElement !== this.input.element) {
-        this.input.element.focus();
-      }
+      this.input.focus();
     }
   }
 
@@ -1214,7 +1212,7 @@ class Choices {
     // We wont to close the dropdown if we are dealing with a single select box
     if (hasActiveDropdown && this.isSelectOneElement) {
       this.hideDropdown();
-      this.containerOuter.element.focus();
+      this.containerOuter.focus();
     }
   }
 
@@ -1232,7 +1230,7 @@ class Choices {
       // If editing the last item is allowed and there are not other selected items,
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
-        this.input.element.value = lastItem.value;
+        this.input.setValue(lastItem.value);
         this.input.setWidth();
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
@@ -1312,8 +1310,7 @@ class Choices {
   _handleLoadingState(isLoading = true) {
     let placeholderItem = this.itemList.querySelector(`.${this.config.classNames.placeholder}`);
     if (isLoading) {
-      this.containerOuter.element.classList.add(this.config.classNames.loadingState);
-      this.containerOuter.element.setAttribute('aria-busy', 'true');
+      this.containerOuter.addLoadingState();
       if (this.isSelectOneElement) {
         if (!placeholderItem) {
           placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
@@ -1325,8 +1322,7 @@ class Choices {
         this.input.setPlaceholder(this.config.loadingText);
       }
     } else {
-      // Remove loading states/text
-      this.containerOuter.element.classList.remove(this.config.classNames.loadingState);
+      this.containerOuter.removeLoadingState();
 
       if (this.isSelectOneElement) {
         placeholderItem.innerHTML = (this.placeholder || '');
@@ -1382,8 +1378,6 @@ class Choices {
         // No results, remove loading state
         this._handleLoadingState(false);
       }
-
-      this.containerOuter.element.removeAttribute('aria-busy');
     };
   }
 
@@ -1438,7 +1432,7 @@ class Choices {
     const hasUnactiveChoices = choices.some(option => !option.active);
 
     // Run callback if it is a function
-    if (this.input.element === document.activeElement) {
+    if (this.input.isFocussed) {
       // Check that we have a value to search and the input was an alphanumeric character
       if (value && value.length >= this.config.searchFloor) {
         let resultCount = 0;
@@ -1524,7 +1518,7 @@ class Choices {
 
     const target = e.target;
     const activeItems = this.store.getItemsFilteredByActive();
-    const hasFocusedInput = this.input.element === document.activeElement;
+    const hasFocusedInput = this.input.isFocussed;
     const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList && this.itemList.children;
     const keyString = String.fromCharCode(e.keyCode);
@@ -1538,7 +1532,7 @@ class Choices {
     const downKey = 40;
     const pageUpKey = 33;
     const pageDownKey = 34;
-    const ctrlDownKey = e.ctrlKey || e.metaKey;
+    const ctrlDownKey = (e.ctrlKey || e.metaKey);
 
     // If a user is typing and the dropdown is not active
     if (!this.isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
@@ -1586,9 +1580,7 @@ class Choices {
 
       if (hasActiveDropdown) {
         e.preventDefault();
-        const highlighted = this.dropdown.element.querySelector(
-          `.${this.config.classNames.highlightedState}`,
-        );
+        const highlighted = this.dropdown.getHighlightedChildren();
 
         // If we have a highlighted choice
         if (highlighted) {
@@ -1607,8 +1599,8 @@ class Choices {
 
     const onEscapeKey = () => {
       if (hasActiveDropdown) {
-        this.dropdown.hide();
-        this.containerOuter.element.focus();
+        this.hideDropdown();
+        this.containerOuter.focus();
       }
     };
 
@@ -1762,7 +1754,7 @@ class Choices {
    * @private
    */
   _onTouchEnd(e) {
-    const target = e.target || e.touches[0].target;
+    const target = (e.target || e.touches[0].target);
     const hasActiveDropdown = this.dropdown.isActive;
 
     // If a user tapped within our container...
@@ -1773,10 +1765,8 @@ class Choices {
         !this.isSelectOneElement
       ) {
         if (this.isTextElement) {
-          // If text element, we only want to focus the input (if it isn't already)
-          if (document.activeElement !== this.input.element) {
-            this.input.element.focus();
-          }
+          // If text element, we only want to focus the input
+          this.input.focus();
         } else if (!hasActiveDropdown) {
             // If a select box, we want to show the dropdown
           this.showDropdown(true);
@@ -1836,21 +1826,16 @@ class Choices {
 
     // If target is something that concerns us
     if (this.containerOuter.element.contains(target)) {
-      // Handle button delete
-      if (target.hasAttribute('data-button')) {
-        this._handleButtonAction(activeItems, target);
-      }
-
       if (!hasActiveDropdown) {
         if (this.isTextElement) {
           if (document.activeElement !== this.input.element) {
-            this.input.element.focus();
+            this.input.focus();
           }
         } else if (this.canSearch) {
           this.showDropdown(true);
         } else {
           this.showDropdown();
-          this.containerOuter.element.focus();
+          this.containerOuter.focus();
         }
       } else if (
         this.isSelectOneElement &&
@@ -1868,7 +1853,7 @@ class Choices {
       }
 
       // Remove focus state
-      this.containerOuter.blur();
+      this.containerOuter.removeFocusState();
 
       // Close all other dropdowns
       if (hasActiveDropdown) {
@@ -1907,24 +1892,21 @@ class Choices {
       const focusActions = {
         text: () => {
           if (target === this.input.element) {
-            this.containerOuter.focus();
+            this.containerOuter.addFocusState();
           }
         },
         'select-one': () => {
-          this.containerOuter.focus();
-          if (target === this.input.element) {
+          this.containerOuter.addFocusState();
+          if ((target === this.input.element) && !hasActiveDropdown) {
             // Show dropdown if it isn't already showing
-            if (!hasActiveDropdown) {
-              this.showDropdown();
-            }
+            this.showDropdown();
           }
         },
         'select-multiple': () => {
           if (target === this.input.element) {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
-            this.containerOuter.focus();
-
+            this.containerOuter.addFocusState();
             if (!hasActiveDropdown) {
               this.showDropdown(true);
             }
@@ -1953,7 +1935,7 @@ class Choices {
         text: () => {
           if (target === this.input.element) {
             // Remove the focus state
-            this.containerOuter.blur();
+            this.containerOuter.removeFocusState();
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
@@ -1965,7 +1947,7 @@ class Choices {
           }
         },
         'select-one': () => {
-          this.containerOuter.blur();
+          this.containerOuter.removeFocusState();
           if (target === this.containerOuter.element) {
             // Hide dropdown if it is showing
             if (hasActiveDropdown && !this.canSearch) {
@@ -1980,7 +1962,7 @@ class Choices {
         'select-multiple': () => {
           if (target === this.input.element) {
             // Remove the focus state
-            this.containerOuter.blur();
+            this.containerOuter.removeFocusState();
             // Hide dropdown if it is showing
             if (hasActiveDropdown) {
               this.hideDropdown();
@@ -2110,8 +2092,8 @@ class Choices {
       if (hasActiveDropdown) {
         // IE11 ignores aria-label and blocks virtual keyboard
         // if aria-activedescendant is set without a dropdown
-        this.input.element.setAttribute('aria-activedescendant', passedEl.id);
-        this.containerOuter.element.setAttribute('aria-activedescendant', passedEl.id);
+        this.input.setActiveDescendant(passedEl.id);
+        this.containerOuter.setActiveDescendant(passedEl.id);
       }
     }
   }
@@ -2653,10 +2635,10 @@ class Choices {
     wrap(this.containerInner.element, this.containerOuter.element);
 
     if (this.isSelectOneElement) {
-      this.input.element.placeholder = this.config.searchPlaceholderValue || '';
+      this.input.setPlaceholder(this.config.searchPlaceholderValue || '');
     } else if (this.placeholder) {
-      this.input.element.placeholder = this.placeholder;
-      this.input.element.style.width = getWidthOfInput(this.input.element);
+      this.input.setPlaceholder(this.placeholder);
+      this.input.setWidth(true);
     }
 
     if (!this.config.addItems) {

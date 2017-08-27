@@ -780,7 +780,7 @@ describe('Choices', () => {
     it('should handle toggleDropdown()', function() {
       spyOn(this.choices.dropdown, 'hide');
       this.choices.dropdown.show();
-      this.choices.dropdown.toggle();
+      this.choices.toggleDropdown();
       expect(this.choices.dropdown.hide).toHaveBeenCalled();
     });
 
