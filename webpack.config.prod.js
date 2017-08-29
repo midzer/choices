@@ -8,12 +8,12 @@ const minimize = process.argv.includes('--minimize');
 const config = {
   devtool: minimize ? false : 'cheap-module-source-map',
   entry: [
-    './assets/scripts/src/choices'
+    './src/scripts/src/choices'
   ],
   output: {
-    path: path.join(__dirname, '/assets/scripts/dist'),
+    path: path.join(__dirname, '/src/scripts/dist'),
     filename: minimize ? 'choices.min.js' : 'choices.js',
-    publicPath: '/assets/scripts/dist/',
+    publicPath: '/src/scripts/dist/',
     library: 'Choices',
     libraryTarget: 'umd',
   },
@@ -34,7 +34,7 @@ const config = {
       test: /\.js$/,
       exclude: /(node_modules|bower_components)/,
       loaders: ['babel'],
-      include: path.join(__dirname, 'assets/scripts/src')
+      include: path.join(__dirname, 'src/scripts/src')
     }]
   }
 };
