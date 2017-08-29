@@ -1,6 +1,3 @@
-/**
- * Dropdown
- */
 export default class Dropdown {
   constructor(instance, element, classNames) {
     this.instance = instance;
@@ -11,16 +8,23 @@ export default class Dropdown {
     this.isActive = false;
   }
 
-  getPosition() {
+  /**
+   * Determine how far the top of our element is from
+   * the top of the window
+   * @return {Number} Vertical position
+   */
+  getVerticalPos() {
     this.dimensions = this.element.getBoundingClientRect();
     this.position = Math.ceil(this.dimensions.top + window.scrollY + this.element.offsetHeight);
     return this.position;
   }
 
-  getHighlightedChildren() {
-    return this.element.querySelector(
-      `.${this.classNames.highlightedState}`,
-    );
+  /**
+   * Find element that matches passed selector
+   * @return {HTMLElement}
+   */
+  getChild(selector) {
+    return this.element.querySelector(selector);
   }
 
   /**

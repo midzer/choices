@@ -124,11 +124,11 @@ describe('Choices', () => {
     });
 
     it('should create a choice list', function() {
-      expect(this.choices.choiceList).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.choiceList.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an item list', function() {
-      expect(this.choices.itemList).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.itemList.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an input', function() {
@@ -219,7 +219,7 @@ describe('Choices', () => {
       });
 
       expect(
-        this.choices.currentState.items[this.choices.currentState.items.length - 1]
+        this.choices.currentState.items[this.choices.currentState.items.length - 1],
       ).not.toContain(this.choices.input.element.value);
     });
 
@@ -435,7 +435,7 @@ describe('Choices', () => {
 
       expect(
         document.activeElement === this.choices.input.element &&
-        container.classList.contains(openState)
+        container.classList.contains(openState),
       ).toBe(false);
     });
 
@@ -896,7 +896,7 @@ describe('Choices', () => {
       expect(this.choices.input.element.disabled).toBe(true);
       expect(
         this.choices.containerOuter.element.classList.contains(
-          this.choices.config.classNames.disabledState
+          this.choices.config.classNames.disabledState,
         ),
       ).toBe(true);
       expect(this.choices.containerOuter.element.getAttribute('aria-disabled')).toBe('true');
@@ -1053,7 +1053,7 @@ describe('Choices', () => {
         renderSelectedChoices: 'always',
         renderChoiceLimit: -1,
       });
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(3);
     });
 
@@ -1062,7 +1062,7 @@ describe('Choices', () => {
         renderSelectedChoices: 'auto',
         renderChoiceLimit: -1,
       });
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(1);
     });
 
@@ -1099,7 +1099,7 @@ describe('Choices', () => {
         renderChoiceLimit: 4,
       });
 
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(4);
     });
   });

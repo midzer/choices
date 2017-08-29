@@ -4,6 +4,7 @@ import Store from './store/index';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
+import List from './components/list';
 import {
   addItem,
   removeItem,
@@ -496,11 +497,11 @@ class Choices {
           let choiceListFragment = document.createDocumentFragment();
 
           // Clear choices
-          this.choiceList.innerHTML = '';
+          this.choiceList.clear();
 
           // Scroll back to top of choices list
           if (this.config.resetScrollPosition) {
-            this.choiceList.scrollTop = 0;
+            this.choiceList.scrollTo(0);
           }
 
           // If we have grouped options
@@ -518,11 +519,11 @@ class Choices {
             // ...and we can select them
             if (canAddItem.response) {
               // ...append them and highlight the first choice
-              this.choiceList.appendChild(choiceListFragment);
+              this.choiceList.append(choiceListFragment);
               this._highlightChoice();
             } else {
               // ...otherwise show a notice
-              this.choiceList.appendChild(this._getTemplate('notice', canAddItem.notice));
+              this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
             }
           } else {
             // Otherwise show a notice
@@ -543,7 +544,7 @@ class Choices {
               dropdownItem = this._getTemplate('notice', notice, 'no-choices');
             }
 
-            this.choiceList.appendChild(dropdownItem);
+            this.choiceList.append(dropdownItem);
           }
         }
       }
@@ -554,7 +555,7 @@ class Choices {
         const activeItems = this.store.getItemsFilteredByActive();
 
         // Clear list
-        this.itemList.innerHTML = '';
+        this.itemList.clear();
 
         if (activeItems && activeItems) {
           // Create a fragment to store our list items
@@ -564,7 +565,7 @@ class Choices {
           // If we have items to add
           if (itemListFragment.childNodes) {
             // Update list
-            this.itemList.appendChild(itemListFragment);
+            this.itemList.append(itemListFragment);
           }
         }
       }
@@ -742,7 +743,7 @@ class Choices {
    * @public
    */
   showDropdown(focusInput = false) {
-    this.containerOuter.open(this.dropdown.getPosition());
+    this.containerOuter.open(this.dropdown.getVerticalPos());
     this.dropdown.show();
     this.input.activate(focusInput);
 
@@ -1308,13 +1309,13 @@ class Choices {
    * @private
    */
   _handleLoadingState(isLoading = true) {
-    let placeholderItem = this.itemList.querySelector(`.${this.config.classNames.placeholder}`);
+    let placeholderItem = this.itemList.getChild(`.${this.config.classNames.placeholder}`);
     if (isLoading) {
       this.containerOuter.addLoadingState();
       if (this.isSelectOneElement) {
         if (!placeholderItem) {
           placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-          this.itemList.appendChild(placeholderItem);
+          this.itemList.append(placeholderItem);
         } else {
           placeholderItem.innerHTML = this.config.loadingText;
         }
@@ -1520,7 +1521,7 @@ class Choices {
     const activeItems = this.store.getItemsFilteredByActive();
     const hasFocusedInput = this.input.isFocussed;
     const hasActiveDropdown = this.dropdown.isActive;
-    const hasItems = this.itemList && this.itemList.children;
+    const hasItems = this.itemList.hasChildren;
     const keyString = String.fromCharCode(e.keyCode);
 
     const backKey = 46;
@@ -1580,7 +1581,7 @@ class Choices {
 
       if (hasActiveDropdown) {
         e.preventDefault();
-        const highlighted = this.dropdown.getHighlightedChildren();
+        const highlighted = this.dropdown.getChild(`.${this.config.classNames.highlightedState}`);
 
         // If we have a highlighted choice
         if (highlighted) {
@@ -1997,20 +1998,20 @@ class Choices {
       return;
     }
 
-    const dropdownHeight = this.choiceList.offsetHeight;
+    const dropdownHeight = this.choiceList.height;
     const choiceHeight = choice.offsetHeight;
     // Distance from bottom of element to top of parent
     const choicePos = choice.offsetTop + choiceHeight;
     // Scroll position of dropdown
-    const containerScrollPos = this.choiceList.scrollTop + dropdownHeight;
+    const containerScrollPos = this.choiceList.scrollPos + dropdownHeight;
     // Difference between the choice and scroll position
     const endPoint = direction > 0 ? (
-        (this.choiceList.scrollTop + choicePos) - containerScrollPos) :
+        (this.choiceList.scrollPos + choicePos) - containerScrollPos) :
       choice.offsetTop;
 
     const animateScroll = () => {
       const strength = 4;
-      const choiceListScrollTop = this.choiceList.scrollTop;
+      const choiceListScrollTop = this.choiceList.scrollPos;
       let continueAnimation = false;
       let easing;
       let distance;
@@ -2019,7 +2020,7 @@ class Choices {
         easing = (endPoint - choiceListScrollTop) / strength;
         distance = easing > 1 ? easing : 1;
 
-        this.choiceList.scrollTop = choiceListScrollTop + distance;
+        this.choiceList.scrollTo(choiceListScrollTop + distance);
         if (choiceListScrollTop < endPoint) {
           continueAnimation = true;
         }
@@ -2027,7 +2028,7 @@ class Choices {
         easing = (choiceListScrollTop - endPoint) / strength;
         distance = easing > 1 ? easing : 1;
 
-        this.choiceList.scrollTop = choiceListScrollTop - distance;
+        this.choiceList.scrollTo(choiceListScrollTop - distance);
         if (choiceListScrollTop > endPoint) {
           continueAnimation = true;
         }
@@ -2604,8 +2605,8 @@ class Choices {
     this.containerOuter = new Container(this, containerOuter);
     this.containerInner = new Container(this, containerInner);
     this.input = new Input(this, input);
-    this.choiceList = choiceList;
-    this.itemList = itemList;
+    this.choiceList = new List(this, choiceList);
+    this.itemList = new List(this, itemList);
     this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
 
     // Hide passed input

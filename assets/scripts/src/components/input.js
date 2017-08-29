@@ -1,14 +1,11 @@
 import { getWidthOfInput } from '../lib/utils';
 
-/**
- * Input
- */
 export default class Input {
-  constructor(instance, element, classNames) {
+  constructor(instance, element) {
     this.instance = instance;
     this.element = element;
-    this.classNames = classNames;
     this.isFocussed = this.element === document.activeElement;
+    this.isDisabled = false;
 
     // Bind event listeners
     this.onPaste = this.onPaste.bind(this);
@@ -55,10 +52,16 @@ export default class Input {
     }
   }
 
+  /**
+   * Set focussed state
+   */
   onFocus() {
     this.isFocussed = true;
   }
 
+  /**
+   * Remove focussed state
+   */
   onBlur() {
     this.isFocussed = false;
   }
@@ -80,10 +83,12 @@ export default class Input {
 
   enable() {
     this.element.removeAttribute('disabled');
+    this.isDisabled = false;
   }
 
   disable() {
     this.element.setAttribute('disabled', '');
+    this.isDisabled = true;
   }
 
   focus() {
