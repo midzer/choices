@@ -10,7 +10,7 @@ import itemReducer from './reducers/items.js';
 import choiceReducer from './reducers/choices.js';
 import {
   addItem as addItemAction,
-  addChoice as addChoiceAction
+  addChoice as addChoiceAction,
 } from './actions/actions.js';
 
 describe('Choices', () => {
@@ -189,7 +189,7 @@ describe('Choices', () => {
       instance._onKeyDown({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       expect(instance.currentState.items[0].value).to.include(instance.input.value);
@@ -213,7 +213,7 @@ describe('Choices', () => {
       instance._onKeyDown({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       expect(instance.currentState.items[instance.currentState.items.length - 1]).not.to.include(instance.input.value);
@@ -230,7 +230,7 @@ describe('Choices', () => {
       instance._onKeyDown({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       instance.input.focus();
@@ -239,7 +239,7 @@ describe('Choices', () => {
       instance._onKeyDown({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = instance.currentState.items[instance.currentState.items.length - 1];
@@ -260,7 +260,7 @@ describe('Choices', () => {
       instance._onKeyDown({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = instance.currentState.items[instance.currentState.items.length - 1];
@@ -308,7 +308,7 @@ describe('Choices', () => {
 
     it('should highlight the choices on keydown', () => {
       instance = new Choices(input, {
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
       instance.input.focus();
 
@@ -318,7 +318,7 @@ describe('Choices', () => {
           target: instance.input,
           keyCode: 40,
           ctrlKey: false,
-          preventDefault: () => {}
+          preventDefault: () => {},
         });
       }
 
@@ -334,7 +334,7 @@ describe('Choices', () => {
         target: instance.input,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
@@ -342,7 +342,7 @@ describe('Choices', () => {
         target: instance.input,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(instance.currentState.items.length).to.equal(2);
@@ -365,7 +365,7 @@ describe('Choices', () => {
         target: instance.input,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
@@ -373,7 +373,7 @@ describe('Choices', () => {
         target: instance.input,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       const returnValue = onChangeStub.calls.mostRecent().args[0].detail.value;
@@ -388,7 +388,7 @@ describe('Choices', () => {
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(document.activeElement === instance.input && container.classList.contains('is-open')).to.be.true;
@@ -402,13 +402,13 @@ describe('Choices', () => {
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(document.activeElement === instance.input && container.classList.contains(openState)).to.be.false;
@@ -428,7 +428,7 @@ describe('Choices', () => {
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(showDropdownStub.callCount).to.equal(1);
@@ -448,13 +448,13 @@ describe('Choices', () => {
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       instance._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(hideDropdownStub.callCount).to.equal(1);
@@ -475,12 +475,10 @@ describe('Choices', () => {
       instance._onKeyUp({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const mostAccurateResult = instance.currentState.choices.filter((choice) => {
-        return choice.active;
-      });
+      const mostAccurateResult = instance.currentState.choices.filter(choice => choice.active);
 
       expect(instance.isSearching && mostAccurateResult[0].value === 'Value 3').to.be.true;
       expect(onSearchStub.callCount).to.equal(1);
@@ -488,7 +486,7 @@ describe('Choices', () => {
 
     it('shouldn\'t filter choices when searching', () => {
       instance = new Choices(input, {
-        searchChoices: false
+        searchChoices: false,
       });
 
       instance.setValue(['Javascript', 'HTML', 'Jasmine']);
@@ -505,12 +503,10 @@ describe('Choices', () => {
       instance._onKeyUp({
         target: instance.input,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const activeOptions = instance.currentState.choices.filter(function (choice) {
-        return choice.active;
-      });
+      const activeOptions = instance.currentState.choices.filter((choice) => choice.active);
 
       expect(activeOptions.length).to.equal(instance.currentState.choices.length);
       expect(onSearchStub.callCount).to.equal(1);
@@ -522,13 +518,13 @@ describe('Choices', () => {
         choices: [
           {
             value: 'Value 5',
-            label: 'Label Five'
+            label: 'Label Five',
           }, {
             value: 'Value 6',
-            label: 'Label Six'
+            label: 'Label Six',
           }, {
             value: 'Value 7',
-            label: 'Label Seven'
+            label: 'Label Seven',
           },
         ],
       });
@@ -542,13 +538,13 @@ describe('Choices', () => {
         choices: [
           {
             value: 'Value 5',
-            label: 'Label Five'
+            label: 'Label Five',
           }, {
             value: 'Value 6',
-            label: 'Label Six'
+            label: 'Label Six',
           }, {
             value: 'Value 7',
-            label: 'Label Seven'
+            label: 'Label Seven',
           },
         ],
       });
@@ -588,14 +584,14 @@ describe('Choices', () => {
             value: 'One',
             label: 'Label One',
             selected: true,
-            disabled: false
+            disabled: false,
           }, {
             value: 'Two',
             label: 'Label Two',
-            disabled: true
+            disabled: true,
           }, {
             value: 'Three',
-            label: 'Label Three'
+            label: 'Label Three',
           },
         ],
       });
@@ -672,7 +668,7 @@ describe('Choices', () => {
 
       instance.highlightAll();
 
-      const unhighlightedItems = items.some((item) => item.highlighted === false);
+      const unhighlightedItems = items.some(item => item.highlighted === false);
 
       expect(unhighlightedItems).to.be.false;
     });
@@ -682,7 +678,7 @@ describe('Choices', () => {
 
       instance.unhighlightAll();
 
-      const highlightedItems = items.some((item) => item.highlighted === true);
+      const highlightedItems = items.some(item => item.highlighted === true);
 
       expect(highlightedItems).to.be.false;
     });
@@ -692,7 +688,7 @@ describe('Choices', () => {
       instance.highlightAll();
       instance.removeHighlightedItems();
 
-      const activeItems = items.some((item) => item.active === true);
+      const activeItems = items.some(item => item.active === true);
 
       expect(activeItems).to.be.false;
     });
@@ -771,14 +767,14 @@ describe('Choices', () => {
           {
             value: 'Child One',
             label: 'Child One',
-            selected: true
+            selected: true,
           }, {
             value: 'Child Two',
             label: 'Child Two',
-            disabled: true
+            disabled: true,
           }, {
             value: 'Child Three',
-            label: 'Child Three'
+            label: 'Child Three',
           },
         ],
       }, {
@@ -789,13 +785,13 @@ describe('Choices', () => {
           {
             value: 'Child Four',
             label: 'Child Four',
-            disabled: true
+            disabled: true,
           }, {
             value: 'Child Five',
-            label: 'Child Five'
+            label: 'Child Five',
           }, {
             value: 'Child Six',
-            label: 'Child Six'
+            label: 'Child Six',
           },
         ],
       }], 'value', 'label');
@@ -813,10 +809,10 @@ describe('Choices', () => {
     it('should handle setChoices() with blank values', () => {
       instance.setChoices([{
         label: 'Choice one',
-        value: 'one'
+        value: 'one',
       }, {
         label: 'Choice two',
-        value: ''
+        value: '',
       }], 'value', 'label', true);
 
 
@@ -984,7 +980,7 @@ describe('Choices', () => {
 
     it('shouldn\'t flip the dropdown', () => {
       instance = new Choices(input, {
-        position: 'bottom'
+        position: 'bottom',
       });
 
       const container = instance.containerOuter;
@@ -995,7 +991,7 @@ describe('Choices', () => {
     it('should render selected choices', () => {
       instance = new Choices(input, {
         renderSelectedChoices: 'always',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
 
       const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
@@ -1005,7 +1001,7 @@ describe('Choices', () => {
     it('shouldn\'t render selected choices', () => {
       instance = new Choices(input, {
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
 
       const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
@@ -1042,7 +1038,7 @@ describe('Choices', () => {
           },
         ],
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: 4
+        renderChoiceLimit: 4,
       });
 
       const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
@@ -1059,9 +1055,9 @@ describe('Choices', () => {
         value: 'value',
         label: 'label',
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1073,7 +1069,7 @@ describe('Choices', () => {
         active: true,
         highlighted: false,
         customProperties: randomItem.customProperties,
-        keyCode: randomItem.keyCode
+        keyCode: randomItem.keyCode,
       }];
 
       const action = addItemAction(
@@ -1083,7 +1079,7 @@ describe('Choices', () => {
         randomItem.choiceId,
         randomItem.groupId,
         randomItem.customProperties,
-        randomItem.keyCode
+        randomItem.keyCode,
       );
 
       expect(itemReducer([], action)).to.deep.equal(expectedState);
@@ -1098,9 +1094,9 @@ describe('Choices', () => {
         label: 'label',
         disabled: false,
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1114,7 +1110,7 @@ describe('Choices', () => {
         active: true,
         score: 9999,
         customProperties: randomChoice.customProperties,
-        keyCode: randomChoice.keyCode
+        keyCode: randomChoice.keyCode,
       }];
 
       const action = addChoiceAction(
@@ -1125,7 +1121,7 @@ describe('Choices', () => {
         randomChoice.disabled,
         randomChoice.elementId,
         randomChoice.customProperties,
-        randomChoice.keyCode
+        randomChoice.keyCode,
       );
 
       expect(choiceReducer([], action)).to.deep.equal(expectedState);
@@ -1150,7 +1146,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', () => {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       instance = new Choices(input);
@@ -1159,7 +1155,7 @@ describe('Choices', () => {
         label: 'My awesome choice',
         selected: false,
         disabled: false,
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }], 'value', 'label', true);
 
       instance.setValueByChoice('42');
@@ -1171,7 +1167,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties when directly creating a selected item', () => {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       instance = new Choices(input);
@@ -1179,7 +1175,7 @@ describe('Choices', () => {
       instance.setValue([{
         value: 'bar',
         label: 'foo',
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }]);
       const selectedItems = instance.getValue();
 

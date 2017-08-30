@@ -245,11 +245,9 @@ class Choices {
    * @public
    */
   init() {
-    if (this.initialised === true) {
+    if (this.initialised) {
       return;
     }
-
-    const callback = this.config.callbackOnInit;
 
     // Set initialise flag
     this.initialised = true;
@@ -264,6 +262,7 @@ class Choices {
     // Trigger event listeners
     this._addEventListeners();
 
+    const callback = this.config.callbackOnInit;
     // Run callback if it is a function
     if (callback && isType('Function', callback)) {
       callback.call(this);
@@ -276,7 +275,7 @@ class Choices {
    * @public
    */
   destroy() {
-    if (this.initialised === false) {
+    if (!this.initialised) {
       return;
     }
 
@@ -485,67 +484,66 @@ class Choices {
     if (this.currentState !== this.prevState) {
       // Choices
       if (
-        this.currentState.choices !== this.prevState.choices ||
+        (this.currentState.choices !== this.prevState.choices ||
         this.currentState.groups !== this.prevState.groups ||
-        this.currentState.items !== this.prevState.items
+        this.currentState.items !== this.prevState.items) &&
+        this.isSelectElement
       ) {
-        if (this.isSelectElement) {
           // Get active groups/choices
-          const activeGroups = this.store.getGroupsFilteredByActive();
-          const activeChoices = this.store.getChoicesFilteredByActive();
+        const activeGroups = this.store.getGroupsFilteredByActive();
+        const activeChoices = this.store.getChoicesFilteredByActive();
 
-          let choiceListFragment = document.createDocumentFragment();
+        let choiceListFragment = document.createDocumentFragment();
 
           // Clear choices
-          this.choiceList.clear();
+        this.choiceList.clear();
 
           // Scroll back to top of choices list
-          if (this.config.resetScrollPosition) {
-            this.choiceList.scrollTo(0);
-          }
+        if (this.config.resetScrollPosition) {
+          this.choiceList.scrollTo(0);
+        }
 
           // If we have grouped options
-          if (activeGroups.length >= 1 && this.isSearching !== true) {
-            choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
-          } else if (activeChoices.length >= 1) {
-            choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
-          }
+        if (activeGroups.length >= 1 && this.isSearching !== true) {
+          choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+        } else if (activeChoices.length >= 1) {
+          choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
+        }
 
-          const activeItems = this.store.getItemsFilteredByActive();
-          const canAddItem = this._canAddItem(activeItems, this.input.getValue());
+        const activeItems = this.store.getItemsFilteredByActive();
+        const canAddItem = this._canAddItem(activeItems, this.input.getValue());
 
           // If we have choices to show
-          if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+        if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
             // ...and we can select them
-            if (canAddItem.response) {
+          if (canAddItem.response) {
               // ...append them and highlight the first choice
-              this.choiceList.append(choiceListFragment);
-              this._highlightChoice();
-            } else {
-              // ...otherwise show a notice
-              this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
-            }
+            this.choiceList.append(choiceListFragment);
+            this._highlightChoice();
           } else {
+              // ...otherwise show a notice
+            this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+          }
+        } else {
             // Otherwise show a notice
-            let dropdownItem;
-            let notice;
+          let dropdownItem;
+          let notice;
 
-            if (this.isSearching) {
-              notice = isType('Function', this.config.noResultsText) ?
+          if (this.isSearching) {
+            notice = isType('Function', this.config.noResultsText) ?
                 this.config.noResultsText() :
                 this.config.noResultsText;
 
-              dropdownItem = this._getTemplate('notice', notice, 'no-results');
-            } else {
-              notice = isType('Function', this.config.noChoicesText) ?
+            dropdownItem = this._getTemplate('notice', notice, 'no-results');
+          } else {
+            notice = isType('Function', this.config.noChoicesText) ?
                 this.config.noChoicesText() :
                 this.config.noChoicesText;
 
-              dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-            }
-
-            this.choiceList.append(dropdownItem);
+            dropdownItem = this._getTemplate('notice', notice, 'no-choices');
           }
+
+          this.choiceList.append(dropdownItem);
         }
       }
 
@@ -557,7 +555,7 @@ class Choices {
         // Clear list
         this.itemList.clear();
 
-        if (activeItems && activeItems) {
+        if (activeItems && activeItems.length) {
           // Create a fragment to store our list items
           // (so we don't have to update the DOM for each item)
           const itemListFragment = this.renderItems(activeItems);
@@ -595,20 +593,17 @@ class Choices {
     );
 
     if (runEvent) {
+      const eventResponse = {
+        id,
+        value: item.value,
+        label: item.label,
+      };
+
       if (group && group.value) {
-        triggerEvent(this.passedElement, 'highlightItem', {
-          id,
-          value: item.value,
-          label: item.label,
-          groupValue: group.value,
-        });
-      } else {
-        triggerEvent(this.passedElement, 'highlightItem', {
-          id,
-          value: item.value,
-          label: item.label,
-        });
+        eventResponse.groupValue = group.value;
       }
+
+      triggerEvent(this.passedElement, 'highlightItem', eventResponse);
     }
 
     return this;
@@ -628,25 +623,21 @@ class Choices {
     const id = item.id;
     const groupId = item.groupId;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+    const eventResponse = {
+      id,
+      value: item.value,
+      label: item.label,
+    };
+
+    if (group && group.value) {
+      eventResponse.groupValue = group.value;
+    }
 
     this.store.dispatch(
       highlightItem(id, false),
     );
 
-    if (group && group.value) {
-      triggerEvent(this.passedElement, 'unhighlightItem', {
-        id,
-        value: item.value,
-        label: item.label,
-        groupValue: group.value,
-      });
-    } else {
-      triggerEvent(this.passedElement, 'unhighlightItem', {
-        id,
-        value: item.value,
-        label: item.label,
-      });
-    }
+    triggerEvent(this.passedElement, 'highlightItem', eventResponse);
 
     return this;
   }
@@ -743,6 +734,10 @@ class Choices {
    * @public
    */
   showDropdown(focusInput = false) {
+    if (this.dropdown.isActive) {
+      return this;
+    }
+
     this.containerOuter.open(this.dropdown.getVerticalPos());
     this.dropdown.show();
     this.input.activate(focusInput);
@@ -757,6 +752,10 @@ class Choices {
    * @public
    */
   hideDropdown(blurInput = false) {
+    if (!this.dropdown.isActive) {
+      return this;
+    }
+
     this.containerOuter.close();
     this.dropdown.hide();
     this.input.deactivate(blurInput);
@@ -793,18 +792,12 @@ class Choices {
 
     items.forEach((item) => {
       const itemValue = valueOnly ? item.value : item;
-      if (this.isTextElement) {
-        selectedItems.push(itemValue);
-      } else if (item.active) {
+      if (this.isTextElement || item.active) {
         selectedItems.push(itemValue);
       }
     });
 
-    if (this.isSelectOneElement) {
-      return selectedItems[0];
-    }
-
-    return selectedItems;
+    return this.isSelectOneElement ? selectedItems[0] : selectedItems;
   }
 
   /**
@@ -822,53 +815,54 @@ class Choices {
     // Convert args to an iterable array
     const values = [...args];
     const handleValue = (item) => {
-      const itemType = getType(item);
-      if (itemType === 'Object') {
-        if (!item.value) {
-          return;
-        }
+      const itemType = getType(item).toLowerCase();
+      const handleType = {
+        object: () => {
+          if (!item.value) {
+            return;
+          }
 
-        // If we are dealing with a select input, we need to create an option first
-        // that is then selected. For text inputs we can just add items normally.
-        if (!this.isTextElement) {
-          this._addChoice(
-            item.value,
-            item.label,
-            true,
-            false, -1,
-            item.customProperties,
-            item.placeholder,
-          );
-        } else {
-          this._addItem(
-            item.value,
-            item.label,
-            item.id,
-            undefined,
-            item.customProperties,
-            item.placeholder,
-          );
-        }
-      } else if (itemType === 'String') {
-        if (!this.isTextElement) {
-          this._addChoice(
-            item,
-            item,
-            true,
-            false, -1,
-            null,
-          );
-        } else {
-          this._addItem(item);
-        }
-      }
+          // If we are dealing with a select input, we need to create an option first
+          // that is then selected. For text inputs we can just add items normally.
+          if (!this.isTextElement) {
+            this._addChoice(
+              item.value,
+              item.label,
+              true,
+              false, -1,
+              item.customProperties,
+              item.placeholder,
+            );
+          } else {
+            this._addItem(
+              item.value,
+              item.label,
+              item.id,
+              undefined,
+              item.customProperties,
+              item.placeholder,
+            );
+          }
+        },
+        string: () => {
+          if (!this.isTextElement) {
+            this._addChoice(
+              item,
+              item,
+              true,
+              false, -1,
+              null,
+            );
+          } else {
+            this._addItem(item);
+          }
+        },
+      };
+
+      handleType[itemType]();
     };
 
-    if (values.length > 1) {
-      values.forEach(value => handleValue(value));
-    } else {
-      handleValue(values[0]);
-    }
+    values.forEach(value => handleValue(value));
 
     return this;
   }
@@ -911,6 +905,7 @@ class Choices {
         console.warn('Attempting to select choice that does not exist');
       }
     });
+
     return this;
   }
 
@@ -974,9 +969,7 @@ class Choices {
    * @public
    */
   clearStore() {
-    this.store.dispatch(
-      clearAll(),
-    );
+    this.store.dispatch(clearAll());
     return this;
   }
 
@@ -991,9 +984,7 @@ class Choices {
 
     if (!this.isTextElement && this.config.searchEnabled) {
       this.isSearching = false;
-      this.store.dispatch(
-        activateChoices(true),
-      );
+      this.store.dispatch(activateChoices(true));
     }
 
     return this;
@@ -1009,9 +1000,8 @@ class Choices {
     }
 
     this.passedElement.disabled = false;
-    const isDisabled = this.containerOuter.isDisabled;
 
-    if (isDisabled) {
+    if (this.containerOuter.isDisabled) {
       this._addEventListeners();
       this.passedElement.removeAttribute('disabled');
       this.input.enable();
@@ -1032,9 +1022,8 @@ class Choices {
     }
 
     this.passedElement.disabled = true;
-    const isEnabled = !this.containerOuter.isDisabled;
 
-    if (isEnabled) {
+    if (!this.containerOuter.isDisabled) {
       this._removeEventListeners();
       this.passedElement.setAttribute('disabled', '');
       this.input.disable();
@@ -1093,22 +1082,24 @@ class Choices {
    * @private
    */
   _handleButtonAction(activeItems, element) {
-    if (!activeItems || !element) {
+    if (
+      !activeItems ||
+      !element ||
+      !this.config.removeItems ||
+      !this.config.removeItemButton
+    ) {
       return;
     }
 
-    // If we are clicking on a button
-    if (this.config.removeItems && this.config.removeItemButton) {
-      const itemId = element.parentNode.getAttribute('data-id');
-      const itemToRemove = activeItems.find(item => item.id === parseInt(itemId, 10));
+    const itemId = element.parentNode.getAttribute('data-id');
+    const itemToRemove = activeItems.find(item => item.id === parseInt(itemId, 10));
 
-      // Remove item associated with button
-      this._removeItem(itemToRemove);
-      this._triggerChange(itemToRemove.value);
+   // Remove item associated with button
+    this._removeItem(itemToRemove);
+    this._triggerChange(itemToRemove.value);
 
-      if (this.isSelectOneElement) {
-        this._selectPlaceholderChoice();
-      }
+    if (this.isSelectOneElement) {
+      this._selectPlaceholderChoice();
     }
   }
 
@@ -1140,31 +1131,31 @@ class Choices {
    * @private
    */
   _handleItemAction(activeItems, element, hasShiftKey = false) {
-    if (!activeItems || !element) {
+    if (
+      !activeItems ||
+      !element ||
+      !this.config.removeItems ||
+      this.isSelectOneElement
+    ) {
       return;
     }
 
-    // If we are clicking on an item
-    if (this.config.removeItems && !this.isSelectOneElement) {
-      const passedId = element.getAttribute('data-id');
+    const passedId = element.getAttribute('data-id');
 
-      // We only want to select one item with a click
-      // so we deselect any items that aren't the target
-      // unless shift is being pressed
-      activeItems.forEach((item) => {
-        if (item.id === parseInt(passedId, 10) && !item.highlighted) {
-          this.highlightItem(item);
-        } else if (!hasShiftKey) {
-          if (item.highlighted) {
-            this.unhighlightItem(item);
-          }
-        }
-      });
+    // We only want to select one item with a click
+    // so we deselect any items that aren't the target
+    // unless shift is being pressed
+    activeItems.forEach((item) => {
+      if (item.id === parseInt(passedId, 10) && !item.highlighted) {
+        this.highlightItem(item);
+      } else if (!hasShiftKey && item.highlighted) {
+        this.unhighlightItem(item);
+      }
+    });
 
-      // Focus input as without focus, a user cannot do anything with a
-      // highlighted item
-      this.input.focus();
-    }
+    // Focus input as without focus, a user cannot do anything with a
+    // highlighted item
+    this.input.focus();
   }
 
   /**
@@ -1224,23 +1215,25 @@ class Choices {
    * @private
    */
   _handleBackspace(activeItems) {
-    if (this.config.removeItems && activeItems) {
-      const lastItem = activeItems[activeItems.length - 1];
-      const hasHighlightedItems = activeItems.some(item => item.highlighted);
+    if (!this.config.removeItems || !activeItems) {
+      return;
+    }
 
-      // If editing the last item is allowed and there are not other selected items,
-      // we can edit the item value. Otherwise if we can remove items, remove all selected items
-      if (this.config.editItems && !hasHighlightedItems && lastItem) {
-        this.input.setValue(lastItem.value);
-        this.input.setWidth();
-        this._removeItem(lastItem);
-        this._triggerChange(lastItem.value);
-      } else {
-        if (!hasHighlightedItems) {
-          this.highlightItem(lastItem, false);
-        }
-        this.removeHighlightedItems(true);
+    const lastItem = activeItems[activeItems.length - 1];
+    const hasHighlightedItems = activeItems.some(item => item.highlighted);
+
+    // If editing the last item is allowed and there are not other selected items,
+    // we can edit the item value. Otherwise if we can remove items, remove all selected items
+    if (this.config.editItems && !hasHighlightedItems && lastItem) {
+      this.input.setValue(lastItem.value);
+      this.input.setWidth();
+      this._removeItem(lastItem);
+      this._triggerChange(lastItem.value);
+    } else {
+      if (!hasHighlightedItems) {
+        this.highlightItem(lastItem, false);
       }
+      this.removeHighlightedItems(true);
     }
   }
 
@@ -1408,9 +1401,7 @@ class Choices {
       this.currentValue = newValue;
       this.highlightPosition = 0;
       this.isSearching = true;
-      this.store.dispatch(
-        filterChoices(results),
-      );
+      this.store.dispatch(filterChoices(results));
 
       return results.length;
     }
@@ -1425,35 +1416,25 @@ class Choices {
    * @private
    */
   _handleSearch(value) {
-    if (!value) {
+    if (!value || !this.input.isFocussed) {
       return;
     }
 
     const choices = this.store.getChoices();
     const hasUnactiveChoices = choices.some(option => !option.active);
 
-    // Run callback if it is a function
-    if (this.input.isFocussed) {
-      // Check that we have a value to search and the input was an alphanumeric character
-      if (value && value.length >= this.config.searchFloor) {
-        let resultCount = 0;
-        // Check flag to filter search input
-        if (this.config.searchChoices) {
-          // Filter available choices
-          resultCount = this._searchChoices(value);
-        }
-        // Trigger search event
-        triggerEvent(this.passedElement, 'search', {
-          value,
-          resultCount,
-        });
-      } else if (hasUnactiveChoices) {
-        // Otherwise reset choices to active
-        this.isSearching = false;
-        this.store.dispatch(
-          activateChoices(true),
-        );
-      }
+    // Check that we have a value to search and the input was an alphanumeric character
+    if (value && value.length >= this.config.searchFloor) {
+      const resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
+      // Trigger search event
+      triggerEvent(this.passedElement, 'search', {
+        value,
+        resultCount,
+      });
+    } else if (hasUnactiveChoices) {
+      // Otherwise reset choices to active
+      this.isSearching = false;
+      this.store.dispatch(activateChoices(true));
     }
   }
 
@@ -1524,6 +1505,7 @@ class Choices {
     const hasItems = this.itemList.hasChildren;
     const keyString = String.fromCharCode(e.keyCode);
 
+    // TO DO: Move into constants file
     const backKey = 46;
     const deleteKey = 8;
     const enterKey = 13;
@@ -1536,7 +1518,7 @@ class Choices {
     const ctrlDownKey = (e.ctrlKey || e.metaKey);
 
     // If a user is typing and the dropdown is not active
-    if (!this.isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
+    if (!this.isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
       this.showDropdown(true);
     }
 
@@ -1565,9 +1547,7 @@ class Choices {
 
         // All is good, add
         if (canAddItem.response) {
-          if (hasActiveDropdown) {
-            this.hideDropdown();
-          }
+          this.hideDropdown();
           this._addItem(value);
           this._triggerChange(value);
           this.clearInput();
@@ -1591,7 +1571,7 @@ class Choices {
           }
           this._handleChoiceAction(activeItems, highlighted);
         }
-      } else if (this.isSelectOneElement && !hasActiveDropdown) {
+      } else if (this.isSelectOneElement) {
         // Open single select dropdown if it's not active
         this.showDropdown(true);
         e.preventDefault();
@@ -1609,9 +1589,7 @@ class Choices {
       // If up or down key is pressed, traverse through options
       if (hasActiveDropdown || this.isSelectOneElement) {
         // Show dropdown if focus
-        if (!hasActiveDropdown) {
-          this.showDropdown(true);
-        }
+        this.showDropdown(true);
 
         this.canSearch = false;
 
@@ -1698,8 +1676,6 @@ class Choices {
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this.isTextElement) {
-      const hasActiveDropdown = this.dropdown.isActive;
-
       if (value) {
         if (canAddItem.notice) {
           const dropdownItem = this._getTemplate('notice', canAddItem.notice);
@@ -1707,13 +1683,11 @@ class Choices {
         }
 
         if (canAddItem.response === true) {
-          if (!hasActiveDropdown) {
-            this.showDropdown();
-          }
-        } else if (!canAddItem.notice && hasActiveDropdown) {
+          this.showDropdown();
+        } else if (!canAddItem.notice) {
           this.hideDropdown();
         }
-      } else if (hasActiveDropdown) {
+      } else {
         this.hideDropdown();
       }
     } else {
@@ -1756,7 +1730,6 @@ class Choices {
    */
   _onTouchEnd(e) {
     const target = (e.target || e.touches[0].target);
-    const hasActiveDropdown = this.dropdown.isActive;
 
     // If a user tapped within our container...
     if (this.wasTap === true && this.containerOuter.element.contains(target)) {
@@ -1768,7 +1741,7 @@ class Choices {
         if (this.isTextElement) {
           // If text element, we only want to focus the input
           this.input.focus();
-        } else if (!hasActiveDropdown) {
+        } else {
             // If a select box, we want to show the dropdown
           this.showDropdown(true);
         }
@@ -1857,9 +1830,7 @@ class Choices {
       this.containerOuter.removeFocusState();
 
       // Close all other dropdowns
-      if (hasActiveDropdown) {
-        this.hideDropdown();
-      }
+      this.hideDropdown();
     }
   }
 
@@ -1889,7 +1860,6 @@ class Choices {
     const target = e.target;
     // If target is something that concerns us
     if (this.containerOuter.element.contains(target)) {
-      const hasActiveDropdown = this.dropdown.isActive;
       const focusActions = {
         text: () => {
           if (target === this.input.element) {
@@ -1898,7 +1868,7 @@ class Choices {
         },
         'select-one': () => {
           this.containerOuter.addFocusState();
-          if ((target === this.input.element) && !hasActiveDropdown) {
+          if (target === this.input.element) {
             // Show dropdown if it isn't already showing
             this.showDropdown();
           }
@@ -1908,9 +1878,7 @@ class Choices {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
             this.containerOuter.addFocusState();
-            if (!hasActiveDropdown) {
-              this.showDropdown(true);
-            }
+            this.showDropdown(true);
           }
         },
       };
@@ -1930,7 +1898,6 @@ class Choices {
     // If target is something that concerns us
     if (this.containerOuter.element.contains(target) && !this.isScrollingOnIe) {
       const activeItems = this.store.getItemsFilteredByActive();
-      const hasActiveDropdown = this.dropdown.isActive;
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
@@ -1941,21 +1908,18 @@ class Choices {
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
-            // Hide dropdown if it is showing
-            if (hasActiveDropdown) {
-              this.hideDropdown();
-            }
+            this.hideDropdown();
           }
         },
         'select-one': () => {
           this.containerOuter.removeFocusState();
           if (target === this.containerOuter.element) {
             // Hide dropdown if it is showing
-            if (hasActiveDropdown && !this.canSearch) {
+            if (!this.canSearch) {
               this.hideDropdown();
             }
           }
-          if (target === this.input.element && hasActiveDropdown) {
+          if (target === this.input.element) {
             // Hide dropdown if it is showing
             this.hideDropdown();
           }
@@ -1964,10 +1928,7 @@ class Choices {
           if (target === this.input.element) {
             // Remove the focus state
             this.containerOuter.removeFocusState();
-            // Hide dropdown if it is showing
-            if (hasActiveDropdown) {
-              this.hideDropdown();
-            }
+            this.hideDropdown();
             // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
