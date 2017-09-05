@@ -128,7 +128,7 @@ class Choices {
     };
 
     // Merge options with user options
-    this.config = extend(defaultConfig, userConfig);
+    this.config = extend(defaultConfig, Choices.userDefaults, userConfig);
 
     if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
       if (!this.config.silent) {
@@ -2866,5 +2866,7 @@ class Choices {
 
   /* =====  End of Private functions  ====== */
 }
+
+Choices.userDefaults = {};
 
 module.exports = Choices;
