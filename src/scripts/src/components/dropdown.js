@@ -15,7 +15,7 @@ export default class Dropdown {
    */
   getVerticalPos() {
     this.dimensions = this.element.getBoundingClientRect();
-    this.position = Math.ceil(this.dimensions.top + window.scrollY + this.element.offsetHeight);
+    this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
     return this.position;
   }
 
