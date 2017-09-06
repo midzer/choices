@@ -196,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    // Merge options with user options
-	    this.config = (0, _utils.extend)(defaultConfig, userConfig);
+	    this.config = (0, _utils.extend)(defaultConfig, Choices.userDefaults, userConfig);
 
 	    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
 	      if (!this.config.silent) {
@@ -882,7 +882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.dropdown.setAttribute('aria-expanded', 'true');
 
 	      var dimensions = this.dropdown.getBoundingClientRect();
-	      var dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
+	      var dropdownPos = Math.ceil(dimensions.top + window.pageYOffset + this.dropdown.offsetHeight);
 
 	      // If flip is enabled and the dropdown bottom position is
 	      // greater than the window height flip the dropdown.
@@ -2859,7 +2859,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Choices;
 	}();
 
-		module.exports = Choices;
+	Choices.userDefaults = {};
+
+	module.exports = Choices;
 
 /***/ }),
 /* 2 */
