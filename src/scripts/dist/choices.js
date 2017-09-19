@@ -428,7 +428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (_this.isSelectOneElement) {
 	            return choice.groupId === group.id;
 	          }
-	          return choice.groupId === group.id && !choice.selected;
+	          return choice.groupId === group.id && (_this.config.renderSelectedChoices === 'always' || !choice.selected);
 	        });
 
 	        if (groupChoices.length >= 1) {
