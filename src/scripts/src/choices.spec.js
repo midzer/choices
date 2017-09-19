@@ -5,13 +5,17 @@ import 'custom-event-autopolyfill';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import Choices from './choices.js';
-import itemReducer from './reducers/items.js';
-import choiceReducer from './reducers/choices.js';
+import Choices from './choices';
+import itemReducer from './reducers/items';
+import choiceReducer from './reducers/choices';
 import {
   addItem as addItemAction,
   addChoice as addChoiceAction,
-} from './actions/actions.js';
+} from './actions/actions';
+import Dropdown from './components/dropdown';
+import Container from './components/container';
+import Input from './components/input';
+import List from './components/list';
 
 describe('Choices', () => {
   describe('should initialize Choices', () => {
@@ -121,27 +125,27 @@ describe('Choices', () => {
     });
 
     it('should create an outer container', () => {
-      expect(instance.containerOuter).to.be.an.instanceof(HTMLElement);
+      expect(instance.containerOuter).to.be.an.instanceof(Container);
     });
 
     it('should create an inner container', () => {
-      expect(instance.containerInner).to.be.an.instanceof(HTMLElement);
+      expect(instance.containerInner).to.be.an.instanceof(Container);
     });
 
     it('should create a choice list', () => {
-      expect(instance.choiceList).to.be.an.instanceof(HTMLElement);
+      expect(instance.choiceList).to.be.an.instanceof(List);
     });
 
     it('should create an item list', () => {
-      expect(instance.itemList).to.be.an.instanceof(HTMLElement);
+      expect(instance.itemList).to.be.an.instanceof(List);
     });
 
     it('should create an input', () => {
-      expect(instance.input).to.be.an.instanceof(HTMLElement);
+      expect(instance.input).to.be.an.instanceof(Input);
     });
 
     it('should create a dropdown', () => {
-      expect(instance.dropdown).to.be.an.instanceof(HTMLElement);
+      expect(instance.dropdown).to.be.an.instanceof(Dropdown);
     });
 
     it('should backup and recover original styles', () => {
@@ -183,22 +187,22 @@ describe('Choices', () => {
     it('should accept a user inputted value', () => {
       instance = new Choices(input);
 
-      instance.input.focus();
-      instance.input.value = 'test';
+      instance.input.element.focus();
+      instance.input.element.value = 'test';
 
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      expect(instance.currentState.items[0].value).to.include(instance.input.value);
+      expect(instance.currentState.items[0].value).to.include(instance.input.element.value);
     });
 
     it('should copy the passed placeholder to the cloned input', () => {
       instance = new Choices(input);
 
-      expect(instance.input.placeholder).to.equal(input.placeholder);
+      expect(instance.input.element.placeholder).to.equal(input.placeholder);
     });
 
     it('should not allow duplicates if duplicateItems is false', () => {
@@ -207,16 +211,16 @@ describe('Choices', () => {
         items: ['test 1'],
       });
 
-      instance.input.focus();
-      instance.input.value = 'test 1';
+      instance.input.element.focus();
+      instance.input.element.value = 'test 1';
 
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      expect(instance.currentState.items[instance.currentState.items.length - 1]).not.to.include(instance.input.value);
+      expect(instance.currentState.items[instance.currentState.items.length - 1].value).to.equal(instance.input.element.value);
     });
 
     it('should filter input if regexFilter is passed', () => {
@@ -224,20 +228,20 @@ describe('Choices', () => {
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       });
 
-      instance.input.focus();
-      instance.input.value = 'josh@joshuajohnson.co.uk';
+      instance.input.element.focus();
+      instance.input.element.value = 'josh@joshuajohnson.co.uk';
 
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      instance.input.focus();
-      instance.input.value = 'not an email address';
+      instance.input.element.focus();
+      instance.input.element.value = 'not an email address';
 
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
@@ -254,11 +258,11 @@ describe('Choices', () => {
         appendValue: '-value',
       });
 
-      instance.input.focus();
-      instance.input.value = 'test';
+      instance.input.element.focus();
+      instance.input.element.value = 'test';
 
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
@@ -297,8 +301,8 @@ describe('Choices', () => {
 
     it('should open the choice list on focusing', () => {
       instance = new Choices(input);
-      instance.input.focus();
-      expect(instance.dropdown.classList).to.include(instance.config.classNames.activeState);
+      instance.input.element.focus();
+      expect(instance.dropdown.element.classList.contains(instance.config.classNames.activeState)).to.be.true;
     });
 
     it('should select the first choice', () => {
@@ -310,12 +314,12 @@ describe('Choices', () => {
       instance = new Choices(input, {
         renderChoiceLimit: -1,
       });
-      instance.input.focus();
+      instance.input.element.focus();
 
       for (let i = 0; i < 2; i++) {
         // Key down to third choice
         instance._onKeyDown({
-          target: instance.input,
+          target: instance.input.element,
           keyCode: 40,
           ctrlKey: false,
           preventDefault: () => {},
@@ -327,11 +331,11 @@ describe('Choices', () => {
 
     it('should select choice on enter key press', () => {
       instance = new Choices(input);
-      instance.input.focus();
+      instance.input.element.focus();
 
       // Key down to second choice
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 40,
         ctrlKey: false,
         preventDefault: () => {},
@@ -339,7 +343,7 @@ describe('Choices', () => {
 
       // Key down to select choice
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
         preventDefault: () => {},
@@ -358,11 +362,11 @@ describe('Choices', () => {
       passedElement.addEventListener('change', onChangeStub);
       passedElement.addEventListener('addItem', addSpyStub);
 
-      instance.input.focus();
+      instance.input.element.focus();
 
       // Key down to second choice
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 40,
         ctrlKey: false,
         preventDefault: () => {},
@@ -370,7 +374,7 @@ describe('Choices', () => {
 
       // Key down to select choice
       instance._onKeyDown({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
         preventDefault: () => {},
@@ -384,20 +388,20 @@ describe('Choices', () => {
 
     it('should open the dropdown on click', () => {
       instance = new Choices(input);
-      const container = instance.containerOuter;
+      const container = instance.containerOuter.element;
       instance._onClick({
         target: container,
         ctrlKey: false,
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === instance.input && container.classList.contains('is-open')).to.be.true;
+      expect(document.activeElement === instance.input.element && container.classList.contains('is-open')).to.be.true;
     });
 
     it('should close the dropdown on double click', () => {
       instance = new Choices(input);
-      const container = instance.containerOuter,
-        openState = instance.config.classNames.openState;
+      const container = instance.containerOuter.element;
+      const openState = instance.config.classNames.openState;
 
       instance._onClick({
         target: container,
@@ -411,12 +415,12 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      expect(document.activeElement === instance.input && container.classList.contains(openState)).to.be.false;
+      expect(document.activeElement === instance.input.element && container.classList.contains(openState)).to.be.false;
     });
 
     it('should trigger showDropdown on dropdown opening', () => {
       instance = new Choices(input);
-      const container = instance.containerOuter;
+      const container = instance.containerOuter.element;
 
       const showDropdownStub = sinon.spy();
       const passedElement = instance.passedElement;
@@ -437,13 +441,13 @@ describe('Choices', () => {
     it('should trigger hideDropdown on dropdown closing', () => {
       instance = new Choices(input);
 
-      const container = instance.containerOuter;
+      const container = instance.containerOuter.element;
       const hideDropdownStub = sinon.stub();
       const passedElement = instance.passedElement;
 
       passedElement.addEventListener('hideDropdown', hideDropdownStub);
 
-      instance.input.focus();
+      instance.input.element.focus();
 
       instance._onClick({
         target: container,
@@ -468,12 +472,12 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', onSearchStub);
 
-      instance.input.focus();
+      instance.input.element.focus();
       instance.input.value = '3 ';
 
       // Key down to search
       instance._onKeyUp({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
@@ -496,17 +500,17 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', onSearchStub);
 
-      instance.input.focus();
-      instance.input.value = 'Javascript';
+      instance.input.element.focus();
+      instance.input.element.value = 'Javascript';
 
       // Key down to search
       instance._onKeyUp({
-        target: instance.input,
+        target: instance.input.element,
         keyCode: 13,
         ctrlKey: false,
       });
 
-      const activeOptions = instance.currentState.choices.filter((choice) => choice.active);
+      const activeOptions = instance.currentState.choices.filter(choice => choice.active);
 
       expect(activeOptions.length).to.equal(instance.currentState.choices.length);
       expect(onSearchStub.callCount).to.equal(1);
@@ -610,7 +614,7 @@ describe('Choices', () => {
     });
 
     it('should add a placeholder defined in the config to the search input', () => {
-      expect(instance.input.placeholder).to.equal('Placeholder text');
+      expect(instance.input.element.placeholder).to.equal('Placeholder text');
     });
   });
 
@@ -696,9 +700,9 @@ describe('Choices', () => {
     it('should handle showDropdown()', () => {
       instance.showDropdown();
 
-      const hasOpenState = instance.containerOuter.classList.contains(instance.config.classNames.openState);
-      const hasAttr = instance.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = instance.dropdown.classList.contains(instance.config.classNames.activeState);
+      const hasOpenState = instance.containerOuter.element.classList.contains(instance.config.classNames.openState);
+      const hasAttr = instance.containerOuter.element.getAttribute('aria-expanded') === 'true';
+      const hasActiveState = instance.dropdown.element.classList.contains(instance.config.classNames.activeState);
 
       expect(hasOpenState && hasAttr && hasActiveState).to.be.true;
     });
@@ -707,9 +711,10 @@ describe('Choices', () => {
       instance.showDropdown();
       instance.hideDropdown();
 
-      const hasOpenState = instance.containerOuter.classList.contains(instance.config.classNames.openState);
-      const hasAttr = instance.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = instance.dropdown.classList.contains(instance.config.classNames.activeState);
+      const hasOpenState = instance.containerOuter.element.classList.contains(instance.config.classNames.openState);
+      const hasAttr = instance.containerOuter.element.getAttribute('aria-expanded') === 'true';
+      const hasActiveState = instance.dropdown.element.classList.contains(instance.config.classNames.activeState);
+
 
       expect(hasOpenState && hasAttr && hasActiveState).to.be.false;
     });
@@ -719,11 +724,6 @@ describe('Choices', () => {
       instance.showDropdown();
       instance.toggleDropdown();
       expect(instance.hideDropdown.callCount).to.equal(1);
-    });
-
-    it('should handle hideDropdown()', () => {
-      instance.showDropdown();
-      expect(instance.containerOuter.classList).to.include(instance.config.classNames.openState);
     });
 
     it('should handle getValue()', () => {
@@ -832,17 +832,17 @@ describe('Choices', () => {
     it('should handle disable()', () => {
       instance.disable();
 
-      expect(instance.input.disabled).to.be.true;
-      expect(instance.containerOuter.classList.contains(instance.config.classNames.disabledState)).to.be.true;
-      expect(instance.containerOuter.getAttribute('aria-disabled')).to.equal('true');
+      expect(instance.input.element.disabled).to.be.true;
+      expect(instance.containerOuter.element.classList.contains(instance.config.classNames.disabledState)).to.be.true;
+      expect(instance.containerOuter.element.getAttribute('aria-disabled')).to.equal('true');
     });
 
     it('should handle enable()', () => {
       instance.enable();
 
-      expect(instance.input.disabled).to.be.false;
-      expect(instance.containerOuter.classList.contains(instance.config.classNames.disabledState)).to.be.false;
-      expect(instance.containerOuter.hasAttribute('aria-disabled')).to.be.false;
+      expect(instance.input.element.disabled).to.be.false;
+      expect(instance.containerOuter.element.classList.contains(instance.config.classNames.disabledState)).to.be.false;
+      expect(instance.containerOuter.element.hasAttribute('aria-disabled')).to.be.false;
     });
 
     it('should handle ajax()', () => {
@@ -860,7 +860,7 @@ describe('Choices', () => {
           });
       });
 
-      expect(instance.ajax).toHaveBeenCalledWith(jasmine.any(Function));
+      expect(instance.ajax).to.have.been.called();
     });
   });
 
@@ -897,13 +897,13 @@ describe('Choices', () => {
     it('should handle disable()', () => {
       instance.disable();
 
-      expect(instance.containerOuter.getAttribute('tabindex')).to.equal('-1');
+      expect(instance.containerOuter.element.getAttribute('tabindex')).to.equal('-1');
     });
 
     it('should handle enable()', () => {
       instance.enable();
 
-      expect(instance.containerOuter.getAttribute('tabindex')).to.equal('0');
+      expect(instance.containerOuter.element.getAttribute('tabindex')).to.equal('0');
     });
   });
 
@@ -927,7 +927,7 @@ describe('Choices', () => {
 
     it('should handle clearInput()', () => {
       instance.clearInput();
-      expect(instance.input.value).to.equal('');
+      expect(instance.input.element.value).to.equal('');
     });
 
     it('should handle removeItemsByValue()', () => {
@@ -973,8 +973,8 @@ describe('Choices', () => {
         position: 'top',
       });
 
-      const container = instance.containerOuter;
-      instance.input.focus();
+      const container = instance.containerOuter.element;
+      instance.input.element.focus();
       expect(container.classList.contains(instance.config.classNames.flippedState)).to.be.true;
     });
 
@@ -983,8 +983,8 @@ describe('Choices', () => {
         position: 'bottom',
       });
 
-      const container = instance.containerOuter;
-      instance.input.focus();
+      const container = instance.containerOuter.element;
+      instance.input.element.focus();
       expect(container.classList.contains(instance.config.classNames.flippedState)).to.be.false;
     });
 
@@ -994,7 +994,7 @@ describe('Choices', () => {
         renderChoiceLimit: -1,
       });
 
-      const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = instance.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).to.equal(3);
     });
 
@@ -1004,7 +1004,7 @@ describe('Choices', () => {
         renderChoiceLimit: -1,
       });
 
-      const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = instance.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).to.equal(1);
     });
 
@@ -1041,7 +1041,7 @@ describe('Choices', () => {
         renderChoiceLimit: 4,
       });
 
-      const renderedChoices = instance.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = instance.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).to.equal(4);
     });
   });
@@ -1057,6 +1057,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar',
         },
+        placeholder: false,
         keyCode: null,
       };
 
@@ -1069,6 +1070,7 @@ describe('Choices', () => {
         active: true,
         highlighted: false,
         customProperties: randomItem.customProperties,
+        placeholder: randomItem.placeholder,
         keyCode: randomItem.keyCode,
       }];
 
@@ -1079,6 +1081,7 @@ describe('Choices', () => {
         randomItem.choiceId,
         randomItem.groupId,
         randomItem.customProperties,
+        randomItem.placeholder,
         randomItem.keyCode,
       );
 
@@ -1096,6 +1099,7 @@ describe('Choices', () => {
         customProperties: {
           foo: 'bar',
         },
+        placeholder: false,
         keyCode: null,
       };
 
@@ -1110,6 +1114,7 @@ describe('Choices', () => {
         active: true,
         score: 9999,
         customProperties: randomChoice.customProperties,
+        placeholder: randomChoice.placeholder,
         keyCode: randomChoice.keyCode,
       }];
 
@@ -1121,6 +1126,7 @@ describe('Choices', () => {
         randomChoice.disabled,
         randomChoice.elementId,
         randomChoice.customProperties,
+        randomChoice.placeholder,
         randomChoice.keyCode,
       );
 
