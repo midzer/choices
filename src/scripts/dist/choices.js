@@ -2645,7 +2645,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (passedGroups && passedGroups.length) {
 	          // If we have a placeholder option
 	          var placeholderChoice = this.passedElement.querySelector('option[placeholder]');
-	          if (placeholderChoice.parentNode.tagName === 'SELECT') {
+	          if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
 	            this._addChoice(placeholderChoice.value, placeholderChoice.innerHTML, placeholderChoice.selected, placeholderChoice.disabled, undefined, undefined,
 	            /* placeholder */true);
 	          }

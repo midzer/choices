@@ -2637,7 +2637,7 @@ class Choices {
       if (passedGroups && passedGroups.length) {
         // If we have a placeholder option
         const placeholderChoice = this.passedElement.querySelector('option[placeholder]');
-        if (placeholderChoice.parentNode.tagName === 'SELECT') {
+        if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
           this._addChoice(
             placeholderChoice.value,
             placeholderChoice.innerHTML,
