@@ -8,12 +8,12 @@ module.exports = {
   devtool: 'eval',
   entry: [
     'webpack-dev-server/client?http://localhost:3000',
-    './assets/scripts/src/choices'
+    './src/scripts/src/choices'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'choices.min.js',
-    publicPath: '/assets/scripts/dist/',
+    publicPath: '/src/scripts/dist/',
     library: 'Choices',
     libraryTarget: 'umd',
   },
@@ -34,7 +34,7 @@ module.exports = {
       test: /\.js$/,
       exclude: /(node_modules|bower_components)/,
       loaders: ['babel', 'eslint-loader'],
-      include: path.join(__dirname, 'assets/scripts/src')
+      include: path.join(__dirname, 'src/scripts/src')
     }]
   }
 };

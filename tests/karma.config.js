@@ -1,3 +1,4 @@
+/* eslint-disable */
 var webpack = require('karma-webpack');
 
 module.exports = function(config) {

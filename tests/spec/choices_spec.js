@@ -1,13 +1,14 @@
 import 'whatwg-fetch';
 import 'es6-promise';
 import 'core-js/fn/object/assign';
-import Choices from '../../assets/scripts/src/choices.js';
-import itemReducer from '../../assets/scripts/src/reducers/items.js';
-import choiceReducer from '../../assets/scripts/src/reducers/choices.js';
+import 'core-js/fn/array/includes';
+import Choices from '../../src/scripts/src/choices';
+import itemReducer from '../../src/scripts/src/reducers/items';
+import choiceReducer from '../../src/scripts/src/reducers/choices';
 import {
   addItem as addItemAction,
-  addChoice as addChoiceAction
-} from '../../assets/scripts/src/actions/index.js';
+  addChoice as addChoiceAction,
+} from '../../src/scripts/src/actions/actions';
 
 describe('Choices', () => {
   describe('should initialize Choices', () => {
@@ -115,27 +116,27 @@ describe('Choices', () => {
     });
 
     it('should create an outer container', function() {
-      expect(this.choices.containerOuter).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.containerOuter.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an inner container', function() {
-      expect(this.choices.containerInner).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.containerInner.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create a choice list', function() {
-      expect(this.choices.choiceList).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.choiceList.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an item list', function() {
-      expect(this.choices.itemList).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.itemList.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create an input', function() {
-      expect(this.choices.input).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.input.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should create a dropdown', function() {
-      expect(this.choices.dropdown).toEqual(jasmine.any(HTMLElement));
+      expect(this.choices.dropdown.element).toEqual(jasmine.any(HTMLElement));
     });
 
     it('should backup and recover original styles', function () {
@@ -157,7 +158,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept text inputs', function() {
+  describe('should accept text inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('input');
       this.input.type = 'text';
@@ -173,33 +174,33 @@ describe('Choices', () => {
 
     it('should apply placeholderValue to input', function() {
       this.choices = new Choices(this.input);
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
 
     it('should not apply searchPlaceholderValue to input', function() {
       this.choices = new Choices(this.input);
-      expect(this.choices.input.placeholder).not.toEqual('Test');
+      expect(this.choices.input.element.placeholder).not.toEqual('Test');
     });
 
     it('should accept a user inputted value', function() {
       this.choices = new Choices(this.input);
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      expect(this.choices.currentState.items[0].value).toContain(this.choices.input.value);
+      expect(this.choices.currentState.items[0].value).toContain(this.choices.input.element.value);
     });
 
     it('should copy the passed placeholder to the cloned input', function() {
       this.choices = new Choices(this.input);
 
-      expect(this.choices.input.placeholder).toEqual(this.input.placeholder);
+      expect(this.choices.input.element.placeholder).toEqual(this.input.placeholder);
     });
 
     it('should not allow duplicates if duplicateItems is false', function() {
@@ -208,16 +209,18 @@ describe('Choices', () => {
         items: ['test 1'],
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test 1';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test 1';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      expect(this.choices.currentState.items[this.choices.currentState.items.length - 1]).not.toContain(this.choices.input.value);
+      expect(
+        this.choices.currentState.items[this.choices.currentState.items.length - 1],
+      ).not.toContain(this.choices.input.element.value);
     });
 
     it('should filter input if regexFilter is passed', function() {
@@ -225,22 +228,22 @@ describe('Choices', () => {
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'josh@joshuajohnson.co.uk';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'josh@joshuajohnson.co.uk';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'not an email address';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'not an email address';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
@@ -255,13 +258,13 @@ describe('Choices', () => {
         appendValue: '-value',
       });
 
-      this.choices.input.focus();
-      this.choices.input.value = 'test';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'test';
 
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
       const lastItem = this.choices.currentState.items[this.choices.currentState.items.length - 1];
@@ -271,7 +274,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept single select inputs', function() {
+  describe('should accept single select inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -295,24 +298,26 @@ describe('Choices', () => {
 
     it('should not apply placeholderValue to input', function() {
       this.choices = new Choices(this.input, {
-        placeholderValue: 'Placeholder'
+        placeholderValue: 'Placeholder',
       });
 
-      expect(this.choices.input.placeholder).not.toEqual('Placeholder');
+      expect(this.choices.input.element.placeholder).not.toEqual('Placeholder');
     });
 
     it('should apply searchPlaceholderValue to input', function() {
       this.choices = new Choices(this.input, {
-        searchPlaceholderValue: 'Placeholder'
+        searchPlaceholderValue: 'Placeholder',
       });
 
-      expect(this.choices.input.placeholder).toEqual('Placeholder');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder');
     });
 
     it('should open the choice list on focusing', function() {
       this.choices = new Choices(this.input);
-      this.choices.input.focus();
-      expect(this.choices.dropdown.classList).toContain(this.choices.config.classNames.activeState);
+      this.choices.input.element.focus();
+      expect(
+        this.choices.dropdown.element.classList,
+      ).toContain(this.choices.config.classNames.activeState);
     });
 
     it('should select the first choice', function() {
@@ -322,17 +327,17 @@ describe('Choices', () => {
 
     it('should highlight the choices on keydown', function() {
       this.choices = new Choices(this.input, {
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       for (let i = 0; i < 2; i++) {
         // Key down to third choice
         this.choices._onKeyDown({
-          target: this.choices.input,
+          target: this.choices.input.element,
           keyCode: 40,
           ctrlKey: false,
-          preventDefault: () => {}
+          preventDefault: () => {},
         });
       }
 
@@ -341,22 +346,22 @@ describe('Choices', () => {
 
     it('should select choice on enter key press', function() {
       this.choices = new Choices(this.input);
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       // Key down to second choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(this.choices.currentState.items.length).toBe(2);
@@ -372,22 +377,22 @@ describe('Choices', () => {
       passedElement.addEventListener('change', changeSpy);
       passedElement.addEventListener('addItem', addSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       // Key down to second choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 40,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Key down to select choice
       this.choices._onKeyDown({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       const returnValue = changeSpy.calls.mostRecent().args[0].detail.value;
@@ -398,34 +403,40 @@ describe('Choices', () => {
 
     it('should open the dropdown on click', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input && container.classList.contains('is-open')).toBe(true);
+      expect(
+        document.activeElement === this.choices.input.element &&
+        container.classList.contains('is-open'),
+      ).toBe(true);
     });
 
     it('should close the dropdown on double click', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       const openState = this.choices.config.classNames.openState;
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
-      expect(document.activeElement === this.choices.input && container.classList.contains(openState)).toBe(false);
+      expect(
+        document.activeElement === this.choices.input.element &&
+        container.classList.contains(openState),
+      ).toBe(false);
     });
 
     it('should set scrolling flag and not hide dropdown when scrolling on IE', function() {
@@ -434,21 +445,21 @@ describe('Choices', () => {
 
       spyOn(this.choices, 'hideDropdown');
 
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
       const choiceList = this.choices.choiceList;
 
       // Click to open dropdown
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       // Hold mouse on scrollbar
       this.choices._onMouseDown({
         target: choiceList,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(this.choices.isScrollingOnIe).toBe(true);
@@ -457,19 +468,19 @@ describe('Choices', () => {
 
     it('should trigger showDropdown on dropdown opening', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
 
       const showDropdownSpy = jasmine.createSpy('showDropdownSpy');
       const passedElement = this.choices.passedElement;
 
       passedElement.addEventListener('showDropdown', showDropdownSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(showDropdownSpy).toHaveBeenCalled();
@@ -477,25 +488,25 @@ describe('Choices', () => {
 
     it('should trigger hideDropdown on dropdown closing', function() {
       this.choices = new Choices(this.input);
-      const container = this.choices.containerOuter;
+      const container = this.choices.containerOuter.element;
 
       const hideDropdownSpy = jasmine.createSpy('hideDropdownSpy');
       const passedElement = this.choices.passedElement;
 
       passedElement.addEventListener('hideDropdown', hideDropdownSpy);
 
-      this.choices.input.focus();
+      this.choices.input.element.focus();
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       this.choices._onClick({
         target: container,
         ctrlKey: false,
-        preventDefault: () => {}
+        preventDefault: () => {},
       });
 
       expect(hideDropdownSpy).toHaveBeenCalled();
@@ -509,19 +520,17 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', searchSpy);
 
-      this.choices.input.focus();
-      this.choices.input.value = '3 ';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = '3 ';
 
       // Key down to search
       this.choices._onKeyUp({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const mostAccurateResult = this.choices.currentState.choices.filter(function (choice) {
-        return choice.active;
-      });
+      const mostAccurateResult = this.choices.currentState.choices.filter(choice => choice.active);
 
       expect(this.choices.isSearching && mostAccurateResult[0].value === 'Value 3').toBe(true);
       expect(searchSpy).toHaveBeenCalled();
@@ -529,7 +538,7 @@ describe('Choices', () => {
 
     it('shouldn\'t filter choices when searching', function() {
       this.choices = new Choices(this.input, {
-        searchChoices: false
+        searchChoices: false,
       });
 
       this.choices.setValue(['Javascript', 'HTML', 'Jasmine']);
@@ -539,19 +548,17 @@ describe('Choices', () => {
 
       passedElement.addEventListener('search', searchSpy);
 
-      this.choices.input.focus();
-      this.choices.input.value = 'Javascript';
+      this.choices.input.element.focus();
+      this.choices.input.element.value = 'Javascript';
 
       // Key down to search
       this.choices._onKeyUp({
-        target: this.choices.input,
+        target: this.choices.input.element,
         keyCode: 13,
-        ctrlKey: false
+        ctrlKey: false,
       });
 
-      const activeOptions = this.choices.currentState.choices.filter(function(choice) {
-        return choice.active;
-      });
+      const activeOptions = this.choices.currentState.choices.filter(choice => choice.active);
 
       expect(activeOptions.length).toEqual(this.choices.currentState.choices.length);
       expect(searchSpy).toHaveBeenCalled();
@@ -562,14 +569,14 @@ describe('Choices', () => {
         shouldSort: false,
         choices: [{
           value: 'Value 5',
-          label: 'Label Five'
+          label: 'Label Five',
         }, {
           value: 'Value 6',
-          label: 'Label Six'
+          label: 'Label Six',
         }, {
           value: 'Value 7',
-          label: 'Label Seven'
-        }, ],
+          label: 'Label Seven',
+        }],
       });
 
       expect(this.choices.currentState.choices[0].value).toEqual('Value 5');
@@ -580,14 +587,14 @@ describe('Choices', () => {
         shouldSort: true,
         choices: [{
           value: 'Value 5',
-          label: 'Label Five'
+          label: 'Label Five',
         }, {
           value: 'Value 6',
-          label: 'Label Six'
+          label: 'Label Six',
         }, {
           value: 'Value 7',
-          label: 'Label Seven'
-        }, ],
+          label: 'Label Seven',
+        }],
       });
 
       expect(this.choices.currentState.choices[0].value).toEqual('Value 1');
@@ -596,14 +603,14 @@ describe('Choices', () => {
     it('should set searchPlaceholderValue if set', function() {
       const dummyPlaceholder = 'Test placeholder';
       this.choices = new Choices(this.input, {
-        searchPlaceholderValue: dummyPlaceholder
+        searchPlaceholderValue: dummyPlaceholder,
       });
 
-      expect(this.choices.input.placeholder).toEqual(dummyPlaceholder);
+      expect(this.choices.input.element.placeholder).toEqual(dummyPlaceholder);
     });
   });
 
-  describe('should accept multiple select inputs', function() {
+  describe('should accept multiple select inputs', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -631,15 +638,15 @@ describe('Choices', () => {
           value: 'One',
           label: 'Label One',
           selected: true,
-          disabled: false
+          disabled: false,
         }, {
           value: 'Two',
           label: 'Label Two',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Three',
-          label: 'Label Three'
-        }, ],
+          label: 'Label Three',
+        }],
       });
     });
 
@@ -648,11 +655,11 @@ describe('Choices', () => {
     });
 
     it('should apply placeholderValue to input', function() {
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
 
     it('should not apply searchPlaceholderValue to input', function() {
-      expect(this.choices.input.placeholder).not.toEqual('Test');
+      expect(this.choices.input.element.placeholder).not.toEqual('Test');
     });
 
     it('should add any pre-defined values', function() {
@@ -664,11 +671,11 @@ describe('Choices', () => {
     });
 
     it('should add a placeholder defined in the config to the search input', function() {
-      expect(this.choices.input.placeholder).toEqual('Placeholder text');
+      expect(this.choices.input.element.placeholder).toEqual('Placeholder text');
     });
   });
 
-  describe('should handle public methods on select input types', function() {
+  describe('should handle public methods on select input types', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -719,7 +726,7 @@ describe('Choices', () => {
 
       this.choices.highlightAll();
 
-      const unhighlightedItems = items.some((item) => item.highlighted === false);
+      const unhighlightedItems = items.some(item => item.highlighted === false);
 
       expect(unhighlightedItems).toBe(false);
     });
@@ -729,7 +736,7 @@ describe('Choices', () => {
 
       this.choices.unhighlightAll();
 
-      const highlightedItems = items.some((item) => item.highlighted === true);
+      const highlightedItems = items.some(item => item.highlighted === true);
 
       expect(highlightedItems).toBe(false);
     });
@@ -739,39 +746,49 @@ describe('Choices', () => {
       this.choices.highlightAll();
       this.choices.removeHighlightedItems();
 
-      const activeItems = items.some((item) => item.active === true);
+      const activeItems = items.some(item => item.active === true);
 
       expect(activeItems).toBe(false);
     });
 
     it('should handle showDropdown()', function() {
       this.choices.showDropdown();
-      const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
-      const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(
+        this.choices.config.classNames.openState,
+      );
+      const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
+      const hasActiveState = this.choices.dropdown.element.classList.contains(
+        this.choices.config.classNames.activeState,
+      );
       expect(hasOpenState && hasAttr && hasActiveState).toBe(true);
     });
 
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
       this.choices.hideDropdown();
-      const hasOpenState = this.choices.containerOuter.classList.contains(this.choices.config.classNames.openState);
-      const hasAttr = this.choices.containerOuter.getAttribute('aria-expanded') === 'true';
-      const hasActiveState = this.choices.dropdown.classList.contains(this.choices.config.classNames.activeState);
+      const hasOpenState = this.choices.containerOuter.element.classList.contains(
+        this.choices.config.classNames.openState,
+      );
+      const hasAttr = this.choices.containerOuter.element.getAttribute('aria-expanded') === 'true';
+      const hasActiveState = this.choices.dropdown.element.classList.contains(
+        this.choices.config.classNames.activeState,
+      );
 
       expect(hasOpenState && hasAttr && hasActiveState).toBe(false);
     });
 
     it('should handle toggleDropdown()', function() {
-      spyOn(this.choices, 'hideDropdown');
-      this.choices.showDropdown();
+      spyOn(this.choices.dropdown, 'hide');
+      this.choices.dropdown.show();
       this.choices.toggleDropdown();
-      expect(this.choices.hideDropdown).toHaveBeenCalled();
+      expect(this.choices.dropdown.hide).toHaveBeenCalled();
     });
 
     it('should handle hideDropdown()', function() {
       this.choices.showDropdown();
-      expect(this.choices.containerOuter.classList).toContain(this.choices.config.classNames.openState);
+      expect(
+        this.choices.containerOuter.element.classList,
+      ).toContain(this.choices.config.classNames.openState);
     });
 
     it('should handle getValue()', function() {
@@ -814,15 +831,15 @@ describe('Choices', () => {
         choices: [{
           value: 'Child One',
           label: 'Child One',
-          selected: true
+          selected: true,
         }, {
           value: 'Child Two',
           label: 'Child Two',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Child Three',
-          label: 'Child Three'
-        }, ]
+          label: 'Child Three',
+        }],
       }, {
         label: 'Group two',
         id: 2,
@@ -830,14 +847,14 @@ describe('Choices', () => {
         choices: [{
           value: 'Child Four',
           label: 'Child Four',
-          disabled: true
+          disabled: true,
         }, {
           value: 'Child Five',
-          label: 'Child Five'
+          label: 'Child Five',
         }, {
           value: 'Child Six',
-          label: 'Child Six'
-        }, ]
+          label: 'Child Six',
+        }],
       }], 'value', 'label');
 
 
@@ -853,10 +870,10 @@ describe('Choices', () => {
     it('should handle setChoices() with blank values', function() {
       this.choices.setChoices([{
         label: 'Choice one',
-        value: 'one'
+        value: 'one',
       }, {
         label: 'Choice two',
-        value: ''
+        value: '',
       }], 'value', 'label', true);
 
 
@@ -876,17 +893,25 @@ describe('Choices', () => {
     it('should handle disable()', function() {
       this.choices.disable();
 
-      expect(this.choices.input.disabled).toBe(true);
-      expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(true);
-      expect(this.choices.containerOuter.getAttribute('aria-disabled')).toBe('true');
+      expect(this.choices.input.element.disabled).toBe(true);
+      expect(
+        this.choices.containerOuter.element.classList.contains(
+          this.choices.config.classNames.disabledState,
+        ),
+      ).toBe(true);
+      expect(this.choices.containerOuter.element.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('should handle enable()', function() {
       this.choices.enable();
 
-      expect(this.choices.input.disabled).toBe(false);
-      expect(this.choices.containerOuter.classList.contains(this.choices.config.classNames.disabledState)).toBe(false);
-      expect(this.choices.containerOuter.hasAttribute('aria-disabled')).toBe(false);
+      expect(this.choices.input.element.disabled).toBe(false);
+      expect(
+        this.choices.containerOuter.element.classList.contains(
+          this.choices.config.classNames.disabledState,
+        ),
+      ).toBe(false);
+      expect(this.choices.containerOuter.element.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('should handle ajax()', function() {
@@ -908,7 +933,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should handle public methods on select-one input types', function() {
+  describe('should handle public methods on select-one input types', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -938,17 +963,17 @@ describe('Choices', () => {
     it('should handle disable()', function() {
       this.choices.disable();
 
-      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('-1');
+      expect(this.choices.containerOuter.element.getAttribute('tabindex')).toBe('-1');
     });
 
     it('should handle enable()', function() {
       this.choices.enable();
 
-      expect(this.choices.containerOuter.getAttribute('tabindex')).toBe('0');
+      expect(this.choices.containerOuter.element.getAttribute('tabindex')).toBe('0');
     });
   });
 
-  describe('should handle public methods on text input types', function() {
+  describe('should handle public methods on text input types', () => {
     beforeEach(function() {
       this.input = document.createElement('input');
       this.input.type = 'text';
@@ -965,7 +990,7 @@ describe('Choices', () => {
 
     it('should handle clearInput()', function() {
       this.choices.clearInput();
-      expect(this.choices.input.value).toBe('');
+      expect(this.choices.input.element.value).toBe('');
     });
 
     it('should handle removeItemsByValue()', function() {
@@ -977,7 +1002,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should react to config options', function() {
+  describe('should react to config options', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -1008,36 +1033,36 @@ describe('Choices', () => {
         position: 'top',
       });
 
-      const container = this.choices.containerOuter;
-      this.choices.input.focus();
+      const container = this.choices.containerOuter.element;
+      this.choices.input.element.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(true);
     });
 
     it('shouldn\'t flip the dropdown', function() {
       this.choices = new Choices(this.input, {
-        position: 'bottom'
+        position: 'bottom',
       });
 
-      const container = this.choices.containerOuter;
-      this.choices.input.focus();
+      const container = this.choices.containerOuter.element;
+      this.choices.input.element.focus();
       expect(container.classList.contains(this.choices.config.classNames.flippedState)).toBe(false);
     });
 
     it('should render selected choices', function() {
       this.choices = new Choices(this.input, {
         renderSelectedChoices: 'always',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(3);
     });
 
     it('shouldn\'t render selected choices', function() {
       this.choices = new Choices(this.input, {
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: -1
+        renderChoiceLimit: -1,
       });
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(1);
     });
 
@@ -1071,16 +1096,16 @@ describe('Choices', () => {
           },
         ],
         renderSelectedChoices: 'auto',
-        renderChoiceLimit: 4
+        renderChoiceLimit: 4,
       });
 
-      const renderedChoices = this.choices.choiceList.querySelectorAll('.choices__item');
+      const renderedChoices = this.choices.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).toEqual(4);
     });
   });
 
-  describe('should allow custom properties provided by the user on items or choices', function() {
-    it('should allow the user to supply custom properties for an item', function() {
+  describe('should allow custom properties provided by the user on items or choices', () => {
+    it('should allow the user to supply custom properties for an item', () => {
       const randomItem = {
         id: 8999,
         choiceId: 9000,
@@ -1088,10 +1113,10 @@ describe('Choices', () => {
         value: 'value',
         label: 'label',
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
         placeholder: false,
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1104,7 +1129,7 @@ describe('Choices', () => {
         highlighted: false,
         customProperties: randomItem.customProperties,
         placeholder: false,
-        keyCode: randomItem.keyCode
+        keyCode: randomItem.keyCode,
       }];
 
       const action = addItemAction(
@@ -1114,13 +1139,13 @@ describe('Choices', () => {
         randomItem.choiceId,
         randomItem.groupId,
         randomItem.customProperties,
-        randomItem.keyCode
+        randomItem.keyCode,
       );
 
       expect(itemReducer([], action)).toEqual(expectedState);
     });
 
-    it('should allow the user to supply custom properties for a choice', function() {
+    it('should allow the user to supply custom properties for a choice', () => {
       const randomChoice = {
         id: 123,
         elementId: 321,
@@ -1129,10 +1154,10 @@ describe('Choices', () => {
         label: 'label',
         disabled: false,
         customProperties: {
-          foo: 'bar'
+          foo: 'bar',
         },
         placeholder: false,
-        keyCode: null
+        keyCode: null,
       };
 
       const expectedState = [{
@@ -1147,7 +1172,7 @@ describe('Choices', () => {
         score: 9999,
         customProperties: randomChoice.customProperties,
         placeholder: randomChoice.placeholder,
-        keyCode: randomChoice.keyCode
+        keyCode: randomChoice.keyCode,
       }];
 
       const action = addChoiceAction(
@@ -1158,14 +1183,14 @@ describe('Choices', () => {
         randomChoice.disabled,
         randomChoice.elementId,
         randomChoice.customProperties,
-        randomChoice.keyCode
+        randomChoice.keyCode,
       );
 
       expect(choiceReducer([], action)).toEqual(expectedState);
     });
   });
 
-  describe('should allow custom properties provided by the user on items or choices', function() {
+  describe('should allow custom properties provided by the user on items or choices', () => {
     beforeEach(function() {
       this.input = document.createElement('select');
       this.input.className = 'js-choices';
@@ -1180,7 +1205,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', function() {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       this.choices = new Choices(this.input);
@@ -1189,7 +1214,7 @@ describe('Choices', () => {
         label: 'My awesome choice',
         selected: false,
         disabled: false,
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }], 'value', 'label', true);
 
       this.choices.setValueByChoice('42');
@@ -1201,7 +1226,7 @@ describe('Choices', () => {
 
     it('should allow the user to supply custom properties when directly creating a selected item', function() {
       const expectedCustomProperties = {
-        isBestOptionEver: true
+        isBestOptionEver: true,
       };
 
       this.choices = new Choices(this.input);
@@ -1209,7 +1234,7 @@ describe('Choices', () => {
       this.choices.setValue([{
         value: 'bar',
         label: 'foo',
-        customProperties: expectedCustomProperties
+        customProperties: expectedCustomProperties,
       }]);
       const selectedItems = this.choices.getValue();
 
