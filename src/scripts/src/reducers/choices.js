@@ -71,7 +71,7 @@ const choices = (state = [], action) => {
         // Set active state based on whether choice is
         // within filtered results
         choice.active = filteredResults.some((result) => {
-          if (result.item.id === choice.id) {
+          if (result.id === choice.id) {
             choice.score = result.score;
             return true;
           }
