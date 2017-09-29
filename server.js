@@ -1,14 +1,14 @@
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var config = require('./webpack.config.dev');
-var opn = require('opn');
+let webpack = require('webpack');
+let WebpackDevServer = require('webpack-dev-server');
+let config = require('./webpack.config.dev');
+let opn = require('opn');
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
   historyApiFallback: true,
   quiet: true, // lets WebpackDashboard do its thing
-}).listen(3000, 'localhost', function(err, result) {
+}).listen(3001, 'localhost', (err, result) => {
   if (err) console.log(err);
-  opn('http://localhost:3000');
-  console.log('Listening at localhost:3000');
+  opn('http://localhost:3001');
+  console.log('Listening at localhost:3001');
 });
