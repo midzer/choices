@@ -52,7 +52,7 @@ export default class Container {
    * @returns
    */
   shouldFlip(dropdownPos) {
-    if (!dropdownPos) {
+    if (dropdownPos === undefined) {
       return false;
     }
 

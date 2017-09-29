@@ -20,30 +20,35 @@ function ignoreExtensions(extensions = [], returnValue = {}) {
   });
 }
 
-function mockStorage() {
-  return {
-    removeItem: function(key) {
-      delete this[key];
-    },
-    getItem: function(key) {
-      return this[key];
-    },
-    setItem: function(key, value) {
-      this[key] = value;
-    },
-    clear: function() {}
-  }
+function mockRAF(global) {
+  let callbacksQueue = [];
+
+  global.setInterval(() => {
+    for (let i = 0; i < callbacksQueue.length; i++) {
+      if (callbacksQueue[i] !== false) {
+        callbacksQueue[i].call(null);
+      }
+    }
+
+    callbacksQueue = [];
+  }, 1000 / 60);
+
+  global.requestAnimationFrame = callback => callbacksQueue.push(callback) - 1;
+
+  global.cancelAnimationFrame = (id) => {
+    callbacksQueue[id] = false;
+  };
 }
 
 global.window = window;
 global.document = window.document;
 global.navigator = {
-  userAgent: 'node.js'
+  userAgent: 'node.js',
 };
 global.HTMLElement = window.HTMLElement;
-global.window.localStorage = mockStorage;
-global.window.sessionStorage = mockStorage;
 
 copyProps(window, global);
+mockRAF(global);
+
 ignoreExtensions(['.scss', '.css']);
 ignoreExtensions(['.jpg', '.png', '.svg'], '');

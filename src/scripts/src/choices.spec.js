@@ -380,7 +380,7 @@ describe('Choices', () => {
         preventDefault: () => {},
       });
 
-      const returnValue = onChangeStub.calls.mostRecent().args[0].detail.value;
+      const returnValue = onChangeStub.lastCall.args[0].detail.value;
       expect(returnValue).to.be.a('string');
       expect(onChangeStub.callCount).to.equal(1);
       expect(addSpyStub.callCount).to.equal(1);
@@ -473,7 +473,7 @@ describe('Choices', () => {
       passedElement.addEventListener('search', onSearchStub);
 
       instance.input.element.focus();
-      instance.input.value = '3 ';
+      instance.input.element.value = '3 ';
 
       // Key down to search
       instance._onKeyUp({
@@ -482,9 +482,9 @@ describe('Choices', () => {
         ctrlKey: false,
       });
 
-      const mostAccurateResult = instance.currentState.choices.filter(choice => choice.active);
+      const mostAccurateResult = instance.currentState.choices.find(choice => choice.active);
 
-      expect(instance.isSearching && mostAccurateResult[0].value === 'Value 3').to.be.true;
+      expect(instance.isSearching && mostAccurateResult.value === 'Value 3').to.be.true;
       expect(onSearchStub.callCount).to.equal(1);
     });
 
