@@ -846,21 +846,11 @@ describe('Choices', () => {
     });
 
     it('should handle ajax()', () => {
-      sinon.spy(instance, 'ajax');
+      const dummyFn = sinon.spy();
 
-      instance.ajax((callback) => {
-        fetch('https://restcountries.eu/rest/v1/all')
-          .then((response) => {
-            response.json().then((data) => {
-              callback(data, 'alpha2Code', 'name');
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      });
+      instance.ajax(dummyFn);
 
-      expect(instance.ajax).to.have.been.called();
+      expect(dummyFn.callCount).to.equal(1);
     });
   });
 
