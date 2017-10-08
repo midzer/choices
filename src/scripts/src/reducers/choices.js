@@ -1,4 +1,6 @@
-const choices = (state = [], action) => {
+export const defaultState = [];
+
+export default function choices(state = defaultState, action) {
   switch (action.type) {
     case 'ADD_CHOICE': {
       /*
@@ -100,6 +102,4 @@ const choices = (state = [], action) => {
       return state;
     }
   }
-};
-
-export default choices;
+}

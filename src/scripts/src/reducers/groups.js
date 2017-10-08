@@ -1,4 +1,6 @@
-const groups = (state = [], action) => {
+export const defaultState = [];
+
+export default function groups(state = defaultState, action) {
   switch (action.type) {
     case 'ADD_GROUP': {
       return [...state, {
@@ -17,6 +19,4 @@ const groups = (state = [], action) => {
       return state;
     }
   }
-};
-
-export default groups;
+}

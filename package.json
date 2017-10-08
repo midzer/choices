@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "lint": "eslint assets/**/*.js",
-    "test": "nyc mocha --require ./config/test.js --compilers babel-core/register \"./src/**/**/**/**/*.spec.js\"",
+    "test": "nyc mocha --require ./config/test.js --compilers babel-core/register \"./src/**/**/**/**/*.test.js\"",
     "test:watch": "npm run test -- --watch",
     "css:watch": "nodemon -e scss -x \"npm run css:build\"",
     "css:build": "npm run css:sass -s && npm run css:prefix -s && npm run css:min -s",

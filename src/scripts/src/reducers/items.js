@@ -1,4 +1,6 @@
-const items = (state = [], action) => {
+export const defaultState = [];
+
+export default function items(state = defaultState, action) {
   switch (action.type) {
     case 'ADD_ITEM': {
       // Add object to items array
@@ -49,6 +51,4 @@ const items = (state = [], action) => {
       return state;
     }
   }
-};
-
-export default items;
+}
