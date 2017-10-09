@@ -25,20 +25,19 @@ export default function choices(state = defaultState, action) {
     }
 
     case 'ADD_ITEM': {
-      let newState = state;
-
       // If all choices need to be activated
       if (action.activateOptions) {
-        newState = state.map((obj) => {
+        return state.map((obj) => {
           const choice = obj;
           choice.active = action.active;
           return choice;
         });
       }
+
       // When an item is added and it has an associated choice,
       // we want to disable it so it can't be chosen again
       if (action.choiceId > -1) {
-        newState = state.map((obj) => {
+        return state.map((obj) => {
           const choice = obj;
           if (choice.id === parseInt(action.choiceId, 10)) {
             choice.selected = true;
@@ -47,7 +46,7 @@ export default function choices(state = defaultState, action) {
         });
       }
 
-      return newState;
+      return state;
     }
 
     case 'REMOVE_ITEM': {
@@ -67,14 +66,13 @@ export default function choices(state = defaultState, action) {
     }
 
     case 'FILTER_CHOICES': {
-      const filteredResults = action.results;
-      const filteredState = state.map((obj) => {
+      return state.map((obj) => {
         const choice = obj;
         // Set active state based on whether choice is
         // within filtered results
-        choice.active = filteredResults.some((result) => {
-          if (result.id === choice.id) {
-            choice.score = result.score;
+        choice.active = action.results.some(({ item, score }) => {
+          if (item.id === choice.id) {
+            choice.score = score;
             return true;
           }
           return false;
@@ -82,8 +80,6 @@ export default function choices(state = defaultState, action) {
 
         return choice;
       });
-
-      return filteredState;
     }
 
     case 'ACTIVATE_CHOICES': {
@@ -95,7 +91,7 @@ export default function choices(state = defaultState, action) {
     }
 
     case 'CLEAR_CHOICES': {
-      return [];
+      return defaultState;
     }
 
     default: {

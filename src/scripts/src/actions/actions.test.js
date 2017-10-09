@@ -2,16 +2,16 @@ import { expect } from 'chai';
 import * as actions from './actions';
 
 describe('actions', () => {
-  describe('addItem', () => {
+  describe('addItem action', () => {
     it('returns ADD_ITEM action', () => {
       const value = 'test';
       const label = 'test';
-      const id = 'test';
-      const choiceId = 'test';
+      const id = '1234';
+      const choiceId = '1234';
       const groupId = 'test';
       const customProperties = 'test';
       const placeholder = 'test';
-      const keyCode = 'test';
+      const keyCode = 10;
 
       const expectedAction = {
         type: 'ADD_ITEM',
@@ -38,7 +38,7 @@ describe('actions', () => {
     });
   });
 
-  describe('removeItem', () => {
+  describe('removeItem action', () => {
     it('returns REMOVE_ITEM action', () => {
       const id = '1234';
       const choiceId = '1';
@@ -52,7 +52,7 @@ describe('actions', () => {
     });
   });
 
-  describe('highlightItem', () => {
+  describe('highlightItem action', () => {
     it('returns HIGHLIGHT_ITEM action', () => {
       const id = '1234';
       const highlighted = true;
@@ -67,17 +67,17 @@ describe('actions', () => {
     });
   });
 
-  describe('addChoice', () => {
+  describe('addChoice action', () => {
     it('returns ADD_CHOICE action', () => {
       const value = 'test';
       const label = 'test';
       const id = 'test';
       const groupId = 'test';
-      const disabled = 'test';
+      const disabled = false;
       const elementId = 'test';
       const customProperties = 'test';
       const placeholder = 'test';
-      const keyCode = 'test';
+      const keyCode = 10;
 
       const expectedAction = {
         type: 'ADD_CHOICE',
@@ -106,7 +106,7 @@ describe('actions', () => {
     });
   });
 
-  describe('filterChoices', () => {
+  describe('filterChoices action', () => {
     it('returns FILTER_CHOICES action', () => {
       const results = Array(10);
       const expectedAction = {
@@ -118,7 +118,7 @@ describe('actions', () => {
     });
   });
 
-  describe('activateChoices', () => {
+  describe('activateChoices action', () => {
     it('returns ACTIVATE_CHOICES action', () => {
       const active = true;
       const expectedAction = {
@@ -130,7 +130,7 @@ describe('actions', () => {
     });
   });
 
-  describe('clearChoices', () => {
+  describe('clearChoices action', () => {
     it('returns CLEAR_CHOICES action', () => {
       const expectedAction = {
         type: 'CLEAR_CHOICES',
@@ -140,12 +140,12 @@ describe('actions', () => {
     });
   });
 
-  describe('addGroup', () => {
+  describe('addGroup action', () => {
     it('returns ADD_GROUP action', () => {
       const value = 'test';
       const id = 'test';
-      const active = 'test';
-      const disabled = 'test';
+      const active = true;
+      const disabled = false;
       const expectedAction = {
         type: 'ADD_GROUP',
         value,
@@ -163,7 +163,7 @@ describe('actions', () => {
     });
   });
 
-  describe('clearAll', () => {
+  describe('clearAll action', () => {
     it('returns CLEAR_ALL action', () => {
       const expectedAction = {
         type: 'CLEAR_ALL',

@@ -118,7 +118,7 @@ class Choices {
         noChoices: 'has-no-choices',
       },
       fuseOptions: {
-        include: 'score',
+        includeScore: true,
       },
       callbackOnInit: null,
       callbackOnCreateTemplates: null,
