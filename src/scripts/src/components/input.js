@@ -1,9 +1,10 @@
 import { getWidthOfInput } from '../lib/utils';
 
 export default class Input {
-  constructor(instance, element) {
+  constructor(instance, element, classNames) {
     this.instance = instance;
     this.element = element;
+    this.classNames = classNames;
     this.isFocussed = this.element === document.activeElement;
     this.isDisabled = false;
 

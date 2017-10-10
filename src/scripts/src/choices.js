@@ -5,6 +5,7 @@ import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
+import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES } from './constants';
 import {
   addItem,
   removeItem,
@@ -53,75 +54,11 @@ class Choices {
     }
 
     const defaultConfig = {
-      silent: false,
+      ...DEFAULT_CONFIG,
       items: [],
       choices: [],
-      renderChoiceLimit: -1,
-      maxItemCount: -1,
-      addItems: true,
-      removeItems: true,
-      removeItemButton: false,
-      editItems: false,
-      duplicateItems: true,
-      delimiter: ',',
-      paste: true,
-      searchEnabled: true,
-      searchChoices: true,
-      searchFloor: 1,
-      searchResultLimit: 4,
-      searchFields: ['label', 'value'],
-      position: 'auto',
-      resetScrollPosition: true,
-      regexFilter: null,
-      shouldSort: true,
-      shouldSortItems: false,
+      classNames: DEFAULT_CLASSNAMES,
       sortFilter: sortByAlpha,
-      placeholder: true,
-      placeholderValue: null,
-      searchPlaceholderValue: null,
-      prependValue: null,
-      appendValue: null,
-      renderSelectedChoices: 'auto',
-      loadingText: 'Loading...',
-      noResultsText: 'No results found',
-      noChoicesText: 'No choices to choose from',
-      itemSelectText: 'Press to select',
-      addItemText: value => `Press Enter to add <b>"${value}"</b>`,
-      maxItemText: maxItemCount => `Only ${maxItemCount} values can be added.`,
-      uniqueItemText: 'Only unique values can be added.',
-      classNames: {
-        containerOuter: 'choices',
-        containerInner: 'choices__inner',
-        input: 'choices__input',
-        inputCloned: 'choices__input--cloned',
-        list: 'choices__list',
-        listItems: 'choices__list--multiple',
-        listSingle: 'choices__list--single',
-        listDropdown: 'choices__list--dropdown',
-        item: 'choices__item',
-        itemSelectable: 'choices__item--selectable',
-        itemDisabled: 'choices__item--disabled',
-        itemChoice: 'choices__item--choice',
-        placeholder: 'choices__placeholder',
-        group: 'choices__group',
-        groupHeading: 'choices__heading',
-        button: 'choices__button',
-        activeState: 'is-active',
-        focusState: 'is-focused',
-        openState: 'is-open',
-        disabledState: 'is-disabled',
-        highlightedState: 'is-highlighted',
-        hiddenState: 'is-hidden',
-        flippedState: 'is-flipped',
-        loadingState: 'is-loading',
-        noResults: 'has-no-results',
-        noChoices: 'has-no-choices',
-      },
-      fuseOptions: {
-        includeScore: true,
-      },
-      callbackOnInit: null,
-      callbackOnCreateTemplates: null,
     };
 
     this.idNames = {
@@ -2570,11 +2507,11 @@ class Choices {
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
 
-    this.containerOuter = new Container(this, containerOuter);
-    this.containerInner = new Container(this, containerInner);
-    this.input = new Input(this, input);
-    this.choiceList = new List(this, choiceList);
-    this.itemList = new List(this, itemList);
+    this.containerOuter = new Container(this, containerOuter, this.config.classNames);
+    this.containerInner = new Container(this, containerInner, this.config.classNames);
+    this.input = new Input(this, input, this.config.classNames);
+    this.choiceList = new List(this, choiceList, this.config.classNames);
+    this.itemList = new List(this, itemList, this.config.classNames);
     this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
 
     // Hide passed input

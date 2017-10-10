@@ -1,9 +1,9 @@
 export default class Container {
-  constructor(instance, element) {
+  constructor(instance, element, classNames) {
     this.instance = instance;
     this.element = element;
+    this.classNames = classNames;
     this.config = instance.config;
-    this.classNames = instance.config.classNames;
     this.isOpen = false;
     this.isFlipped = false;
     this.isFocussed = false;
