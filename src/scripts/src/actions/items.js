@@ -1,3 +1,5 @@
+import { ACTION_TYPES } from './../constants';
+
 export const addItem = (
   value,
   label,
@@ -8,7 +10,7 @@ export const addItem = (
   placeholder,
   keyCode,
 ) => ({
-  type: 'ADD_ITEM',
+  type: ACTION_TYPES.ADD_ITEM,
   value,
   label,
   id,
@@ -20,13 +22,13 @@ export const addItem = (
 });
 
 export const removeItem = (id, choiceId) => ({
-  type: 'REMOVE_ITEM',
+  type: ACTION_TYPES.REMOVE_ITEM,
   id,
   choiceId,
 });
 
 export const highlightItem = (id, highlighted) => ({
-  type: 'HIGHLIGHT_ITEM',
+  type: ACTION_TYPES.HIGHLIGHT_ITEM,
   id,
   highlighted,
 });

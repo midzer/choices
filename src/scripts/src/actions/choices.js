@@ -1,3 +1,5 @@
+import { ACTION_TYPES } from './../constants';
+
 export const addChoice = (
   value,
   label,
@@ -9,7 +11,7 @@ export const addChoice = (
   placeholder,
   keyCode,
 ) => ({
-  type: 'ADD_CHOICE',
+  type: ACTION_TYPES.ADD_CHOICE,
   value,
   label,
   id,
@@ -22,15 +24,15 @@ export const addChoice = (
 });
 
 export const filterChoices = results => ({
-  type: 'FILTER_CHOICES',
+  type: ACTION_TYPES.FILTER_CHOICES,
   results,
 });
 
 export const activateChoices = (active = true) => ({
-  type: 'ACTIVATE_CHOICES',
+  type: ACTION_TYPES.ACTIVATE_CHOICES,
   active,
 });
 
 export const clearChoices = () => ({
-  type: 'CLEAR_CHOICES',
+  type: ACTION_TYPES.CLEAR_CHOICES,
 });
