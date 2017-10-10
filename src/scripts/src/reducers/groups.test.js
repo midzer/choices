@@ -6,30 +6,34 @@ describe('groups reducer', () => {
     expect(groups(defaultState, {})).to.equal(defaultState);
   });
 
-  describe('ADD_GROUP', () => {
-    const id = '1';
-    const value = 'Group one';
-    const active = true;
-    const disabled = false;
+  describe('when groups do not exist', () => {
+    describe('ADD_GROUP', () => {
+      it('adds group', () => {
+        const id = '1';
+        const value = 'Group one';
+        const active = true;
+        const disabled = false;
 
-    const expectedResponse = [
-      {
-        id,
-        value,
-        active,
-        disabled,
-      },
-    ];
+        const expectedResponse = [
+          {
+            id,
+            value,
+            active,
+            disabled,
+          },
+        ];
 
-    const actualResponse = groups(undefined, {
-      type: 'ADD_GROUP',
-      id,
-      value,
-      active,
-      disabled,
+        const actualResponse = groups(undefined, {
+          type: 'ADD_GROUP',
+          id,
+          value,
+          active,
+          disabled,
+        });
+
+        expect(actualResponse).to.eql(expectedResponse);
+      });
     });
-
-    expect(actualResponse).to.eql(expectedResponse);
   });
 
   describe('when groups exist', () => {
