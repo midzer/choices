@@ -18,18 +18,6 @@ describe('choices reducer', () => {
         const customProperties = 'test';
         const placeholder = 'test';
 
-        const actualResponse = choices(undefined, {
-          type: 'ADD_CHOICE',
-          value,
-          label,
-          id,
-          groupId,
-          disabled,
-          elementId,
-          customProperties,
-          placeholder,
-        });
-
         const expectedResponse = [
           {
             value,
@@ -46,6 +34,18 @@ describe('choices reducer', () => {
             keyCode: null,
           },
         ];
+
+        const actualResponse = choices(undefined, {
+          type: 'ADD_CHOICE',
+          value,
+          label,
+          id,
+          groupId,
+          disabled,
+          elementId,
+          customProperties,
+          placeholder,
+        });
 
         expect(actualResponse).to.eql(expectedResponse);
       });
@@ -92,7 +92,16 @@ describe('choices reducer', () => {
       it('sets active flag based on whether choice is in passed results', () => {
         const id = 1;
         const score = 10;
-        const actualResponse = choices([...state], {
+        const active = true;
+
+        const expectedResponse = {
+          ...state[0],
+          active,
+          score,
+        };
+
+
+        const actualResponse = choices(state, {
           type: 'FILTER_CHOICES',
           results: [{
             item: {
@@ -100,16 +109,7 @@ describe('choices reducer', () => {
             },
             score,
           }],
-        });
-
-        const expectedResponse = state.map((choice) => {
-          const clonedChoice = choice;
-          if (clonedChoice.id === id) {
-            clonedChoice.active = true;
-            clonedChoice.score = 10;
-          }
-          return clonedChoice;
-        });
+        }).find(choice => choice.id === id);
 
         expect(actualResponse).to.eql(expectedResponse);
       });
@@ -117,15 +117,22 @@ describe('choices reducer', () => {
 
     describe('ACTIVATE_CHOICES', () => {
       it('sets active flag to passed value', () => {
-        const actualResponse = choices([...state], {
+        const clonedState = state.slice(0);
+
+        const expectedResponse = [
+          {
+            ...state[0],
+            active: true,
+          },
+          {
+            ...state[1],
+            active: true,
+          },
+        ];
+
+        const actualResponse = choices(clonedState, {
           type: 'ACTIVATE_CHOICES',
           active: true,
-        });
-
-        const expectedResponse = state.map((choice) => {
-          const clonedChoice = choice;
-          clonedChoice.active = true;
-          return clonedChoice;
         });
 
         expect(actualResponse).to.eql(expectedResponse);
@@ -134,11 +141,11 @@ describe('choices reducer', () => {
 
     describe('CLEAR_CHOICES', () => {
       it('restores to defaultState', () => {
-        const actualResponse = choices([...state], {
+        const clonedState = state.slice(0);
+        const expectedResponse = defaultState;
+        const actualResponse = choices(clonedState, {
           type: 'CLEAR_CHOICES',
         });
-
-        const expectedResponse = defaultState;
 
         expect(actualResponse).to.eql(expectedResponse);
       });
@@ -147,24 +154,28 @@ describe('choices reducer', () => {
     describe('ADD_ITEM', () => {
       it('disables choice if action has choice id', () => {
         const id = 2;
-        const actualResponse = choices(state, {
+        const clonedState = state.slice(0);
+        const expectedResponse = [
+          {
+            ...state[0],
+          },
+          {
+            ...state[1],
+            selected: true,
+          },
+        ];
+
+        const actualResponse = choices(clonedState, {
           type: 'ADD_ITEM',
           choiceId: id,
-        });
-
-        const expectedResponse = state.map((choice) => {
-          const clonedChoice = choice;
-          if (clonedChoice.id === id) {
-            clonedChoice.selected = false;
-          }
-          return clonedChoice;
         });
 
         expect(actualResponse).to.eql(expectedResponse);
       });
 
       it('activates all choices if activateOptions flag passed', () => {
-        const actualResponse = choices(state, {
+        const clonedState = state.slice(0);
+        const actualResponse = choices(clonedState, {
           type: 'ADD_ITEM',
           activateOptions: true,
           active: true,
@@ -178,17 +189,20 @@ describe('choices reducer', () => {
     describe('REMOVE_ITEM', () => {
       it('selects choice by passed id', () => {
         const id = 2;
-        const actualResponse = choices([...state], {
+        const clonedState = state.slice(0);
+        const expectedResponse = [
+          {
+            ...state[0],
+          },
+          {
+            ...state[1],
+            selected: false,
+          },
+        ];
+
+        const actualResponse = choices(clonedState, {
           type: 'REMOVE_ITEM',
           choiceId: id,
-        });
-
-        const expectedResponse = state.map((choice) => {
-          const clonedChoice = choice;
-          if (clonedChoice.id === id) {
-            clonedChoice.selected = false;
-          }
-          return clonedChoice;
         });
 
         expect(actualResponse).to.eql(expectedResponse);
