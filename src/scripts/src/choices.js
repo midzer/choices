@@ -5,7 +5,7 @@ import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
-import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES } from './constants';
+import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS } from './constants';
 import {
   addItem,
   removeItem,
@@ -120,7 +120,6 @@ class Choices {
 
     // Assign preset choices from passed object
     this.presetChoices = this.config.choices;
-
     // Assign preset items from passed object first
     this.presetItems = this.config.items;
 
@@ -547,7 +546,7 @@ class Choices {
         eventResponse.groupValue = group.value;
       }
 
-      triggerEvent(this.passedElement, 'highlightItem', eventResponse);
+      triggerEvent(this.passedElement, EVENTS.highlightItem, eventResponse);
     }
 
     return this;
@@ -581,7 +580,7 @@ class Choices {
       highlightItem(id, false),
     );
 
-    triggerEvent(this.passedElement, 'highlightItem', eventResponse);
+    triggerEvent(this.passedElement, EVENTS.highlightItem, eventResponse);
 
     return this;
   }
@@ -686,7 +685,7 @@ class Choices {
     this.dropdown.show();
     this.input.activate(focusInput);
 
-    triggerEvent(this.passedElement, 'showDropdown', {});
+    triggerEvent(this.passedElement, EVENTS.showDropdown, {});
     return this;
   }
 
@@ -704,7 +703,7 @@ class Choices {
     this.dropdown.hide();
     this.input.deactivate(blurInput);
 
-    triggerEvent(this.passedElement, 'hideDropdown', {});
+    triggerEvent(this.passedElement, EVENTS.hideDropdown, {});
     return this;
   }
 
@@ -1013,7 +1012,7 @@ class Choices {
       return;
     }
 
-    triggerEvent(this.passedElement, 'change', {
+    triggerEvent(this.passedElement, EVENTS.change, {
       value,
     });
   }
@@ -1122,7 +1121,7 @@ class Choices {
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
 
-    triggerEvent(this.passedElement, 'choice', {
+    triggerEvent(this.passedElement, EVENTS.choice, {
       choice,
     });
 
@@ -1371,7 +1370,7 @@ class Choices {
     if (value && value.length >= this.config.searchFloor) {
       const resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
       // Trigger search event
-      triggerEvent(this.passedElement, 'search', {
+      triggerEvent(this.passedElement, EVENTS.search, {
         value,
         resultCount,
       });
@@ -2064,7 +2063,7 @@ class Choices {
 
     // Trigger change event
     if (group && group.value) {
-      triggerEvent(this.passedElement, 'addItem', {
+      triggerEvent(this.passedElement, EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2072,7 +2071,7 @@ class Choices {
         keyCode: passedKeyCode,
       });
     } else {
-      triggerEvent(this.passedElement, 'addItem', {
+      triggerEvent(this.passedElement, EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2106,14 +2105,14 @@ class Choices {
     );
 
     if (group && group.value) {
-      triggerEvent(this.passedElement, 'removeItem', {
+      triggerEvent(this.passedElement, EVENTS.removeItem, {
         id,
         value,
         label,
         groupValue: group.value,
       });
     } else {
-      triggerEvent(this.passedElement, 'removeItem', {
+      triggerEvent(this.passedElement, EVENTS.removeItem, {
         id,
         value,
         label,

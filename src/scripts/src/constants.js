@@ -68,3 +68,14 @@ export const DEFAULT_CONFIG = {
   callbackOnInit: null,
   callbackOnCreateTemplates: null,
 };
+
+export const EVENTS = {
+  showDropdown: 'showDropdown',
+  hideDropdown: 'hideDropdown',
+  change: 'change',
+  choice: 'choice',
+  search: 'search',
+  addItem: 'addItem',
+  removeItem: 'removeItem',
+  highlightItem: 'highlightItem',
+};
