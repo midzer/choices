@@ -10,8 +10,10 @@ import itemReducer from './reducers/items';
 import choiceReducer from './reducers/choices';
 import {
   addItem as addItemAction,
+} from './actions/items';
+import {
   addChoice as addChoiceAction,
-} from './actions/actions';
+} from './actions/choices';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';

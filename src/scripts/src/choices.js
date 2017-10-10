@@ -6,17 +6,11 @@ import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
 import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS } from './constants';
-import {
-  addItem,
-  removeItem,
-  highlightItem,
-  addChoice,
-  filterChoices,
-  activateChoices,
-  addGroup,
-  clearAll,
-  clearChoices,
-} from './actions/actions';
+import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
+import { addItem, removeItem, highlightItem } from './actions/items';
+import { addGroup } from './actions/groups';
+import { clearAll } from './actions/misc';
+
 import {
   isScrolledIntoView,
   getAdjacentEl,
@@ -59,10 +53,6 @@ class Choices {
       choices: [],
       classNames: DEFAULT_CLASSNAMES,
       sortFilter: sortByAlpha,
-    };
-
-    this.idNames = {
-      itemChoice: 'item-choice',
     };
 
     // Merge options with user options
@@ -132,6 +122,10 @@ class Choices {
 
     // Set unique base Id
     this.baseId = generateId(this.passedElement, 'choices-');
+
+    this.idNames = {
+      itemChoice: 'item-choice',
+    };
 
     // Bind methods
     this.render = this.render.bind(this);
