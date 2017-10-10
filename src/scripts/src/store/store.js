@@ -12,11 +12,12 @@ export default class Store {
   }
 
   /**
-   * Get store object (wrapping Redux method)
-   * @return {Object} State
+   * Subscribe store to function call (wrapped Redux method)
+   * @param  {Function} onChange Function to trigger when state changes
+   * @return
    */
-  getState() {
-    return this.store.getState();
+  subscribe(onChange) {
+    this.store.subscribe(onChange);
   }
 
   /**
@@ -29,12 +30,11 @@ export default class Store {
   }
 
   /**
-   * Subscribe store to function call (wrapped Redux method)
-   * @param  {Function} onChange Function to trigger when state changes
-   * @return
+   * Get store object (wrapping Redux method)
+   * @return {Object} State
    */
-  subscribe(onChange) {
-    this.store.subscribe(onChange);
+  getState() {
+    return this.store.getState();
   }
 
   /**
