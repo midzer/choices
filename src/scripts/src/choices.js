@@ -1,11 +1,11 @@
 import Fuse from 'fuse.js';
-import classNames from 'classnames';
 import Store from './store/store';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
 import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS } from './constants';
+import { TEMPLATES } from './templates';
 import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
 import { addItem, removeItem, highlightItem } from './actions/items';
 import { addGroup } from './actions/groups';
@@ -2247,7 +2247,8 @@ class Choices {
       return null;
     }
     const templates = this.config.templates;
-    return templates[template](...args);
+    const globalClasses = this.config.classNames;
+    return templates[template].call(this, globalClasses, ...args);
   }
 
   /**
@@ -2256,226 +2257,6 @@ class Choices {
    * @private
    */
   _createTemplates() {
-    const globalClasses = this.config.classNames;
-    const templates = {
-      containerOuter: (direction) => {
-        const tabIndex = this.isSelectOneElement ? 'tabindex="0"' : '';
-        let role = this.isSelectElement ? 'role="listbox"' : '';
-        let ariaAutoComplete = '';
-
-        if (this.isSelectElement && this.config.searchEnabled) {
-          role = 'role="combobox"';
-          ariaAutoComplete = 'aria-autocomplete="list"';
-        }
-
-        return strToEl(`
-          <div
-            class="${globalClasses.containerOuter}"
-            data-type="${this.passedElement.type}"
-            ${role}
-            ${tabIndex}
-            ${ariaAutoComplete}
-            aria-haspopup="true"
-            aria-expanded="false"
-            dir="${direction}"
-            >
-          </div>
-        `);
-      },
-      containerInner: () => strToEl(`
-        <div class="${globalClasses.containerInner}"></div>
-      `),
-      itemList: () => {
-        const localClasses = classNames(
-          globalClasses.list, {
-            [globalClasses.listSingle]: (this.isSelectOneElement),
-            [globalClasses.listItems]: (!this.isSelectOneElement),
-          },
-        );
-
-        return strToEl(`
-          <div class="${localClasses}"></div>
-        `);
-      },
-      placeholder: value => strToEl(`
-        <div class="${globalClasses.placeholder}">
-          ${value}
-        </div>
-      `),
-      item: (data) => {
-        const ariaSelected = data.active ? 'aria-selected="true"' : '';
-        const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
-
-        let localClasses = classNames(
-          globalClasses.item, {
-            [globalClasses.highlightedState]: data.highlighted,
-            [globalClasses.itemSelectable]: !data.highlighted,
-            [globalClasses.placeholder]: data.placeholder,
-          },
-        );
-
-        if (this.config.removeItemButton) {
-          localClasses = classNames(
-            globalClasses.item, {
-              [globalClasses.highlightedState]: data.highlighted,
-              [globalClasses.itemSelectable]: !data.disabled,
-              [globalClasses.placeholder]: data.placeholder,
-            },
-          );
-
-          return strToEl(`
-            <div
-              class="${localClasses}"
-              data-item
-              data-id="${data.id}"
-              data-value="${data.value}"
-              data-deletable
-              ${ariaSelected}
-              ${ariaDisabled}
-              >
-              ${data.label}<!--
-           --><button
-                type="button"
-                class="${globalClasses.button}"
-                data-button
-                aria-label="Remove item: '${data.value}'"
-                >
-                Remove item
-              </button>
-            </div>
-          `);
-        }
-
-        return strToEl(`
-          <div
-            class="${localClasses}"
-            data-item
-            data-id="${data.id}"
-            data-value="${data.value}"
-            ${ariaSelected}
-            ${ariaDisabled}
-            >
-            ${data.label}
-          </div>
-        `);
-      },
-      choiceList: () => {
-        const ariaMultiSelectable = !this.isSelectOneElement ?
-          'aria-multiselectable="true"' :
-          '';
-
-        return strToEl(`
-          <div
-            class="${globalClasses.list}"
-            dir="ltr"
-            role="listbox"
-            ${ariaMultiSelectable}
-            >
-          </div>
-        `);
-      },
-      choiceGroup: (data) => {
-        const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
-        const localClasses = classNames(
-          globalClasses.group, {
-            [globalClasses.itemDisabled]: data.disabled,
-          },
-        );
-
-        return strToEl(`
-          <div
-            class="${localClasses}"
-            data-group
-            data-id="${data.id}"
-            data-value="${data.value}"
-            role="group"
-            ${ariaDisabled}
-            >
-            <div class="${globalClasses.groupHeading}">${data.value}</div>
-          </div>
-        `);
-      },
-      choice: (data) => {
-        const role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
-        const localClasses = classNames(
-          globalClasses.item,
-          globalClasses.itemChoice, {
-            [globalClasses.itemDisabled]: data.disabled,
-            [globalClasses.itemSelectable]: !data.disabled,
-            [globalClasses.placeholder]: data.placeholder,
-          },
-        );
-
-        return strToEl(`
-          <div
-            class="${localClasses}"
-            data-select-text="${this.config.itemSelectText}"
-            data-choice
-            data-id="${data.id}"
-            data-value="${data.value}"
-            ${data.disabled ?
-              'data-choice-disabled aria-disabled="true"' :
-              'data-choice-selectable'
-            }
-            id="${data.elementId}"
-            ${role}
-            >
-            ${data.label}
-          </div>
-        `);
-      },
-      input: () => {
-        const localClasses = classNames(
-          globalClasses.input,
-          globalClasses.inputCloned,
-        );
-
-        return strToEl(`
-          <input
-            type="text"
-            class="${localClasses}"
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            role="textbox"
-            aria-autocomplete="list"
-            >
-        `);
-      },
-      dropdown: () => {
-        const localClasses = classNames(
-          globalClasses.list,
-          globalClasses.listDropdown,
-        );
-
-        return strToEl(`
-          <div
-            class="${localClasses}"
-            aria-expanded="false"
-            >
-          </div>
-        `);
-      },
-      notice: (label, type = '') => {
-        const localClasses = classNames(
-          globalClasses.item,
-          globalClasses.itemChoice, {
-            [globalClasses.noResults]: (type === 'no-results'),
-            [globalClasses.noChoices]: (type === 'no-choices'),
-          },
-        );
-
-        return strToEl(`
-          <div class="${localClasses}">
-            ${label}
-          </div>
-        `);
-      },
-      option: data => strToEl(`
-        <option value="${data.value}" selected>${data.label}</option>
-      `),
-    };
-
     // User's custom templates
     const callbackTemplate = this.config.callbackOnCreateTemplates;
     let userTemplates = {};
@@ -2483,7 +2264,7 @@ class Choices {
       userTemplates = callbackTemplate.call(this, strToEl);
     }
 
-    this.config.templates = extend(templates, userTemplates);
+    this.config.templates = extend(TEMPLATES, userTemplates);
   }
 
   /**
