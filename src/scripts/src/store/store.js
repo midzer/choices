@@ -124,6 +124,19 @@ export default class Store {
   }
 
   /**
+   * Get placeholder choice from store
+   * @return {Object} Found placeholder
+   */
+  getPlaceholderChoice() {
+    const choices = this.getChoices();
+    const placeholderChoice = [...choices]
+      .reverse()
+      .find(choice => choice.placeholder === true);
+
+    return placeholderChoice;
+  }
+
+  /**
    * Get groups from store
    * @return {Array} Group objects
    */
@@ -158,22 +171,9 @@ export default class Store {
    */
   getGroupById(id) {
     const groups = this.getGroups();
-    const foundGroup = groups.find(group => group.id === id);
+    const foundGroup = groups.find(group => group.id === parseInt(id, 10));
 
     return foundGroup;
-  }
-
-  /**
-   * Get placeholder choice from store
-   * @return {Object} Found placeholder
-   */
-  getPlaceholderChoice() {
-    const choices = this.getChoices();
-    const placeholderChoice = [...choices]
-      .reverse()
-      .find(choice => choice.placeholder === true);
-
-    return placeholderChoice;
   }
 }
 

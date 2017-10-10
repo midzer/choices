@@ -63,16 +63,74 @@ describe('Store', () => {
     beforeEach(() => {
       state = {
         items: [
-          { id: 1 },
-          { id: 2 },
+          {
+            id: 1,
+            choiceId: 1,
+            groupId: -1,
+            value: 'Item one',
+            label: 'Item one',
+            active: false,
+            highlighted: false,
+            customProperties: null,
+            placeholder: false,
+            keyCode: null,
+          },
+          {
+            id: 2,
+            choiceId: 2,
+            groupId: -1,
+            value: 'Item one',
+            label: 'Item one',
+            active: true,
+            highlighted: false,
+            customProperties: null,
+            placeholder: false,
+            keyCode: null,
+          },
         ],
         choices: [
-          { id: 1 },
-          { id: 2 },
+          {
+            id: 1,
+            elementId: 'choices-test-1',
+            groupId: -1,
+            value: 'Choice 1',
+            label: 'Choice 1',
+            disabled: false,
+            selected: false,
+            active: true,
+            score: 9999,
+            customProperties: null,
+            placeholder: false,
+            keyCode: null,
+          },
+          {
+            id: 2,
+            elementId: 'choices-test-2',
+            groupId: -1,
+            value: 'Choice 2',
+            label: 'Choice 2',
+            disabled: false,
+            selected: true,
+            active: false,
+            score: 9999,
+            customProperties: null,
+            placeholder: false,
+            keyCode: null,
+          },
         ],
         groups: [
-          { id: 1 },
-          { id: 2 },
+          {
+            id: 1,
+            value: 'Group one',
+            active: true,
+            disabled: false,
+          },
+          {
+            id: 2,
+            value: 'Group two',
+            active: true,
+            disabled: false,
+          },
         ],
       };
 
@@ -87,8 +145,24 @@ describe('Store', () => {
       });
     });
 
-    // describe('getItemsFilteredByActive', () => { });
-    // describe('getItemsReducedToValues', () => { });
+    describe('getItemsFilteredByActive', () => {
+      it('returns items that are active', () => {
+        const expectedResponse = state.items.filter((item => item.active));
+        const actualResponse = instance.getItemsFilteredByActive();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getItemsReducedToValues', () => {
+      it('returns an array of item values', () => {
+        const expectedResponse = state.items.reduce((items, item) => {
+          items.push(item.value);
+          return items;
+        }, []);
+        const actualResponse = instance.getItemsReducedToValues();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
 
     describe('getChoices', () => {
       it('returns choices', () => {
@@ -98,10 +172,46 @@ describe('Store', () => {
       });
     });
 
-    // describe('getChoicesFilteredByActive', () => { });
-    // describe('getChoicesFilteredBySelectable', () => { });
-    // describe('getSearchableChoices', () => { });
-    // describe('getChoiceById', () => { });
+    describe('getChoicesFilteredByActive', () => {
+      it('returns choices that are active', () => {
+        const expectedResponse = state.choices.filter((choice => choice.active));
+        const actualResponse = instance.getChoicesFilteredByActive();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getChoicesFilteredBySelectable', () => {
+      it('returns choices that are not disabled', () => {
+        const expectedResponse = state.choices.filter((choice => !choice.disabled));
+        const actualResponse = instance.getChoicesFilteredBySelectable();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getSearchableChoices', () => {
+      it('returns choices that are not placeholders and are selectable', () => {
+        const expectedResponse = state.choices.filter((choice => !choice.disabled && !choice.placeholder));
+        const actualResponse = instance.getSearchableChoices();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getChoiceById', () => {
+      it('returns active choice by id', () => {
+        const id = '1';
+        const expectedResponse = state.choices.find((choice => choice.id === parseInt(id, 10)));
+        const actualResponse = instance.getChoiceById(id);
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getPlaceholderChoice', () => {
+      it('returns placeholder choice', () => {
+        const expectedResponse = state.choices.reverse().find(choice => choice.placeholder);
+        const actualResponse = instance.getPlaceholderChoice();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
 
     describe('getGroups', () => {
       it('returns groups', () => {
@@ -111,8 +221,21 @@ describe('Store', () => {
       });
     });
 
-    // describe('getGroupsFilteredByActive', () => { });
-    // describe('getGroupById', () => { });
-    // describe('getPlaceholderChoice', () => { });
+    describe('getGroupsFilteredByActive', () => {
+      it('returns active groups', () => {
+        const expectedResponse = state.groups.filter(group => group.active);
+        const actualResponse = instance.getGroupsFilteredByActive();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
+    describe('getGroupById', () => {
+      it('returns group by id', () => {
+        const id = '1';
+        const expectedResponse = state.groups.find((group => group.id === parseInt(id, 10)));
+        const actualResponse = instance.getGroupById(id);
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
   });
 });
