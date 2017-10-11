@@ -18,10 +18,9 @@ export default class List {
   /**
    * Scroll to passed position on Y axis
    */
-  scrollTo(scrollPos) {
+  scrollTo(scrollPos = 0) {
     this.element.scrollTop = scrollPos;
   }
-
   /**
    * Append node to element
    */
