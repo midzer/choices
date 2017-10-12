@@ -2,7 +2,7 @@ import { getWidthOfInput } from '../lib/utils';
 
 export default class Input {
   constructor(instance, element, classNames) {
-    this.instance = instance;
+    this.parentInstance = instance;
     this.element = element;
     this.classNames = classNames;
     this.isFocussed = this.element === document.activeElement;
@@ -35,7 +35,7 @@ export default class Input {
    * @private
    */
   onInput() {
-    if (!this.instance.isSelectOneElement) {
+    if (!this.parentInstance.isSelectOneElement) {
       this.setWidth();
     }
   }
@@ -48,7 +48,7 @@ export default class Input {
    */
   onPaste(e) {
     // Disable pasting into the input if option has been set
-    if (e.target === this.element && !this.instance.config.paste) {
+    if (e.target === this.element && !this.parentInstance.config.paste) {
       e.preventDefault();
     }
   }
@@ -69,7 +69,7 @@ export default class Input {
 
   activate(focusInput) {
     // Optionally focus the input if we have a search input
-    if (focusInput && this.instance.canSearch && document.activeElement !== this.element) {
+    if (focusInput && this.parentInstance.canSearch && document.activeElement !== this.element) {
       this.element.focus();
     }
   }
@@ -77,7 +77,7 @@ export default class Input {
   deactivate(blurInput) {
     this.removeActiveDescendant();
     // Optionally blur the input if we have a search input
-    if (blurInput && this.instance.canSearch && document.activeElement === this.element) {
+    if (blurInput && this.parentInstance.canSearch && document.activeElement === this.element) {
       this.element.blur();
     }
   }
@@ -112,7 +112,7 @@ export default class Input {
       this.setWidth();
     }
 
-    return this.instance;
+    return this.parentInstance;
   }
 
   /**
@@ -121,20 +121,24 @@ export default class Input {
    * @return
    */
   setWidth(enforceWidth) {
-    if (this.instance.placeholder) {
+    if (this.parentInstance.placeholder) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
       if (
         (this.element.value &&
-        this.element.value.length >= (this.instance.placeholder.length / 1.25)) ||
+        this.element.value.length >= (this.parentInstance.placeholder.length / 1.25)) ||
         enforceWidth
       ) {
-        this.element.style.width = getWidthOfInput(this.element);
+        this.element.style.width = this.getWidth();
       }
     } else {
       // If there is no placeholder, resize input to contents
-      this.element.style.width = getWidthOfInput(this.element);
+      this.element.style.width = this.getWidth();
     }
+  }
+
+  getWidth() {
+    return getWidthOfInput(this.element);
   }
 
   setPlaceholder(placeholder) {
@@ -149,8 +153,8 @@ export default class Input {
     return this.element.value;
   }
 
-  setActiveDescendant(activeDescendant) {
-    this.element.setAttribute('aria-activedescendant', activeDescendant);
+  setActiveDescendant(activeDescendantID) {
+    this.element.setAttribute('aria-activedescendant', activeDescendantID);
   }
 
   removeActiveDescendant() {
