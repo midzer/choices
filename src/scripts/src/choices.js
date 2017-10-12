@@ -4,13 +4,12 @@ import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
-import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS } from './constants';
+import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS, KEY_CODES } from './constants';
 import { TEMPLATES } from './templates';
 import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
 import { addItem, removeItem, highlightItem } from './actions/items';
 import { addGroup } from './actions/groups';
 import { clearAll } from './actions/misc';
-
 import {
   isScrolledIntoView,
   getAdjacentEl,
@@ -263,6 +262,12 @@ class Choices {
   renderGroups(groups, choices, fragment) {
     const groupFragment = fragment || document.createDocumentFragment();
     const filter = this.config.sortFilter;
+    const getGroupChoices = group => choices.filter((choice) => {
+      if (this.isSelectOneElement) {
+        return choice.groupId === group.id;
+      }
+      return choice.groupId === group.id && (this.config.renderSelectedChoices === 'always' || !choice.selected);
+    });
 
     // If sorting is enabled, filter groups
     if (this.config.shouldSort) {
@@ -270,13 +275,7 @@ class Choices {
     }
 
     groups.forEach((group) => {
-      // Grab options that are children of this group
-      const groupChoices = choices.filter((choice) => {
-        if (this.isSelectOneElement) {
-          return choice.groupId === group.id;
-        }
-        return choice.groupId === group.id && (this.config.renderSelectedChoices === 'always' || !choice.selected);
-      });
+      const groupChoices = getGroupChoices(group);
 
       if (groupChoices.length >= 1) {
         const dropdownGroup = this._getTemplate('choiceGroup', group);
@@ -377,27 +376,30 @@ class Choices {
       this.passedElement.value = itemsFilteredString;
     } else {
       const selectedOptionsFragment = document.createDocumentFragment();
-
-      // Add each list item to list
-      items.forEach((item) => {
+      const addOptionToFragment = (item) => {
         // Create a standard select option
         const option = this._getTemplate('option', item);
         // Append it to fragment
         selectedOptionsFragment.appendChild(option);
-      });
+      };
+
+      // Add each list item to list
+      items.forEach(item => addOptionToFragment(item));
 
       // Update selected choices
       this.passedElement.innerHTML = '';
       this.passedElement.appendChild(selectedOptionsFragment);
     }
 
-    // Add each list item to list
-    items.forEach((item) => {
+    const addItemToFragment = (item) => {
       // Create new list element
       const listItem = this._getTemplate('item', item);
       // Append it to list
       itemListFragment.appendChild(listItem);
-    });
+    };
+
+    // Add each list item to list
+    items.forEach(item => addItemToFragment(item));
 
     return itemListFragment;
   }
@@ -698,6 +700,7 @@ class Choices {
     this.input.deactivate(blurInput);
 
     triggerEvent(this.passedElement, EVENTS.hideDropdown, {});
+
     return this;
   }
 
@@ -818,9 +821,7 @@ class Choices {
     const choices = this.store.getChoices();
     // If only one value has been passed, convert to array
     const choiceValue = isType('Array', value) ? value : [value];
-
-    // Loop through each value and
-    choiceValue.forEach((val) => {
+    const findAndSelectChoice = (val) => {
       // Check 'value' property exists and the choice isn't already selected
       const foundChoice = choices.find(choice => choice.value === val);
 
@@ -841,7 +842,10 @@ class Choices {
       } else if (!this.config.silent) {
         console.warn('Attempting to select choice that does not exist');
       }
-    });
+    };
+
+    // Loop through each value and
+    choiceValue.forEach(val => findAndSelectChoice(val));
 
     return this;
   }
@@ -1443,15 +1447,15 @@ class Choices {
     const keyString = String.fromCharCode(e.keyCode);
 
     // TO DO: Move into constants file
-    const backKey = 46;
-    const deleteKey = 8;
-    const enterKey = 13;
-    const aKey = 65;
-    const escapeKey = 27;
-    const upKey = 38;
-    const downKey = 40;
-    const pageUpKey = 33;
-    const pageDownKey = 34;
+    const backKey = KEY_CODES.BACK_KEY;
+    const deleteKey = KEY_CODES.DELETE_KEY;
+    const enterKey = KEY_CODES.ENTER_KEY;
+    const aKey = KEY_CODES.A_KEY;
+    const escapeKey = KEY_CODES.ESC_KEY;
+    const upKey = KEY_CODES.UP_KEY;
+    const downKey = KEY_CODES.DOWN_KEY;
+    const pageUpKey = KEY_CODES.PAGE_UP_KEY;
+    const pageDownKey = KEY_CODES.PAGE_DOWN_KEY;
     const ctrlDownKey = (e.ctrlKey || e.metaKey);
 
     // If a user is typing and the dropdown is not active
