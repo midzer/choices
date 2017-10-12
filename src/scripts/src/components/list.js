@@ -1,6 +1,6 @@
 export default class List {
   constructor(instance, element, classNames) {
-    this.instance = instance;
+    this.parentInstance = instance;
     this.element = element;
     this.classNames = classNames;
     this.scrollPos = this.element.scrollTop;

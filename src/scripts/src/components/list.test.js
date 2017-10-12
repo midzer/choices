@@ -19,7 +19,7 @@ describe('List', () => {
   });
 
   it('assigns choices instance to class', () => {
-    expect(instance.instance).to.eql(choicesInstance);
+    expect(instance.parentInstance).to.eql(choicesInstance);
   });
 
   it('assigns choices element to class', () => {

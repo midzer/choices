@@ -1,6 +1,6 @@
 export default class Container {
   constructor(instance, element, classNames) {
-    this.instance = instance;
+    this.parentInstance = instance;
     this.element = element;
     this.classNames = classNames;
     this.config = instance.config;
@@ -82,8 +82,8 @@ export default class Container {
    * Set active descendant attribute
    * @param {Number} activeDescendant ID of active descendant
    */
-  setActiveDescendant(activeDescendant) {
-    this.element.setAttribute('aria-activedescendant', activeDescendant);
+  setActiveDescendant(activeDescendantID) {
+    this.element.setAttribute('aria-activedescendant', activeDescendantID);
   }
 
   /**
@@ -137,7 +137,7 @@ export default class Container {
   enable() {
     this.element.classList.remove(this.config.classNames.disabledState);
     this.element.removeAttribute('aria-disabled');
-    if (this.instance.isSelectOneElement) {
+    if (this.parentInstance.isSelectOneElement) {
       this.element.setAttribute('tabindex', '0');
     }
     this.isDisabled = false;
@@ -149,7 +149,7 @@ export default class Container {
   disable() {
     this.element.classList.add(this.config.classNames.disabledState);
     this.element.setAttribute('aria-disabled', 'true');
-    if (this.instance.isSelectOneElement) {
+    if (this.parentInstance.isSelectOneElement) {
       this.element.setAttribute('tabindex', '-1');
     }
     this.isDisabled = true;
