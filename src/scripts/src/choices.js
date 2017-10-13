@@ -4,6 +4,8 @@ import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
+import WrappedInput from './components/wrapped-input';
+import WrappedSelect from './components/wrapped-select';
 import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS, KEY_CODES } from './constants';
 import { TEMPLATES } from './templates';
 import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
@@ -71,8 +73,19 @@ class Choices {
     this.currentValue = '';
 
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-    this.element = element;
-    this.passedElement = isType('String', element) ? document.querySelector(element) : element;
+    const passedElement = isType('String', element) ? document.querySelector(element) : element;
+
+    this.isTextElement = passedElement.type === 'text';
+    this.isSelectOneElement = passedElement.type === 'select-one';
+    this.isSelectMultipleElement = passedElement.type === 'select-multiple';
+    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
+    this.isValidElementType = this.isTextElement || this.isSelectElement;
+
+    if (this.isTextElement) {
+      this.passedElement = new WrappedInput(this, passedElement, this.config.classNames);
+    } else if (this.isSelectElement) {
+      this.passedElement = new WrappedSelect(this, passedElement, this.config.classNames);
+    }
 
     if (!this.passedElement) {
       if (!this.config.silent) {
@@ -81,11 +94,6 @@ class Choices {
       return false;
     }
 
-    this.isTextElement = this.passedElement.type === 'text';
-    this.isSelectOneElement = this.passedElement.type === 'select-one';
-    this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
-    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
-    this.isValidElementType = this.isTextElement || this.isSelectElement;
     this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
     this.isScrollingOnIe = false;
 
@@ -103,7 +111,7 @@ class Choices {
     this.placeholder = false;
     if (!this.isSelectOneElement) {
       this.placeholder = this.config.placeholder ?
-        (this.config.placeholderValue || this.passedElement.getAttribute('placeholder')) :
+        (this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder')) :
         false;
     }
 
@@ -113,14 +121,14 @@ class Choices {
     this.presetItems = this.config.items;
 
     // Then add any values passed from attribute
-    if (this.passedElement.value) {
+    if (this.passedElement.element.value) {
       this.presetItems = this.presetItems.concat(
-        this.passedElement.value.split(this.config.delimiter),
+        this.passedElement.element.value.split(this.config.delimiter),
       );
     }
 
     // Set unique base Id
-    this.baseId = generateId(this.passedElement, 'choices-');
+    this.baseId = generateId(this.passedElement.element, 'choices-');
 
     this.idNames = {
       itemChoice: 'item-choice',
@@ -149,11 +157,11 @@ class Choices {
       console.error('Choices: Your browser doesn\'t support Choices');
     }
 
-    const canInit = isElement(this.passedElement) && this.isValidElementType;
+    const canInit = isElement(this.passedElement.element) && this.isValidElementType;
 
     if (canInit) {
       // If element has already been initialised with Choices
-      if (this.passedElement.getAttribute('data-choice') === 'active') {
+      if (this.passedElement.element.getAttribute('data-choice') === 'active') {
         return false;
       }
 
@@ -210,31 +218,11 @@ class Choices {
 
     // Remove all event listeners
     this._removeEventListeners();
-
-    // Reinstate passed element
-    this.passedElement.classList.remove(
-      this.config.classNames.input,
-      this.config.classNames.hiddenState,
-    );
-    this.passedElement.removeAttribute('tabindex');
-
-    // Recover original styles if any
-    const origStyle = this.passedElement.getAttribute('data-choice-orig-style');
-    if (origStyle) {
-      this.passedElement.removeAttribute('data-choice-orig-style');
-      this.passedElement.setAttribute('style', origStyle);
-    } else {
-      this.passedElement.removeAttribute('style');
-    }
-    this.passedElement.removeAttribute('aria-hidden');
-    this.passedElement.removeAttribute('data-choice');
-
-    // Re-assign values - this is weird, I know
-    this.passedElement.value = this.passedElement.value;
+    this.passedElement.reveal();
 
     // Move passed element back to original position
     this.containerOuter.element.parentNode.insertBefore(
-      this.passedElement,
+      this.passedElement.element,
       this.containerOuter.element,
     );
 
@@ -372,8 +360,8 @@ class Choices {
       const itemsFiltered = this.store.getItemsReducedToValues(items);
       const itemsFilteredString = itemsFiltered.join(this.config.delimiter);
       // Update the value of the hidden input
-      this.passedElement.setAttribute('value', itemsFilteredString);
-      this.passedElement.value = itemsFilteredString;
+      this.passedElement.element.setAttribute('value', itemsFilteredString);
+      this.passedElement.element.value = itemsFilteredString;
     } else {
       const selectedOptionsFragment = document.createDocumentFragment();
       const addOptionToFragment = (item) => {
@@ -387,8 +375,8 @@ class Choices {
       items.forEach(item => addOptionToFragment(item));
 
       // Update selected choices
-      this.passedElement.innerHTML = '';
-      this.passedElement.appendChild(selectedOptionsFragment);
+      this.passedElement.element.innerHTML = '';
+      this.passedElement.element.appendChild(selectedOptionsFragment);
     }
 
     const addItemToFragment = (item) => {
@@ -542,7 +530,7 @@ class Choices {
         eventResponse.groupValue = group.value;
       }
 
-      triggerEvent(this.passedElement, EVENTS.highlightItem, eventResponse);
+      triggerEvent(this.passedElement.element, EVENTS.highlightItem, eventResponse);
     }
 
     return this;
@@ -576,7 +564,7 @@ class Choices {
       highlightItem(id, false),
     );
 
-    triggerEvent(this.passedElement, EVENTS.highlightItem, eventResponse);
+    triggerEvent(this.passedElement.element, EVENTS.highlightItem, eventResponse);
 
     return this;
   }
@@ -681,7 +669,7 @@ class Choices {
     this.dropdown.show();
     this.input.activate(focusInput);
 
-    triggerEvent(this.passedElement, EVENTS.showDropdown, {});
+    triggerEvent(this.passedElement.element, EVENTS.showDropdown, {});
     return this;
   }
 
@@ -699,7 +687,7 @@ class Choices {
     this.dropdown.hide();
     this.input.deactivate(blurInput);
 
-    triggerEvent(this.passedElement, EVENTS.hideDropdown, {});
+    triggerEvent(this.passedElement.element, EVENTS.hideDropdown, {});
 
     return this;
   }
@@ -934,11 +922,11 @@ class Choices {
       return this;
     }
 
-    this.passedElement.disabled = false;
+    this.passedElement.element.disabled = false;
 
     if (this.containerOuter.isDisabled) {
       this._addEventListeners();
-      this.passedElement.removeAttribute('disabled');
+      this.passedElement.element.removeAttribute('disabled');
       this.input.enable();
       this.containerOuter.enable();
     }
@@ -956,11 +944,11 @@ class Choices {
       return this;
     }
 
-    this.passedElement.disabled = true;
+    this.passedElement.element.disabled = true;
 
     if (!this.containerOuter.isDisabled) {
       this._removeEventListeners();
-      this.passedElement.setAttribute('disabled', '');
+      this.passedElement.element.setAttribute('disabled', '');
       this.input.disable();
       this.containerOuter.disable();
     }
@@ -1004,7 +992,7 @@ class Choices {
       return;
     }
 
-    triggerEvent(this.passedElement, EVENTS.change, {
+    triggerEvent(this.passedElement.element, EVENTS.change, {
       value,
     });
   }
@@ -1113,7 +1101,7 @@ class Choices {
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
 
-    triggerEvent(this.passedElement, EVENTS.choice, {
+    triggerEvent(this.passedElement.element, EVENTS.choice, {
       choice,
     });
 
@@ -1362,7 +1350,7 @@ class Choices {
     if (value && value.length >= this.config.searchFloor) {
       const resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
       // Trigger search event
-      triggerEvent(this.passedElement, EVENTS.search, {
+      triggerEvent(this.passedElement.element, EVENTS.search, {
         value,
         resultCount,
       });
@@ -1819,7 +1807,7 @@ class Choices {
         },
       };
 
-      focusActions[this.passedElement.type]();
+      focusActions[this.passedElement.element.type]();
     }
   }
 
@@ -1873,7 +1861,7 @@ class Choices {
         },
       };
 
-      blurActions[this.passedElement.type]();
+      blurActions[this.passedElement.element.type]();
     } else {
       // On IE11, clicking the scollbar blurs our input and thus
       // closes the dropdown. To stop this, we refocus our input
@@ -2056,7 +2044,7 @@ class Choices {
 
     // Trigger change event
     if (group && group.value) {
-      triggerEvent(this.passedElement, EVENTS.addItem, {
+      triggerEvent(this.passedElement.element, EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2064,7 +2052,7 @@ class Choices {
         keyCode: passedKeyCode,
       });
     } else {
-      triggerEvent(this.passedElement, EVENTS.addItem, {
+      triggerEvent(this.passedElement.element, EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2098,14 +2086,14 @@ class Choices {
     );
 
     if (group && group.value) {
-      triggerEvent(this.passedElement, EVENTS.removeItem, {
+      triggerEvent(this.passedElement.element, EVENTS.removeItem, {
         id,
         value,
         label,
         groupValue: group.value,
       });
     } else {
-      triggerEvent(this.passedElement, EVENTS.removeItem, {
+      triggerEvent(this.passedElement.element, EVENTS.removeItem, {
         id,
         value,
         label,
@@ -2272,7 +2260,7 @@ class Choices {
    * @private
    */
   _createInput() {
-    const direction = this.passedElement.getAttribute('dir') || 'ltr';
+    const direction = this.passedElement.element.getAttribute('dir') || 'ltr';
     const containerOuter = this._getTemplate('containerOuter', direction);
     const containerInner = this._getTemplate('containerInner');
     const itemList = this._getTemplate('itemList');
@@ -2287,28 +2275,10 @@ class Choices {
     this.itemList = new List(this, itemList, this.config.classNames);
     this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
 
-    // Hide passed input
-    this.passedElement.classList.add(
-      this.config.classNames.input,
-      this.config.classNames.hiddenState,
-    );
-
-    // Remove element from tab index
-    this.passedElement.tabIndex = '-1';
-
-    // Backup original styles if any
-    const origStyle = this.passedElement.getAttribute('style');
-
-    if (origStyle) {
-      this.passedElement.setAttribute('data-choice-orig-style', origStyle);
-    }
-
-    this.passedElement.setAttribute('style', 'display:none;');
-    this.passedElement.setAttribute('aria-hidden', 'true');
-    this.passedElement.setAttribute('data-choice', 'active');
+    this.passedElement.conceal();
 
     // Wrap input in container preserving DOM ordering
-    wrap(this.passedElement, this.containerInner.element);
+    wrap(this.passedElement.element, this.containerInner.element);
 
     // Wrapper inner container with outer container
     wrap(this.containerInner.element, this.containerOuter.element);
@@ -2339,14 +2309,14 @@ class Choices {
     }
 
     if (this.isSelectElement) {
-      const passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
+      const passedGroups = Array.from(this.passedElement.element.getElementsByTagName('OPTGROUP'));
 
       this.highlightPosition = 0;
       this.isSearching = false;
 
       if (passedGroups && passedGroups.length) {
         // If we have a placeholder option
-        const placeholderChoice = this.passedElement.querySelector('option[placeholder]');
+        const placeholderChoice = this.passedElement.element.querySelector('option[placeholder]');
         if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
           this._addChoice(
             placeholderChoice.value,
@@ -2363,7 +2333,7 @@ class Choices {
           this._addGroup(group, (group.id || null));
         });
       } else {
-        const passedOptions = Array.from(this.passedElement.options);
+        const passedOptions = Array.from(this.passedElement.element.options);
         const filter = this.config.sortFilter;
         const allChoices = this.presetChoices;
 

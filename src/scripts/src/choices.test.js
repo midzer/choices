@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 import 'es6-promise';
 import 'core-js/fn/object/assign';
 import 'custom-event-autopolyfill';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import Choices from './choices';
@@ -11,9 +11,11 @@ import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
 import List from './components/list';
+import WrappedInput from './components/wrapped-input';
+import WrappedSelect from './components/wrapped-select';
 
 describe('Choices', () => {
-  describe('should initialize Choices', () => {
+  describe('initialize Choices', () => {
     let input;
     let instance;
 
@@ -39,7 +41,7 @@ describe('Choices', () => {
     });
 
     it('should not re-initialise if passed element again', () => {
-      const reinitialise = new Choices(instance.passedElement);
+      const reinitialise = new Choices(instance.passedElement.element);
       sinon.spy(reinitialise, '_createTemplates');
       expect(reinitialise._createTemplates.callCount).to.equal(0);
     });
@@ -117,7 +119,7 @@ describe('Choices', () => {
     });
 
     it('should hide passed input', () => {
-      expect(instance.passedElement.style.display).to.equal('none');
+      expect(instance.passedElement.element.style.display).to.equal('none');
     });
 
     it('should create an outer container', () => {
@@ -178,6 +180,11 @@ describe('Choices', () => {
 
     afterEach(() => {
       instance.destroy();
+    });
+
+    it('should wrap passed input', () => {
+      instance = new Choices(input);
+      expect(instance.passedElement).to.be.an.instanceof(WrappedInput);
     });
 
     it('should accept a user inputted value', () => {
@@ -295,6 +302,11 @@ describe('Choices', () => {
       instance.destroy();
     });
 
+    it('should wrap passed input', () => {
+      instance = new Choices(input);
+      expect(instance.passedElement).to.be.an.instanceof(WrappedSelect);
+    });
+
     it('should open the choice list on focusing', () => {
       instance = new Choices(input);
       instance.input.element.focus();
@@ -355,8 +367,8 @@ describe('Choices', () => {
       const addSpyStub = sinon.stub();
       const passedElement = instance.passedElement;
 
-      passedElement.addEventListener('change', onChangeStub);
-      passedElement.addEventListener('addItem', addSpyStub);
+      passedElement.element.addEventListener('change', onChangeStub);
+      passedElement.element.addEventListener('addItem', addSpyStub);
 
       instance.input.element.focus();
 
@@ -421,7 +433,7 @@ describe('Choices', () => {
       const showDropdownStub = sinon.spy();
       const passedElement = instance.passedElement;
 
-      passedElement.addEventListener('showDropdown', showDropdownStub);
+      passedElement.element.addEventListener('showDropdown', showDropdownStub);
 
       instance.input.focus();
 
@@ -441,7 +453,7 @@ describe('Choices', () => {
       const hideDropdownStub = sinon.stub();
       const passedElement = instance.passedElement;
 
-      passedElement.addEventListener('hideDropdown', hideDropdownStub);
+      passedElement.element.addEventListener('hideDropdown', hideDropdownStub);
 
       instance.input.element.focus();
 
@@ -466,7 +478,7 @@ describe('Choices', () => {
       const onSearchStub = sinon.spy();
       const passedElement = instance.passedElement;
 
-      passedElement.addEventListener('search', onSearchStub);
+      passedElement.element.addEventListener('search', onSearchStub);
 
       instance.input.element.focus();
       instance.input.element.value = '3 ';
@@ -494,7 +506,7 @@ describe('Choices', () => {
       const onSearchStub = sinon.spy();
       const passedElement = instance.passedElement;
 
-      passedElement.addEventListener('search', onSearchStub);
+      passedElement.element.addEventListener('search', onSearchStub);
 
       instance.input.element.focus();
       instance.input.element.value = 'Javascript';
@@ -599,6 +611,10 @@ describe('Choices', () => {
 
     afterEach(() => {
       instance.destroy();
+    });
+
+    it('should wrap passed input', () => {
+      expect(instance.passedElement).to.be.an.instanceof(WrappedSelect);
     });
 
     it('should add any pre-defined values', () => {

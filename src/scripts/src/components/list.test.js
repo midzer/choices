@@ -7,7 +7,6 @@ describe('List', () => {
   let choicesInstance;
   let choicesElement;
 
-
   beforeEach(() => {
     choicesInstance = {
       config: {

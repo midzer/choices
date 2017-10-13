@@ -8,7 +8,6 @@ describe('Input', () => {
   let choicesInstance;
   let choicesElement;
 
-
   beforeEach(() => {
     choicesInstance = {
       config: {

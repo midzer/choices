@@ -8,7 +8,6 @@ describe('Container', () => {
   let choicesInstance;
   let choicesElement;
 
-
   beforeEach(() => {
     choicesInstance = {
       config: {
