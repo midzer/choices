@@ -1,19 +1,12 @@
+/* eslint-disable no-unused-expressions */
 import 'whatwg-fetch';
 import 'es6-promise';
 import 'core-js/fn/object/assign';
 import 'custom-event-autopolyfill';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import sinon from 'sinon';
 
 import Choices from './choices';
-import itemReducer from './reducers/items';
-import choiceReducer from './reducers/choices';
-import {
-  addItem as addItemAction,
-} from './actions/items';
-import {
-  addChoice as addChoiceAction,
-} from './actions/choices';
 import Dropdown from './components/dropdown';
 import Container from './components/container';
 import Input from './components/input';
@@ -38,7 +31,7 @@ describe('Choices', () => {
     });
 
     it('should be defined', () => {
-      expect(instance).not.be.undefined;
+      expect(instance).to.not.be.undefined;
     });
 
     it('should have initialised', () => {
@@ -74,7 +67,8 @@ describe('Choices', () => {
       expect(instance.config.searchChoices).to.be.a('boolean');
       expect(instance.config.searchFloor).to.be.a('number');
       expect(instance.config.searchResultLimit).to.be.a('number');
-      // expect(instance.config.searchFields).to.equal(jasmine.any(Array) || jasmine.any(String));
+      expect(instance.config.searchFields, 'should be string or array').to.satisfy(searchFields =>
+         Array.isArray(searchFields) || typeof searchFields === 'string');
       expect(instance.config.position).to.be.a('string');
       expect(instance.config.regexFilter).to.be.null;
       expect(instance.config.sortFilter).to.be.a('function');
@@ -835,7 +829,11 @@ describe('Choices', () => {
       instance.disable();
 
       expect(instance.input.element.disabled).to.be.true;
-      expect(instance.containerOuter.element.classList.contains(instance.config.classNames.disabledState)).to.be.true;
+      expect(
+        instance.containerOuter.element.classList.contains(
+          instance.config.classNames.disabledState,
+        ),
+      ).to.be.true;
       expect(instance.containerOuter.element.getAttribute('aria-disabled')).to.equal('true');
     });
 
@@ -843,7 +841,11 @@ describe('Choices', () => {
       instance.enable();
 
       expect(instance.input.element.disabled).to.be.false;
-      expect(instance.containerOuter.element.classList.contains(instance.config.classNames.disabledState)).to.be.false;
+      expect(
+        instance.containerOuter.element.classList.contains(
+          instance.config.classNames.disabledState,
+        ),
+      ).to.be.false;
       expect(instance.containerOuter.element.hasAttribute('aria-disabled')).to.be.false;
     });
 
@@ -1035,94 +1037,6 @@ describe('Choices', () => {
 
       const renderedChoices = instance.choiceList.element.querySelectorAll('.choices__item');
       expect(renderedChoices.length).to.equal(4);
-    });
-  });
-
-  describe('should allow custom properties provided by the user on items or choices', () => {
-    it('should allow the user to supply custom properties for an item', () => {
-      const randomItem = {
-        id: 8999,
-        choiceId: 9000,
-        groupId: 9001,
-        value: 'value',
-        label: 'label',
-        customProperties: {
-          foo: 'bar',
-        },
-        placeholder: false,
-        keyCode: null,
-      };
-
-      const expectedState = [{
-        id: randomItem.id,
-        choiceId: randomItem.choiceId,
-        groupId: randomItem.groupId,
-        value: randomItem.value,
-        label: randomItem.label,
-        active: true,
-        highlighted: false,
-        customProperties: randomItem.customProperties,
-        placeholder: randomItem.placeholder,
-        keyCode: randomItem.keyCode,
-      }];
-
-      const action = addItemAction(
-        randomItem.value,
-        randomItem.label,
-        randomItem.id,
-        randomItem.choiceId,
-        randomItem.groupId,
-        randomItem.customProperties,
-        randomItem.placeholder,
-        randomItem.keyCode,
-      );
-
-      expect(itemReducer([], action)).to.deep.equal(expectedState);
-    });
-
-    it('should allow the user to supply custom properties for a choice', () => {
-      const randomChoice = {
-        id: 123,
-        elementId: 321,
-        groupId: 213,
-        value: 'value',
-        label: 'label',
-        disabled: false,
-        customProperties: {
-          foo: 'bar',
-        },
-        placeholder: false,
-        keyCode: null,
-      };
-
-      const expectedState = [{
-        id: randomChoice.id,
-        elementId: randomChoice.elementId,
-        groupId: randomChoice.groupId,
-        value: randomChoice.value,
-        label: randomChoice.label,
-        disabled: randomChoice.disabled,
-        selected: false,
-        active: true,
-        score: 9999,
-        customProperties: randomChoice.customProperties,
-        placeholder: randomChoice.placeholder,
-        keyCode: randomChoice.keyCode,
-      }];
-
-      const action = addChoiceAction(
-        randomChoice.value,
-        randomChoice.label,
-        randomChoice.id,
-        randomChoice.groupId,
-        randomChoice.disabled,
-        randomChoice.elementId,
-        randomChoice.customProperties,
-        randomChoice.placeholder,
-        randomChoice.keyCode,
-      );
-
-      expect(choiceReducer([], action)).to.deep.equal(expectedState);
     });
   });
 

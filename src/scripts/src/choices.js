@@ -1750,6 +1750,7 @@ class Choices {
           this.showDropdown(true);
         } else {
           this.showDropdown();
+          // code smell
           this.containerOuter.focus();
         }
       } else if (
@@ -1783,10 +1784,12 @@ class Choices {
    */
   _onMouseOver(e) {
     // If the dropdown is either the target or one of its children is the target
-    if (
-      (e.target === this.dropdown || this.dropdown.element.contains(e.target)) &&
-      e.target.hasAttribute('data-choice')
-    ) {
+    const targetWithinDropdown = (
+      e.target === this.dropdown || this.dropdown.element.contains(e.target)
+    );
+    const shouldHighlightChoice = targetWithinDropdown && e.target.hasAttribute('data-choice');
+
+    if (shouldHighlightChoice) {
       this._highlightChoice(e.target);
     }
   }
