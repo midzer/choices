@@ -825,22 +825,16 @@ class Choices {
       // Check 'value' property exists and the choice isn't already selected
       const foundChoice = choices.find(choice => choice.value === val);
 
-      if (foundChoice) {
-        if (!foundChoice.selected) {
-          this._addItem(
-            foundChoice.value,
-            foundChoice.label,
-            foundChoice.id,
-            foundChoice.groupId,
-            foundChoice.customProperties,
-            foundChoice.placeholder,
-            foundChoice.keyCode,
-          );
-        } else if (!this.config.silent) {
-          console.warn('Attempting to select choice already selected');
-        }
-      } else if (!this.config.silent) {
-        console.warn('Attempting to select choice that does not exist');
+      if (foundChoice && !foundChoice.selected) {
+        this._addItem(
+          foundChoice.value,
+          foundChoice.label,
+          foundChoice.id,
+          foundChoice.groupId,
+          foundChoice.customProperties,
+          foundChoice.placeholder,
+          foundChoice.keyCode,
+        );
       }
     };
 
@@ -1445,8 +1439,6 @@ class Choices {
     const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList.hasChildren;
     const keyString = String.fromCharCode(e.keyCode);
-
-    // TO DO: Move into constants file
     const backKey = KEY_CODES.BACK_KEY;
     const deleteKey = KEY_CODES.DELETE_KEY;
     const enterKey = KEY_CODES.ENTER_KEY;
@@ -2366,6 +2358,7 @@ class Choices {
             /* placeholder */ true,
           );
         }
+
         passedGroups.forEach((group) => {
           this._addGroup(group, (group.id || null));
         });
@@ -2392,9 +2385,7 @@ class Choices {
 
         // Determine whether there is a selected choice
         const hasSelectedChoice = allChoices.some(choice => choice.selected);
-
-        // Add each choice
-        allChoices.forEach((choice, index) => {
+        const handleChoice = (choice, index) => {
           if (this.isSelectElement) {
             // If the choice is actually a group
             if (choice.choices) {
@@ -2428,11 +2419,13 @@ class Choices {
               choice.placeholder,
             );
           }
-        });
+        };
+
+        // Add each choice
+        allChoices.forEach((choice, index) => handleChoice(choice, index));
       }
     } else if (this.isTextElement) {
-      // Add any preset values seperated by delimiter
-      this.presetItems.forEach((item) => {
+      const handlePresetItem = (item) => {
         const itemType = getType(item);
         if (itemType === 'Object') {
           if (!item.value) {
@@ -2449,7 +2442,9 @@ class Choices {
         } else if (itemType === 'String') {
           this._addItem(item);
         }
-      });
+      };
+
+      this.presetItems.forEach(item => handlePresetItem(item));
     }
   }
 
