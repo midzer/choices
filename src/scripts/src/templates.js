@@ -15,7 +15,7 @@ export const TEMPLATES = {
     return strToEl(`
       <div
         class="${globalClasses.containerOuter}"
-        data-type="${this.passedElement.type}"
+        data-type="${this.passedElement.element.type}"
         ${role}
         ${tabIndex}
         ${ariaAutoComplete}
