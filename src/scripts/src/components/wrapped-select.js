@@ -8,6 +8,10 @@ export default class WrappedSelect extends WrappedElement {
     this.classNames = classNames;
   }
 
+  getElement() {
+    super.getElement();
+  }
+
   conceal() {
     super.conceal();
   }
@@ -40,5 +44,4 @@ export default class WrappedSelect extends WrappedElement {
   getOptionGroups() {
     return Array.from(this.element.getElementsByTagName('OPTGROUP'));
   }
-
 }

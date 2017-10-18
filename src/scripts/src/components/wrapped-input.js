@@ -8,6 +8,10 @@ export default class WrappedInput extends WrappedElement {
     this.classNames = classNames;
   }
 
+  getElement() {
+    super.getElement();
+  }
+
   conceal() {
     super.conceal();
   }

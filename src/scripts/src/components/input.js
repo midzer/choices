@@ -15,6 +15,10 @@ export default class Input {
     this.onBlur = this.onBlur.bind(this);
   }
 
+  getElement() {
+    return this.element;
+  }
+
   addEventListeners() {
     this.element.addEventListener('input', this.onInput);
     this.element.addEventListener('paste', this.onPaste);

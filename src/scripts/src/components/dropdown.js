@@ -8,6 +8,10 @@ export default class Dropdown {
     this.isActive = false;
   }
 
+  getElement() {
+    return this.element;
+  }
+
   /**
    * Determine how far the top of our element is from
    * the top of the window

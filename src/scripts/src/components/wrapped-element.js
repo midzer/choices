@@ -8,6 +8,14 @@ export default class WrappedElement {
     this.isDisabled = false;
   }
 
+  getElement() {
+    return this.element;
+  }
+
+  getValue() {
+    return this.element.value;
+  }
+
   conceal() {
     // Hide passed input
     this.element.classList.add(

@@ -120,9 +120,9 @@ class Choices {
     this.presetItems = this.config.items;
 
     // Then add any values passed from attribute
-    if (this.passedElement.element.value) {
+    if (this.passedElement.getValue()) {
       this.presetItems = this.presetItems.concat(
-        this.passedElement.element.value.split(this.config.delimiter),
+        this.passedElement.getValue().split(this.config.delimiter),
       );
     }
 
@@ -218,15 +218,7 @@ class Choices {
     // Remove all event listeners
     this._removeEventListeners();
     this.passedElement.reveal();
-
-    // Move passed element back to original position
-    this.containerOuter.element.parentNode.insertBefore(
-      this.passedElement.element,
-      this.containerOuter.element,
-    );
-
-    // Remove added elements
-    this.containerOuter.element.parentNode.removeChild(this.containerOuter.element);
+    this.containerOuter.revert(this.passedElement.element);
 
     // Clear data store
     this.clearStore();
@@ -1446,7 +1438,7 @@ class Choices {
         this.canSearch = false;
         if (
           this.config.removeItems &&
-          !this.input.element.value &&
+          !this.input.getValue() &&
           this.input.element === document.activeElement
         ) {
           // Highlight items
@@ -1458,7 +1450,7 @@ class Choices {
     const onEnterKey = () => {
       // If enter key is pressed and the input has a value
       if (this.isTextElement && target.value) {
-        const value = this.input.element.value;
+        const value = this.input.getValue();
         const canAddItem = this._canAddItem(activeItems, value);
 
         // All is good, add
@@ -1585,7 +1577,7 @@ class Choices {
       return;
     }
 
-    const value = this.input.element.value;
+    const value = this.input.getValue();
     const activeItems = this.store.getItemsFilteredByActive();
     const canAddItem = this._canAddItem(activeItems, value);
 
@@ -1620,7 +1612,7 @@ class Choices {
           );
         }
       } else if (this.canSearch && canAddItem.response) {
-        this._handleSearch(this.input.element.value);
+        this._handleSearch(this.input.getValue());
       }
     }
     // Re-establish canSearch value from changes in _onKeyDown
