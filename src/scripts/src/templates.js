@@ -2,7 +2,14 @@ import classNames from 'classnames';
 import { strToEl } from './lib/utils';
 
 export const TEMPLATES = {
-  containerOuter(globalClasses, direction, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
+  containerOuter(
+    globalClasses,
+    direction,
+    isSelectElement,
+    isSelectOneElement,
+    searchEnabled,
+    passedElementType,
+  ) {
     const tabIndex = isSelectOneElement ? 'tabindex="0"' : '';
     let role = isSelectElement ? 'role="listbox"' : '';
     let ariaAutoComplete = '';

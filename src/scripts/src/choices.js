@@ -24,7 +24,6 @@ import {
   sortByAlpha,
   sortByScore,
   generateId,
-  triggerEvent,
   findAncestorByAttrName,
   regexFilter,
 } from './lib/utils';
@@ -400,29 +399,30 @@ class Choices {
 
     // Only render if our state has actually changed
     if (this.currentState !== this.prevState) {
-      // Choices
-      if (
-        (this.currentState.choices !== this.prevState.choices ||
+      const stateChanged = (
+        this.currentState.choices !== this.prevState.choices ||
         this.currentState.groups !== this.prevState.groups ||
-        this.currentState.items !== this.prevState.items) &&
-        this.isSelectElement
-      ) {
+        this.currentState.items !== this.prevState.items
+      );
+
+      // Choices
+      if (stateChanged && this.isSelectElement) {
           // Get active groups/choices
         const activeGroups = this.store.getGroupsFilteredByActive();
         const activeChoices = this.store.getChoicesFilteredByActive();
 
         let choiceListFragment = document.createDocumentFragment();
 
-          // Clear choices
+        // Clear choices
         this.choiceList.clear();
 
-          // Scroll back to top of choices list
+        // Scroll back to top of choices list
         if (this.config.resetScrollPosition) {
           this.choiceList.scrollTo(0);
         }
 
-          // If we have grouped options
-        if (activeGroups.length >= 1 && this.isSearching !== true) {
+        // If we have grouped options
+        if (activeGroups.length >= 1 && !this.isSearching) {
           // If we have a placeholder choice along with groups
           const activePlaceholders = activeChoices.filter(
             activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
@@ -473,14 +473,14 @@ class Choices {
       }
 
       // Items
-      if (this.currentState.items !== this.prevState.items) {
+      if (stateChanged) {
         // Get active items (items that can be selected)
-        const activeItems = this.store.getItemsFilteredByActive();
+        const activeItems = this.store.getItemsFilteredByActive() || [];
 
         // Clear list
         this.itemList.clear();
 
-        if (activeItems && activeItems.length) {
+        if (activeItems.length) {
           // Create a fragment to store our list items
           // (so we don't have to update the DOM for each item)
           const itemListFragment = this.renderItems(activeItems);
@@ -528,7 +528,7 @@ class Choices {
         eventResponse.groupValue = group.value;
       }
 
-      triggerEvent(this.passedElement.element, EVENTS.highlightItem, eventResponse);
+      this.passedElement.triggerEvent(EVENTS.highlightItem, eventResponse);
     }
 
     return this;
@@ -562,7 +562,7 @@ class Choices {
       highlightItem(id, false),
     );
 
-    triggerEvent(this.passedElement.element, EVENTS.highlightItem, eventResponse);
+    this.passedElement.triggerEvent(EVENTS.highlightItem, eventResponse);
 
     return this;
   }
@@ -666,8 +666,8 @@ class Choices {
     this.containerOuter.open(this.dropdown.getVerticalPos());
     this.dropdown.show();
     this.input.activate(focusInput);
+    this.passedElement.triggerEvent(EVENTS.showDropdown, {});
 
-    triggerEvent(this.passedElement.element, EVENTS.showDropdown, {});
     return this;
   }
 
@@ -684,8 +684,7 @@ class Choices {
     this.containerOuter.close();
     this.dropdown.hide();
     this.input.deactivate(blurInput);
-
-    triggerEvent(this.passedElement.element, EVENTS.hideDropdown, {});
+    this.passedElement.triggerEvent(EVENTS.hideDropdown, {});
 
     return this;
   }
@@ -988,7 +987,7 @@ class Choices {
       return;
     }
 
-    triggerEvent(this.passedElement.element, EVENTS.change, {
+    this.passedElement.triggerEvent(EVENTS.change, {
       value,
     });
   }
@@ -1097,7 +1096,7 @@ class Choices {
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
 
-    triggerEvent(this.passedElement.element, EVENTS.choice, {
+    this.passedElement.triggerEvent(EVENTS.choice, {
       choice,
     });
 
@@ -1346,7 +1345,7 @@ class Choices {
     if (value && value.length >= this.config.searchFloor) {
       const resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
       // Trigger search event
-      triggerEvent(this.passedElement.element, EVENTS.search, {
+      this.passedElement.triggerEvent(EVENTS.search, {
         value,
         resultCount,
       });
@@ -2040,7 +2039,7 @@ class Choices {
 
     // Trigger change event
     if (group && group.value) {
-      triggerEvent(this.passedElement.element, EVENTS.addItem, {
+      this.passedElement.triggerEvent(EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2048,7 +2047,7 @@ class Choices {
         keyCode: passedKeyCode,
       });
     } else {
-      triggerEvent(this.passedElement.element, EVENTS.addItem, {
+      this.passedElement.triggerEvent(EVENTS.addItem, {
         id,
         value: passedValue,
         label: passedLabel,
@@ -2082,14 +2081,14 @@ class Choices {
     );
 
     if (group && group.value) {
-      triggerEvent(this.passedElement.element, EVENTS.removeItem, {
+      this.passedElement.triggerEvent(EVENTS.removeItem, {
         id,
         value,
         label,
         groupValue: group.value,
       });
     } else {
-      triggerEvent(this.passedElement.element, EVENTS.removeItem, {
+      this.passedElement.triggerEvent(EVENTS.removeItem, {
         id,
         value,
         label,

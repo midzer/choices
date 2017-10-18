@@ -552,13 +552,13 @@ export const sortByAlpha = (a, b) => {
 export const sortByScore = (a, b) => a.score - b.score;
 
 /**
- * Trigger native event
+ * Dispatch native event
  * @param  {NodeElement} element Element to trigger event on
  * @param  {String} type         Type of event to trigger
  * @param  {Object} customArgs   Data to pass with event
  * @return {Object}              Triggered event
  */
-export const triggerEvent = (element, type, customArgs = null) => {
+export const dispatchEvent = (element, type, customArgs = null) => {
   const event = new CustomEvent(type, {
     detail: customArgs,
     bubbles: true,

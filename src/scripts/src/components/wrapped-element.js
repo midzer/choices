@@ -1,3 +1,5 @@
+import { dispatchEvent } from '../lib/utils';
+
 export default class WrappedElement {
   constructor(instance, element, classNames) {
     this.parentInstance = instance;
@@ -62,5 +64,9 @@ export default class WrappedElement {
     this.element.setAttribute('disabled', '');
     this.element.disabled = true;
     this.isDisabled = true;
+  }
+
+  triggerEvent(eventType, data) {
+    dispatchEvent(this.element, eventType, data);
   }
 }
