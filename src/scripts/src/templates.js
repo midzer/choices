@@ -2,12 +2,12 @@ import classNames from 'classnames';
 import { strToEl } from './lib/utils';
 
 export const TEMPLATES = {
-  containerOuter(globalClasses, direction) {
-    const tabIndex = this.isSelectOneElement ? 'tabindex="0"' : '';
-    let role = this.isSelectElement ? 'role="listbox"' : '';
+  containerOuter(globalClasses, direction, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
+    const tabIndex = isSelectOneElement ? 'tabindex="0"' : '';
+    let role = isSelectElement ? 'role="listbox"' : '';
     let ariaAutoComplete = '';
 
-    if (this.isSelectElement && this.config.searchEnabled) {
+    if (isSelectElement && searchEnabled) {
       role = 'role="combobox"';
       ariaAutoComplete = 'aria-autocomplete="list"';
     }
@@ -15,7 +15,7 @@ export const TEMPLATES = {
     return strToEl(`
       <div
         class="${globalClasses.containerOuter}"
-        data-type="${this.passedElement.type}"
+        data-type="${passedElementType}"
         ${role}
         ${tabIndex}
         ${ariaAutoComplete}
@@ -31,11 +31,11 @@ export const TEMPLATES = {
       <div class="${globalClasses.containerInner}"></div>
     `);
   },
-  itemList(globalClasses) {
+  itemList(globalClasses, isSelectOneElement) {
     const localClasses = classNames(
       globalClasses.list, {
-        [globalClasses.listSingle]: (this.isSelectOneElement),
-        [globalClasses.listItems]: (!this.isSelectOneElement),
+        [globalClasses.listSingle]: (isSelectOneElement),
+        [globalClasses.listItems]: (!isSelectOneElement),
       },
     );
 
@@ -50,7 +50,7 @@ export const TEMPLATES = {
       </div>
     `);
   },
-  item(globalClasses, data) {
+  item(globalClasses, data, removeItemButton) {
     const ariaSelected = data.active ? 'aria-selected="true"' : '';
     const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
 
@@ -62,7 +62,7 @@ export const TEMPLATES = {
       },
     );
 
-    if (this.config.removeItemButton) {
+    if (removeItemButton) {
       localClasses = classNames(
         globalClasses.item, {
           [globalClasses.highlightedState]: data.highlighted,
@@ -107,8 +107,8 @@ export const TEMPLATES = {
       </div>
     `);
   },
-  choiceList(globalClasses) {
-    const ariaMultiSelectable = !this.isSelectOneElement ?
+  choiceList(globalClasses, isSelectOneElement) {
+    const ariaMultiSelectable = !isSelectOneElement ?
       'aria-multiselectable="true"' :
       '';
 
@@ -143,7 +143,7 @@ export const TEMPLATES = {
       </div>
     `);
   },
-  choice(globalClasses, data) {
+  choice(globalClasses, data, itemSelectText) {
     const role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
     const localClasses = classNames(
       globalClasses.item,
@@ -157,7 +157,7 @@ export const TEMPLATES = {
     return strToEl(`
       <div
         class="${localClasses}"
-        data-select-text="${this.config.itemSelectText}"
+        data-select-text="${itemSelectText}"
         data-choice
         data-id="${data.id}"
         data-value="${data.value}"

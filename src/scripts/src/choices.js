@@ -292,7 +292,7 @@ class Choices {
         (this.isSelectOneElement || !choice.selected) :
         true;
       if (shouldRender) {
-        const dropdownItem = this._getTemplate('choice', choice);
+        const dropdownItem = this._getTemplate('choice', choice, this.config.itemSelectText);
         choicesFragment.appendChild(dropdownItem);
       }
     };
@@ -379,7 +379,7 @@ class Choices {
 
     const addItemToFragment = (item) => {
       // Create new list element
-      const listItem = this._getTemplate('item', item);
+      const listItem = this._getTemplate('item', item, this.config.removeItemButton);
       // Append it to list
       itemListFragment.appendChild(listItem);
     };
@@ -2257,10 +2257,16 @@ class Choices {
    */
   _createInput() {
     const direction = this.passedElement.element.getAttribute('dir') || 'ltr';
-    const containerOuter = this._getTemplate('containerOuter', direction);
+    const containerOuter = this._getTemplate('containerOuter',
+      direction,
+      this.isSelectElement,
+      this.isSelectOneElement,
+      this.config.searchEnabled,
+      this.passedElement.element.type,
+    );
     const containerInner = this._getTemplate('containerInner');
-    const itemList = this._getTemplate('itemList');
-    const choiceList = this._getTemplate('choiceList');
+    const itemList = this._getTemplate('itemList', this.isSelectOneElement);
+    const choiceList = this._getTemplate('choiceList', this.isSelectOneElement);
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
 
