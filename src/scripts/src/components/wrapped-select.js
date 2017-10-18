@@ -15,4 +15,30 @@ export default class WrappedSelect extends WrappedElement {
   reveal() {
     super.reveal();
   }
+
+  enable() {
+    super.enable();
+  }
+
+  disable() {
+    super.enable();
+  }
+
+  setOptions(options) {
+    this.element.innerHTML = '';
+    this.element.appendChild(options);
+  }
+
+  getPlaceholderOption() {
+    return this.element.querySelector('option[placeholder]');
+  }
+
+  getOptions() {
+    return Array.from(this.element.options);
+  }
+
+  getOptionGroups() {
+    return Array.from(this.element.getElementsByTagName('OPTGROUP'));
+  }
+
 }

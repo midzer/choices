@@ -3,6 +3,7 @@ export default class WrappedElement {
     this.parentInstance = instance;
     this.element = element;
     this.classNames = classNames;
+    this.isDisabled = false;
   }
 
   conceal() {
@@ -49,5 +50,17 @@ export default class WrappedElement {
 
     // Re-assign values - this is weird, I know
     this.element.value = this.element.value;
+  }
+
+  enable() {
+    this.element.removeAttribute('disabled');
+    this.element.disabled = false;
+    this.isDisabled = false;
+  }
+
+  disable() {
+    this.element.setAttribute('disabled', '');
+    this.element.disabled = true;
+    this.isDisabled = true;
   }
 }

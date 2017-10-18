@@ -15,4 +15,17 @@ export default class WrappedInput extends WrappedElement {
   reveal() {
     super.reveal();
   }
+
+  enable() {
+    super.enable();
+  }
+
+  disable() {
+    super.enable();
+  }
+
+  setValue(value) {
+    this.element.setAttribute('value', value);
+    this.element.value = value;
+  }
 }

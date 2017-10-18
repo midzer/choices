@@ -359,9 +359,9 @@ class Choices {
       // Simplify store data to just values
       const itemsFiltered = this.store.getItemsReducedToValues(items);
       const itemsFilteredString = itemsFiltered.join(this.config.delimiter);
+
       // Update the value of the hidden input
-      this.passedElement.element.setAttribute('value', itemsFilteredString);
-      this.passedElement.element.value = itemsFilteredString;
+      this.passedElement.setValue(itemsFilteredString);
     } else {
       const selectedOptionsFragment = document.createDocumentFragment();
       const addOptionToFragment = (item) => {
@@ -373,10 +373,8 @@ class Choices {
 
       // Add each list item to list
       items.forEach(item => addOptionToFragment(item));
-
-      // Update selected choices
-      this.passedElement.element.innerHTML = '';
-      this.passedElement.element.appendChild(selectedOptionsFragment);
+      // Update the options of the hidden input
+      this.passedElement.setOptions(selectedOptionsFragment);
     }
 
     const addItemToFragment = (item) => {
@@ -922,11 +920,10 @@ class Choices {
       return this;
     }
 
-    this.passedElement.element.disabled = false;
+    this.passedElement.enable();
 
     if (this.containerOuter.isDisabled) {
       this._addEventListeners();
-      this.passedElement.element.removeAttribute('disabled');
       this.input.enable();
       this.containerOuter.enable();
     }
@@ -944,11 +941,10 @@ class Choices {
       return this;
     }
 
-    this.passedElement.element.disabled = true;
+    this.passedElement.disable();
 
     if (!this.containerOuter.isDisabled) {
       this._removeEventListeners();
-      this.passedElement.element.setAttribute('disabled', '');
       this.input.disable();
       this.containerOuter.disable();
     }
@@ -2309,14 +2305,14 @@ class Choices {
     }
 
     if (this.isSelectElement) {
-      const passedGroups = Array.from(this.passedElement.element.getElementsByTagName('OPTGROUP'));
+      const passedGroups = this.passedElement.getOptionGroups();
 
       this.highlightPosition = 0;
       this.isSearching = false;
 
       if (passedGroups && passedGroups.length) {
         // If we have a placeholder option
-        const placeholderChoice = this.passedElement.element.querySelector('option[placeholder]');
+        const placeholderChoice = this.passedElement.getPlaceholderOption();
         if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
           this._addChoice(
             placeholderChoice.value,
@@ -2333,7 +2329,7 @@ class Choices {
           this._addGroup(group, (group.id || null));
         });
       } else {
-        const passedOptions = Array.from(this.passedElement.element.options);
+        const passedOptions = this.passedElement.getOptions();
         const filter = this.config.sortFilter;
         const allChoices = this.presetChoices;
 
