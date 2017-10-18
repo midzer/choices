@@ -490,7 +490,7 @@
           var classNames = this.config.classNames;
           var itemSelectText = this.config.itemSelectText;
           return {
-            item: function(data) {
+            item: function(classNames, data) {
               return strToEl('\
                 <div\
                   class="'+ String(classNames.item) + ' ' + String(data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"\
@@ -504,7 +504,7 @@
                 </div>\
               ');
             },
-            choice: function(data) {
+            choice: function(classNames, data) {
               return strToEl('\
                 <div\
                   class="'+ String(classNames.item) + ' ' + String(classNames.itemChoice) + ' ' + String(data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '"\
