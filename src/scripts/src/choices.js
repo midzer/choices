@@ -6,7 +6,7 @@ import Input from './components/input';
 import List from './components/list';
 import WrappedInput from './components/wrapped-input';
 import WrappedSelect from './components/wrapped-select';
-import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS, KEY_CODES } from './constants';
+import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS, KEY_CODES, SCROLLING_SPEED } from './constants';
 import { TEMPLATES } from './templates';
 import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
 import { addItem, removeItem, highlightItem } from './actions/items';
@@ -388,105 +388,104 @@ class Choices {
    */
   render() {
     this.currentState = this.store.getState();
+    const stateChanged = (
+      this.currentState.choices !== this.prevState.choices ||
+      this.currentState.groups !== this.prevState.groups ||
+      this.currentState.items !== this.prevState.items
+    );
 
-    // Only render if our state has actually changed
-    if (this.currentState !== this.prevState) {
-      const stateChanged = (
-        this.currentState.choices !== this.prevState.choices ||
-        this.currentState.groups !== this.prevState.groups ||
-        this.currentState.items !== this.prevState.items
-      );
-
-      // Choices
-      if (stateChanged && this.isSelectElement) {
-          // Get active groups/choices
-        const activeGroups = this.store.getGroupsFilteredByActive();
-        const activeChoices = this.store.getChoicesFilteredByActive();
-
-        let choiceListFragment = document.createDocumentFragment();
-
-        // Clear choices
-        this.choiceList.clear();
-
-        // Scroll back to top of choices list
-        if (this.config.resetScrollPosition) {
-          this.choiceList.scrollTo(0);
-        }
-
-        // If we have grouped options
-        if (activeGroups.length >= 1 && !this.isSearching) {
-          // If we have a placeholder choice along with groups
-          const activePlaceholders = activeChoices.filter(
-            activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
-          );
-          if (activePlaceholders.length >= 1) {
-            choiceListFragment = this.renderChoices(activePlaceholders, choiceListFragment);
-          }
-          choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
-        } else if (activeChoices.length >= 1) {
-          choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
-        }
-
-        const activeItems = this.store.getItemsFilteredByActive();
-        const canAddItem = this._canAddItem(activeItems, this.input.getValue());
-
-          // If we have choices to show
-        if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-            // ...and we can select them
-          if (canAddItem.response) {
-              // ...append them and highlight the first choice
-            this.choiceList.append(choiceListFragment);
-            this._highlightChoice();
-          } else {
-              // ...otherwise show a notice
-            this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
-          }
-        } else {
-            // Otherwise show a notice
-          let dropdownItem;
-          let notice;
-
-          if (this.isSearching) {
-            notice = isType('Function', this.config.noResultsText) ?
-                this.config.noResultsText() :
-                this.config.noResultsText;
-
-            dropdownItem = this._getTemplate('notice', notice, 'no-results');
-          } else {
-            notice = isType('Function', this.config.noChoicesText) ?
-                this.config.noChoicesText() :
-                this.config.noChoicesText;
-
-            dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-          }
-
-          this.choiceList.append(dropdownItem);
-        }
-      }
-
-      // Items
-      if (stateChanged) {
-        // Get active items (items that can be selected)
-        const activeItems = this.store.getItemsFilteredByActive() || [];
-
-        // Clear list
-        this.itemList.clear();
-
-        if (activeItems.length) {
-          // Create a fragment to store our list items
-          // (so we don't have to update the DOM for each item)
-          const itemListFragment = this.renderItems(activeItems);
-
-          // If we have items to add
-          if (itemListFragment.childNodes) {
-            // Update list
-            this.itemList.append(itemListFragment);
-          }
-        }
-      }
-
-      this.prevState = this.currentState;
+    if (!stateChanged) {
+      return;
     }
+
+    /* Choices */
+
+    if (this.isSelectElement) {
+      // Get active groups/choices
+      const activeGroups = this.store.getGroupsFilteredByActive();
+      const activeChoices = this.store.getChoicesFilteredByActive();
+
+      let choiceListFragment = document.createDocumentFragment();
+
+      // Clear choices
+      this.choiceList.clear();
+
+      // Scroll back to top of choices list
+      if (this.config.resetScrollPosition) {
+        this.choiceList.scrollTo(0);
+      }
+
+      // If we have grouped options
+      if (activeGroups.length >= 1 && !this.isSearching) {
+        // If we have a placeholder choice along with groups
+        const activePlaceholders = activeChoices.filter(
+          activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
+        );
+        if (activePlaceholders.length >= 1) {
+          choiceListFragment = this.renderChoices(activePlaceholders, choiceListFragment);
+        }
+        choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+      } else if (activeChoices.length >= 1) {
+        choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
+      }
+
+      const activeItems = this.store.getItemsFilteredByActive();
+      const canAddItem = this._canAddItem(activeItems, this.input.getValue());
+
+      // If we have choices to show
+      if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+        // ...and we can select them
+        if (canAddItem.response) {
+          // ...append them and highlight the first choice
+          this.choiceList.append(choiceListFragment);
+          this._highlightChoice();
+        } else {
+          // ...otherwise show a notice
+          this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+        }
+      } else {
+        // Otherwise show a notice
+        let dropdownItem;
+        let notice;
+
+        if (this.isSearching) {
+          notice = isType('Function', this.config.noResultsText) ?
+              this.config.noResultsText() :
+              this.config.noResultsText;
+
+          dropdownItem = this._getTemplate('notice', notice, 'no-results');
+        } else {
+          notice = isType('Function', this.config.noChoicesText) ?
+              this.config.noChoicesText() :
+              this.config.noChoicesText;
+
+          dropdownItem = this._getTemplate('notice', notice, 'no-choices');
+        }
+
+        this.choiceList.append(dropdownItem);
+      }
+    }
+
+    /* Items */
+
+    // Get active items (items that can be selected)
+    const activeItems = this.store.getItemsFilteredByActive() || [];
+    // Clear list
+    this.itemList.clear();
+
+    if (activeItems.length) {
+      // Create a fragment to store our list items
+      // (so we don't have to update the DOM for each item)
+      const itemListFragment = this.renderItems(activeItems);
+
+      // If we have items to add
+      if (itemListFragment.childNodes) {
+        // Update list
+        this.itemList.append(itemListFragment);
+      }
+    }
+
+    this.prevState = this.currentState;
   }
 
   /**
@@ -550,10 +549,7 @@ class Choices {
       eventResponse.groupValue = group.value;
     }
 
-    this.store.dispatch(
-      highlightItem(id, false),
-    );
-
+    this.store.dispatch(highlightItem(id, false));
     this.passedElement.triggerEvent(EVENTS.highlightItem, eventResponse);
 
     return this;
@@ -1141,6 +1137,7 @@ class Choices {
       this._triggerChange(lastItem.value);
     } else {
       if (!hasHighlightedItems) {
+        // Highlight last item if none already highlighted
         this.highlightItem(lastItem, false);
       }
       this.removeHighlightedItems(true);
@@ -1297,26 +1294,26 @@ class Choices {
       this.currentValue.trim() :
       this.currentValue;
 
-    // If new value matches the desired length and is not the same as the current value with a space
-    if (newValue.length >= 1 && newValue !== `${currentValue} `) {
-      const haystack = this.store.getSearchableChoices();
-      const needle = newValue;
-      const keys = isType('Array', this.config.searchFields) ?
-        this.config.searchFields :
-        [this.config.searchFields];
-      const options = Object.assign(this.config.fuseOptions, { keys });
-      const fuse = new Fuse(haystack, options);
-      const results = fuse.search(needle);
-
-      this.currentValue = newValue;
-      this.highlightPosition = 0;
-      this.isSearching = true;
-      this.store.dispatch(filterChoices(results));
-
-      return results.length;
+    if (newValue.length < 1 && newValue === `${currentValue} `) {
+      return 0;
     }
 
-    return 0;
+    // If new value matches the desired length and is not the same as the current value with a space
+    const haystack = this.store.getSearchableChoices();
+    const needle = newValue;
+    const keys = isType('Array', this.config.searchFields) ?
+      this.config.searchFields :
+      [this.config.searchFields];
+    const options = Object.assign(this.config.fuseOptions, { keys });
+    const fuse = new Fuse(haystack, options);
+    const results = fuse.search(needle);
+
+    this.currentValue = newValue;
+    this.highlightPosition = 0;
+    this.isSearching = true;
+    this.store.dispatch(filterChoices(results));
+
+    return results.length;
   }
 
   /**
@@ -1599,17 +1596,15 @@ class Choices {
         this.hideDropdown();
       }
     } else {
-      const backKey = 46;
-      const deleteKey = 8;
+      const backKey = KEY_CODES.BACK_KEY;
+      const deleteKey = KEY_CODES.DELETE_KEY;
 
       // If user has removed value...
       if ((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
         // ...and it is a multiple select input, activate choices (if searching)
         if (!this.isTextElement && this.isSearching) {
           this.isSearching = false;
-          this.store.dispatch(
-            activateChoices(true),
-          );
+          this.store.dispatch(activateChoices(true));
         }
       } else if (this.canSearch && canAddItem.response) {
         this._handleSearch(this.input.getValue());
@@ -1769,33 +1764,34 @@ class Choices {
    */
   _onFocus(e) {
     const target = e.target;
-    // If target is something that concerns us
-    if (this.containerOuter.element.contains(target)) {
-      const focusActions = {
-        text: () => {
-          if (target === this.input.element) {
-            this.containerOuter.addFocusState();
-          }
-        },
-        'select-one': () => {
-          this.containerOuter.addFocusState();
-          if (target === this.input.element) {
-            // Show dropdown if it isn't already showing
-            this.showDropdown();
-          }
-        },
-        'select-multiple': () => {
-          if (target === this.input.element) {
-            // If element is a select box, the focused element is the container and the dropdown
-            // isn't already open, focus and show dropdown
-            this.containerOuter.addFocusState();
-            this.showDropdown(true);
-          }
-        },
-      };
-
-      focusActions[this.passedElement.element.type]();
+    if (!this.containerOuter.element.contains(target)) {
+      return;
     }
+
+    const focusActions = {
+      text: () => {
+        if (target === this.input.element) {
+          this.containerOuter.addFocusState();
+        }
+      },
+      'select-one': () => {
+        this.containerOuter.addFocusState();
+        if (target === this.input.element) {
+          // Show dropdown if it isn't already showing
+          this.showDropdown();
+        }
+      },
+      'select-multiple': () => {
+        if (target === this.input.element) {
+          // If element is a select box, the focused element is the container and the dropdown
+          // isn't already open, focus and show dropdown
+          this.containerOuter.addFocusState();
+          this.showDropdown(true);
+        }
+      },
+    };
+
+    focusActions[this.passedElement.element.type]();
   }
 
   /**
@@ -1882,7 +1878,7 @@ class Choices {
       choice.offsetTop;
 
     const animateScroll = () => {
-      const strength = 4;
+      const strength = SCROLLING_SPEED;
       const choiceListScrollTop = this.choiceList.scrollPos;
       let continueAnimation = false;
       let easing;
@@ -2068,9 +2064,7 @@ class Choices {
     const groupId = item.groupId;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
-    this.store.dispatch(
-      removeItem(id, choiceId),
-    );
+    this.store.dispatch(removeItem(id, choiceId));
 
     if (group && group.value) {
       this.passedElement.triggerEvent(EVENTS.removeItem, {
@@ -2272,7 +2266,6 @@ class Choices {
 
     // Wrap input in container preserving DOM ordering
     wrap(this.passedElement.element, this.containerInner.element);
-
     // Wrapper inner container with outer container
     wrap(this.containerInner.element, this.containerOuter.element);
 
@@ -2295,7 +2288,7 @@ class Choices {
       dropdown.appendChild(choiceList);
     }
 
-    if (this.isSelectMultipleElement || this.isTextElement) {
+    if (!this.isSelectOneElement) {
       this.containerInner.element.appendChild(this.input.element);
     } else if (this.canSearch) {
       dropdown.insertBefore(input, dropdown.firstChild);
