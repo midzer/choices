@@ -13,6 +13,10 @@ export default class Container {
     this.onBlur = this.onBlur.bind(this);
   }
 
+  getElement() {
+    return this.element;
+  }
+
   /**
    * Add event listeners
   */
@@ -153,6 +157,16 @@ export default class Container {
       this.element.setAttribute('tabindex', '-1');
     }
     this.isDisabled = true;
+  }
+
+  revert(originalElement) {
+    // Move passed element back to original position
+    this.element.parentNode.insertBefore(
+      originalElement,
+      this.element,
+    );
+    // Remove container
+    this.element.parentNode.removeChild(this.element);
   }
 
   /**

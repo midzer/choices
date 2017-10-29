@@ -32,27 +32,27 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should be defined', () => {
+    it('is defined', () => {
       expect(instance).to.not.be.undefined;
     });
 
-    it('should have initialised', () => {
+    it('initialises', () => {
       expect(instance.initialised).to.be.true;
     });
 
-    it('should not re-initialise if passed element again', () => {
+    it('does not re-initialise if passed element again', () => {
       const reinitialise = new Choices(instance.passedElement.element);
       sinon.spy(reinitialise, '_createTemplates');
       expect(reinitialise._createTemplates.callCount).to.equal(0);
     });
 
-    it('should have a blank state', () => {
+    it('has a blank state', () => {
       expect(instance.currentState.items.length).to.equal(0);
       expect(instance.currentState.groups.length).to.equal(0);
       expect(instance.currentState.choices.length).to.equal(0);
     });
 
-    it('should have config options', () => {
+    it('has expected config options', () => {
       expect(instance.config.silent).to.be.a('boolean');
       expect(instance.config.items).to.be.an('array');
       expect(instance.config.choices).to.be.an('array');
@@ -90,7 +90,7 @@ describe('Choices', () => {
       expect(instance.config.callbackOnCreateTemplates).to.be.null;
     });
 
-    it('should expose public methods', () => {
+    it('exposes public methods', () => {
       expect(instance.init).to.be.a('function');
       expect(instance.destroy).to.be.a('function');
       expect(instance.render).to.be.a('function');
@@ -118,35 +118,35 @@ describe('Choices', () => {
       expect(instance.clearInput).to.be.a('function');
     });
 
-    it('should hide passed input', () => {
+    it('hides passed input', () => {
       expect(instance.passedElement.element.style.display).to.equal('none');
     });
 
-    it('should create an outer container', () => {
+    it('creates an outer container', () => {
       expect(instance.containerOuter).to.be.an.instanceof(Container);
     });
 
-    it('should create an inner container', () => {
+    it('creates an inner container', () => {
       expect(instance.containerInner).to.be.an.instanceof(Container);
     });
 
-    it('should create a choice list', () => {
+    it('creates a choice list', () => {
       expect(instance.choiceList).to.be.an.instanceof(List);
     });
 
-    it('should create an item list', () => {
+    it('creates an item list', () => {
       expect(instance.itemList).to.be.an.instanceof(List);
     });
 
-    it('should create an input', () => {
+    it('creates an input', () => {
       expect(instance.input).to.be.an.instanceof(Input);
     });
 
-    it('should create a dropdown', () => {
+    it('creates a dropdown', () => {
       expect(instance.dropdown).to.be.an.instanceof(Dropdown);
     });
 
-    it('should backup and recover original styles', () => {
+    it('backs up and recovers original styles', () => {
       const origStyle = 'background-color: #ccc; margin: 5px padding: 10px;';
 
       instance.destroy();
@@ -165,7 +165,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept text inputs', () => {
+  describe('text inputs', () => {
     let input;
     let instance;
 
@@ -182,12 +182,12 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should wrap passed input', () => {
+    it('wraps passed input', () => {
       instance = new Choices(input);
       expect(instance.passedElement).to.be.an.instanceof(WrappedInput);
     });
 
-    it('should accept a user inputted value', () => {
+    it('accepts a user inputted value', () => {
       instance = new Choices(input);
 
       instance.input.element.focus();
@@ -202,13 +202,13 @@ describe('Choices', () => {
       expect(instance.currentState.items[0].value).to.include(instance.input.element.value);
     });
 
-    it('should copy the passed placeholder to the cloned input', () => {
+    it('copys the passed placeholder to the cloned input', () => {
       instance = new Choices(input);
 
       expect(instance.input.element.placeholder).to.equal(input.placeholder);
     });
 
-    it('should not allow duplicates if duplicateItems is false', () => {
+    it('doesn\'t allow duplicate items if duplicateItems is false', () => {
       instance = new Choices(input, {
         duplicateItems: false,
         items: ['test 1'],
@@ -226,7 +226,7 @@ describe('Choices', () => {
       expect(instance.currentState.items[instance.currentState.items.length - 1].value).to.equal(instance.input.element.value);
     });
 
-    it('should filter input if regexFilter is passed', () => {
+    it('filters input if regexFilter is passed', () => {
       instance = new Choices(input, {
         regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       });
@@ -255,7 +255,7 @@ describe('Choices', () => {
       expect(lastItem.value).not.to.equal('not an email address');
     });
 
-    it('should prepend and append values if passed', () => {
+    it('prepends and appends values if passed', () => {
       instance = new Choices(input, {
         prependValue: 'item-',
         appendValue: '-value',
@@ -277,7 +277,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept single select inputs', () => {
+  describe('single select inputs', () => {
     let input;
     let instance;
 
@@ -302,23 +302,23 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should wrap passed input', () => {
+    it('wraps passed input', () => {
       instance = new Choices(input);
       expect(instance.passedElement).to.be.an.instanceof(WrappedSelect);
     });
 
-    it('should open the choice list on focusing', () => {
+    it('opens the choice list on focusing', () => {
       instance = new Choices(input);
       instance.input.element.focus();
       expect(instance.dropdown.element.classList.contains(instance.config.classNames.activeState)).to.be.true;
     });
 
-    it('should select the first choice', () => {
+    it('selects the first choice', () => {
       instance = new Choices(input);
       expect(instance.currentState.items[0].value).to.include('Value 1');
     });
 
-    it('should highlight the choices on keydown', () => {
+    it('highlights the choices on keydown', () => {
       instance = new Choices(input, {
         renderChoiceLimit: -1,
       });
@@ -337,7 +337,7 @@ describe('Choices', () => {
       expect(instance.highlightPosition).to.equal(2);
     });
 
-    it('should select choice on enter key press', () => {
+    it('selects choice on enter key press', () => {
       instance = new Choices(input);
       instance.input.element.focus();
 
@@ -360,7 +360,7 @@ describe('Choices', () => {
       expect(instance.currentState.items.length).to.equal(2);
     });
 
-    it('should trigger add/change event on selection', () => {
+    it('triggers add/change event on selection', () => {
       instance = new Choices(input);
 
       const onChangeStub = sinon.stub();
@@ -394,7 +394,7 @@ describe('Choices', () => {
       expect(addSpyStub.callCount).to.equal(1);
     });
 
-    it('should open the dropdown on click', () => {
+    it('opens the dropdown on click', () => {
       instance = new Choices(input);
       const container = instance.containerOuter.element;
       instance._onClick({
@@ -406,7 +406,7 @@ describe('Choices', () => {
       expect(document.activeElement === instance.input.element && container.classList.contains('is-open')).to.be.true;
     });
 
-    it('should close the dropdown on double click', () => {
+    it('closes the dropdown on double click', () => {
       instance = new Choices(input);
       const container = instance.containerOuter.element;
       const openState = instance.config.classNames.openState;
@@ -426,7 +426,7 @@ describe('Choices', () => {
       expect(document.activeElement === instance.input.element && container.classList.contains(openState)).to.be.false;
     });
 
-    it('should trigger showDropdown on dropdown opening', () => {
+    it('triggers showDropdown on dropdown opening', () => {
       instance = new Choices(input);
       const container = instance.containerOuter.element;
 
@@ -446,7 +446,7 @@ describe('Choices', () => {
       expect(showDropdownStub.callCount).to.equal(1);
     });
 
-    it('should trigger hideDropdown on dropdown closing', () => {
+    it('triggers hideDropdown on dropdown closing', () => {
       instance = new Choices(input);
 
       const container = instance.containerOuter.element;
@@ -472,7 +472,7 @@ describe('Choices', () => {
       expect(hideDropdownStub.callCount).to.equal(1);
     });
 
-    it('should filter choices when searching', () => {
+    it('filters choices when searching', () => {
       instance = new Choices(input);
 
       const onSearchStub = sinon.spy();
@@ -496,7 +496,7 @@ describe('Choices', () => {
       expect(onSearchStub.callCount).to.equal(1);
     });
 
-    it('shouldn\'t filter choices when searching', () => {
+    it('doesn\'t filter choices when searching', () => {
       instance = new Choices(input, {
         searchChoices: false,
       });
@@ -524,7 +524,7 @@ describe('Choices', () => {
       expect(onSearchStub.callCount).to.equal(1);
     });
 
-    it('shouldn\'t sort choices if shouldSort is false', () => {
+    it('doesn\'t sort choices if shouldSort is false', () => {
       instance = new Choices(input, {
         shouldSort: false,
         choices: [
@@ -544,7 +544,7 @@ describe('Choices', () => {
       expect(instance.currentState.choices[0].value).to.equal('Value 5');
     });
 
-    it('should sort choices if shouldSort is true', () => {
+    it('sorts choices if shouldSort is true', () => {
       instance = new Choices(input, {
         shouldSort: true,
         choices: [
@@ -565,7 +565,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should accept multiple select inputs', () => {
+  describe('multiple select inputs', () => {
     let input;
     let instance;
 
@@ -613,24 +613,24 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should wrap passed input', () => {
+    it('wraps passed input', () => {
       expect(instance.passedElement).to.be.an.instanceof(WrappedSelect);
     });
 
-    it('should add any pre-defined values', () => {
+    it('adds any pre-defined values', () => {
       expect(instance.currentState.items.length).to.be.above(1);
     });
 
-    it('should add options defined in the config + pre-defined options', () => {
+    it('adds options defined in the config + pre-defined options', () => {
       expect(instance.currentState.choices.length).to.equal(6);
     });
 
-    it('should add a placeholder defined in the config to the search input', () => {
+    it('adds a placeholder defined in the config to the search input', () => {
       expect(instance.input.element.placeholder).to.equal('Placeholder text');
     });
   });
 
-  describe('should handle public methods on select input types', () => {
+  describe('handles public methods on select input types', () => {
     let input;
     let instance;
 
@@ -661,7 +661,7 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should handle highlightItem()', () => {
+    it('handles highlightItem()', () => {
       const items = instance.currentState.items;
       const randomItem = items[Math.floor(Math.random() * items.length)];
 
@@ -670,7 +670,7 @@ describe('Choices', () => {
       expect(randomItem.highlighted).to.be.true;
     });
 
-    it('should handle unhighlightItem()', () => {
+    it('handles unhighlightItem()', () => {
       const items = instance.currentState.items;
       const randomItem = items[Math.floor(Math.random() * items.length)];
 
@@ -679,7 +679,7 @@ describe('Choices', () => {
       expect(randomItem.highlighted).to.be.false;
     });
 
-    it('should handle highlightAll()', () => {
+    it('handles highlightAll()', () => {
       const items = instance.currentState.items;
 
       instance.highlightAll();
@@ -689,7 +689,7 @@ describe('Choices', () => {
       expect(unhighlightedItems).to.be.false;
     });
 
-    it('should handle unhighlightAll()', () => {
+    it('handles unhighlightAll()', () => {
       const items = instance.currentState.items;
 
       instance.unhighlightAll();
@@ -699,7 +699,7 @@ describe('Choices', () => {
       expect(highlightedItems).to.be.false;
     });
 
-    it('should handle removeHighlightedItems()', () => {
+    it('handles removeHighlightedItems()', () => {
       const items = instance.currentState.items;
       instance.highlightAll();
       instance.removeHighlightedItems();
@@ -709,7 +709,7 @@ describe('Choices', () => {
       expect(activeItems).to.be.false;
     });
 
-    it('should handle showDropdown()', () => {
+    it('handles showDropdown()', () => {
       instance.showDropdown();
 
       const hasOpenState = instance.containerOuter.element.classList.contains(instance.config.classNames.openState);
@@ -719,7 +719,7 @@ describe('Choices', () => {
       expect(hasOpenState && hasAttr && hasActiveState).to.be.true;
     });
 
-    it('should handle hideDropdown()', () => {
+    it('handles hideDropdown()', () => {
       instance.showDropdown();
       instance.hideDropdown();
 
@@ -731,14 +731,14 @@ describe('Choices', () => {
       expect(hasOpenState && hasAttr && hasActiveState).to.be.false;
     });
 
-    it('should handle toggleDropdown()', () => {
+    it('handles toggleDropdown()', () => {
       sinon.spy(instance, 'hideDropdown');
       instance.showDropdown();
       instance.toggleDropdown();
       expect(instance.hideDropdown.callCount).to.equal(1);
     });
 
-    it('should handle getValue()', () => {
+    it('handles getValue()', () => {
       const valueObjects = instance.getValue();
       const valueStrings = instance.getValue(true);
 
@@ -748,7 +748,7 @@ describe('Choices', () => {
       expect(valueObjects.length).to.equal(5);
     });
 
-    it('should handle setValue()', () => {
+    it('handles setValue()', () => {
       instance.setValue(['Set value 1', 'Set value 2', 'Set value 3']);
       const valueStrings = instance.getValue(true);
 
@@ -757,7 +757,7 @@ describe('Choices', () => {
       expect(valueStrings[valueStrings.length - 3]).to.equal('Set value 1');
     });
 
-    it('should handle setValueByChoice()', () => {
+    it('handles setValueByChoice()', () => {
       const choices = instance.store.getChoicesFilteredByActive();
       const randomChoice = choices[Math.floor(Math.random() * choices.length)];
 
@@ -770,7 +770,7 @@ describe('Choices', () => {
       expect(value[0]).to.equal(randomChoice.value);
     });
 
-    it('should handle setChoices()', () => {
+    it('handles setChoices()', () => {
       instance.setChoices([{
         label: 'Group one',
         id: 1,
@@ -818,7 +818,7 @@ describe('Choices', () => {
       expect(choices[choices.length - 2].value).to.equal('Child Five');
     });
 
-    it('should handle setChoices() with blank values', () => {
+    it('handles setChoices() with blank values', () => {
       instance.setChoices([{
         label: 'Choice one',
         value: 'one',
@@ -833,7 +833,7 @@ describe('Choices', () => {
       expect(choices[1].value).to.equal('');
     });
 
-    it('should handle clearStore()', () => {
+    it('handles clearStore()', () => {
       instance.clearStore();
 
       expect(instance.currentState.items).to.have.lengthOf(0);
@@ -841,7 +841,7 @@ describe('Choices', () => {
       expect(instance.currentState.groups).to.have.lengthOf(0);
     });
 
-    it('should handle disable()', () => {
+    it('handles disable()', () => {
       instance.disable();
 
       expect(instance.input.element.disabled).to.be.true;
@@ -853,7 +853,7 @@ describe('Choices', () => {
       expect(instance.containerOuter.element.getAttribute('aria-disabled')).to.equal('true');
     });
 
-    it('should handle enable()', () => {
+    it('handles enable()', () => {
       instance.enable();
 
       expect(instance.input.element.disabled).to.be.false;
@@ -865,7 +865,7 @@ describe('Choices', () => {
       expect(instance.containerOuter.element.hasAttribute('aria-disabled')).to.be.false;
     });
 
-    it('should handle ajax()', () => {
+    it('handles ajax()', () => {
       const dummyFn = sinon.spy();
 
       instance.ajax(dummyFn);
@@ -874,7 +874,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should handle public methods on select-one input types', () => {
+  describe('handles public methods on select-one input types', () => {
     let input;
     let instance;
 
@@ -904,20 +904,20 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should handle disable()', () => {
+    it('handles disable()', () => {
       instance.disable();
 
       expect(instance.containerOuter.element.getAttribute('tabindex')).to.equal('-1');
     });
 
-    it('should handle enable()', () => {
+    it('handles enable()', () => {
       instance.enable();
 
       expect(instance.containerOuter.element.getAttribute('tabindex')).to.equal('0');
     });
   });
 
-  describe('should handle public methods on text input types', () => {
+  describe('handles public methods on text input types', () => {
     let input;
     let instance;
 
@@ -935,12 +935,12 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should handle clearInput()', () => {
+    it('handles clearInput()', () => {
       instance.clearInput();
       expect(instance.input.element.value).to.equal('');
     });
 
-    it('should handle removeItemsByValue()', () => {
+    it('handles removeItemsByValue()', () => {
       const items = instance.currentState.items;
       const randomItem = items[Math.floor(Math.random() * items.length)];
 
@@ -949,7 +949,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should react to config options', () => {
+  describe('reacts to config options', () => {
     let input;
     let instance;
 
@@ -1056,7 +1056,7 @@ describe('Choices', () => {
     });
   });
 
-  describe('should allow custom properties provided by the user on items or choices', () => {
+  describe('allows custom properties provided by the user on items or choices', () => {
     let input;
     let instance;
 
@@ -1072,7 +1072,7 @@ describe('Choices', () => {
       instance.destroy();
     });
 
-    it('should allow the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', () => {
+    it('allows the user to supply custom properties for a choice that will be inherited by the item when the user selects the choice', () => {
       const expectedCustomProperties = {
         isBestOptionEver: true,
       };
@@ -1093,7 +1093,7 @@ describe('Choices', () => {
       expect(selectedItems[0].customProperties).to.equal(expectedCustomProperties);
     });
 
-    it('should allow the user to supply custom properties when directly creating a selected item', () => {
+    it('allows the user to supply custom properties when directly creating a selected item', () => {
       const expectedCustomProperties = {
         isBestOptionEver: true,
       };

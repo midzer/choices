@@ -1,8 +1,19 @@
+import { dispatchEvent } from '../lib/utils';
+
 export default class WrappedElement {
   constructor(instance, element, classNames) {
     this.parentInstance = instance;
     this.element = element;
     this.classNames = classNames;
+    this.isDisabled = false;
+  }
+
+  getElement() {
+    return this.element;
+  }
+
+  getValue() {
+    return this.element.value;
   }
 
   conceal() {
@@ -49,5 +60,21 @@ export default class WrappedElement {
 
     // Re-assign values - this is weird, I know
     this.element.value = this.element.value;
+  }
+
+  enable() {
+    this.element.removeAttribute('disabled');
+    this.element.disabled = false;
+    this.isDisabled = false;
+  }
+
+  disable() {
+    this.element.setAttribute('disabled', '');
+    this.element.disabled = true;
+    this.isDisabled = true;
+  }
+
+  triggerEvent(eventType, data) {
+    dispatchEvent(this.element, eventType, data);
   }
 }

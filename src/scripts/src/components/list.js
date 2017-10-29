@@ -8,6 +8,10 @@ export default class List {
     this.hasChildren = !!this.element.children;
   }
 
+  getElement() {
+    return this.element;
+  }
+
   /**
    * Clear List contents
    */

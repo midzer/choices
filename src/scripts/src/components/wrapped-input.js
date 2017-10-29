@@ -8,11 +8,28 @@ export default class WrappedInput extends WrappedElement {
     this.classNames = classNames;
   }
 
+  getElement() {
+    super.getElement();
+  }
+
   conceal() {
     super.conceal();
   }
 
   reveal() {
     super.reveal();
+  }
+
+  enable() {
+    super.enable();
+  }
+
+  disable() {
+    super.enable();
+  }
+
+  setValue(value) {
+    this.element.setAttribute('value', value);
+    this.element.value = value;
   }
 }

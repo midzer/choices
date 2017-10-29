@@ -103,3 +103,5 @@ export const KEY_CODES = {
   PAGE_UP_KEY: 33,
   PAGE_DOWN_KEY: 34,
 };
+
+export const SCROLLING_SPEED = 4;
