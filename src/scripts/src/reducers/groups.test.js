@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import groups, { defaultState } from './groups';
 
-describe('groups reducer', () => {
+describe('reducers/groups', () => {
   it('should return same state when no action matches', () => {
     expect(groups(defaultState, {})).to.equal(defaultState);
   });

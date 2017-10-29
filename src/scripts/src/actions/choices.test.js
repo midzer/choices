@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as actions from './choices';
 
-describe('choice actions', () => {
+describe('actions/choices', () => {
   describe('addChoice action', () => {
     it('returns ADD_CHOICE action', () => {
       const value = 'test';

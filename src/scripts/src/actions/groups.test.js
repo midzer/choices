@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as actions from './groups';
 
-describe('group actions', () => {
+describe('actions/groups', () => {
   describe('addGroup action', () => {
     it('returns ADD_GROUP action', () => {
       const value = 'test';

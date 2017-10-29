@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import WrappedSelect from './wrapped-select';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
-describe('WrappedSelect', () => {
+describe('components/wrappedSelect', () => {
   let instance;
   let choicesInstance;
   let choicesElement;

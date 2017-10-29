@@ -5,7 +5,7 @@ import groups from './groups';
 import choices from './choices';
 import items from './items';
 
-describe('rootReducer', () => {
+describe('reducers/rootReducer', () => {
   const store = createStore(rootReducer);
 
   it('returns expected reducers', () => {

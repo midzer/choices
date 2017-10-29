@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import choices, { defaultState } from './choices';
 
-describe('choices reducer', () => {
+describe('reducers/choices', () => {
   it('should return same state when no action matches', () => {
     expect(choices(defaultState, {})).to.equal(defaultState);
   });

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import Store from './store';
 
-describe('Store', () => {
+describe('reducers/store', () => {
   let instance;
   let subscribeStub;
   let dispatchStub;

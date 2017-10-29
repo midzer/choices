@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import Container from './container';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
-describe('Container', () => {
+describe('components/container', () => {
   let instance;
   let choicesInstance;
   let choicesElement;

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import List from './list';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
-describe('List', () => {
+describe('components/list', () => {
   let instance;
   let choicesInstance;
   let choicesElement;

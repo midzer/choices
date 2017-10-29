@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as actions from './misc';
 
-describe('misc actions', () => {
+describe('actions/misc', () => {
   describe('clearAll action', () => {
     it('returns CLEAR_ALL action', () => {
       const expectedAction = {

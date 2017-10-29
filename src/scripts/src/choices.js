@@ -997,6 +997,26 @@ class Choices {
     });
   }
 
+    /**
+   * Select placeholder choice
+   */
+  _selectPlaceholderChoice() {
+    const placeholderChoice = this.store.getPlaceholderChoice();
+
+    if (placeholderChoice) {
+      this._addItem(
+        placeholderChoice.value,
+        placeholderChoice.label,
+        placeholderChoice.id,
+        placeholderChoice.groupId,
+        null,
+        placeholderChoice.placeholder,
+      );
+      this._triggerChange(placeholderChoice.value);
+    }
+  }
+
+
   /**
    * Process enter/click of an item button
    * @param {Array} activeItems The currently active items
@@ -1023,25 +1043,6 @@ class Choices {
 
     if (this.isSelectOneElement) {
       this._selectPlaceholderChoice();
-    }
-  }
-
-  /**
-   * Select placeholder choice
-   */
-  _selectPlaceholderChoice() {
-    const placeholderChoice = this.store.getPlaceholderChoice();
-
-    if (placeholderChoice) {
-      this._addItem(
-        placeholderChoice.value,
-        placeholderChoice.label,
-        placeholderChoice.id,
-        placeholderChoice.groupId,
-        null,
-        placeholderChoice.placeholder,
-      );
-      this._triggerChange(placeholderChoice.value);
     }
   }
 
@@ -1161,6 +1162,38 @@ class Choices {
   }
 
   /**
+   * Apply or remove a loading state to the component.
+   * @param {Boolean} isLoading default value set to 'true'.
+   * @return
+   * @private
+   */
+  _handleLoadingState(isLoading = true) {
+    let placeholderItem = this.itemList.getChild(`.${this.config.classNames.placeholder}`);
+    if (isLoading) {
+      this.containerOuter.addLoadingState();
+      if (this.isSelectOneElement) {
+        if (!placeholderItem) {
+          placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+          this.itemList.append(placeholderItem);
+        } else {
+          placeholderItem.innerHTML = this.config.loadingText;
+        }
+      } else {
+        this.input.setPlaceholder(this.config.loadingText);
+      }
+    } else {
+      this.containerOuter.removeLoadingState();
+
+      if (this.isSelectOneElement) {
+        placeholderItem.innerHTML = (this.placeholder || '');
+      } else {
+        this.input.setPlaceholder(this.placeholder || '');
+      }
+    }
+  }
+
+
+  /**
    * Validates whether an item can be added by a user
    * @param {Array} activeItems The currently active items
    * @param  {String} value     Value of item to add
@@ -1216,37 +1249,6 @@ class Choices {
       response: canAddItem,
       notice,
     };
-  }
-
-  /**
-   * Apply or remove a loading state to the component.
-   * @param {Boolean} isLoading default value set to 'true'.
-   * @return
-   * @private
-   */
-  _handleLoadingState(isLoading = true) {
-    let placeholderItem = this.itemList.getChild(`.${this.config.classNames.placeholder}`);
-    if (isLoading) {
-      this.containerOuter.addLoadingState();
-      if (this.isSelectOneElement) {
-        if (!placeholderItem) {
-          placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-          this.itemList.append(placeholderItem);
-        } else {
-          placeholderItem.innerHTML = this.config.loadingText;
-        }
-      } else {
-        this.input.setPlaceholder(this.config.loadingText);
-      }
-    } else {
-      this.containerOuter.removeLoadingState();
-
-      if (this.isSelectOneElement) {
-        placeholderItem.innerHTML = (this.placeholder || '');
-      } else {
-        this.input.setPlaceholder(this.placeholder || '');
-      }
-    }
   }
 
   /**
@@ -1708,6 +1710,24 @@ class Choices {
     }
   }
 
+    /**
+   * Mouse over (hover) event
+   * @param  {Object} e Event
+   * @return
+   * @private
+   */
+  _onMouseOver(e) {
+    // If the dropdown is either the target or one of its children is the target
+    const targetWithinDropdown = (
+      e.target === this.dropdown || this.dropdown.element.contains(e.target)
+    );
+    const shouldHighlightChoice = targetWithinDropdown && e.target.hasAttribute('data-choice');
+
+    if (shouldHighlightChoice) {
+      this._highlightChoice(e.target);
+    }
+  }
+
   /**
    * Click event
    * @param  {Object} e Event
@@ -1753,24 +1773,6 @@ class Choices {
 
       // Close all other dropdowns
       this.hideDropdown();
-    }
-  }
-
-  /**
-   * Mouse over (hover) event
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
-  _onMouseOver(e) {
-    // If the dropdown is either the target or one of its children is the target
-    const targetWithinDropdown = (
-      e.target === this.dropdown || this.dropdown.element.contains(e.target)
-    );
-    const shouldHighlightChoice = targetWithinDropdown && e.target.hasAttribute('data-choice');
-
-    if (shouldHighlightChoice) {
-      this._highlightChoice(e.target);
     }
   }
 
