@@ -231,6 +231,47 @@ class Choices {
   }
 
   /**
+ * Enable interaction with Choices
+ * @return {Object} Class instance
+ */
+  enable() {
+    if (!this.initialised) {
+      return this;
+    }
+
+    this.passedElement.enable();
+
+    if (this.containerOuter.isDisabled) {
+      this._addEventListeners();
+      this.input.enable();
+      this.containerOuter.enable();
+    }
+
+    return this;
+  }
+
+  /**
+   * Disable interaction with Choices
+   * @return {Object} Class instance
+   * @public
+   */
+  disable() {
+    if (!this.initialised) {
+      return this;
+    }
+
+    this.passedElement.disable();
+
+    if (!this.containerOuter.isDisabled) {
+      this._removeEventListeners();
+      this.input.disable();
+      this.containerOuter.disable();
+    }
+
+    return this;
+  }
+
+  /**
    * Render group choices into a DOM fragment and append to choice list
    * @param  {Array} groups    Groups to add to list
    * @param  {Array} choices   Choices to add to groups
@@ -504,9 +545,7 @@ class Choices {
     const groupId = item.groupId;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
-    this.store.dispatch(
-      highlightItem(id, true),
-    );
+    this.store.dispatch(highlightItem(id, true));
 
     if (runEvent) {
       const eventResponse = {
@@ -701,16 +740,17 @@ class Choices {
    */
   getValue(valueOnly = false) {
     const items = this.store.getItemsFilteredByActive();
-    const selectedItems = [];
 
-    items.forEach((item) => {
+    const values = items.reduce((selectedItems, item) => {
       const itemValue = valueOnly ? item.value : item;
       if (this.isTextElement || item.active) {
         selectedItems.push(itemValue);
       }
-    });
 
-    return this.isSelectOneElement ? selectedItems[0] : selectedItems;
+      return selectedItems;
+    }, []);
+
+    return this.isSelectOneElement ? values[0] : values;
   }
 
   /**
@@ -893,47 +933,6 @@ class Choices {
     if (!this.isTextElement && this.config.searchEnabled) {
       this.isSearching = false;
       this.store.dispatch(activateChoices(true));
-    }
-
-    return this;
-  }
-
-  /**
-   * Enable interaction with Choices
-   * @return {Object} Class instance
-   */
-  enable() {
-    if (!this.initialised) {
-      return this;
-    }
-
-    this.passedElement.enable();
-
-    if (this.containerOuter.isDisabled) {
-      this._addEventListeners();
-      this.input.enable();
-      this.containerOuter.enable();
-    }
-
-    return this;
-  }
-
-  /**
-   * Disable interaction with Choices
-   * @return {Object} Class instance
-   * @public
-   */
-  disable() {
-    if (!this.initialised) {
-      return this;
-    }
-
-    this.passedElement.disable();
-
-    if (!this.containerOuter.isDisabled) {
-      this._removeEventListeners();
-      this.input.disable();
-      this.containerOuter.disable();
     }
 
     return this;
