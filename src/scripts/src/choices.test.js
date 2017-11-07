@@ -865,6 +865,153 @@ describe('choices', () => {
       });
     });
 
+    describe('clearInput', () => {
+      let output;
+      let inputClearSpy;
+      let storeDispatchStub;
+
+      beforeEach(() => {
+        inputClearSpy = spy(instance.input, 'clear');
+        storeDispatchStub = stub();
+        instance.store.dispatch = storeDispatchStub;
+      });
+
+      afterEach(() => {
+        inputClearSpy.restore();
+        instance.store.dispatch.reset();
+      });
+
+      it('returns instance', () => {
+        output = instance.clearInput();
+        expect(output).to.eql(instance);
+      });
+
+      describe('text element', () => {
+        beforeEach(() => {
+          instance.isSelectOneElement = false;
+          instance.isTextElement = false;
+
+          output = instance.clearInput();
+        });
+
+        it('clears input with correct arguments', () => {
+          expect(inputClearSpy.called).to.equal(true);
+          expect(inputClearSpy.lastCall.args[0]).to.equal(true);
+        });
+      });
+
+      describe('select element with search enabled', () => {
+        beforeEach(() => {
+          instance.isSelectOneElement = true;
+          instance.isTextElement = false;
+          instance.config.searchEnabled = true;
+
+          output = instance.clearInput();
+        });
+
+        it('clears input with correct arguments', () => {
+          expect(inputClearSpy.called).to.equal(true);
+          expect(inputClearSpy.lastCall.args[0]).to.equal(false);
+        });
+
+        it('resets search flag', () => {
+          expect(instance.isSearching).to.equal(false);
+        });
+
+        it('dispatches activateChoices action', () => {
+          expect(storeDispatchStub.called).to.equal(true);
+          expect(storeDispatchStub.lastCall.args[0]).to.eql({
+            type: ACTION_TYPES.ACTIVATE_CHOICES,
+            active: true,
+          });
+        });
+      });
+    });
+
+    describe('ajax', () => {
+      const callbackResponse = 'worked';
+      let output;
+      let handleLoadingStateStub;
+      let ajaxCallbackStub;
+
+      const unhappyPath = () => {
+        it('returns instance', () => {
+          expect(output).to.eql(instance);
+        });
+
+        it('returns early', () => {
+          expect(handleLoadingStateStub.called).to.equal(false);
+          expect(ajaxCallbackStub.called).to.equal(false);
+        });
+      };
+
+      beforeEach(() => {
+        handleLoadingStateStub = stub();
+        ajaxCallbackStub = stub().returns(callbackResponse);
+
+        instance._ajaxCallback = ajaxCallbackStub;
+        instance._handleLoadingState = handleLoadingStateStub;
+      });
+
+      afterEach(() => {
+        instance._ajaxCallback.reset();
+        instance._handleLoadingState.reset();
+      });
+
+      describe('not initialised', () => {
+        beforeEach(() => {
+          instance.initialised = false;
+          output = instance.ajax(() => {});
+        });
+
+        unhappyPath();
+      });
+
+      describe('text element', () => {
+        beforeEach(() => {
+          instance.isSelectElement = false;
+          output = instance.ajax(() => {});
+        });
+
+        unhappyPath();
+      });
+
+      describe('passing invalid function', () => {
+        beforeEach(() => {
+          output = instance.ajax(null);
+        });
+
+        unhappyPath();
+      });
+
+      describe('select element', () => {
+        let callback;
+
+        beforeEach(() => {
+          instance.initialised = true;
+          instance.isSelectElement = true;
+          ajaxCallbackStub = stub();
+          callback = stub();
+          output = instance.ajax(callback);
+        });
+
+        it('sets loading state', () => {
+          requestAnimationFrame(() => {
+            expect(handleLoadingStateStub.called).to.equal(true);
+          });
+        });
+
+        it('calls passed function with ajax callback', () => {
+          expect(callback.called).to.equal(true);
+          expect(callback.lastCall.args[0]).to.eql(callbackResponse);
+        });
+
+        it('returns instance', () => {
+          expect(output).to.eql(instance);
+        });
+      });
+    });
+
     describe('renderGroups', () => {});
     describe('renderChoices', () => {});
     describe('renderItems', () => {});
@@ -876,7 +1023,6 @@ describe('choices', () => {
     describe('setValue', () => {});
     describe('setValueByChoice', () => {});
     describe('setChoices', () => {});
-    describe('clearInput', () => {});
   });
 
   describe.skip('private methods', () => {

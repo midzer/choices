@@ -855,7 +855,7 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  setChoices(choices, value, label, replaceChoices = false) {
+  setChoices(choices = [], value = '', label = '', replaceChoices = false) {
     if (
       !this.initialised ||
       !this.isSelectElement ||
@@ -871,29 +871,30 @@ class Choices {
     }
 
     // Add choices if passed
-    if (choices && choices.length) {
+    if (choices.length) {
       this.containerOuter.removeLoadingState();
-
-      choices.forEach((result) => {
-        if (result.choices) {
+      const addGroupsAndChoices = (groupOrChoice) => {
+        if (groupOrChoice.choices) {
           this._addGroup(
-            result,
-            (result.id || null),
+            groupOrChoice,
+            (groupOrChoice.id || null),
             value,
             label,
           );
         } else {
           this._addChoice(
-            result[value],
-            result[label],
-            result.selected,
-            result.disabled,
+            groupOrChoice[value],
+            groupOrChoice[label],
+            groupOrChoice.selected,
+            groupOrChoice.disabled,
             undefined,
-            result.customProperties,
-            result.placeholder,
+            groupOrChoice.customProperties,
+            groupOrChoice.placeholder,
           );
         }
-      });
+      };
+
+      choices.forEach(addGroupsAndChoices);
     }
 
     return this;
@@ -934,13 +935,11 @@ class Choices {
    * @public
    */
   ajax(fn) {
-    if (!this.initialised || !this.isSelectElement) {
+    if (!this.initialised || !this.isSelectElement || !fn) {
       return this;
     }
 
-    // Show loading text
     requestAnimationFrame(() => this._handleLoadingState(true));
-    // Run callback
     fn(this._ajaxCallback());
 
     return this;
