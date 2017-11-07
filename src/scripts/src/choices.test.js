@@ -839,6 +839,32 @@ describe('choices', () => {
       });
     });
 
+    describe('clearStore', () => {
+      let storeDispatchStub;
+      let output;
+
+      beforeEach(() => {
+        storeDispatchStub = stub();
+        instance.store.dispatch = storeDispatchStub;
+
+        output = instance.clearStore();
+      });
+
+      afterEach(() => {
+        instance.store.dispatch.reset();
+      });
+
+      it('returns instance', () => {
+        expect(output).to.eql(instance);
+      });
+
+      it('dispatches clearAll action', () => {
+        expect(storeDispatchStub.lastCall.args[0]).to.eql({
+          type: ACTION_TYPES.CLEAR_ALL,
+        });
+      });
+    });
+
     describe('renderGroups', () => {});
     describe('renderChoices', () => {});
     describe('renderItems', () => {});
@@ -850,7 +876,6 @@ describe('choices', () => {
     describe('setValue', () => {});
     describe('setValueByChoice', () => {});
     describe('setChoices', () => {});
-    describe('clearStore', () => {});
     describe('clearInput', () => {});
   });
 
