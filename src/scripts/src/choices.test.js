@@ -4,7 +4,7 @@ import { spy, stub } from 'sinon';
 import Choices from './choices';
 import { EVENTS } from './constants';
 
-describe.only('choices', () => {
+describe('choices', () => {
   let instance;
   let passedElement;
 
