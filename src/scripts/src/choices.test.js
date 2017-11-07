@@ -43,7 +43,7 @@ describe('choices', () => {
 
         beforeEach(() => {
           createTemplatesSpy = spy(instance, '_createTemplates');
-          createInputSpy = spy(instance, '_createInput');
+          createInputSpy = spy(instance, '_createStructure');
           storeSubscribeSpy = spy(instance.store, 'subscribe');
           renderSpy = spy(instance, 'render');
           addEventListenersSpy = spy(instance, '_addEventListeners');
@@ -1056,6 +1056,6 @@ describe('choices', () => {
     describe('_addGroup', () => {});
     describe('_getTemplate', () => {});
     describe('_createTemplates', () => {});
-    describe('_createInput', () => {});
+    describe('_createStructure', () => {});
   });
 });

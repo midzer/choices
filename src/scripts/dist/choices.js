@@ -1,4 +1,4 @@
-/*! choices.js v3.0.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v3.0.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -2020,7 +2020,7 @@ var Choices = function () {
       // Create required elements
       this._createTemplates();
       // Generate input markup
-      this._createInput();
+      this._createStructure();
       // Subscribe store to render method
       this.store.subscribe(this.render);
       // Render any items
@@ -4152,8 +4152,8 @@ var Choices = function () {
      */
 
   }, {
-    key: '_createInput',
-    value: function _createInput() {
+    key: '_createStructure',
+    value: function _createStructure() {
       var _this22 = this;
 
       var direction = this.passedElement.element.getAttribute('dir') || 'ltr';
@@ -4307,10 +4307,10 @@ module.exports = Choices;
 
 /*!
  * Fuse.js v3.2.0 - Lightweight fuzzy-search (http://fusejs.io)
- * 
+ *
  * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
  * All Rights Reserved. Apache Software License 2.0
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
