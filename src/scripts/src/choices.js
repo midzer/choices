@@ -541,24 +541,18 @@ class Choices {
       return this;
     }
 
-    const id = item.id;
-    const groupId = item.groupId;
+    const { id, groupId = -1, value = '', label = '' } = item;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(highlightItem(id, true));
 
     if (runEvent) {
-      const eventResponse = {
+      this.passedElement.triggerEvent(EVENTS.highlightItem, {
         id,
-        value: item.value,
-        label: item.label,
-      };
-
-      if (group && group.value) {
-        eventResponse.groupValue = group.value;
-      }
-
-      this.passedElement.triggerEvent(EVENTS.highlightItem, eventResponse);
+        value,
+        label,
+        groupValue: group && group.value ? group.value : null,
+      });
     }
 
     return this;
@@ -575,21 +569,16 @@ class Choices {
       return this;
     }
 
-    const id = item.id;
-    const groupId = item.groupId;
+    const { id, groupId = -1, value = '', label = '' } = item;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-    const eventResponse = {
-      id,
-      value: item.value,
-      label: item.label,
-    };
-
-    if (group && group.value) {
-      eventResponse.groupValue = group.value;
-    }
 
     this.store.dispatch(highlightItem(id, false));
-    this.passedElement.triggerEvent(EVENTS.highlightItem, eventResponse);
+    this.passedElement.triggerEvent(EVENTS.highlightItem, {
+      id,
+      value,
+      label,
+      groupValue: group && group.value ? group.value : null,
+    });
 
     return this;
   }
