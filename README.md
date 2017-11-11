@@ -786,7 +786,7 @@ example.setValue([
 example.setValue(['Four','Five','Six']);
 ```
 
-### setValueByChoice(value);
+### setChoiceByValue(value);
 **Input types affected:** `select-one`, `select-multiple`
 
 **Usage:** Set value of input based on existing Choice. `value` can be either a single string or an array of strings
@@ -802,7 +802,7 @@ const example = new Choices(element, {
   ],
 });
 
-example.setValueByChoice('Two'); // Choice with value of 'Two' has now been selected.
+example.setChoiceByValue('Two'); // Choice with value of 'Two' has now been selected.
 ```
 
 ### clearStore();

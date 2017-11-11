@@ -109,7 +109,7 @@ describe('Choices', () => {
       expect(instance.toggleDropdown).to.be.a('function');
       expect(instance.getValue).to.be.a('function');
       expect(instance.setValue).to.be.a('function');
-      expect(instance.setValueByChoice).to.be.a('function');
+      expect(instance.setChoiceByValue).to.be.a('function');
       expect(instance.setChoices).to.be.a('function');
       expect(instance.disable).to.be.a('function');
       expect(instance.enable).to.be.a('function');
@@ -757,13 +757,13 @@ describe('Choices', () => {
       expect(valueStrings[valueStrings.length - 3]).to.equal('Set value 1');
     });
 
-    it('handles setValueByChoice()', () => {
+    it('handles setChoiceByValue()', () => {
       const choices = instance.store.getChoicesFilteredByActive();
       const randomChoice = choices[Math.floor(Math.random() * choices.length)];
 
       instance.highlightAll();
       instance.removeHighlightedItems();
-      instance.setValueByChoice(randomChoice.value);
+      instance.setChoiceByValue(randomChoice.value);
 
       const value = instance.getValue(true);
 
@@ -1086,7 +1086,7 @@ describe('Choices', () => {
         customProperties: expectedCustomProperties,
       }], 'value', 'label', true);
 
-      instance.setValueByChoice('42');
+      instance.setChoiceByValue('42');
       const selectedItems = instance.getValue();
 
       expect(selectedItems.length).to.equal(1);

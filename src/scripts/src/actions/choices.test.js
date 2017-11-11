@@ -54,14 +54,27 @@ describe('actions/choices', () => {
   });
 
   describe('activateChoices action', () => {
-    it('returns ACTIVATE_CHOICES action', () => {
-      const active = true;
-      const expectedAction = {
-        type: 'ACTIVATE_CHOICES',
-        active,
-      };
+    describe('not passing active parameter', () => {
+      it('returns ACTIVATE_CHOICES action', () => {
+        const expectedAction = {
+          type: 'ACTIVATE_CHOICES',
+          active: true,
+        };
 
-      expect(actions.activateChoices(active)).to.eql(expectedAction);
+        expect(actions.activateChoices()).to.eql(expectedAction);
+      });
+    });
+
+    describe('passing active parameter', () => {
+      it('returns ACTIVATE_CHOICES action', () => {
+        const active = true;
+        const expectedAction = {
+          type: 'ACTIVATE_CHOICES',
+          active,
+        };
+
+        expect(actions.activateChoices(active)).to.eql(expectedAction);
+      });
     });
   });
 

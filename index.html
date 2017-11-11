@@ -385,7 +385,7 @@
           .then(function(response) {
             response.json().then(function(data) {
               callback(data.releases, 'title', 'title');
-              singleFetch.setValueByChoice('Fake Tales Of San Francisco');
+              singleFetch.setChoiceByValue('Fake Tales Of San Francisco');
             });
           })
           .catch(function(error) {
@@ -407,7 +407,7 @@
             if (status === 200) {
               data = JSON.parse(request.responseText);
               callback(data.releases, 'title', 'title');
-              singleXhrRemove.setValueByChoice('How Soon Is Now?');
+              singleXhrRemove.setChoiceByValue('How Soon Is Now?');
             } else {
               console.error(status);
             }
@@ -469,7 +469,7 @@
             }
           },
         ],
-      }).setValueByChoice('Two');
+      }).setChoiceByValue('Two');
 
       var singleNoSorting = new Choices('#choices-single-no-sorting', {
         shouldSort: false,

@@ -2742,8 +2742,8 @@ var Choices = function () {
      */
 
   }, {
-    key: 'setValueByChoice',
-    value: function setValueByChoice(value) {
+    key: 'setChoiceByValue',
+    value: function setChoiceByValue(value) {
       var _this11 = this;
 
       if (this.isTextElement) {

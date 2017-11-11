@@ -732,10 +732,7 @@ class Choices {
 
     const values = items.reduce((selectedItems, item) => {
       const itemValue = valueOnly ? item.value : item;
-      if (this.isTextElement || item.active) {
-        selectedItems.push(itemValue);
-      }
-
+      selectedItems.push(itemValue);
       return selectedItems;
     }, []);
 
@@ -756,55 +753,7 @@ class Choices {
 
     // Convert args to an iterable array
     const values = [...args];
-    const handleValue = (item) => {
-      const itemType = getType(item).toLowerCase();
-      const handleType = {
-        object: () => {
-          if (!item.value) {
-            return;
-          }
-
-          // If we are dealing with a select input, we need to create an option first
-          // that is then selected. For text inputs we can just add items normally.
-          if (!this.isTextElement) {
-            this._addChoice(
-              item.value,
-              item.label,
-              true,
-              false, -1,
-              item.customProperties,
-              item.placeholder,
-            );
-          } else {
-            this._addItem(
-              item.value,
-              item.label,
-              item.id,
-              undefined,
-              item.customProperties,
-              item.placeholder,
-            );
-          }
-        },
-        string: () => {
-          if (!this.isTextElement) {
-            this._addChoice(
-              item,
-              item,
-              true,
-              false, -1,
-              null,
-            );
-          } else {
-            this._addItem(item);
-          }
-        },
-      };
-
-      handleType[itemType]();
-    };
-
-    values.forEach(value => handleValue(value));
+    values.forEach(value => this._setChoiceOrItem(value));
 
     return this;
   }
@@ -815,33 +764,16 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  setValueByChoice(value) {
-    if (this.isTextElement) {
+  setChoiceByValue(value) {
+    if (this.isTextElement || !this.initialised) {
       return this;
     }
 
-    const choices = this.store.getChoices();
     // If only one value has been passed, convert to array
     const choiceValue = isType('Array', value) ? value : [value];
-    const findAndSelectChoice = (val) => {
-      // Check 'value' property exists and the choice isn't already selected
-      const foundChoice = choices.find(choice => choice.value === val);
-
-      if (foundChoice && !foundChoice.selected) {
-        this._addItem(
-          foundChoice.value,
-          foundChoice.label,
-          foundChoice.id,
-          foundChoice.groupId,
-          foundChoice.customProperties,
-          foundChoice.placeholder,
-          foundChoice.keyCode,
-        );
-      }
-    };
 
     // Loop through each value and
-    choiceValue.forEach(val => findAndSelectChoice(val));
+    choiceValue.forEach(val => this._findAndSelectChoiceByValue(val));
 
     return this;
   }
@@ -2168,18 +2100,20 @@ class Choices {
         ),
       );
 
-      groupChoices.forEach((option) => {
-        const isOptDisabled = option.disabled || (option.parentNode && option.parentNode.disabled);
+      const addGroupChoices = (choice) => {
+        const isOptDisabled = choice.disabled || (choice.parentNode && choice.parentNode.disabled);
         this._addChoice(
-          option[valueKey],
-          (isType('Object', option)) ? option[labelKey] : option.innerHTML,
-          option.selected,
+          choice[valueKey],
+          (isType('Object', choice)) ? choice[labelKey] : choice.innerHTML,
+          choice.selected,
           isOptDisabled,
           groupId,
-          option.customProperties,
-          option.placeholder,
+          choice.customProperties,
+          choice.placeholder,
         );
-      });
+      };
+
+      groupChoices.forEach(addGroupChoices);
     } else {
       this.store.dispatch(
         addGroup(
@@ -2399,6 +2333,72 @@ class Choices {
     };
 
     this.presetItems.forEach(item => handlePresetItem(item));
+  }
+
+  _setChoiceOrItem(item) {
+    const itemType = getType(item).toLowerCase();
+    const handleType = {
+      object: () => {
+        if (!item.value) {
+          return;
+        }
+
+        // If we are dealing with a select input, we need to create an option first
+        // that is then selected. For text inputs we can just add items normally.
+        if (!this.isTextElement) {
+          this._addChoice(
+            item.value,
+            item.label,
+            true,
+            false, -1,
+            item.customProperties,
+            item.placeholder,
+          );
+        } else {
+          this._addItem(
+            item.value,
+            item.label,
+            item.id,
+            undefined,
+            item.customProperties,
+            item.placeholder,
+          );
+        }
+      },
+      string: () => {
+        if (!this.isTextElement) {
+          this._addChoice(
+            item,
+            item,
+            true,
+            false, -1,
+            null,
+          );
+        } else {
+          this._addItem(item);
+        }
+      },
+    };
+
+    handleType[itemType]();
+  }
+
+  _findAndSelectChoiceByValue(val) {
+    const choices = this.store.getChoices();
+    // Check 'value' property exists and the choice isn't already selected
+    const foundChoice = choices.find(choice => choice.value === val);
+
+    if (foundChoice && !foundChoice.selected) {
+      this._addItem(
+        foundChoice.value,
+        foundChoice.label,
+        foundChoice.id,
+        foundChoice.groupId,
+        foundChoice.customProperties,
+        foundChoice.placeholder,
+        foundChoice.keyCode,
+      );
+    }
   }
 
   /* =====  End of Private functions  ====== */

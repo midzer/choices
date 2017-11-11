@@ -6,9 +6,20 @@ import { EVENTS, ACTION_TYPES } from './constants';
 
 describe('choices', () => {
   let instance;
+  let output;
   let passedElement;
 
   describe('public methods', () => {
+    const returnsInstance = () => {
+      it('returns this', () => {
+        expect(output).to.eql(instance);
+      });
+    };
+
+    afterEach(() => {
+      output = null;
+    });
+
     describe('init', () => {
       const callbackOnInitSpy = spy();
 
@@ -175,7 +186,6 @@ describe('choices', () => {
         inputEnableSpy = spy(instance.input, 'enable');
       });
 
-
       afterEach(() => {
         addEventListenersSpy.restore();
         passedElementEnableSpy.restore();
@@ -184,16 +194,12 @@ describe('choices', () => {
       });
 
       describe('not already initialised', () => {
-        let response;
-
         beforeEach(() => {
           instance.initialised = false;
-          response = instance.enable();
+          output = instance.enable();
         });
 
-        it('returns instance', () => {
-          expect(response).to.equal(instance);
-        });
+        returnsInstance(output);
 
         it('returns early', () => {
           expect(passedElementEnableSpy.called).to.equal(false);
@@ -204,17 +210,13 @@ describe('choices', () => {
       });
 
       describe('already initialised', () => {
-        let response;
-
         describe('containerOuter enabled', () => {
           beforeEach(() => {
             instance.initialised = true;
-            response = instance.enable();
+            output = instance.enable();
           });
 
-          it('returns instance', () => {
-            expect(response).to.equal(instance);
-          });
+          returnsInstance(output);
 
           it('enables passedElement', () => {
             expect(passedElementEnableSpy.called).to.equal(true);
@@ -265,16 +267,12 @@ describe('choices', () => {
       });
 
       describe('not already initialised', () => {
-        let response;
-
         beforeEach(() => {
           instance.initialised = false;
-          response = instance.disable();
+          output = instance.disable();
         });
 
-        it('returns instance', () => {
-          expect(response).to.equal(instance);
-        });
+        returnsInstance(output);
 
         it('returns early', () => {
           expect(removeEventListenersSpy.called).to.equal(false);
@@ -285,18 +283,14 @@ describe('choices', () => {
       });
 
       describe('already initialised', () => {
-        let response;
-
         describe('containerOuter disabled', () => {
           beforeEach(() => {
             instance.initialised = true;
             instance.containerOuter.isDisabled = true;
-            response = instance.disable();
+            output = instance.disable();
           });
 
-          it('returns instance', () => {
-            expect(response).to.equal(instance);
-          });
+          returnsInstance(output);
 
           it('disables passedElement', () => {
             expect(passedElementDisableSpy.called).to.equal(true);
@@ -348,15 +342,15 @@ describe('choices', () => {
       });
 
       describe('dropdown active', () => {
-        let response;
+        let output;
 
         beforeEach(() => {
           instance.dropdown.isActive = true;
-          response = instance.showDropdown();
+          output = instance.showDropdown();
         });
 
         it('returns this', () => {
-          expect(response).to.eql(instance);
+          expect(output).to.eql(instance);
         });
 
         it('returns early', () => {
@@ -368,14 +362,13 @@ describe('choices', () => {
       });
 
       describe('dropdown inactive', () => {
-        let response;
         beforeEach(() => {
           instance.dropdown.isActive = false;
-          response = instance.showDropdown();
+          output = instance.showDropdown();
         });
 
         it('returns this', () => {
-          expect(response).to.eql(instance);
+          expect(output).to.eql(instance);
         });
 
         it('opens containerOuter', () => {
@@ -421,16 +414,12 @@ describe('choices', () => {
       });
 
       describe('dropdown inactive', () => {
-        let response;
-
         beforeEach(() => {
           instance.dropdown.isActive = false;
-          response = instance.hideDropdown();
+          output = instance.hideDropdown();
         });
 
-        it('returns this', () => {
-          expect(response).to.eql(instance);
-        });
+        returnsInstance(output);
 
         it('returns early', () => {
           expect(containerOuterCloseSpy.called).to.equal(false);
@@ -441,14 +430,13 @@ describe('choices', () => {
       });
 
       describe('dropdown active', () => {
-        let response;
         beforeEach(() => {
           instance.dropdown.isActive = true;
-          response = instance.hideDropdown();
+          output = instance.hideDropdown();
         });
 
         it('returns this', () => {
-          expect(response).to.eql(instance);
+          expect(output).to.eql(instance);
         });
 
         it('closes containerOuter', () => {
@@ -472,7 +460,6 @@ describe('choices', () => {
     });
 
     describe('toggleDropdown', () => {
-      let response;
       let hideDropdownSpy;
       let showDropdownSpy;
 
@@ -489,31 +476,27 @@ describe('choices', () => {
       describe('dropdown active', () => {
         beforeEach(() => {
           instance.dropdown.isActive = true;
-          response = instance.toggleDropdown();
+          output = instance.toggleDropdown();
         });
 
         it('hides dropdown', () => {
           expect(hideDropdownSpy.called).to.equal(true);
         });
 
-        it('returns instance', () => {
-          expect(response).to.eql(instance);
-        });
+        returnsInstance(output);
       });
 
       describe('dropdown inactive', () => {
         beforeEach(() => {
           instance.dropdown.isActive = false;
-          response = instance.toggleDropdown();
+          output = instance.toggleDropdown();
         });
 
         it('shows dropdown', () => {
           expect(showDropdownSpy.called).to.equal(true);
         });
 
-        it('returns instance', () => {
-          expect(response).to.eql(instance);
-        });
+        returnsInstance(output);
       });
     });
 
@@ -541,14 +524,11 @@ describe('choices', () => {
       });
 
       describe('no item passed', () => {
-        let output;
         beforeEach(() => {
           output = instance.highlightItem();
         });
 
-        it('returns instance', () => {
-          expect(output).to.eql(instance);
-        });
+        returnsInstance(output);
 
         it('returns early', () => {
           expect(passedElementTriggerEventStub.called).to.equal(false);
@@ -558,8 +538,6 @@ describe('choices', () => {
       });
 
       describe('item passed', () => {
-        let output;
-
         const item = {
           id: 1234,
           value: 'Test',
@@ -571,9 +549,7 @@ describe('choices', () => {
             output = instance.highlightItem(item, true);
           });
 
-          it('returns instance', () => {
-            expect(output).to.eql(instance);
-          });
+          returnsInstance(output);
 
           it('dispatches highlightItem action with correct arguments', () => {
             expect(storeDispatchSpy.called).to.equal(true);
@@ -623,16 +599,14 @@ describe('choices', () => {
 
         describe('passing falsey second paremeter', () => {
           beforeEach(() => {
-            instance.highlightItem(item, false);
+            output = instance.highlightItem(item, false);
           });
 
           it('doesn\'t trigger event', () => {
             expect(passedElementTriggerEventStub.called).to.equal(false);
           });
 
-          it('returns instance', () => {
-            expect(output).to.eql(instance);
-          });
+          returnsInstance(output);
         });
       });
     });
@@ -661,14 +635,11 @@ describe('choices', () => {
       });
 
       describe('no item passed', () => {
-        let output;
         beforeEach(() => {
           output = instance.unhighlightItem();
         });
 
-        it('returns instance', () => {
-          expect(output).to.eql(instance);
-        });
+        returnsInstance(output);
 
         it('returns early', () => {
           expect(passedElementTriggerEventStub.called).to.equal(false);
@@ -678,8 +649,6 @@ describe('choices', () => {
       });
 
       describe('item passed', () => {
-        let output;
-
         const item = {
           id: 1234,
           value: 'Test',
@@ -691,9 +660,7 @@ describe('choices', () => {
             output = instance.unhighlightItem(item, true);
           });
 
-          it('returns instance', () => {
-            expect(output).to.eql(instance);
-          });
+          returnsInstance(output);
 
           it('dispatches highlightItem action with correct arguments', () => {
             expect(storeDispatchSpy.called).to.equal(true);
@@ -743,16 +710,14 @@ describe('choices', () => {
 
         describe('passing falsey second paremeter', () => {
           beforeEach(() => {
-            instance.highlightItem(item, false);
+            output = instance.highlightItem(item, false);
           });
 
           it('doesn\'t trigger event', () => {
             expect(passedElementTriggerEventStub.called).to.equal(false);
           });
 
-          it('returns instance', () => {
-            expect(output).to.eql(instance);
-          });
+          returnsInstance(output);
         });
       });
     });
@@ -760,7 +725,6 @@ describe('choices', () => {
     describe('highlightAll', () => {
       let storeGetItemsStub;
       let highlightItemSpy;
-      let output;
 
       const items = [
         {
@@ -787,9 +751,7 @@ describe('choices', () => {
         instance.store.getItems.reset();
       });
 
-      it('returns instance', () => {
-        expect(output).to.eql(instance);
-      });
+      returnsInstance(output);
 
       it('highlights each item in store', () => {
         expect(highlightItemSpy.callCount).to.equal(items.length);
@@ -801,7 +763,6 @@ describe('choices', () => {
     describe('unhighlightAll', () => {
       let storeGetItemsStub;
       let unhighlightItemSpy;
-      let output;
 
       const items = [
         {
@@ -828,9 +789,7 @@ describe('choices', () => {
         instance.store.getItems.reset();
       });
 
-      it('returns instance', () => {
-        expect(output).to.eql(instance);
-      });
+      returnsInstance(output);
 
       it('unhighlights each item in store', () => {
         expect(unhighlightItemSpy.callCount).to.equal(items.length);
@@ -841,7 +800,6 @@ describe('choices', () => {
 
     describe('clearStore', () => {
       let storeDispatchStub;
-      let output;
 
       beforeEach(() => {
         storeDispatchStub = stub();
@@ -854,9 +812,7 @@ describe('choices', () => {
         instance.store.dispatch.reset();
       });
 
-      it('returns instance', () => {
-        expect(output).to.eql(instance);
-      });
+      returnsInstance(output);
 
       it('dispatches clearAll action', () => {
         expect(storeDispatchStub.lastCall.args[0]).to.eql({
@@ -866,7 +822,6 @@ describe('choices', () => {
     });
 
     describe('clearInput', () => {
-      let output;
       let inputClearSpy;
       let storeDispatchStub;
 
@@ -881,7 +836,7 @@ describe('choices', () => {
         instance.store.dispatch.reset();
       });
 
-      it('returns instance', () => {
+      it('returnsInstance(output)', () => {
         output = instance.clearInput();
         expect(output).to.eql(instance);
       });
@@ -929,16 +884,12 @@ describe('choices', () => {
     });
 
     describe('ajax', () => {
-      const callbackResponse = 'worked';
-      let output;
+      const callbackoutput = 'worked';
+
       let handleLoadingStateStub;
       let ajaxCallbackStub;
 
-      const unhappyPath = () => {
-        it('returns instance', () => {
-          expect(output).to.eql(instance);
-        });
-
+      const returnsEarly = () => {
         it('returns early', () => {
           expect(handleLoadingStateStub.called).to.equal(false);
           expect(ajaxCallbackStub.called).to.equal(false);
@@ -947,7 +898,7 @@ describe('choices', () => {
 
       beforeEach(() => {
         handleLoadingStateStub = stub();
-        ajaxCallbackStub = stub().returns(callbackResponse);
+        ajaxCallbackStub = stub().returns(callbackoutput);
 
         instance._ajaxCallback = ajaxCallbackStub;
         instance._handleLoadingState = handleLoadingStateStub;
@@ -964,7 +915,8 @@ describe('choices', () => {
           output = instance.ajax(() => {});
         });
 
-        unhappyPath();
+        returnsInstance(output);
+        returnsEarly();
       });
 
       describe('text element', () => {
@@ -973,7 +925,8 @@ describe('choices', () => {
           output = instance.ajax(() => {});
         });
 
-        unhappyPath();
+        returnsInstance(output);
+        returnsEarly();
       });
 
       describe('passing invalid function', () => {
@@ -981,7 +934,8 @@ describe('choices', () => {
           output = instance.ajax(null);
         });
 
-        unhappyPath();
+        returnsInstance(output);
+        returnsEarly();
       });
 
       describe('select element', () => {
@@ -995,6 +949,8 @@ describe('choices', () => {
           output = instance.ajax(callback);
         });
 
+        returnsInstance(output);
+
         it('sets loading state', () => {
           requestAnimationFrame(() => {
             expect(handleLoadingStateStub.called).to.equal(true);
@@ -1003,11 +959,189 @@ describe('choices', () => {
 
         it('calls passed function with ajax callback', () => {
           expect(callback.called).to.equal(true);
-          expect(callback.lastCall.args[0]).to.eql(callbackResponse);
+          expect(callback.lastCall.args[0]).to.eql(callbackoutput);
+        });
+      });
+    });
+
+    describe('setValue', () => {
+      let setChoiceOrItemStub;
+      const values = [
+        'Value 1',
+        {
+          value: 'Value 2',
+        },
+      ];
+
+      beforeEach(() => {
+        setChoiceOrItemStub = stub();
+        instance._setChoiceOrItem = setChoiceOrItemStub;
+      });
+
+      afterEach(() => {
+        instance._setChoiceOrItem.reset();
+      });
+
+      describe('not already initialised', () => {
+        beforeEach(() => {
+          instance.initialised = false;
+          output = instance.setValue(values);
         });
 
-        it('returns instance', () => {
-          expect(output).to.eql(instance);
+        returnsInstance(output);
+
+        it('returns early', () => {
+          expect(setChoiceOrItemStub.called).to.equal(false);
+        });
+      });
+
+      describe('already initialised', () => {
+        beforeEach(() => {
+          instance.initialised = true;
+          output = instance.setValue(values);
+        });
+
+        returnsInstance(output);
+
+        it('sets each value', () => {
+          expect(setChoiceOrItemStub.callCount).to.equal(2);
+          expect(setChoiceOrItemStub.firstCall.args[0]).to.equal(values[0]);
+          expect(setChoiceOrItemStub.secondCall.args[0]).to.equal(values[1]);
+        });
+      });
+    });
+
+    describe('setChoiceByValue', () => {
+      let findAndSelectChoiceByValueStub;
+
+      beforeEach(() => {
+        findAndSelectChoiceByValueStub = stub();
+        instance._findAndSelectChoiceByValue = findAndSelectChoiceByValueStub;
+      });
+
+      afterEach(() => {
+        instance._findAndSelectChoiceByValue.reset();
+      });
+
+      describe('not already initialised', () => {
+        beforeEach(() => {
+          instance.initialised = false;
+          output = instance.setChoiceByValue([]);
+        });
+
+        returnsInstance(output);
+
+        it('returns early', () => {
+          expect(findAndSelectChoiceByValueStub.called).to.equal(false);
+        });
+      });
+
+      describe('already initialised', () => {
+        describe('passing a string value', () => {
+          const value = 'Test value';
+
+          beforeEach(() => {
+            instance.initialised = true;
+            output = instance.setChoiceByValue(value);
+          });
+
+          returnsInstance(output);
+
+          it('sets each choice with same value', () => {
+            expect(findAndSelectChoiceByValueStub.called).to.equal(true);
+            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(value);
+          });
+        });
+
+        describe('passing an array of values', () => {
+          const values = [
+            'Value 1',
+            'Value 2',
+          ];
+
+          beforeEach(() => {
+            instance.initialised = true;
+            output = instance.setChoiceByValue(values);
+          });
+
+          returnsInstance(output);
+
+          it('sets each choice with same value', () => {
+            expect(findAndSelectChoiceByValueStub.callCount).to.equal(2);
+            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(values[0]);
+            expect(findAndSelectChoiceByValueStub.secondCall.args[0]).to.equal(values[1]);
+          });
+        });
+      });
+    });
+
+    describe('getValue', () => {
+      let getItemsFilteredByActiveStub;
+      const items = [
+        {
+          id: '1',
+          value: 'Test value 1',
+        },
+        {
+          id: '2',
+          value: 'Test value 2',
+        },
+      ];
+
+      beforeEach(() => {
+        getItemsFilteredByActiveStub = stub().returns(items);
+        instance.store.getItemsFilteredByActive = getItemsFilteredByActiveStub;
+      });
+
+      afterEach(() => {
+        instance.store.getItemsFilteredByActive.reset();
+      });
+
+      describe('passing true valueOnly flag', () => {
+        describe('select one input', () => {
+          beforeEach(() => {
+            instance.isSelectOneElement = true;
+            output = instance.getValue(true);
+          });
+
+          it('returns a single action value', () => {
+            expect(output).to.equal(items[0].value);
+          });
+        });
+
+        describe('non select one input', () => {
+          beforeEach(() => {
+            instance.isSelectOneElement = false;
+            output = instance.getValue(true);
+          });
+
+          it('returns all active item values', () => {
+            expect(output).to.eql(items.map((item => item.value)));
+          });
+        });
+      });
+
+      describe('passing false valueOnly flag', () => {
+        describe('select one input', () => {
+          beforeEach(() => {
+            instance.isSelectOneElement = true;
+            output = instance.getValue(false);
+          });
+
+          it('returns a single active item', () => {
+            expect(output).to.equal(items[0]);
+          });
+        });
+
+        describe('non select one input', () => {
+          beforeEach(() => {
+            instance.isSelectOneElement = false;
+            output = instance.getValue(false);
+          });
+
+          it('returns all active items', () => {
+            expect(output).to.eql(items);
+          });
         });
       });
     });
@@ -1019,9 +1153,6 @@ describe('choices', () => {
     describe('removeItemsByValue', () => {});
     describe('removeActiveItems', () => {});
     describe('removeHighlightedItems', () => {});
-    describe('getValue', () => {});
-    describe('setValue', () => {});
-    describe('setValueByChoice', () => {});
     describe('setChoices', () => {});
   });
 
