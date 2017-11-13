@@ -176,5 +176,3 @@ export default class Store {
     return foundGroup;
   }
 }
-
-module.exports = Store;
