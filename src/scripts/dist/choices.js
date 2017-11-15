@@ -1,11 +1,15 @@
 /*! choices.js v3.0.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
+   //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
+   //AMD
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
+   //CommonJS
 	else if(typeof exports === 'object')
 		exports["Choices"] = factory();
+   //Window
 	else
 		root["Choices"] = factory();
 })(this, function() {
@@ -71,42 +75,734 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "/src/scripts/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var g;
+"use strict";
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-module.exports = g;
+/* eslint-disable */
 
+/**
+ * Capitalises the first letter of each word in a string
+ * @param  {String} str String to capitalise
+ * @return {String}     Capitalised string
+ */
+var capitalise = exports.capitalise = function capitalise(str) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+};
+
+/**
+ * Generates a string of random chars
+ * @param  {Number} length Length of the string to generate
+ * @return {String} String of random chars
+ */
+var generateChars = exports.generateChars = function generateChars(length) {
+  var chars = '';
+
+  for (var i = 0; i < length; i++) {
+    var randomChar = getRandomNumber(0, 36);
+    chars += randomChar.toString(36);
+  }
+
+  return chars;
+};
+
+/**
+ * Generates a unique id based on an element
+ * @param  {HTMLElement} element Element to generate the id from
+ * @param  {String} Prefix for the Id
+ * @return {String} Unique Id
+ */
+var generateId = exports.generateId = function generateId(element, prefix) {
+  var id = element.id || element.name && element.name + '-' + generateChars(2) || generateChars(4);
+  id = id.replace(/(:|\.|\[|\]|,)/g, '');
+  id = prefix + id;
+
+  return id;
+};
+
+/**
+ * Tests the type of an object
+ * @param  {String}  type Type to test object against
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+var getType = exports.getType = function getType(obj) {
+  return Object.prototype.toString.call(obj).slice(8, -1);
+};
+
+/**
+ * Tests the type of an object
+ * @param  {String}  type Type to test object against
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+var isType = exports.isType = function isType(type, obj) {
+  var clas = getType(obj);
+  return obj !== undefined && obj !== null && clas === type;
+};
+
+/**
+ * Tests to see if a passed object is a node
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+var isNode = exports.isNode = function isNode(o) {
+  return (typeof Node === 'undefined' ? 'undefined' : _typeof(Node)) === 'object' ? o instanceof Node : o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && typeof o.nodeType === 'number' && typeof o.nodeName === 'string';
+};
+
+/**
+ * Tests to see if a passed object is an element
+ * @param  {Object}  obj  Object to be tested
+ * @return {Boolean}
+ */
+var isElement = exports.isElement = function isElement(o) {
+  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object' ? o instanceof HTMLElement : // DOM2
+  o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
+};
+
+/**
+ * Merges unspecified amount of objects into new object
+ * @private
+ * @return {Object} Merged object of arguments
+ */
+var extend = exports.extend = function extend() {
+  var extended = {};
+  var length = arguments.length;
+
+  /**
+   * Merge one object into another
+   * @param  {Object} obj  Object to merge into extended object
+   */
+  var merge = function merge(obj) {
+    for (var prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        // If deep merge and property is an object, merge properties
+        if (isType('Object', obj[prop])) {
+          extended[prop] = extend(true, extended[prop], obj[prop]);
+        } else {
+          extended[prop] = obj[prop];
+        }
+      }
+    }
+  };
+
+  // Loop through each passed argument
+  for (var i = 0; i < length; i++) {
+    // store argument at position i
+    var obj = arguments[i];
+
+    // If we are in fact dealing with an object, merge it.
+    if (isType('Object', obj)) {
+      merge(obj);
+    }
+  }
+
+  return extended;
+};
+
+/**
+ * CSS transition end event listener
+ * @return
+ */
+var whichTransitionEvent = exports.whichTransitionEvent = function whichTransitionEvent() {
+  var t = void 0,
+      el = document.createElement('fakeelement');
+
+  var transitions = {
+    transition: 'transitionend',
+    OTransition: 'oTransitionEnd',
+    MozTransition: 'transitionend',
+    WebkitTransition: 'webkitTransitionEnd'
+  };
+
+  for (t in transitions) {
+    if (el.style[t] !== undefined) {
+      return transitions[t];
+    }
+  }
+};
+
+/**
+ * CSS animation end event listener
+ * @return
+ */
+var whichAnimationEvent = exports.whichAnimationEvent = function whichAnimationEvent() {
+  var t = void 0,
+      el = document.createElement('fakeelement');
+
+  var animations = {
+    animation: 'animationend',
+    OAnimation: 'oAnimationEnd',
+    MozAnimation: 'animationend',
+    WebkitAnimation: 'webkitAnimationEnd'
+  };
+
+  for (t in animations) {
+    if (el.style[t] !== undefined) {
+      return animations[t];
+    }
+  }
+};
+
+/**
+ *  Get the ancestors of each element in the current set of matched elements,
+ *  up to but not including the element matched by the selector
+ * @param  {NodeElement} elem     Element to begin search from
+ * @param  {NodeElement} parent   Parent to find
+ * @param  {String} selector Class to find
+ * @return {Array}          Array of parent elements
+ */
+var getParentsUntil = exports.getParentsUntil = function getParentsUntil(elem, parent, selector) {
+  var parents = [];
+  // Get matches
+  for (; elem && elem !== document; elem = elem.parentNode) {
+    // Check if parent has been reached
+    if (parent) {
+      var parentType = parent.charAt(0);
+
+      // If parent is a class
+      if (parentType === '.') {
+        if (elem.classList.contains(parent.substr(1))) {
+          break;
+        }
+      }
+
+      // If parent is an ID
+      if (parentType === '#') {
+        if (elem.id === parent.substr(1)) {
+          break;
+        }
+      }
+
+      // If parent is a data attribute
+      if (parentType === '[') {
+        if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
+          break;
+        }
+      }
+
+      // If parent is a tag
+      if (elem.tagName.toLowerCase() === parent) {
+        break;
+      }
+    }
+    if (selector) {
+      var selectorType = selector.charAt(0);
+
+      // If selector is a class
+      if (selectorType === '.') {
+        if (elem.classList.contains(selector.substr(1))) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is an ID
+      if (selectorType === '#') {
+        if (elem.id === selector.substr(1)) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is a data attribute
+      if (selectorType === '[') {
+        if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
+          parents.push(elem);
+        }
+      }
+
+      // If selector is a tag
+      if (elem.tagName.toLowerCase() === selector) {
+        parents.push(elem);
+      }
+    } else {
+      parents.push(elem);
+    }
+  }
+
+  // Return parents if any exist
+  if (parents.length === 0) {
+    return null;
+  }
+  return parents;
+};
+
+var wrap = exports.wrap = function wrap(element, wrapper) {
+  wrapper = wrapper || document.createElement('div');
+  if (element.nextSibling) {
+    element.parentNode.insertBefore(wrapper, element.nextSibling);
+  } else {
+    element.parentNode.appendChild(wrapper);
+  }
+  return wrapper.appendChild(element);
+};
+
+var getSiblings = exports.getSiblings = function getSiblings(elem) {
+  var siblings = [];
+  var sibling = elem.parentNode.firstChild;
+  for (; sibling; sibling = sibling.nextSibling) {
+    if (sibling.nodeType === 1 && sibling !== elem) {
+      siblings.push(sibling);
+    }
+  }
+  return siblings;
+};
+
+/**
+ * Find ancestor in DOM tree
+ * @param  {NodeElement} el  Element to start search from
+ * @param  {[type]} cls Class of parent
+ * @return {NodeElement}     Found parent element
+ */
+var findAncestor = exports.findAncestor = function findAncestor(el, cls) {
+  while ((el = el.parentElement) && !el.classList.contains(cls)) {}
+  return el;
+};
+
+/**
+ * Find ancestor in DOM tree by attribute name
+ * @param  {NodeElement} el  Element to start search from
+ * @param  {string} attr Attribute name of parent
+ * @return {?NodeElement}     Found parent element or null
+ */
+var findAncestorByAttrName = exports.findAncestorByAttrName = function findAncestorByAttrName(el, attr) {
+  var target = el;
+
+  while (target) {
+    if (target.hasAttribute(attr)) {
+      return target;
+    }
+
+    target = target.parentElement;
+  }
+
+  return null;
+};
+
+/**
+ * Debounce an event handler.
+ * @param  {Function} func      Function to run after wait
+ * @param  {Number} wait      The delay before the function is executed
+ * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing.
+ * @return {Function}           A function will be called after it stops being called for a given delay
+ */
+var debounce = exports.debounce = function debounce(func, wait, immediate) {
+  var timeout = void 0;
+  return function () {
+    var context = this,
+        args = arguments;
+    var later = function later() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
+/**
+ * Get an element's distance from the top of the page
+ * @private
+ * @param  {NodeElement} el Element to test for
+ * @return {Number} Elements Distance from top of page
+ */
+var getElemDistance = exports.getElemDistance = function getElemDistance(el) {
+  var location = 0;
+  if (el.offsetParent) {
+    do {
+      location += el.offsetTop;
+      el = el.offsetParent;
+    } while (el);
+  }
+  return location >= 0 ? location : 0;
+};
+
+/**
+ * Determine element height multiplied by any offsets
+ * @private
+ * @param  {HTMLElement} el Element to test for
+ * @return {Number}    Height of element
+ */
+var getElementOffset = exports.getElementOffset = function getElementOffset(el, offset) {
+  var elOffset = offset;
+  if (elOffset > 1) elOffset = 1;
+  if (elOffset > 0) elOffset = 0;
+
+  return Math.max(el.offsetHeight * elOffset);
+};
+
+/**
+ * Get the next or previous element from a given start point
+ * @param  {HTMLElement} startEl    Element to start position from
+ * @param  {String}      className  The class we will look through
+ * @param  {Number}      direction  Positive next element, negative previous element
+ * @return {[HTMLElement}           Found element
+ */
+var getAdjacentEl = exports.getAdjacentEl = function getAdjacentEl(startEl, className) {
+  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+  if (!startEl || !className) return;
+
+  var parent = startEl.parentNode.parentNode;
+  var children = Array.from(parent.querySelectorAll(className));
+
+  var startPos = children.indexOf(startEl);
+  var operatorDirection = direction > 0 ? 1 : -1;
+
+  return children[startPos + operatorDirection];
+};
+
+/**
+ * Get scroll position based on top/bottom position
+ * @private
+ * @return {String} Position of scroll
+ */
+var getScrollPosition = exports.getScrollPosition = function getScrollPosition(position) {
+  if (position === 'bottom') {
+    // Scroll position from the bottom of the viewport
+    return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
+  }
+  // Scroll position from the top of the viewport
+  return window.scrollY || window.pageYOffset;
+};
+
+/**
+ * Determine whether an element is within the viewport
+ * @param  {HTMLElement}  el Element to test
+ * @return {String} Position of scroll
+ * @return {Boolean}
+ */
+var isInView = exports.isInView = function isInView(el, position, offset) {
+  // If the user has scrolled further than the distance from the element to the top of its parent
+  return this.getScrollPosition(position) > this.getElemDistance(el) + this.getElementOffset(el, offset);
+};
+
+/**
+ * Determine whether an element is within
+ * @param  {HTMLElement} el        Element to test
+ * @param  {HTMLElement} parent    Scrolling parent
+ * @param  {Number} direction      Whether element is visible from above or below
+ * @return {Boolean}
+ */
+var isScrolledIntoView = exports.isScrolledIntoView = function isScrolledIntoView(el, parent) {
+  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+  if (!el) return;
+
+  var isVisible = void 0;
+
+  if (direction > 0) {
+    // In view from bottom
+    isVisible = parent.scrollTop + parent.offsetHeight >= el.offsetTop + el.offsetHeight;
+  } else {
+    // In view from top
+    isVisible = el.offsetTop >= parent.scrollTop;
+  }
+
+  return isVisible;
+};
+
+/**
+ * Remove html tags from a string
+ * @param  {String}  Initial string/html
+ * @return {String}  Sanitised string
+ */
+var stripHTML = exports.stripHTML = function stripHTML(html) {
+  var el = document.createElement('DIV');
+  el.innerHTML = html;
+  return el.textContent || el.innerText || '';
+};
+
+/**
+ * Adds animation to an element and removes it upon animation completion
+ * @param  {Element} el        Element to add animation to
+ * @param  {String} animation Animation class to add to element
+ * @return
+ */
+var addAnimation = exports.addAnimation = function addAnimation(el, animation) {
+  var animationEvent = whichAnimationEvent();
+
+  var removeAnimation = function removeAnimation() {
+    el.classList.remove(animation);
+    el.removeEventListener(animationEvent, removeAnimation, false);
+  };
+
+  el.classList.add(animation);
+  el.addEventListener(animationEvent, removeAnimation, false);
+};
+
+/**
+ * Get a random number between a range
+ * @param  {Number} min Minimum range
+ * @param  {Number} max Maximum range
+ * @return {Number}     Random number
+ */
+var getRandomNumber = exports.getRandomNumber = function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+};
+
+/**
+ * Turn a string into a node
+ * @param  {String} String to convert
+ * @return {HTMLElement}   Converted node element
+ */
+var strToEl = exports.strToEl = function () {
+  var tmpEl = document.createElement('div');
+  return function (str) {
+    var cleanedInput = str.trim();
+    var r = void 0;
+    tmpEl.innerHTML = cleanedInput;
+    r = tmpEl.children[0];
+
+    while (tmpEl.firstChild) {
+      tmpEl.removeChild(tmpEl.firstChild);
+    }
+
+    return r;
+  };
+}();
+
+/**
+ * Sets the width of a passed input based on its value
+ * @return {Number} Width of input
+ */
+var getWidthOfInput = exports.getWidthOfInput = function getWidthOfInput(input) {
+  var value = input.value || input.placeholder;
+  var width = input.offsetWidth;
+
+  if (value) {
+    var testEl = strToEl('<span>' + value + '</span>');
+    testEl.style.position = 'absolute';
+    testEl.style.padding = '0';
+    testEl.style.top = '-9999px';
+    testEl.style.left = '-9999px';
+    testEl.style.width = 'auto';
+    testEl.style.whiteSpace = 'pre';
+
+    if (document.body.contains(input) && window.getComputedStyle) {
+      var inputStyle = window.getComputedStyle(input);
+
+      if (inputStyle) {
+        testEl.style.fontSize = inputStyle.fontSize;
+        testEl.style.fontFamily = inputStyle.fontFamily;
+        testEl.style.fontWeight = inputStyle.fontWeight;
+        testEl.style.fontStyle = inputStyle.fontStyle;
+        testEl.style.letterSpacing = inputStyle.letterSpacing;
+        testEl.style.textTransform = inputStyle.textTransform;
+        testEl.style.padding = inputStyle.padding;
+      }
+    }
+
+    document.body.appendChild(testEl);
+
+    if (value && testEl.offsetWidth !== input.offsetWidth) {
+      width = testEl.offsetWidth + 4;
+    }
+
+    document.body.removeChild(testEl);
+  }
+
+  return width + 'px';
+};
+
+/**
+ * Sorting function for current and previous string
+ * @param  {String} a Current value
+ * @param  {String} b Next value
+ * @return {Number}   -1 for after previous,
+ *                    1 for before,
+ *                    0 for same location
+ */
+var sortByAlpha = exports.sortByAlpha = function sortByAlpha(a, b) {
+  var labelA = (a.label || a.value).toLowerCase();
+  var labelB = (b.label || b.value).toLowerCase();
+
+  if (labelA < labelB) return -1;
+  if (labelA > labelB) return 1;
+  return 0;
+};
+
+/**
+ * Sort by numeric score
+ * @param  {Object} a Current value
+ * @param  {Object} b Next value
+ * @return {Number}   -1 for after previous,
+ *                    1 for before,
+ *                    0 for same location
+ */
+var sortByScore = exports.sortByScore = function sortByScore(a, b) {
+  return a.score - b.score;
+};
+
+/**
+ * Dispatch native event
+ * @param  {NodeElement} element Element to trigger event on
+ * @param  {String} type         Type of event to trigger
+ * @param  {Object} customArgs   Data to pass with event
+ * @return {Object}              Triggered event
+ */
+var dispatchEvent = exports.dispatchEvent = function dispatchEvent(element, type) {
+  var customArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  var event = new CustomEvent(type, {
+    detail: customArgs,
+    bubbles: true,
+    cancelable: true
+  });
+
+  return element.dispatchEvent(event);
+};
+
+/**
+ * Tests value against a regular expression
+ * @param  {string} value   Value to test
+ * @return {Boolean}        Whether test passed/failed
+ * @private
+ */
+var regexFilter = exports.regexFilter = function regexFilter(value, regex) {
+  if (!value || !regex) {
+    return false;
+  }
+
+  var expression = new RegExp(regex.source, 'i');
+  return expression.test(value);
+};
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(2);
+"use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var DEFAULT_CLASSNAMES = exports.DEFAULT_CLASSNAMES = {
+  containerOuter: 'choices',
+  containerInner: 'choices__inner',
+  input: 'choices__input',
+  inputCloned: 'choices__input--cloned',
+  list: 'choices__list',
+  listItems: 'choices__list--multiple',
+  listSingle: 'choices__list--single',
+  listDropdown: 'choices__list--dropdown',
+  item: 'choices__item',
+  itemSelectable: 'choices__item--selectable',
+  itemDisabled: 'choices__item--disabled',
+  itemChoice: 'choices__item--choice',
+  placeholder: 'choices__placeholder',
+  group: 'choices__group',
+  groupHeading: 'choices__heading',
+  button: 'choices__button',
+  activeState: 'is-active',
+  focusState: 'is-focused',
+  openState: 'is-open',
+  disabledState: 'is-disabled',
+  highlightedState: 'is-highlighted',
+  hiddenState: 'is-hidden',
+  flippedState: 'is-flipped',
+  loadingState: 'is-loading',
+  noResults: 'has-no-results',
+  noChoices: 'has-no-choices'
+};
+
+var DEFAULT_CONFIG = exports.DEFAULT_CONFIG = {
+  silent: false,
+  renderChoiceLimit: -1,
+  maxItemCount: -1,
+  addItems: true,
+  removeItems: true,
+  removeItemButton: false,
+  editItems: false,
+  duplicateItems: true,
+  delimiter: ',',
+  paste: true,
+  searchEnabled: true,
+  searchChoices: true,
+  searchFloor: 1,
+  searchResultLimit: 4,
+  searchFields: ['label', 'value'],
+  position: 'auto',
+  resetScrollPosition: true,
+  regexFilter: null,
+  shouldSort: true,
+  shouldSortItems: false,
+  placeholder: true,
+  placeholderValue: null,
+  searchPlaceholderValue: null,
+  prependValue: null,
+  appendValue: null,
+  renderSelectedChoices: 'auto',
+  loadingText: 'Loading...',
+  noResultsText: 'No results found',
+  noChoicesText: 'No choices to choose from',
+  itemSelectText: 'Press to select',
+  addItemText: function addItemText(value) {
+    return 'Press Enter to add <b>"' + value + '"</b>';
+  },
+  maxItemText: function maxItemText(maxItemCount) {
+    return 'Only ' + maxItemCount + ' values can be added.';
+  },
+  uniqueItemText: 'Only unique values can be added.',
+  fuseOptions: {
+    includeScore: true
+  },
+  callbackOnInit: null,
+  callbackOnCreateTemplates: null
+};
+
+var EVENTS = exports.EVENTS = {
+  showDropdown: 'showDropdown',
+  hideDropdown: 'hideDropdown',
+  change: 'change',
+  choice: 'choice',
+  search: 'search',
+  addItem: 'addItem',
+  removeItem: 'removeItem',
+  highlightItem: 'highlightItem'
+};
+
+var ACTION_TYPES = exports.ACTION_TYPES = {
+  ADD_CHOICE: 'ADD_CHOICE',
+  FILTER_CHOICES: 'FILTER_CHOICES',
+  ACTIVATE_CHOICES: 'ACTIVATE_CHOICES',
+  CLEAR_CHOICES: 'CLEAR_CHOICES',
+  ADD_GROUP: 'ADD_GROUP',
+  ADD_ITEM: 'ADD_ITEM',
+  REMOVE_ITEM: 'REMOVE_ITEM',
+  HIGHLIGHT_ITEM: 'HIGHLIGHT_ITEM',
+  CLEAR_ALL: 'CLEAR_ALL'
+};
+
+var KEY_CODES = exports.KEY_CODES = {
+  BACK_KEY: 46,
+  DELETE_KEY: 8,
+  ENTER_KEY: 13,
+  A_KEY: 65,
+  ESC_KEY: 27,
+  UP_KEY: 38,
+  DOWN_KEY: 40,
+  PAGE_UP_KEY: 33,
+  PAGE_DOWN_KEY: 34
+};
+
+var SCROLLING_SPEED = exports.SCROLLING_SPEED = 4;
 
 /***/ }),
 /* 2 */
@@ -115,12 +811,8 @@ module.exports = __webpack_require__(2);
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
-// EXTERNAL MODULE: ./node_modules/fuse.js/dist/fuse.js
-var dist_fuse = __webpack_require__(3);
-var fuse_default = /*#__PURE__*/__webpack_require__.n(dist_fuse);
-
 // EXTERNAL MODULE: ./node_modules/redux/node_modules/lodash-es/_freeGlobal.js
-var _freeGlobal = __webpack_require__(4);
+var _freeGlobal = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_root.js
 
@@ -137,9 +829,9 @@ var root = _freeGlobal["a" /* default */] || freeSelf || Function('return this')
 
 
 /** Built-in value references. */
-var _Symbol_Symbol = _root.Symbol;
+var Symbol = _root.Symbol;
 
-/* harmony default export */ var _Symbol = (_Symbol_Symbol);
+/* harmony default export */ var _Symbol = (Symbol);
 
 // CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_getRawTag.js
 
@@ -364,7 +1056,7 @@ function isPlainObject(value) {
 /* harmony default export */ var lodash_es_isPlainObject = (isPlainObject);
 
 // EXTERNAL MODULE: ./node_modules/redux/node_modules/symbol-observable/index.js
-var symbol_observable = __webpack_require__(5);
+var symbol_observable = __webpack_require__(10);
 var symbol_observable_default = /*#__PURE__*/__webpack_require__.n(symbol_observable);
 
 // CONCATENATED MODULE: ./node_modules/redux/es/createStore.js
@@ -900,6 +1592,11 @@ function applyMiddleware() {
   };
 }
 // CONCATENATED MODULE: ./node_modules/redux/es/index.js
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "createStore", function() { return createStore_createStore; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "combineReducers", function() { return combineReducers; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "bindActionCreators", function() { return bindActionCreators; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "applyMiddleware", function() { return applyMiddleware; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "compose", function() { return compose; });
 
 
 
@@ -918,1691 +1615,54 @@ if (false) {
 }
 
 
-// CONCATENATED MODULE: ./src/scripts/src/reducers/items.js
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var defaultState = [];
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
 
-function items_items() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
-  var action = arguments[1];
+var g;
 
-  switch (action.type) {
-    case 'ADD_ITEM':
-      {
-        // Add object to items array
-        var newState = [].concat(_toConsumableArray(state), [{
-          id: action.id,
-          choiceId: action.choiceId,
-          groupId: action.groupId,
-          value: action.value,
-          label: action.label,
-          active: true,
-          highlighted: false,
-          customProperties: action.customProperties,
-          placeholder: action.placeholder || false,
-          keyCode: null
-        }]);
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
 
-        return newState.map(function (obj) {
-          var item = obj;
-          if (item.highlighted) {
-            item.highlighted = false;
-          }
-          return item;
-        });
-      }
-
-    case 'REMOVE_ITEM':
-      {
-        // Set item to inactive
-        return state.map(function (obj) {
-          var item = obj;
-          if (item.id === action.id) {
-            item.active = false;
-          }
-          return item;
-        });
-      }
-
-    case 'HIGHLIGHT_ITEM':
-      {
-        return state.map(function (obj) {
-          var item = obj;
-          if (item.id === action.id) {
-            item.highlighted = action.highlighted;
-          }
-          return item;
-        });
-      }
-
-    default:
-      {
-        return state;
-      }
-  }
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
 }
-// CONCATENATED MODULE: ./src/scripts/src/reducers/groups.js
-function groups__toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var groups_defaultState = [];
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
 
-function groups() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : groups_defaultState;
-  var action = arguments[1];
-
-  switch (action.type) {
-    case 'ADD_GROUP':
-      {
-        return [].concat(groups__toConsumableArray(state), [{
-          id: action.id,
-          value: action.value,
-          active: action.active,
-          disabled: action.disabled
-        }]);
-      }
-
-    case 'CLEAR_CHOICES':
-      {
-        return [];
-      }
-
-    default:
-      {
-        return state;
-      }
-  }
-}
-// CONCATENATED MODULE: ./src/scripts/src/reducers/choices.js
-function choices__toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var choices_defaultState = [];
-
-function choices_choices() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : choices_defaultState;
-  var action = arguments[1];
-
-  switch (action.type) {
-    case 'ADD_CHOICE':
-      {
-        /*
-            A disabled choice appears in the choice dropdown but cannot be selected
-            A selected choice has been added to the passed input's value (added as an item)
-            An active choice appears within the choice dropdown
-         */
-        return [].concat(choices__toConsumableArray(state), [{
-          id: action.id,
-          elementId: action.elementId,
-          groupId: action.groupId,
-          value: action.value,
-          label: action.label || action.value,
-          disabled: action.disabled || false,
-          selected: false,
-          active: true,
-          score: 9999,
-          customProperties: action.customProperties,
-          placeholder: action.placeholder || false,
-          keyCode: null
-        }]);
-      }
-
-    case 'ADD_ITEM':
-      {
-        // If all choices need to be activated
-        if (action.activateOptions) {
-          return state.map(function (obj) {
-            var choice = obj;
-            choice.active = action.active;
-            return choice;
-          });
-        }
-
-        // When an item is added and it has an associated choice,
-        // we want to disable it so it can't be chosen again
-        if (action.choiceId > -1) {
-          return state.map(function (obj) {
-            var choice = obj;
-            if (choice.id === parseInt(action.choiceId, 10)) {
-              choice.selected = true;
-            }
-            return choice;
-          });
-        }
-
-        return state;
-      }
-
-    case 'REMOVE_ITEM':
-      {
-        // When an item is removed and it has an associated choice,
-        // we want to re-enable it so it can be chosen again
-        if (action.choiceId > -1) {
-          return state.map(function (obj) {
-            var choice = obj;
-            if (choice.id === parseInt(action.choiceId, 10)) {
-              choice.selected = false;
-            }
-            return choice;
-          });
-        }
-
-        return state;
-      }
-
-    case 'FILTER_CHOICES':
-      {
-        return state.map(function (obj) {
-          var choice = obj;
-          // Set active state based on whether choice is
-          // within filtered results
-          choice.active = action.results.some(function (_ref) {
-            var item = _ref.item,
-                score = _ref.score;
-
-            if (item.id === choice.id) {
-              choice.score = score;
-              return true;
-            }
-            return false;
-          });
-
-          return choice;
-        });
-      }
-
-    case 'ACTIVATE_CHOICES':
-      {
-        return state.map(function (obj) {
-          var choice = obj;
-          choice.active = action.active;
-          return choice;
-        });
-      }
-
-    case 'CLEAR_CHOICES':
-      {
-        return choices_defaultState;
-      }
-
-    default:
-      {
-        return state;
-      }
-  }
-}
-// CONCATENATED MODULE: ./src/scripts/src/reducers/index.js
+module.exports = g;
 
 
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
-
-var appReducer = combineReducers({
-  items: items_items,
-  groups: groups,
-  choices: choices_choices
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
 
-var rootReducer = function rootReducer(passedState, action) {
-  var state = passedState;
-  // If we are clearing all items, groups and options we reassign
-  // state and then pass that state to our proper reducer. This isn't
-  // mutating our actual state
-  // See: http://stackoverflow.com/a/35641992
-  if (action.type === 'CLEAR_ALL') {
-    state = undefined;
-  }
-
-  return appReducer(state, action);
-};
-
-/* harmony default export */ var src_reducers = (rootReducer);
-// CONCATENATED MODULE: ./src/scripts/src/store/store.js
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function store__toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+var _utils = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-
-
-
-var store_Store = function () {
-  function Store() {
-    _classCallCheck(this, Store);
-
-    this.store = createStore_createStore(src_reducers, window.devToolsExtension ? window.devToolsExtension() : undefined);
-  }
-
-  /**
-   * Subscribe store to function call (wrapped Redux method)
-   * @param  {Function} onChange Function to trigger when state changes
-   * @return
-   */
-
-
-  _createClass(Store, [{
-    key: 'subscribe',
-    value: function subscribe(onChange) {
-      this.store.subscribe(onChange);
-    }
-
-    /**
-     * Dispatch event to store (wrapped Redux method)
-     * @param  {Function} action Action function to trigger
-     * @return
-     */
-
-  }, {
-    key: 'dispatch',
-    value: function dispatch(action) {
-      this.store.dispatch(action);
-    }
-
-    /**
-     * Get store object (wrapping Redux method)
-     * @return {Object} State
-     */
-
-  }, {
-    key: 'getState',
-    value: function getState() {
-      return this.store.getState();
-    }
-
-    /**
-     * Get items from store
-     * @return {Array} Item objects
-     */
-
-  }, {
-    key: 'getItems',
-    value: function getItems() {
-      var state = this.store.getState();
-      return state.items;
-    }
-
-    /**
-     * Get active items from store
-     * @return {Array} Item objects
-     */
-
-  }, {
-    key: 'getItemsFilteredByActive',
-    value: function getItemsFilteredByActive() {
-      var items = this.getItems();
-      var values = items.filter(function (item) {
-        return item.active === true;
-      }, []);
-
-      return values;
-    }
-
-    /**
-     * Get items from store reduced to just their values
-     * @return {Array} Item objects
-     */
-
-  }, {
-    key: 'getItemsReducedToValues',
-    value: function getItemsReducedToValues() {
-      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getItems();
-
-      var values = items.reduce(function (prev, current) {
-        prev.push(current.value);
-        return prev;
-      }, []);
-
-      return values;
-    }
-
-    /**
-     * Get choices from store
-     * @return {Array} Option objects
-     */
-
-  }, {
-    key: 'getChoices',
-    value: function getChoices() {
-      var state = this.store.getState();
-      return state.choices;
-    }
-
-    /**
-     * Get active choices from store
-     * @return {Array} Option objects
-     */
-
-  }, {
-    key: 'getChoicesFilteredByActive',
-    value: function getChoicesFilteredByActive() {
-      var choices = this.getChoices();
-      var values = choices.filter(function (choice) {
-        return choice.active === true;
-      });
-
-      return values;
-    }
-
-    /**
-     * Get selectable choices from store
-     * @return {Array} Option objects
-     */
-
-  }, {
-    key: 'getChoicesFilteredBySelectable',
-    value: function getChoicesFilteredBySelectable() {
-      var choices = this.getChoices();
-      var values = choices.filter(function (choice) {
-        return choice.disabled !== true;
-      });
-
-      return values;
-    }
-
-    /**
-     * Get choices that can be searched (excluding placeholders)
-     * @return {Array} Option objects
-     */
-
-  }, {
-    key: 'getSearchableChoices',
-    value: function getSearchableChoices() {
-      var filtered = this.getChoicesFilteredBySelectable();
-      return filtered.filter(function (choice) {
-        return choice.placeholder !== true;
-      });
-    }
-
-    /**
-     * Get single choice by it's ID
-     * @return {Object} Found choice
-     */
-
-  }, {
-    key: 'getChoiceById',
-    value: function getChoiceById(id) {
-      if (id) {
-        var choices = this.getChoicesFilteredByActive();
-        var foundChoice = choices.find(function (choice) {
-          return choice.id === parseInt(id, 10);
-        });
-        return foundChoice;
-      }
-      return false;
-    }
-
-    /**
-     * Get placeholder choice from store
-     * @return {Object} Found placeholder
-     */
-
-  }, {
-    key: 'getPlaceholderChoice',
-    value: function getPlaceholderChoice() {
-      var choices = this.getChoices();
-      var placeholderChoice = [].concat(store__toConsumableArray(choices)).reverse().find(function (choice) {
-        return choice.placeholder === true;
-      });
-
-      return placeholderChoice;
-    }
-
-    /**
-     * Get groups from store
-     * @return {Array} Group objects
-     */
-
-  }, {
-    key: 'getGroups',
-    value: function getGroups() {
-      var state = this.store.getState();
-      return state.groups;
-    }
-
-    /**
-     * Get active groups from store
-     * @return {Array} Group objects
-     */
-
-  }, {
-    key: 'getGroupsFilteredByActive',
-    value: function getGroupsFilteredByActive() {
-      var groups = this.getGroups();
-      var choices = this.getChoices();
-
-      var values = groups.filter(function (group) {
-        var isActive = group.active === true && group.disabled === false;
-        var hasActiveOptions = choices.some(function (choice) {
-          return choice.active === true && choice.disabled === false;
-        });
-        return isActive && hasActiveOptions;
-      }, []);
-
-      return values;
-    }
-
-    /**
-     * Get group by group id
-     * @param  {Number} id Group ID
-     * @return {Object}    Group data
-     */
-
-  }, {
-    key: 'getGroupById',
-    value: function getGroupById(id) {
-      var groups = this.getGroups();
-      var foundGroup = groups.find(function (group) {
-        return group.id === parseInt(id, 10);
-      });
-
-      return foundGroup;
-    }
-  }]);
-
-  return Store;
-}();
-
-/* harmony default export */ var store_store = (store_Store);
-// CONCATENATED MODULE: ./src/scripts/src/components/dropdown.js
-var dropdown__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function dropdown__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Dropdown = function () {
-  function Dropdown(instance, element, classNames) {
-    dropdown__classCallCheck(this, Dropdown);
-
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.dimensions = null;
-    this.position = null;
-    this.isActive = false;
-  }
-
-  dropdown__createClass(Dropdown, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Determine how far the top of our element is from
-     * the top of the window
-     * @return {Number} Vertical position
-     */
-
-  }, {
-    key: 'getVerticalPos',
-    value: function getVerticalPos() {
-      this.dimensions = this.element.getBoundingClientRect();
-      this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
-      return this.position;
-    }
-
-    /**
-     * Find element that matches passed selector
-     * @return {HTMLElement}
-     */
-
-  }, {
-    key: 'getChild',
-    value: function getChild(selector) {
-      return this.element.querySelector(selector);
-    }
-
-    /**
-     * Show dropdown to user by adding active state class
-     * @return {Object} Class instance
-     * @public
-     */
-
-  }, {
-    key: 'show',
-    value: function show() {
-      this.element.classList.add(this.classNames.activeState);
-      this.element.setAttribute('aria-expanded', 'true');
-      this.isActive = true;
-      return this.parentInstance;
-    }
-
-    /**
-     * Hide dropdown from user
-     * @return {Object} Class instance
-     * @public
-     */
-
-  }, {
-    key: 'hide',
-    value: function hide() {
-      this.element.classList.remove(this.classNames.activeState);
-      this.element.setAttribute('aria-expanded', 'false');
-      this.isActive = false;
-      return this.parentInstance;
-    }
-  }]);
-
-  return Dropdown;
-}();
-
-/* harmony default export */ var components_dropdown = (Dropdown);
-// CONCATENATED MODULE: ./src/scripts/src/components/container.js
-var container__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function container__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Container = function () {
-  function Container(instance, element, classNames) {
-    container__classCallCheck(this, Container);
-
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.config = instance.config;
-    this.isOpen = false;
-    this.isFlipped = false;
-    this.isFocussed = false;
-    this.isDisabled = false;
-    this.isLoading = false;
-    this.onFocus = this.onFocus.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-  }
-
-  container__createClass(Container, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Add event listeners
-    */
-
-  }, {
-    key: 'addEventListeners',
-    value: function addEventListeners() {
-      this.element.addEventListener('focus', this.onFocus);
-      this.element.addEventListener('blur', this.onBlur);
-    }
-
-    /**
-     * Remove event listeners
-    */
-
-    /** */
-
-  }, {
-    key: 'removeEventListeners',
-    value: function removeEventListeners() {
-      this.element.removeEventListener('focus', this.onFocus);
-      this.element.removeEventListener('blur', this.onBlur);
-    }
-
-    /**
-     * Set focussed state
-     */
-
-  }, {
-    key: 'onFocus',
-    value: function onFocus() {
-      this.isFocussed = true;
-    }
-
-    /**
-     * Remove blurred state
-     */
-
-  }, {
-    key: 'onBlur',
-    value: function onBlur() {
-      this.isFocussed = false;
-    }
-
-    /**
-     * Determine whether container should be flipped
-     * based on passed dropdown position
-     * @param {Number} dropdownPos
-     * @returns
-     */
-
-  }, {
-    key: 'shouldFlip',
-    value: function shouldFlip(dropdownPos) {
-      if (dropdownPos === undefined) {
-        return false;
-      }
-
-      var body = document.body;
-      var html = document.documentElement;
-      var winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-
-      // If flip is enabled and the dropdown bottom position is
-      // greater than the window height flip the dropdown.
-      var shouldFlip = false;
-      if (this.config.position === 'auto') {
-        shouldFlip = dropdownPos >= winHeight;
-      } else if (this.config.position === 'top') {
-        shouldFlip = true;
-      }
-
-      return shouldFlip;
-    }
-
-    /**
-     * Set active descendant attribute
-     * @param {Number} activeDescendant ID of active descendant
-     */
-
-  }, {
-    key: 'setActiveDescendant',
-    value: function setActiveDescendant(activeDescendantID) {
-      this.element.setAttribute('aria-activedescendant', activeDescendantID);
-    }
-
-    /**
-     * Remove active descendant attribute
-     */
-
-  }, {
-    key: 'removeActiveDescendant',
-    value: function removeActiveDescendant() {
-      this.element.removeAttribute('aria-activedescendant');
-    }
-  }, {
-    key: 'open',
-    value: function open(dropdownPos) {
-      this.element.classList.add(this.classNames.openState);
-      this.element.setAttribute('aria-expanded', 'true');
-      this.isOpen = true;
-
-      if (this.shouldFlip(dropdownPos)) {
-        this.element.classList.add(this.classNames.flippedState);
-        this.isFlipped = true;
-      }
-    }
-  }, {
-    key: 'close',
-    value: function close() {
-      this.element.classList.remove(this.classNames.openState);
-      this.element.setAttribute('aria-expanded', 'false');
-      this.removeActiveDescendant();
-      this.isOpen = false;
-
-      // A dropdown flips if it does not have space within the page
-      if (this.isFlipped) {
-        this.element.classList.remove(this.classNames.flippedState);
-        this.isFlipped = false;
-      }
-    }
-  }, {
-    key: 'focus',
-    value: function focus() {
-      if (!this.isFocussed) {
-        this.element.focus();
-      }
-    }
-  }, {
-    key: 'addFocusState',
-    value: function addFocusState() {
-      this.element.classList.add(this.classNames.focusState);
-    }
-  }, {
-    key: 'removeFocusState',
-    value: function removeFocusState() {
-      this.element.classList.remove(this.classNames.focusState);
-    }
-
-    /**
-     * Remove disabled state
-     */
-
-  }, {
-    key: 'enable',
-    value: function enable() {
-      this.element.classList.remove(this.config.classNames.disabledState);
-      this.element.removeAttribute('aria-disabled');
-      if (this.parentInstance.isSelectOneElement) {
-        this.element.setAttribute('tabindex', '0');
-      }
-      this.isDisabled = false;
-    }
-
-    /**
-     * Set disabled state
-     */
-
-  }, {
-    key: 'disable',
-    value: function disable() {
-      this.element.classList.add(this.config.classNames.disabledState);
-      this.element.setAttribute('aria-disabled', 'true');
-      if (this.parentInstance.isSelectOneElement) {
-        this.element.setAttribute('tabindex', '-1');
-      }
-      this.isDisabled = true;
-    }
-  }, {
-    key: 'revert',
-    value: function revert(originalElement) {
-      // Move passed element back to original position
-      this.element.parentNode.insertBefore(originalElement, this.element);
-      // Remove container
-      this.element.parentNode.removeChild(this.element);
-    }
-
-    /**
-     * Add loading state to element
-     */
-
-  }, {
-    key: 'addLoadingState',
-    value: function addLoadingState() {
-      this.element.classList.add(this.classNames.loadingState);
-      this.element.setAttribute('aria-busy', 'true');
-      this.isLoading = true;
-    }
-
-    /**
-     * Remove loading state from element
-     */
-
-  }, {
-    key: 'removeLoadingState',
-    value: function removeLoadingState() {
-      this.element.classList.remove(this.classNames.loadingState);
-      this.element.removeAttribute('aria-busy');
-      this.isLoading = false;
-    }
-  }]);
-
-  return Container;
-}();
-
-/* harmony default export */ var container = (Container);
-// CONCATENATED MODULE: ./src/scripts/src/lib/utils.js
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/* eslint-disable */
-
-/**
- * Capitalises the first letter of each word in a string
- * @param  {String} str String to capitalise
- * @return {String}     Capitalised string
- */
-var capitalise = function capitalise(str) {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-};
-
-/**
- * Generates a string of random chars
- * @param  {Number} length Length of the string to generate
- * @return {String} String of random chars
- */
-var generateChars = function generateChars(length) {
-  var chars = '';
-
-  for (var i = 0; i < length; i++) {
-    var randomChar = getRandomNumber(0, 36);
-    chars += randomChar.toString(36);
-  }
-
-  return chars;
-};
-
-/**
- * Generates a unique id based on an element
- * @param  {HTMLElement} element Element to generate the id from
- * @param  {String} Prefix for the Id
- * @return {String} Unique Id
- */
-var generateId = function generateId(element, prefix) {
-  var id = element.id || element.name && element.name + '-' + generateChars(2) || generateChars(4);
-  id = id.replace(/(:|\.|\[|\]|,)/g, '');
-  id = prefix + id;
-
-  return id;
-};
-
-/**
- * Tests the type of an object
- * @param  {String}  type Type to test object against
- * @param  {Object}  obj  Object to be tested
- * @return {Boolean}
- */
-var getType = function getType(obj) {
-  return Object.prototype.toString.call(obj).slice(8, -1);
-};
-
-/**
- * Tests the type of an object
- * @param  {String}  type Type to test object against
- * @param  {Object}  obj  Object to be tested
- * @return {Boolean}
- */
-var isType = function isType(type, obj) {
-  var clas = getType(obj);
-  return obj !== undefined && obj !== null && clas === type;
-};
-
-/**
- * Tests to see if a passed object is a node
- * @param  {Object}  obj  Object to be tested
- * @return {Boolean}
- */
-var isNode = function isNode(o) {
-  return (typeof Node === 'undefined' ? 'undefined' : _typeof(Node)) === 'object' ? o instanceof Node : o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && typeof o.nodeType === 'number' && typeof o.nodeName === 'string';
-};
-
-/**
- * Tests to see if a passed object is an element
- * @param  {Object}  obj  Object to be tested
- * @return {Boolean}
- */
-var isElement = function isElement(o) {
-  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object' ? o instanceof HTMLElement : // DOM2
-  o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
-};
-
-/**
- * Merges unspecified amount of objects into new object
- * @private
- * @return {Object} Merged object of arguments
- */
-var extend = function extend() {
-  var extended = {};
-  var length = arguments.length;
-
-  /**
-   * Merge one object into another
-   * @param  {Object} obj  Object to merge into extended object
-   */
-  var merge = function merge(obj) {
-    for (var prop in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-        // If deep merge and property is an object, merge properties
-        if (isType('Object', obj[prop])) {
-          extended[prop] = extend(true, extended[prop], obj[prop]);
-        } else {
-          extended[prop] = obj[prop];
-        }
-      }
-    }
-  };
-
-  // Loop through each passed argument
-  for (var i = 0; i < length; i++) {
-    // store argument at position i
-    var obj = arguments[i];
-
-    // If we are in fact dealing with an object, merge it.
-    if (isType('Object', obj)) {
-      merge(obj);
-    }
-  }
-
-  return extended;
-};
-
-/**
- * CSS transition end event listener
- * @return
- */
-var whichTransitionEvent = function whichTransitionEvent() {
-  var t = void 0,
-      el = document.createElement('fakeelement');
-
-  var transitions = {
-    transition: 'transitionend',
-    OTransition: 'oTransitionEnd',
-    MozTransition: 'transitionend',
-    WebkitTransition: 'webkitTransitionEnd'
-  };
-
-  for (t in transitions) {
-    if (el.style[t] !== undefined) {
-      return transitions[t];
-    }
-  }
-};
-
-/**
- * CSS animation end event listener
- * @return
- */
-var whichAnimationEvent = function whichAnimationEvent() {
-  var t = void 0,
-      el = document.createElement('fakeelement');
-
-  var animations = {
-    animation: 'animationend',
-    OAnimation: 'oAnimationEnd',
-    MozAnimation: 'animationend',
-    WebkitAnimation: 'webkitAnimationEnd'
-  };
-
-  for (t in animations) {
-    if (el.style[t] !== undefined) {
-      return animations[t];
-    }
-  }
-};
-
-/**
- *  Get the ancestors of each element in the current set of matched elements,
- *  up to but not including the element matched by the selector
- * @param  {NodeElement} elem     Element to begin search from
- * @param  {NodeElement} parent   Parent to find
- * @param  {String} selector Class to find
- * @return {Array}          Array of parent elements
- */
-var getParentsUntil = function getParentsUntil(elem, parent, selector) {
-  var parents = [];
-  // Get matches
-  for (; elem && elem !== document; elem = elem.parentNode) {
-    // Check if parent has been reached
-    if (parent) {
-      var parentType = parent.charAt(0);
-
-      // If parent is a class
-      if (parentType === '.') {
-        if (elem.classList.contains(parent.substr(1))) {
-          break;
-        }
-      }
-
-      // If parent is an ID
-      if (parentType === '#') {
-        if (elem.id === parent.substr(1)) {
-          break;
-        }
-      }
-
-      // If parent is a data attribute
-      if (parentType === '[') {
-        if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
-          break;
-        }
-      }
-
-      // If parent is a tag
-      if (elem.tagName.toLowerCase() === parent) {
-        break;
-      }
-    }
-    if (selector) {
-      var selectorType = selector.charAt(0);
-
-      // If selector is a class
-      if (selectorType === '.') {
-        if (elem.classList.contains(selector.substr(1))) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is an ID
-      if (selectorType === '#') {
-        if (elem.id === selector.substr(1)) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is a data attribute
-      if (selectorType === '[') {
-        if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is a tag
-      if (elem.tagName.toLowerCase() === selector) {
-        parents.push(elem);
-      }
-    } else {
-      parents.push(elem);
-    }
-  }
-
-  // Return parents if any exist
-  if (parents.length === 0) {
-    return null;
-  }
-  return parents;
-};
-
-var wrap = function wrap(element, wrapper) {
-  wrapper = wrapper || document.createElement('div');
-  if (element.nextSibling) {
-    element.parentNode.insertBefore(wrapper, element.nextSibling);
-  } else {
-    element.parentNode.appendChild(wrapper);
-  }
-  return wrapper.appendChild(element);
-};
-
-var getSiblings = function getSiblings(elem) {
-  var siblings = [];
-  var sibling = elem.parentNode.firstChild;
-  for (; sibling; sibling = sibling.nextSibling) {
-    if (sibling.nodeType === 1 && sibling !== elem) {
-      siblings.push(sibling);
-    }
-  }
-  return siblings;
-};
-
-/**
- * Find ancestor in DOM tree
- * @param  {NodeElement} el  Element to start search from
- * @param  {[type]} cls Class of parent
- * @return {NodeElement}     Found parent element
- */
-var findAncestor = function findAncestor(el, cls) {
-  while ((el = el.parentElement) && !el.classList.contains(cls)) {}
-  return el;
-};
-
-/**
- * Find ancestor in DOM tree by attribute name
- * @param  {NodeElement} el  Element to start search from
- * @param  {string} attr Attribute name of parent
- * @return {?NodeElement}     Found parent element or null
- */
-var findAncestorByAttrName = function findAncestorByAttrName(el, attr) {
-  var target = el;
-
-  while (target) {
-    if (target.hasAttribute(attr)) {
-      return target;
-    }
-
-    target = target.parentElement;
-  }
-
-  return null;
-};
-
-/**
- * Debounce an event handler.
- * @param  {Function} func      Function to run after wait
- * @param  {Number} wait      The delay before the function is executed
- * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing.
- * @return {Function}           A function will be called after it stops being called for a given delay
- */
-var debounce = function debounce(func, wait, immediate) {
-  var timeout = void 0;
-  return function () {
-    var context = this,
-        args = arguments;
-    var later = function later() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-};
-
-/**
- * Get an element's distance from the top of the page
- * @private
- * @param  {NodeElement} el Element to test for
- * @return {Number} Elements Distance from top of page
- */
-var getElemDistance = function getElemDistance(el) {
-  var location = 0;
-  if (el.offsetParent) {
-    do {
-      location += el.offsetTop;
-      el = el.offsetParent;
-    } while (el);
-  }
-  return location >= 0 ? location : 0;
-};
-
-/**
- * Determine element height multiplied by any offsets
- * @private
- * @param  {HTMLElement} el Element to test for
- * @return {Number}    Height of element
- */
-var getElementOffset = function getElementOffset(el, offset) {
-  var elOffset = offset;
-  if (elOffset > 1) elOffset = 1;
-  if (elOffset > 0) elOffset = 0;
-
-  return Math.max(el.offsetHeight * elOffset);
-};
-
-/**
- * Get the next or previous element from a given start point
- * @param  {HTMLElement} startEl    Element to start position from
- * @param  {String}      className  The class we will look through
- * @param  {Number}      direction  Positive next element, negative previous element
- * @return {[HTMLElement}           Found element
- */
-var getAdjacentEl = function getAdjacentEl(startEl, className) {
-  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
-  if (!startEl || !className) return;
-
-  var parent = startEl.parentNode.parentNode;
-  var children = Array.from(parent.querySelectorAll(className));
-
-  var startPos = children.indexOf(startEl);
-  var operatorDirection = direction > 0 ? 1 : -1;
-
-  return children[startPos + operatorDirection];
-};
-
-/**
- * Get scroll position based on top/bottom position
- * @private
- * @return {String} Position of scroll
- */
-var getScrollPosition = function getScrollPosition(position) {
-  if (position === 'bottom') {
-    // Scroll position from the bottom of the viewport
-    return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
-  }
-  // Scroll position from the top of the viewport
-  return window.scrollY || window.pageYOffset;
-};
-
-/**
- * Determine whether an element is within the viewport
- * @param  {HTMLElement}  el Element to test
- * @return {String} Position of scroll
- * @return {Boolean}
- */
-var isInView = function isInView(el, position, offset) {
-  // If the user has scrolled further than the distance from the element to the top of its parent
-  return this.getScrollPosition(position) > this.getElemDistance(el) + this.getElementOffset(el, offset);
-};
-
-/**
- * Determine whether an element is within
- * @param  {HTMLElement} el        Element to test
- * @param  {HTMLElement} parent    Scrolling parent
- * @param  {Number} direction      Whether element is visible from above or below
- * @return {Boolean}
- */
-var isScrolledIntoView = function isScrolledIntoView(el, parent) {
-  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
-  if (!el) return;
-
-  var isVisible = void 0;
-
-  if (direction > 0) {
-    // In view from bottom
-    isVisible = parent.scrollTop + parent.offsetHeight >= el.offsetTop + el.offsetHeight;
-  } else {
-    // In view from top
-    isVisible = el.offsetTop >= parent.scrollTop;
-  }
-
-  return isVisible;
-};
-
-/**
- * Remove html tags from a string
- * @param  {String}  Initial string/html
- * @return {String}  Sanitised string
- */
-var stripHTML = function stripHTML(html) {
-  var el = document.createElement('DIV');
-  el.innerHTML = html;
-  return el.textContent || el.innerText || '';
-};
-
-/**
- * Adds animation to an element and removes it upon animation completion
- * @param  {Element} el        Element to add animation to
- * @param  {String} animation Animation class to add to element
- * @return
- */
-var addAnimation = function addAnimation(el, animation) {
-  var animationEvent = whichAnimationEvent();
-
-  var removeAnimation = function removeAnimation() {
-    el.classList.remove(animation);
-    el.removeEventListener(animationEvent, removeAnimation, false);
-  };
-
-  el.classList.add(animation);
-  el.addEventListener(animationEvent, removeAnimation, false);
-};
-
-/**
- * Get a random number between a range
- * @param  {Number} min Minimum range
- * @param  {Number} max Maximum range
- * @return {Number}     Random number
- */
-var getRandomNumber = function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-};
-
-/**
- * Turn a string into a node
- * @param  {String} String to convert
- * @return {HTMLElement}   Converted node element
- */
-var strToEl = function () {
-  var tmpEl = document.createElement('div');
-  return function (str) {
-    var cleanedInput = str.trim();
-    var r = void 0;
-    tmpEl.innerHTML = cleanedInput;
-    r = tmpEl.children[0];
-
-    while (tmpEl.firstChild) {
-      tmpEl.removeChild(tmpEl.firstChild);
-    }
-
-    return r;
-  };
-}();
-
-/**
- * Sets the width of a passed input based on its value
- * @return {Number} Width of input
- */
-var getWidthOfInput = function getWidthOfInput(input) {
-  var value = input.value || input.placeholder;
-  var width = input.offsetWidth;
-
-  if (value) {
-    var testEl = strToEl('<span>' + value + '</span>');
-    testEl.style.position = 'absolute';
-    testEl.style.padding = '0';
-    testEl.style.top = '-9999px';
-    testEl.style.left = '-9999px';
-    testEl.style.width = 'auto';
-    testEl.style.whiteSpace = 'pre';
-
-    if (document.body.contains(input) && window.getComputedStyle) {
-      var inputStyle = window.getComputedStyle(input);
-
-      if (inputStyle) {
-        testEl.style.fontSize = inputStyle.fontSize;
-        testEl.style.fontFamily = inputStyle.fontFamily;
-        testEl.style.fontWeight = inputStyle.fontWeight;
-        testEl.style.fontStyle = inputStyle.fontStyle;
-        testEl.style.letterSpacing = inputStyle.letterSpacing;
-        testEl.style.textTransform = inputStyle.textTransform;
-        testEl.style.padding = inputStyle.padding;
-      }
-    }
-
-    document.body.appendChild(testEl);
-
-    if (value && testEl.offsetWidth !== input.offsetWidth) {
-      width = testEl.offsetWidth + 4;
-    }
-
-    document.body.removeChild(testEl);
-  }
-
-  return width + 'px';
-};
-
-/**
- * Sorting function for current and previous string
- * @param  {String} a Current value
- * @param  {String} b Next value
- * @return {Number}   -1 for after previous,
- *                    1 for before,
- *                    0 for same location
- */
-var sortByAlpha = function sortByAlpha(a, b) {
-  var labelA = (a.label || a.value).toLowerCase();
-  var labelB = (b.label || b.value).toLowerCase();
-
-  if (labelA < labelB) return -1;
-  if (labelA > labelB) return 1;
-  return 0;
-};
-
-/**
- * Sort by numeric score
- * @param  {Object} a Current value
- * @param  {Object} b Next value
- * @return {Number}   -1 for after previous,
- *                    1 for before,
- *                    0 for same location
- */
-var sortByScore = function sortByScore(a, b) {
-  return a.score - b.score;
-};
-
-/**
- * Dispatch native event
- * @param  {NodeElement} element Element to trigger event on
- * @param  {String} type         Type of event to trigger
- * @param  {Object} customArgs   Data to pass with event
- * @return {Object}              Triggered event
- */
-var dispatchEvent = function dispatchEvent(element, type) {
-  var customArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-  var event = new CustomEvent(type, {
-    detail: customArgs,
-    bubbles: true,
-    cancelable: true
-  });
-
-  return element.dispatchEvent(event);
-};
-
-/**
- * Tests value against a regular expression
- * @param  {string} value   Value to test
- * @return {Boolean}        Whether test passed/failed
- * @private
- */
-var regexFilter = function regexFilter(value, regex) {
-  if (!value || !regex) {
-    return false;
-  }
-
-  var expression = new RegExp(regex.source, 'i');
-  return expression.test(value);
-};
-// CONCATENATED MODULE: ./src/scripts/src/components/input.js
-var input__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function input__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-var input_Input = function () {
-  function Input(instance, element, classNames) {
-    input__classCallCheck(this, Input);
-
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.isFocussed = this.element === document.activeElement;
-    this.isDisabled = false;
-
-    // Bind event listeners
-    this.onPaste = this.onPaste.bind(this);
-    this.onInput = this.onInput.bind(this);
-    this.onFocus = this.onFocus.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-  }
-
-  input__createClass(Input, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-  }, {
-    key: 'addEventListeners',
-    value: function addEventListeners() {
-      this.element.addEventListener('input', this.onInput);
-      this.element.addEventListener('paste', this.onPaste);
-      this.element.addEventListener('focus', this.onFocus);
-      this.element.addEventListener('blur', this.onBlur);
-    }
-  }, {
-    key: 'removeEventListeners',
-    value: function removeEventListeners() {
-      this.element.removeEventListener('input', this.onInput);
-      this.element.removeEventListener('paste', this.onPaste);
-      this.element.removeEventListener('focus', this.onFocus);
-      this.element.removeEventListener('blur', this.onBlur);
-    }
-
-    /**
-     * Input event
-     * @return
-     * @private
-     */
-
-  }, {
-    key: 'onInput',
-    value: function onInput() {
-      if (!this.parentInstance.isSelectOneElement) {
-        this.setWidth();
-      }
-    }
-
-    /**
-     * Paste event
-     * @param  {Object} e Event
-     * @return
-     * @private
-     */
-
-  }, {
-    key: 'onPaste',
-    value: function onPaste(e) {
-      // Disable pasting into the input if option has been set
-      if (e.target === this.element && !this.parentInstance.config.paste) {
-        e.preventDefault();
-      }
-    }
-
-    /**
-     * Set focussed state
-     */
-
-  }, {
-    key: 'onFocus',
-    value: function onFocus() {
-      this.isFocussed = true;
-    }
-
-    /**
-     * Remove focussed state
-     */
-
-  }, {
-    key: 'onBlur',
-    value: function onBlur() {
-      this.isFocussed = false;
-    }
-  }, {
-    key: 'activate',
-    value: function activate(focusInput) {
-      // Optionally focus the input if we have a search input
-      if (focusInput && this.parentInstance.canSearch && document.activeElement !== this.element) {
-        this.element.focus();
-      }
-    }
-  }, {
-    key: 'deactivate',
-    value: function deactivate(blurInput) {
-      this.removeActiveDescendant();
-      // Optionally blur the input if we have a search input
-      if (blurInput && this.parentInstance.canSearch && document.activeElement === this.element) {
-        this.element.blur();
-      }
-    }
-  }, {
-    key: 'enable',
-    value: function enable() {
-      this.element.removeAttribute('disabled');
-      this.isDisabled = false;
-    }
-  }, {
-    key: 'disable',
-    value: function disable() {
-      this.element.setAttribute('disabled', '');
-      this.isDisabled = true;
-    }
-  }, {
-    key: 'focus',
-    value: function focus() {
-      if (!this.isFocussed) {
-        this.element.focus();
-      }
-    }
-
-    /**
-     * Set value of input to blank
-     * @return {Object} Class instance
-     * @public
-     */
-
-  }, {
-    key: 'clear',
-    value: function clear() {
-      var setWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-      if (this.element.value) {
-        this.element.value = '';
-      }
-
-      if (setWidth) {
-        this.setWidth();
-      }
-
-      return this.parentInstance;
-    }
-
-    /**
-     * Set the correct input width based on placeholder
-     * value or input value
-     * @return
-     */
-
-  }, {
-    key: 'setWidth',
-    value: function setWidth(enforceWidth) {
-      if (this.parentInstance.placeholder) {
-        // If there is a placeholder, we only want to set the width of the input when it is a greater
-        // length than 75% of the placeholder. This stops the input jumping around.
-        if (this.element.value && this.element.value.length >= this.parentInstance.placeholder.length / 1.25 || enforceWidth) {
-          this.element.style.width = this.getWidth();
-        }
-      } else {
-        // If there is no placeholder, resize input to contents
-        this.element.style.width = this.getWidth();
-      }
-    }
-  }, {
-    key: 'getWidth',
-    value: function getWidth() {
-      return getWidthOfInput(this.element);
-    }
-  }, {
-    key: 'setPlaceholder',
-    value: function setPlaceholder(placeholder) {
-      this.element.placeholder = placeholder;
-    }
-  }, {
-    key: 'setValue',
-    value: function setValue(value) {
-      this.element.value = value;
-    }
-  }, {
-    key: 'getValue',
-    value: function getValue() {
-      return this.element.value;
-    }
-  }, {
-    key: 'setActiveDescendant',
-    value: function setActiveDescendant(activeDescendantID) {
-      this.element.setAttribute('aria-activedescendant', activeDescendantID);
-    }
-  }, {
-    key: 'removeActiveDescendant',
-    value: function removeActiveDescendant() {
-      this.element.removeAttribute('aria-activedescendant');
-    }
-  }]);
-
-  return Input;
-}();
-
-/* harmony default export */ var components_input = (input_Input);
-// CONCATENATED MODULE: ./src/scripts/src/components/list.js
-var list__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function list__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var List = function () {
-  function List(instance, element, classNames) {
-    list__classCallCheck(this, List);
-
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.scrollPos = this.element.scrollTop;
-    this.height = this.element.offsetHeight;
-    this.hasChildren = !!this.element.children;
-  }
-
-  list__createClass(List, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Clear List contents
-     */
-
-  }, {
-    key: 'clear',
-    value: function clear() {
-      this.element.innerHTML = '';
-    }
-
-    /**
-     * Scroll to passed position on Y axis
-     */
-
-  }, {
-    key: 'scrollTo',
-    value: function scrollTo() {
-      var scrollPos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-
-      this.element.scrollTop = scrollPos;
-    }
-    /**
-     * Append node to element
-     */
-
-  }, {
-    key: 'append',
-    value: function append(node) {
-      this.element.appendChild(node);
-    }
-
-    /**
-     * Find element that matches passed selector
-     * @return {HTMLElement}
-    */
-
-  }, {
-    key: 'getChild',
-    value: function getChild(selector) {
-      return this.element.querySelector(selector);
-    }
-  }]);
-
-  return List;
-}();
-
-/* harmony default export */ var list = (List);
-// CONCATENATED MODULE: ./src/scripts/src/components/wrapped-element.js
-var wrapped_element__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function wrapped_element__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-var wrapped_element_WrappedElement = function () {
+var WrappedElement = function () {
   function WrappedElement(instance, element, classNames) {
-    wrapped_element__classCallCheck(this, WrappedElement);
+    _classCallCheck(this, WrappedElement);
 
     this.parentInstance = instance;
     this.element = element;
@@ -2610,7 +1670,7 @@ var wrapped_element_WrappedElement = function () {
     this.isDisabled = false;
   }
 
-  wrapped_element__createClass(WrappedElement, [{
+  _createClass(WrappedElement, [{
     key: 'getElement',
     value: function getElement() {
       return this.element;
@@ -2679,503 +1739,102 @@ var wrapped_element_WrappedElement = function () {
   }, {
     key: 'triggerEvent',
     value: function triggerEvent(eventType, data) {
-      dispatchEvent(this.element, eventType, data);
+      (0, _utils.dispatchEvent)(this.element, eventType, data);
     }
   }]);
 
   return WrappedElement;
 }();
 
-/* harmony default export */ var wrapped_element = (wrapped_element_WrappedElement);
-// CONCATENATED MODULE: ./src/scripts/src/components/wrapped-input.js
-var wrapped_input__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+exports.default = WrappedElement;
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
 
-function wrapped_input__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+module.exports = __webpack_require__(6);
 
 
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var WrappedInput = function (_WrappedElement) {
-  _inherits(WrappedInput, _WrappedElement);
-
-  function WrappedInput(instance, element, classNames) {
-    wrapped_input__classCallCheck(this, WrappedInput);
-
-    var _this = _possibleConstructorReturn(this, (WrappedInput.__proto__ || Object.getPrototypeOf(WrappedInput)).call(this, instance, element, classNames));
-
-    _this.parentInstance = instance;
-    _this.element = element;
-    _this.classNames = classNames;
-    return _this;
-  }
-
-  wrapped_input__createClass(WrappedInput, [{
-    key: 'getElement',
-    value: function getElement() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'getElement', this).call(this);
-    }
-  }, {
-    key: 'conceal',
-    value: function conceal() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'conceal', this).call(this);
-    }
-  }, {
-    key: 'reveal',
-    value: function reveal() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'reveal', this).call(this);
-    }
-  }, {
-    key: 'enable',
-    value: function enable() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'disable',
-    value: function disable() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'setValue',
-    value: function setValue(value) {
-      this.element.setAttribute('value', value);
-      this.element.value = value;
-    }
-  }]);
-
-  return WrappedInput;
-}(wrapped_element);
-
-/* harmony default export */ var wrapped_input = (WrappedInput);
-// CONCATENATED MODULE: ./src/scripts/src/components/wrapped-select.js
-var wrapped_select__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var wrapped_select__get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-function wrapped_select__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function wrapped_select__possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function wrapped_select__inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+"use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var WrappedSelect = function (_WrappedElement) {
-  wrapped_select__inherits(WrappedSelect, _WrappedElement);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-  function WrappedSelect(instance, element, classNames) {
-    wrapped_select__classCallCheck(this, WrappedSelect);
+var _fuse = __webpack_require__(7);
 
-    var _this = wrapped_select__possibleConstructorReturn(this, (WrappedSelect.__proto__ || Object.getPrototypeOf(WrappedSelect)).call(this, instance, element, classNames));
+var _fuse2 = _interopRequireDefault(_fuse);
 
-    _this.parentInstance = instance;
-    _this.element = element;
-    _this.classNames = classNames;
-    return _this;
-  }
+var _store = __webpack_require__(8);
 
-  wrapped_select__createClass(WrappedSelect, [{
-    key: 'getElement',
-    value: function getElement() {
-      wrapped_select__get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'getElement', this).call(this);
-    }
-  }, {
-    key: 'conceal',
-    value: function conceal() {
-      wrapped_select__get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'conceal', this).call(this);
-    }
-  }, {
-    key: 'reveal',
-    value: function reveal() {
-      wrapped_select__get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'reveal', this).call(this);
-    }
-  }, {
-    key: 'enable',
-    value: function enable() {
-      wrapped_select__get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'disable',
-    value: function disable() {
-      wrapped_select__get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'setOptions',
-    value: function setOptions(options) {
-      this.element.innerHTML = '';
-      this.element.appendChild(options);
-    }
-  }, {
-    key: 'getPlaceholderOption',
-    value: function getPlaceholderOption() {
-      return this.element.querySelector('option[placeholder]');
-    }
-  }, {
-    key: 'getOptions',
-    value: function getOptions() {
-      return Array.from(this.element.options);
-    }
-  }, {
-    key: 'getOptionGroups',
-    value: function getOptionGroups() {
-      return Array.from(this.element.getElementsByTagName('OPTGROUP'));
-    }
-  }]);
+var _store2 = _interopRequireDefault(_store);
 
-  return WrappedSelect;
-}(wrapped_element);
+var _dropdown = __webpack_require__(18);
 
-/* harmony default export */ var wrapped_select = (WrappedSelect);
-// CONCATENATED MODULE: ./src/scripts/src/constants.js
+var _dropdown2 = _interopRequireDefault(_dropdown);
 
-var DEFAULT_CLASSNAMES = {
-  containerOuter: 'choices',
-  containerInner: 'choices__inner',
-  input: 'choices__input',
-  inputCloned: 'choices__input--cloned',
-  list: 'choices__list',
-  listItems: 'choices__list--multiple',
-  listSingle: 'choices__list--single',
-  listDropdown: 'choices__list--dropdown',
-  item: 'choices__item',
-  itemSelectable: 'choices__item--selectable',
-  itemDisabled: 'choices__item--disabled',
-  itemChoice: 'choices__item--choice',
-  placeholder: 'choices__placeholder',
-  group: 'choices__group',
-  groupHeading: 'choices__heading',
-  button: 'choices__button',
-  activeState: 'is-active',
-  focusState: 'is-focused',
-  openState: 'is-open',
-  disabledState: 'is-disabled',
-  highlightedState: 'is-highlighted',
-  hiddenState: 'is-hidden',
-  flippedState: 'is-flipped',
-  loadingState: 'is-loading',
-  noResults: 'has-no-results',
-  noChoices: 'has-no-choices'
-};
+var _container = __webpack_require__(19);
 
-var DEFAULT_CONFIG = {
-  silent: false,
-  renderChoiceLimit: -1,
-  maxItemCount: -1,
-  addItems: true,
-  removeItems: true,
-  removeItemButton: false,
-  editItems: false,
-  duplicateItems: true,
-  delimiter: ',',
-  paste: true,
-  searchEnabled: true,
-  searchChoices: true,
-  searchFloor: 1,
-  searchResultLimit: 4,
-  searchFields: ['label', 'value'],
-  position: 'auto',
-  resetScrollPosition: true,
-  regexFilter: null,
-  shouldSort: true,
-  shouldSortItems: false,
-  placeholder: true,
-  placeholderValue: null,
-  searchPlaceholderValue: null,
-  prependValue: null,
-  appendValue: null,
-  renderSelectedChoices: 'auto',
-  loadingText: 'Loading...',
-  noResultsText: 'No results found',
-  noChoicesText: 'No choices to choose from',
-  itemSelectText: 'Press to select',
-  addItemText: function addItemText(value) {
-    return 'Press Enter to add <b>"' + value + '"</b>';
-  },
-  maxItemText: function maxItemText(maxItemCount) {
-    return 'Only ' + maxItemCount + ' values can be added.';
-  },
-  uniqueItemText: 'Only unique values can be added.',
-  fuseOptions: {
-    includeScore: true
-  },
-  callbackOnInit: null,
-  callbackOnCreateTemplates: null
-};
+var _container2 = _interopRequireDefault(_container);
 
-var EVENTS = {
-  showDropdown: 'showDropdown',
-  hideDropdown: 'hideDropdown',
-  change: 'change',
-  choice: 'choice',
-  search: 'search',
-  addItem: 'addItem',
-  removeItem: 'removeItem',
-  highlightItem: 'highlightItem'
-};
+var _input = __webpack_require__(20);
 
-var ACTION_TYPES = {
-  ADD_CHOICE: 'ADD_CHOICE',
-  FILTER_CHOICES: 'FILTER_CHOICES',
-  ACTIVATE_CHOICES: 'ACTIVATE_CHOICES',
-  CLEAR_CHOICES: 'CLEAR_CHOICES',
-  ADD_GROUP: 'ADD_GROUP',
-  ADD_ITEM: 'ADD_ITEM',
-  REMOVE_ITEM: 'REMOVE_ITEM',
-  HIGHLIGHT_ITEM: 'HIGHLIGHT_ITEM',
-  CLEAR_ALL: 'CLEAR_ALL'
-};
+var _input2 = _interopRequireDefault(_input);
 
-var KEY_CODES = {
-  BACK_KEY: 46,
-  DELETE_KEY: 8,
-  ENTER_KEY: 13,
-  A_KEY: 65,
-  ESC_KEY: 27,
-  UP_KEY: 38,
-  DOWN_KEY: 40,
-  PAGE_UP_KEY: 33,
-  PAGE_DOWN_KEY: 34
-};
+var _list = __webpack_require__(21);
 
-var SCROLLING_SPEED = 4;
-// EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(9);
-var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
+var _list2 = _interopRequireDefault(_list);
 
-// CONCATENATED MODULE: ./src/scripts/src/templates.js
+var _wrappedInput = __webpack_require__(22);
+
+var _wrappedInput2 = _interopRequireDefault(_wrappedInput);
+
+var _wrappedSelect = __webpack_require__(23);
+
+var _wrappedSelect2 = _interopRequireDefault(_wrappedSelect);
+
+var _constants = __webpack_require__(1);
+
+var _templates = __webpack_require__(24);
+
+var _choices = __webpack_require__(26);
+
+var _items = __webpack_require__(27);
+
+var _groups = __webpack_require__(28);
+
+var _misc = __webpack_require__(29);
+
+var _utils = __webpack_require__(0);
+
+__webpack_require__(30);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-
-
-var TEMPLATES = {
-  containerOuter: function containerOuter(globalClasses, direction, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
-    var tabIndex = isSelectOneElement ? 'tabindex="0"' : '';
-    var role = isSelectElement ? 'role="listbox"' : '';
-    var ariaAutoComplete = '';
-
-    if (isSelectElement && searchEnabled) {
-      role = 'role="combobox"';
-      ariaAutoComplete = 'aria-autocomplete="list"';
-    }
-
-    return strToEl('\n      <div\n        class="' + globalClasses.containerOuter + '"\n        data-type="' + passedElementType + '"\n        ' + role + '\n        ' + tabIndex + '\n        ' + ariaAutoComplete + '\n        aria-haspopup="true"\n        aria-expanded="false"\n        dir="' + direction + '"\n        >\n      </div>\n    ');
-  },
-  containerInner: function containerInner(globalClasses) {
-    return strToEl('\n      <div class="' + globalClasses.containerInner + '"></div>\n    ');
-  },
-  itemList: function itemList(globalClasses, isSelectOneElement) {
-    var _classNames;
-
-    var localClasses = classnames_default()(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !isSelectOneElement), _classNames));
-
-    return strToEl('\n      <div class="' + localClasses + '"></div>\n    ');
-  },
-  placeholder: function placeholder(globalClasses, value) {
-    return strToEl('\n      <div class="' + globalClasses.placeholder + '">\n        ' + value + '\n      </div>\n    ');
-  },
-  item: function item(globalClasses, data, removeItemButton) {
-    var _classNames2;
-
-    var ariaSelected = data.active ? 'aria-selected="true"' : '';
-    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
-
-    var localClasses = classnames_default()(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _defineProperty(_classNames2, globalClasses.placeholder, data.placeholder), _classNames2));
-
-    if (removeItemButton) {
-      var _classNames3;
-
-      localClasses = classnames_default()(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames3, globalClasses.placeholder, data.placeholder), _classNames3));
-
-      return strToEl('\n        <div\n          class="' + localClasses + '"\n          data-item\n          data-id="' + data.id + '"\n          data-value="' + data.value + '"\n          data-deletable\n          ' + ariaSelected + '\n          ' + ariaDisabled + '\n          >\n          ' + data.label + '<!--\n       --><button\n            type="button"\n            class="' + globalClasses.button + '"\n            data-button\n            aria-label="Remove item: \'' + data.value + '\'"\n            >\n            Remove item\n          </button>\n        </div>\n      ');
-    }
-
-    return strToEl('\n      <div\n        class="' + localClasses + '"\n        data-item\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        ' + ariaSelected + '\n        ' + ariaDisabled + '\n        >\n        ' + data.label + '\n      </div>\n    ');
-  },
-  choiceList: function choiceList(globalClasses, isSelectOneElement) {
-    var ariaMultiSelectable = !isSelectOneElement ? 'aria-multiselectable="true"' : '';
-
-    return strToEl('\n      <div\n        class="' + globalClasses.list + '"\n        dir="ltr"\n        role="listbox"\n        ' + ariaMultiSelectable + '\n        >\n      </div>\n    ');
-  },
-  choiceGroup: function choiceGroup(globalClasses, data) {
-    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
-    var localClasses = classnames_default()(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
-
-    return strToEl('\n      <div\n        class="' + localClasses + '"\n        data-group\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        role="group"\n        ' + ariaDisabled + '\n        >\n        <div class="' + globalClasses.groupHeading + '">' + data.value + '</div>\n      </div>\n    ');
-  },
-  choice: function choice(globalClasses, data, itemSelectText) {
-    var _classNames5;
-
-    var role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
-    var localClasses = classnames_default()(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames5, globalClasses.placeholder, data.placeholder), _classNames5));
-
-    return strToEl('\n      <div\n        class="' + localClasses + '"\n        data-select-text="' + itemSelectText + '"\n        data-choice\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n        id="' + data.elementId + '"\n        ' + role + '\n        >\n        ' + data.label + '\n      </div>\n    ');
-  },
-  input: function input(globalClasses) {
-    var localClasses = classnames_default()(globalClasses.input, globalClasses.inputCloned);
-
-    return strToEl('\n      <input\n        type="text"\n        class="' + localClasses + '"\n        autocomplete="off"\n        autocapitalize="off"\n        spellcheck="false"\n        role="textbox"\n        aria-autocomplete="list"\n        >\n    ');
-  },
-  dropdown: function dropdown(globalClasses) {
-    var localClasses = classnames_default()(globalClasses.list, globalClasses.listDropdown);
-
-    return strToEl('\n      <div\n        class="' + localClasses + '"\n        aria-expanded="false"\n        >\n      </div>\n    ');
-  },
-  notice: function notice(globalClasses, label) {
-    var _classNames6;
-
-    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-
-    var localClasses = classnames_default()(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
-
-    return strToEl('\n      <div class="' + localClasses + '">\n        ' + label + '\n      </div>\n    ');
-  },
-  option: function option(globalClasses, data) {
-    return strToEl('\n      <option value="' + data.value + '" selected>' + data.label + '</option>\n    ');
-  }
-};
-
-/* harmony default export */ var templates = (TEMPLATES);
-// CONCATENATED MODULE: ./src/scripts/src/actions/choices.js
-
-
-var choices_addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
-  return {
-    type: ACTION_TYPES.ADD_CHOICE,
-    value: value,
-    label: label,
-    id: id,
-    groupId: groupId,
-    disabled: disabled,
-    elementId: elementId,
-    customProperties: customProperties,
-    placeholder: placeholder,
-    keyCode: keyCode
-  };
-};
-
-var choices_filterChoices = function filterChoices(results) {
-  return {
-    type: ACTION_TYPES.FILTER_CHOICES,
-    results: results
-  };
-};
-
-var choices_activateChoices = function activateChoices() {
-  var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-  return {
-    type: ACTION_TYPES.ACTIVATE_CHOICES,
-    active: active
-  };
-};
-
-var choices_clearChoices = function clearChoices() {
-  return {
-    type: ACTION_TYPES.CLEAR_CHOICES
-  };
-};
-// CONCATENATED MODULE: ./src/scripts/src/actions/items.js
-
-
-var items_addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
-  return {
-    type: ACTION_TYPES.ADD_ITEM,
-    value: value,
-    label: label,
-    id: id,
-    choiceId: choiceId,
-    groupId: groupId,
-    customProperties: customProperties,
-    placeholder: placeholder,
-    keyCode: keyCode
-  };
-};
-
-var items_removeItem = function removeItem(id, choiceId) {
-  return {
-    type: ACTION_TYPES.REMOVE_ITEM,
-    id: id,
-    choiceId: choiceId
-  };
-};
-
-var items_highlightItem = function highlightItem(id, highlighted) {
-  return {
-    type: ACTION_TYPES.HIGHLIGHT_ITEM,
-    id: id,
-    highlighted: highlighted
-  };
-};
-// CONCATENATED MODULE: ./src/scripts/src/actions/groups.js
-
-
-/* eslint-disable import/prefer-default-export */
-var groups_addGroup = function addGroup(value, id, active, disabled) {
-  return {
-    type: ACTION_TYPES.ADD_GROUP,
-    value: value,
-    id: id,
-    active: active,
-    disabled: disabled
-  };
-};
-// CONCATENATED MODULE: ./src/scripts/src/actions/misc.js
-/* eslint-disable import/prefer-default-export */
-var clearAll = function clearAll() {
-  return {
-    type: 'CLEAR_ALL'
-  };
-};
-// EXTERNAL MODULE: ./src/scripts/src/lib/polyfills.js
-var polyfills = __webpack_require__(10);
-var polyfills_default = /*#__PURE__*/__webpack_require__.n(polyfills);
-
-// CONCATENATED MODULE: ./src/scripts/src/choices.js
-var choices__extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var choices__createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function choices__defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function src_choices__toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function choices__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
  * Choices
  */
-
-var choices_Choices = function () {
+var Choices = function () {
   function Choices() {
     var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '[data-choice]';
     var userConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    choices__classCallCheck(this, Choices);
+    _classCallCheck(this, Choices);
 
     // If there are multiple elements, create a new instance
     // for each element besides the first one (as that already has an instance)
-    if (isType('String', element)) {
+    if ((0, _utils.isType)('String', element)) {
       var elements = document.querySelectorAll(element);
       if (elements.length > 1) {
         for (var i = 1; i < elements.length; i += 1) {
@@ -3186,22 +1845,22 @@ var choices_Choices = function () {
       }
     }
 
-    var defaultConfig = choices__extends({}, DEFAULT_CONFIG, {
+    var defaultConfig = _extends({}, _constants.DEFAULT_CONFIG, {
       items: [],
       choices: [],
-      classNames: DEFAULT_CLASSNAMES,
-      sortFilter: sortByAlpha
+      classNames: _constants.DEFAULT_CLASSNAMES,
+      sortFilter: _utils.sortByAlpha
     });
 
     // Merge options with user options
-    this.config = extend(defaultConfig, Choices.userDefaults, userConfig);
+    this.config = (0, _utils.extend)(defaultConfig, Choices.userDefaults, userConfig);
 
     if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
     }
 
     // Create data store
-    this.store = new store_store(this.render);
+    this.store = new _store2.default(this.render);
 
     // State tracking
     this.initialised = false;
@@ -3210,7 +1869,7 @@ var choices_Choices = function () {
     this.currentValue = '';
 
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-    var passedElement = isType('String', element) ? document.querySelector(element) : element;
+    var passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
 
     this.isTextElement = passedElement.type === 'text';
     this.isSelectOneElement = passedElement.type === 'select-one';
@@ -3219,9 +1878,9 @@ var choices_Choices = function () {
     this.isValidElementType = this.isTextElement || this.isSelectElement;
 
     if (this.isTextElement) {
-      this.passedElement = new wrapped_input(this, passedElement, this.config.classNames);
+      this.passedElement = new _wrappedInput2.default(this, passedElement, this.config.classNames);
     } else if (this.isSelectElement) {
-      this.passedElement = new wrapped_select(this, passedElement, this.config.classNames);
+      this.passedElement = new _wrappedSelect2.default(this, passedElement, this.config.classNames);
     }
 
     if (!this.passedElement) {
@@ -3259,7 +1918,7 @@ var choices_Choices = function () {
     }
 
     // Set unique base Id
-    this.baseId = generateId(this.passedElement.element, 'choices-');
+    this.baseId = (0, _utils.generateId)(this.passedElement.element, 'choices-');
 
     this.idNames = {
       itemChoice: 'item-choice'
@@ -3288,7 +1947,7 @@ var choices_Choices = function () {
       console.error('Choices: Your browser doesn\'t support Choices');
     }
 
-    var canInit = isElement(this.passedElement.element) && this.isValidElementType;
+    var canInit = (0, _utils.isElement)(this.passedElement.element) && this.isValidElementType;
 
     if (canInit) {
       // If element has already been initialised with Choices
@@ -3314,7 +1973,7 @@ var choices_Choices = function () {
    */
 
 
-  choices__createClass(Choices, [{
+  _createClass(Choices, [{
     key: 'init',
     value: function init() {
       if (this.initialised) {
@@ -3336,7 +1995,7 @@ var choices_Choices = function () {
 
       var callback = this.config.callbackOnInit;
       // Run callback if it is a function
-      if (callback && isType('Function', callback)) {
+      if (callback && (0, _utils.isType)('Function', callback)) {
         callback.call(this);
       }
     }
@@ -3481,7 +2140,7 @@ var choices_Choices = function () {
           searchResultLimit = _config.searchResultLimit,
           renderChoiceLimit = _config.renderChoiceLimit;
 
-      var filter = this.isSearching ? sortByScore : this.config.sortFilter;
+      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
       var appendChoice = function appendChoice(choice) {
         var shouldRender = renderSelectedChoices === 'auto' ? _this2.isSelectOneElement || !choice.selected : true;
         if (shouldRender) {
@@ -3521,7 +2180,7 @@ var choices_Choices = function () {
       var choiceLimit = rendererableChoices.length;
 
       // Prepend placeholeder
-      var sortedChoices = [].concat(src_choices__toConsumableArray(placeholderChoices), src_choices__toConsumableArray(normalChoices));
+      var sortedChoices = [].concat(_toConsumableArray(placeholderChoices), _toConsumableArray(normalChoices));
 
       if (this.isSearching) {
         choiceLimit = searchResultLimit;
@@ -3668,11 +2327,11 @@ var choices_Choices = function () {
           var notice = void 0;
 
           if (this.isSearching) {
-            notice = isType('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+            notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
 
             dropdownItem = this._getTemplate('notice', notice, 'no-results');
           } else {
-            notice = isType('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+            notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
 
             dropdownItem = this._getTemplate('notice', notice, 'no-choices');
           }
@@ -3730,10 +2389,10 @@ var choices_Choices = function () {
 
       var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
-      this.store.dispatch(items_highlightItem(id, true));
+      this.store.dispatch((0, _items.highlightItem)(id, true));
 
       if (runEvent) {
-        this.passedElement.triggerEvent(EVENTS.highlightItem, {
+        this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
           id: id,
           value: value,
           label: label,
@@ -3768,8 +2427,8 @@ var choices_Choices = function () {
 
       var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
-      this.store.dispatch(items_highlightItem(id, false));
-      this.passedElement.triggerEvent(EVENTS.highlightItem, {
+      this.store.dispatch((0, _items.highlightItem)(id, false));
+      this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
         id: id,
         value: value,
         label: label,
@@ -3827,7 +2486,7 @@ var choices_Choices = function () {
     value: function removeItemsByValue(value) {
       var _this6 = this;
 
-      if (!value || !isType('String', value)) {
+      if (!value || !(0, _utils.isType)('String', value)) {
         return this;
       }
 
@@ -3914,7 +2573,7 @@ var choices_Choices = function () {
       this.containerOuter.open(this.dropdown.getVerticalPos());
       this.dropdown.show();
       this.input.activate(focusInput);
-      this.passedElement.triggerEvent(EVENTS.showDropdown, {});
+      this.passedElement.triggerEvent(_constants.EVENTS.showDropdown, {});
 
       return this;
     }
@@ -3937,7 +2596,7 @@ var choices_Choices = function () {
       this.containerOuter.close();
       this.dropdown.hide();
       this.input.deactivate(blurInput);
-      this.passedElement.triggerEvent(EVENTS.hideDropdown, {});
+      this.passedElement.triggerEvent(_constants.EVENTS.hideDropdown, {});
 
       return this;
     }
@@ -4002,7 +2661,7 @@ var choices_Choices = function () {
       }
 
       // Convert args to an iterable array
-      var values = [].concat(src_choices__toConsumableArray(args));
+      var values = [].concat(_toConsumableArray(args));
       values.forEach(function (value) {
         return _this9._setChoiceOrItem(value);
       });
@@ -4027,7 +2686,7 @@ var choices_Choices = function () {
       }
 
       // If only one value has been passed, convert to array
-      var choiceValue = isType('Array', value) ? value : [value];
+      var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
 
       // Loop through each value and
       choiceValue.forEach(function (val) {
@@ -4058,7 +2717,7 @@ var choices_Choices = function () {
       var label = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-      if (!this.initialised || !this.isSelectElement || !isType('Array', choices) || !value) {
+      if (!this.initialised || !this.isSelectElement || !(0, _utils.isType)('Array', choices) || !value) {
         return this;
       }
 
@@ -4094,7 +2753,7 @@ var choices_Choices = function () {
   }, {
     key: 'clearStore',
     value: function clearStore() {
-      this.store.dispatch(clearAll());
+      this.store.dispatch((0, _misc.clearAll)());
       return this;
     }
 
@@ -4112,7 +2771,7 @@ var choices_Choices = function () {
 
       if (!this.isTextElement && this.config.searchEnabled) {
         this.isSearching = false;
-        this.store.dispatch(choices_activateChoices(true));
+        this.store.dispatch((0, _choices.activateChoices)(true));
       }
 
       return this;
@@ -4162,7 +2821,7 @@ var choices_Choices = function () {
         return;
       }
 
-      this.passedElement.triggerEvent(EVENTS.change, {
+      this.passedElement.triggerEvent(_constants.EVENTS.change, {
         value: value
       });
     }
@@ -4272,7 +2931,7 @@ var choices_Choices = function () {
       // Update choice keyCode
       choice.keyCode = passedKeyCode;
 
-      this.passedElement.triggerEvent(EVENTS.choice, {
+      this.passedElement.triggerEvent(_constants.EVENTS.choice, {
         choice: choice
       });
 
@@ -4377,14 +3036,14 @@ var choices_Choices = function () {
     key: '_canAddItem',
     value: function _canAddItem(activeItems, value) {
       var canAddItem = true;
-      var notice = isType('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
+      var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
       if (this.isSelectMultipleElement || this.isTextElement) {
         if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
           // If there is a max entry limit and we have reached that limit
           // don't update
           canAddItem = false;
-          notice = isType('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
+          notice = (0, _utils.isType)('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
         }
       }
 
@@ -4392,13 +3051,13 @@ var choices_Choices = function () {
         // If a user has supplied a regular expression filter
         // determine whether we can update based on whether
         // our regular expression passes
-        canAddItem = regexFilter(value, this.config.regexFilter);
+        canAddItem = (0, _utils.regexFilter)(value, this.config.regexFilter);
       }
 
       // If no duplicates are allowed, and the value already exists
       // in the array
       var isUnique = !activeItems.some(function (item) {
-        if (isType('String', value)) {
+        if ((0, _utils.isType)('String', value)) {
           return item.value === value.trim();
         }
 
@@ -4407,7 +3066,7 @@ var choices_Choices = function () {
 
       if (!isUnique && !this.config.duplicateItems && !this.isSelectOneElement && canAddItem) {
         canAddItem = false;
-        notice = isType('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+        notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
       }
 
       return {
@@ -4432,9 +3091,9 @@ var choices_Choices = function () {
           return;
         }
 
-        var parsedResults = isType('Object', results) ? [results] : results;
+        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
 
-        if (parsedResults && isType('Array', parsedResults) && parsedResults.length) {
+        if (parsedResults && (0, _utils.isType)('Array', parsedResults) && parsedResults.length) {
           // Remove loading states/text
           _this14._handleLoadingState(false);
           // Add each result as a choice
@@ -4467,8 +3126,8 @@ var choices_Choices = function () {
   }, {
     key: '_searchChoices',
     value: function _searchChoices(value) {
-      var newValue = isType('String', value) ? value.trim() : value;
-      var currentValue = isType('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+      var newValue = (0, _utils.isType)('String', value) ? value.trim() : value;
+      var currentValue = (0, _utils.isType)('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
 
       if (newValue.length < 1 && newValue === currentValue + ' ') {
         return 0;
@@ -4477,15 +3136,15 @@ var choices_Choices = function () {
       // If new value matches the desired length and is not the same as the current value with a space
       var haystack = this.store.getSearchableChoices();
       var needle = newValue;
-      var keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
+      var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
       var options = Object.assign(this.config.fuseOptions, { keys: keys });
-      var fuse = new fuse_default.a(haystack, options);
+      var fuse = new _fuse2.default(haystack, options);
       var results = fuse.search(needle);
 
       this.currentValue = newValue;
       this.highlightPosition = 0;
       this.isSearching = true;
-      this.store.dispatch(choices_filterChoices(results));
+      this.store.dispatch((0, _choices.filterChoices)(results));
 
       return results.length;
     }
@@ -4513,14 +3172,14 @@ var choices_Choices = function () {
       if (value && value.length >= this.config.searchFloor) {
         var resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
         // Trigger search event
-        this.passedElement.triggerEvent(EVENTS.search, {
+        this.passedElement.triggerEvent(_constants.EVENTS.search, {
           value: value,
           resultCount: resultCount
         });
       } else if (hasUnactiveChoices) {
         // Otherwise reset choices to active
         this.isSearching = false;
-        this.store.dispatch(choices_activateChoices(true));
+        this.store.dispatch((0, _choices.activateChoices)(true));
       }
     }
 
@@ -4602,15 +3261,15 @@ var choices_Choices = function () {
       var hasActiveDropdown = this.dropdown.isActive;
       var hasItems = this.itemList.hasChildren;
       var keyString = String.fromCharCode(e.keyCode);
-      var backKey = KEY_CODES.BACK_KEY;
-      var deleteKey = KEY_CODES.DELETE_KEY;
-      var enterKey = KEY_CODES.ENTER_KEY;
-      var aKey = KEY_CODES.A_KEY;
-      var escapeKey = KEY_CODES.ESC_KEY;
-      var upKey = KEY_CODES.UP_KEY;
-      var downKey = KEY_CODES.DOWN_KEY;
-      var pageUpKey = KEY_CODES.PAGE_UP_KEY;
-      var pageDownKey = KEY_CODES.PAGE_DOWN_KEY;
+      var backKey = _constants.KEY_CODES.BACK_KEY;
+      var deleteKey = _constants.KEY_CODES.DELETE_KEY;
+      var enterKey = _constants.KEY_CODES.ENTER_KEY;
+      var aKey = _constants.KEY_CODES.A_KEY;
+      var escapeKey = _constants.KEY_CODES.ESC_KEY;
+      var upKey = _constants.KEY_CODES.UP_KEY;
+      var downKey = _constants.KEY_CODES.DOWN_KEY;
+      var pageUpKey = _constants.KEY_CODES.PAGE_UP_KEY;
+      var pageDownKey = _constants.KEY_CODES.PAGE_DOWN_KEY;
       var ctrlDownKey = e.ctrlKey || e.metaKey;
 
       // If a user is typing and the dropdown is not active
@@ -4698,7 +3357,7 @@ var choices_Choices = function () {
           } else {
             var currentEl = _this15.dropdown.element.querySelector('.' + _this15.config.classNames.highlightedState);
             if (currentEl) {
-              nextEl = getAdjacentEl(currentEl, '[data-choice-selectable]', directionInt);
+              nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
             } else {
               nextEl = _this15.dropdown.element.querySelector('[data-choice-selectable]');
             }
@@ -4707,7 +3366,7 @@ var choices_Choices = function () {
           if (nextEl) {
             // We prevent default to stop the cursor moving
             // when pressing the arrow
-            if (!isScrolledIntoView(nextEl, _this15.choiceList, directionInt)) {
+            if (!(0, _utils.isScrolledIntoView)(nextEl, _this15.choiceList, directionInt)) {
               _this15._scrollToChoice(nextEl, directionInt);
             }
             _this15._highlightChoice(nextEl);
@@ -4728,7 +3387,7 @@ var choices_Choices = function () {
       };
 
       // Map keys to key actions
-      var keyDownActions = (_keyDownActions = {}, choices__defineProperty(_keyDownActions, aKey, onAKey), choices__defineProperty(_keyDownActions, enterKey, onEnterKey), choices__defineProperty(_keyDownActions, escapeKey, onEscapeKey), choices__defineProperty(_keyDownActions, upKey, onDirectionKey), choices__defineProperty(_keyDownActions, pageUpKey, onDirectionKey), choices__defineProperty(_keyDownActions, downKey, onDirectionKey), choices__defineProperty(_keyDownActions, pageDownKey, onDirectionKey), choices__defineProperty(_keyDownActions, deleteKey, onDeleteKey), choices__defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
+      var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, aKey, onAKey), _defineProperty(_keyDownActions, enterKey, onEnterKey), _defineProperty(_keyDownActions, escapeKey, onEscapeKey), _defineProperty(_keyDownActions, upKey, onDirectionKey), _defineProperty(_keyDownActions, pageUpKey, onDirectionKey), _defineProperty(_keyDownActions, downKey, onDirectionKey), _defineProperty(_keyDownActions, pageDownKey, onDirectionKey), _defineProperty(_keyDownActions, deleteKey, onDeleteKey), _defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
 
       // If keycode has a function, run it
       if (keyDownActions[e.keyCode]) {
@@ -4772,15 +3431,15 @@ var choices_Choices = function () {
           this.hideDropdown();
         }
       } else {
-        var backKey = KEY_CODES.BACK_KEY;
-        var deleteKey = KEY_CODES.DELETE_KEY;
+        var backKey = _constants.KEY_CODES.BACK_KEY;
+        var deleteKey = _constants.KEY_CODES.DELETE_KEY;
 
         // If user has removed value...
         if ((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
           // ...and it is a multiple select input, activate choices (if searching)
           if (!this.isTextElement && this.isSearching) {
             this.isSearching = false;
-            this.store.dispatch(choices_activateChoices(true));
+            this.store.dispatch((0, _choices.activateChoices)(true));
           }
         } else if (this.canSearch && canAddItem.response) {
           this._handleSearch(this.input.getValue());
@@ -4856,9 +3515,9 @@ var choices_Choices = function () {
         var activeItems = this.store.getItemsFilteredByActive();
         var hasShiftKey = e.shiftKey;
 
-        var buttonTarget = findAncestorByAttrName(target, 'data-button');
-        var itemTarget = findAncestorByAttrName(target, 'data-item');
-        var choiceTarget = findAncestorByAttrName(target, 'data-choice');
+        var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
+        var itemTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item');
+        var choiceTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice');
 
         if (buttonTarget) {
           this._handleButtonAction(activeItems, buttonTarget);
@@ -5077,7 +3736,7 @@ var choices_Choices = function () {
       var endPoint = direction > 0 ? this.choiceList.scrollPos + choicePos - containerScrollPos : choice.offsetTop;
 
       var animateScroll = function animateScroll() {
-        var strength = SCROLLING_SPEED;
+        var strength = _constants.SCROLLING_SPEED;
         var choiceListScrollTop = _this18.choiceList.scrollPos;
         var continueAnimation = false;
         var easing = void 0;
@@ -5192,7 +3851,7 @@ var choices_Choices = function () {
       var placeholder = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
       var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
-      var passedValue = isType('String', value) ? value.trim() : value;
+      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
       var passedKeyCode = keyCode;
       var items = this.store.getItems();
       var passedLabel = label || passedValue;
@@ -5214,7 +3873,7 @@ var choices_Choices = function () {
         passedValue += this.config.appendValue.toString();
       }
 
-      this.store.dispatch(items_addItem(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
+      this.store.dispatch((0, _items.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
 
       if (this.isSelectOneElement) {
         this.removeActiveItems(id);
@@ -5222,7 +3881,7 @@ var choices_Choices = function () {
 
       // Trigger change event
       if (group && group.value) {
-        this.passedElement.triggerEvent(EVENTS.addItem, {
+        this.passedElement.triggerEvent(_constants.EVENTS.addItem, {
           id: id,
           value: passedValue,
           label: passedLabel,
@@ -5230,7 +3889,7 @@ var choices_Choices = function () {
           keyCode: passedKeyCode
         });
       } else {
-        this.passedElement.triggerEvent(EVENTS.addItem, {
+        this.passedElement.triggerEvent(_constants.EVENTS.addItem, {
           id: id,
           value: passedValue,
           label: passedLabel,
@@ -5251,7 +3910,7 @@ var choices_Choices = function () {
   }, {
     key: '_removeItem',
     value: function _removeItem(item) {
-      if (!item || !isType('Object', item)) {
+      if (!item || !(0, _utils.isType)('Object', item)) {
         return this;
       }
 
@@ -5262,17 +3921,17 @@ var choices_Choices = function () {
       var groupId = item.groupId;
       var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
-      this.store.dispatch(items_removeItem(id, choiceId));
+      this.store.dispatch((0, _items.removeItem)(id, choiceId));
 
       if (group && group.value) {
-        this.passedElement.triggerEvent(EVENTS.removeItem, {
+        this.passedElement.triggerEvent(_constants.EVENTS.removeItem, {
           id: id,
           value: value,
           label: label,
           groupValue: group.value
         });
       } else {
-        this.passedElement.triggerEvent(EVENTS.removeItem, {
+        this.passedElement.triggerEvent(_constants.EVENTS.removeItem, {
           id: id,
           value: value,
           label: label
@@ -5315,7 +3974,7 @@ var choices_Choices = function () {
       var choiceId = choices ? choices.length + 1 : 1;
       var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
-      this.store.dispatch(choices_addChoice(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
+      this.store.dispatch((0, _choices.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
 
       if (isSelected) {
         this._addItem(value, choiceLabel, choiceId, undefined, customProperties, placeholder, keyCode);
@@ -5331,7 +3990,7 @@ var choices_Choices = function () {
   }, {
     key: '_clearChoices',
     value: function _clearChoices() {
-      this.store.dispatch(choices_clearChoices());
+      this.store.dispatch((0, _choices.clearChoices)());
     }
 
     /**
@@ -5352,21 +4011,21 @@ var choices_Choices = function () {
       var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
       var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
 
-      var groupChoices = isType('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
+      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
       var groupId = id || Math.floor(new Date().valueOf() * Math.random());
       var isDisabled = group.disabled ? group.disabled : false;
 
       if (groupChoices) {
-        this.store.dispatch(groups_addGroup(group.label, groupId, true, isDisabled));
+        this.store.dispatch((0, _groups.addGroup)(group.label, groupId, true, isDisabled));
 
         var addGroupChoices = function addGroupChoices(choice) {
           var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
-          _this20._addChoice(choice[valueKey], isType('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
+          _this20._addChoice(choice[valueKey], (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
         };
 
         groupChoices.forEach(addGroupChoices);
       } else {
-        this.store.dispatch(groups_addGroup(group.label, group.id, false, group.disabled));
+        this.store.dispatch((0, _groups.addGroup)(group.label, group.id, false, group.disabled));
       }
     }
 
@@ -5408,11 +4067,11 @@ var choices_Choices = function () {
       // User's custom templates
       var callbackTemplate = this.config.callbackOnCreateTemplates;
       var userTemplates = {};
-      if (callbackTemplate && isType('Function', callbackTemplate)) {
-        userTemplates = callbackTemplate.call(this, strToEl);
+      if (callbackTemplate && (0, _utils.isType)('Function', callbackTemplate)) {
+        userTemplates = callbackTemplate.call(this, _utils.strToEl);
       }
 
-      this.config.templates = extend(TEMPLATES, userTemplates);
+      this.config.templates = (0, _utils.extend)(_templates.TEMPLATES, userTemplates);
     }
 
     /**
@@ -5432,19 +4091,19 @@ var choices_Choices = function () {
       var input = this._getTemplate('input');
       var dropdown = this._getTemplate('dropdown');
 
-      this.containerOuter = new container(this, containerOuter, this.config.classNames);
-      this.containerInner = new container(this, containerInner, this.config.classNames);
-      this.input = new components_input(this, input, this.config.classNames);
-      this.choiceList = new list(this, choiceList, this.config.classNames);
-      this.itemList = new list(this, itemList, this.config.classNames);
-      this.dropdown = new components_dropdown(this, dropdown, this.config.classNames);
+      this.containerOuter = new _container2.default(this, containerOuter, this.config.classNames);
+      this.containerInner = new _container2.default(this, containerInner, this.config.classNames);
+      this.input = new _input2.default(this, input, this.config.classNames);
+      this.choiceList = new _list2.default(this, choiceList, this.config.classNames);
+      this.itemList = new _list2.default(this, itemList, this.config.classNames);
+      this.dropdown = new _dropdown2.default(this, dropdown, this.config.classNames);
 
       this.passedElement.conceal();
 
       // Wrap input in container preserving DOM ordering
-      wrap(this.passedElement.element, this.containerInner.element);
+      (0, _utils.wrap)(this.passedElement.element, this.containerInner.element);
       // Wrapper inner container with outer container
-      wrap(this.containerInner.element, this.containerOuter.element);
+      (0, _utils.wrap)(this.containerInner.element, this.containerOuter.element);
 
       if (this.isSelectOneElement) {
         this.input.setPlaceholder(this.config.searchPlaceholderValue || '');
@@ -5555,7 +4214,7 @@ var choices_Choices = function () {
       var _this22 = this;
 
       var handlePresetItem = function handlePresetItem(item) {
-        var itemType = getType(item);
+        var itemType = (0, _utils.getType)(item);
         if (itemType === 'Object') {
           if (!item.value) {
             return;
@@ -5575,7 +4234,7 @@ var choices_Choices = function () {
     value: function _setChoiceOrItem(item) {
       var _this23 = this;
 
-      var itemType = getType(item).toLowerCase();
+      var itemType = (0, _utils.getType)(item).toLowerCase();
       var handleType = {
         object: function object() {
           if (!item.value) {
@@ -5622,13 +4281,11 @@ var choices_Choices = function () {
   return Choices;
 }();
 
-/* harmony default export */ var src_choices = __webpack_exports__["default"] = (choices_Choices);
-
-
-choices_Choices.userDefaults = {};
+Choices.userDefaults = {};
+module.exports = Choices;
 
 /***/ }),
-/* 3 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -6629,7 +5286,270 @@ module.exports = Fuse;
 //# sourceMappingURL=fuse.js.map
 
 /***/ }),
-/* 4 */
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _redux = __webpack_require__(2);
+
+var _index = __webpack_require__(14);
+
+var _index2 = _interopRequireDefault(_index);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Store = function () {
+  function Store() {
+    _classCallCheck(this, Store);
+
+    this.store = (0, _redux.createStore)(_index2.default, window.devToolsExtension ? window.devToolsExtension() : undefined);
+  }
+
+  /**
+   * Subscribe store to function call (wrapped Redux method)
+   * @param  {Function} onChange Function to trigger when state changes
+   * @return
+   */
+
+
+  _createClass(Store, [{
+    key: 'subscribe',
+    value: function subscribe(onChange) {
+      this.store.subscribe(onChange);
+    }
+
+    /**
+     * Dispatch event to store (wrapped Redux method)
+     * @param  {Function} action Action function to trigger
+     * @return
+     */
+
+  }, {
+    key: 'dispatch',
+    value: function dispatch(action) {
+      this.store.dispatch(action);
+    }
+
+    /**
+     * Get store object (wrapping Redux method)
+     * @return {Object} State
+     */
+
+  }, {
+    key: 'getState',
+    value: function getState() {
+      return this.store.getState();
+    }
+
+    /**
+     * Get items from store
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: 'getItems',
+    value: function getItems() {
+      var state = this.store.getState();
+      return state.items;
+    }
+
+    /**
+     * Get active items from store
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: 'getItemsFilteredByActive',
+    value: function getItemsFilteredByActive() {
+      var items = this.getItems();
+      var values = items.filter(function (item) {
+        return item.active === true;
+      }, []);
+
+      return values;
+    }
+
+    /**
+     * Get items from store reduced to just their values
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: 'getItemsReducedToValues',
+    value: function getItemsReducedToValues() {
+      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getItems();
+
+      var values = items.reduce(function (prev, current) {
+        prev.push(current.value);
+        return prev;
+      }, []);
+
+      return values;
+    }
+
+    /**
+     * Get choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: 'getChoices',
+    value: function getChoices() {
+      var state = this.store.getState();
+      return state.choices;
+    }
+
+    /**
+     * Get active choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: 'getChoicesFilteredByActive',
+    value: function getChoicesFilteredByActive() {
+      var choices = this.getChoices();
+      var values = choices.filter(function (choice) {
+        return choice.active === true;
+      });
+
+      return values;
+    }
+
+    /**
+     * Get selectable choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: 'getChoicesFilteredBySelectable',
+    value: function getChoicesFilteredBySelectable() {
+      var choices = this.getChoices();
+      var values = choices.filter(function (choice) {
+        return choice.disabled !== true;
+      });
+
+      return values;
+    }
+
+    /**
+     * Get choices that can be searched (excluding placeholders)
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: 'getSearchableChoices',
+    value: function getSearchableChoices() {
+      var filtered = this.getChoicesFilteredBySelectable();
+      return filtered.filter(function (choice) {
+        return choice.placeholder !== true;
+      });
+    }
+
+    /**
+     * Get single choice by it's ID
+     * @return {Object} Found choice
+     */
+
+  }, {
+    key: 'getChoiceById',
+    value: function getChoiceById(id) {
+      if (id) {
+        var choices = this.getChoicesFilteredByActive();
+        var foundChoice = choices.find(function (choice) {
+          return choice.id === parseInt(id, 10);
+        });
+        return foundChoice;
+      }
+      return false;
+    }
+
+    /**
+     * Get placeholder choice from store
+     * @return {Object} Found placeholder
+     */
+
+  }, {
+    key: 'getPlaceholderChoice',
+    value: function getPlaceholderChoice() {
+      var choices = this.getChoices();
+      var placeholderChoice = [].concat(_toConsumableArray(choices)).reverse().find(function (choice) {
+        return choice.placeholder === true;
+      });
+
+      return placeholderChoice;
+    }
+
+    /**
+     * Get groups from store
+     * @return {Array} Group objects
+     */
+
+  }, {
+    key: 'getGroups',
+    value: function getGroups() {
+      var state = this.store.getState();
+      return state.groups;
+    }
+
+    /**
+     * Get active groups from store
+     * @return {Array} Group objects
+     */
+
+  }, {
+    key: 'getGroupsFilteredByActive',
+    value: function getGroupsFilteredByActive() {
+      var groups = this.getGroups();
+      var choices = this.getChoices();
+
+      var values = groups.filter(function (group) {
+        var isActive = group.active === true && group.disabled === false;
+        var hasActiveOptions = choices.some(function (choice) {
+          return choice.active === true && choice.disabled === false;
+        });
+        return isActive && hasActiveOptions;
+      }, []);
+
+      return values;
+    }
+
+    /**
+     * Get group by group id
+     * @param  {Number} id Group ID
+     * @return {Object}    Group data
+     */
+
+  }, {
+    key: 'getGroupById',
+    value: function getGroupById(id) {
+      var groups = this.getGroups();
+      var foundGroup = groups.find(function (group) {
+        return group.id === parseInt(id, 10);
+      });
+
+      return foundGroup;
+    }
+  }]);
+
+  return Store;
+}();
+
+exports.default = Store;
+
+/***/ }),
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6638,17 +5558,17 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 /* harmony default export */ __webpack_exports__["a"] = (freeGlobal);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
 
 /***/ }),
-/* 5 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(6);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
-/* 6 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6658,7 +5578,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _ponyfill = __webpack_require__(8);
+var _ponyfill = __webpack_require__(13);
 
 var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -6681,10 +5601,10 @@ if (typeof self !== 'undefined') {
 
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(7)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(12)(module)))
 
 /***/ }),
-/* 7 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -6712,7 +5632,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 8 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6741,7 +5661,1227 @@ function symbolObservablePonyfill(root) {
 };
 
 /***/ }),
-/* 9 */
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _redux = __webpack_require__(2);
+
+var _items = __webpack_require__(15);
+
+var _items2 = _interopRequireDefault(_items);
+
+var _groups = __webpack_require__(16);
+
+var _groups2 = _interopRequireDefault(_groups);
+
+var _choices = __webpack_require__(17);
+
+var _choices2 = _interopRequireDefault(_choices);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var appReducer = (0, _redux.combineReducers)({
+  items: _items2.default,
+  groups: _groups2.default,
+  choices: _choices2.default
+});
+
+var rootReducer = function rootReducer(passedState, action) {
+  var state = passedState;
+  // If we are clearing all items, groups and options we reassign
+  // state and then pass that state to our proper reducer. This isn't
+  // mutating our actual state
+  // See: http://stackoverflow.com/a/35641992
+  if (action.type === 'CLEAR_ALL') {
+    state = undefined;
+  }
+
+  return appReducer(state, action);
+};
+
+exports.default = rootReducer;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = items;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var defaultState = exports.defaultState = [];
+
+function items() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'ADD_ITEM':
+      {
+        // Add object to items array
+        var newState = [].concat(_toConsumableArray(state), [{
+          id: action.id,
+          choiceId: action.choiceId,
+          groupId: action.groupId,
+          value: action.value,
+          label: action.label,
+          active: true,
+          highlighted: false,
+          customProperties: action.customProperties,
+          placeholder: action.placeholder || false,
+          keyCode: null
+        }]);
+
+        return newState.map(function (obj) {
+          var item = obj;
+          if (item.highlighted) {
+            item.highlighted = false;
+          }
+          return item;
+        });
+      }
+
+    case 'REMOVE_ITEM':
+      {
+        // Set item to inactive
+        return state.map(function (obj) {
+          var item = obj;
+          if (item.id === action.id) {
+            item.active = false;
+          }
+          return item;
+        });
+      }
+
+    case 'HIGHLIGHT_ITEM':
+      {
+        return state.map(function (obj) {
+          var item = obj;
+          if (item.id === action.id) {
+            item.highlighted = action.highlighted;
+          }
+          return item;
+        });
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = groups;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var defaultState = exports.defaultState = [];
+
+function groups() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'ADD_GROUP':
+      {
+        return [].concat(_toConsumableArray(state), [{
+          id: action.id,
+          value: action.value,
+          active: action.active,
+          disabled: action.disabled
+        }]);
+      }
+
+    case 'CLEAR_CHOICES':
+      {
+        return [];
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = choices;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var defaultState = exports.defaultState = [];
+
+function choices() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'ADD_CHOICE':
+      {
+        /*
+            A disabled choice appears in the choice dropdown but cannot be selected
+            A selected choice has been added to the passed input's value (added as an item)
+            An active choice appears within the choice dropdown
+         */
+        return [].concat(_toConsumableArray(state), [{
+          id: action.id,
+          elementId: action.elementId,
+          groupId: action.groupId,
+          value: action.value,
+          label: action.label || action.value,
+          disabled: action.disabled || false,
+          selected: false,
+          active: true,
+          score: 9999,
+          customProperties: action.customProperties,
+          placeholder: action.placeholder || false,
+          keyCode: null
+        }]);
+      }
+
+    case 'ADD_ITEM':
+      {
+        // If all choices need to be activated
+        if (action.activateOptions) {
+          return state.map(function (obj) {
+            var choice = obj;
+            choice.active = action.active;
+            return choice;
+          });
+        }
+
+        // When an item is added and it has an associated choice,
+        // we want to disable it so it can't be chosen again
+        if (action.choiceId > -1) {
+          return state.map(function (obj) {
+            var choice = obj;
+            if (choice.id === parseInt(action.choiceId, 10)) {
+              choice.selected = true;
+            }
+            return choice;
+          });
+        }
+
+        return state;
+      }
+
+    case 'REMOVE_ITEM':
+      {
+        // When an item is removed and it has an associated choice,
+        // we want to re-enable it so it can be chosen again
+        if (action.choiceId > -1) {
+          return state.map(function (obj) {
+            var choice = obj;
+            if (choice.id === parseInt(action.choiceId, 10)) {
+              choice.selected = false;
+            }
+            return choice;
+          });
+        }
+
+        return state;
+      }
+
+    case 'FILTER_CHOICES':
+      {
+        return state.map(function (obj) {
+          var choice = obj;
+          // Set active state based on whether choice is
+          // within filtered results
+          choice.active = action.results.some(function (_ref) {
+            var item = _ref.item,
+                score = _ref.score;
+
+            if (item.id === choice.id) {
+              choice.score = score;
+              return true;
+            }
+            return false;
+          });
+
+          return choice;
+        });
+      }
+
+    case 'ACTIVATE_CHOICES':
+      {
+        return state.map(function (obj) {
+          var choice = obj;
+          choice.active = action.active;
+          return choice;
+        });
+      }
+
+    case 'CLEAR_CHOICES':
+      {
+        return defaultState;
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Dropdown = function () {
+  function Dropdown(instance, element, classNames) {
+    _classCallCheck(this, Dropdown);
+
+    this.parentInstance = instance;
+    this.element = element;
+    this.classNames = classNames;
+    this.dimensions = null;
+    this.position = null;
+    this.isActive = false;
+  }
+
+  _createClass(Dropdown, [{
+    key: 'getElement',
+    value: function getElement() {
+      return this.element;
+    }
+
+    /**
+     * Determine how far the top of our element is from
+     * the top of the window
+     * @return {Number} Vertical position
+     */
+
+  }, {
+    key: 'getVerticalPos',
+    value: function getVerticalPos() {
+      this.dimensions = this.element.getBoundingClientRect();
+      this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
+      return this.position;
+    }
+
+    /**
+     * Find element that matches passed selector
+     * @return {HTMLElement}
+     */
+
+  }, {
+    key: 'getChild',
+    value: function getChild(selector) {
+      return this.element.querySelector(selector);
+    }
+
+    /**
+     * Show dropdown to user by adding active state class
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: 'show',
+    value: function show() {
+      this.element.classList.add(this.classNames.activeState);
+      this.element.setAttribute('aria-expanded', 'true');
+      this.isActive = true;
+      return this.parentInstance;
+    }
+
+    /**
+     * Hide dropdown from user
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: 'hide',
+    value: function hide() {
+      this.element.classList.remove(this.classNames.activeState);
+      this.element.setAttribute('aria-expanded', 'false');
+      this.isActive = false;
+      return this.parentInstance;
+    }
+  }]);
+
+  return Dropdown;
+}();
+
+exports.default = Dropdown;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Container = function () {
+  function Container(instance, element, classNames) {
+    _classCallCheck(this, Container);
+
+    this.parentInstance = instance;
+    this.element = element;
+    this.classNames = classNames;
+    this.config = instance.config;
+    this.isOpen = false;
+    this.isFlipped = false;
+    this.isFocussed = false;
+    this.isDisabled = false;
+    this.isLoading = false;
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+
+  _createClass(Container, [{
+    key: 'getElement',
+    value: function getElement() {
+      return this.element;
+    }
+
+    /**
+     * Add event listeners
+    */
+
+  }, {
+    key: 'addEventListeners',
+    value: function addEventListeners() {
+      this.element.addEventListener('focus', this.onFocus);
+      this.element.addEventListener('blur', this.onBlur);
+    }
+
+    /**
+     * Remove event listeners
+    */
+
+    /** */
+
+  }, {
+    key: 'removeEventListeners',
+    value: function removeEventListeners() {
+      this.element.removeEventListener('focus', this.onFocus);
+      this.element.removeEventListener('blur', this.onBlur);
+    }
+
+    /**
+     * Set focussed state
+     */
+
+  }, {
+    key: 'onFocus',
+    value: function onFocus() {
+      this.isFocussed = true;
+    }
+
+    /**
+     * Remove blurred state
+     */
+
+  }, {
+    key: 'onBlur',
+    value: function onBlur() {
+      this.isFocussed = false;
+    }
+
+    /**
+     * Determine whether container should be flipped
+     * based on passed dropdown position
+     * @param {Number} dropdownPos
+     * @returns
+     */
+
+  }, {
+    key: 'shouldFlip',
+    value: function shouldFlip(dropdownPos) {
+      if (dropdownPos === undefined) {
+        return false;
+      }
+
+      var body = document.body;
+      var html = document.documentElement;
+      var winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+      // If flip is enabled and the dropdown bottom position is
+      // greater than the window height flip the dropdown.
+      var shouldFlip = false;
+      if (this.config.position === 'auto') {
+        shouldFlip = dropdownPos >= winHeight;
+      } else if (this.config.position === 'top') {
+        shouldFlip = true;
+      }
+
+      return shouldFlip;
+    }
+
+    /**
+     * Set active descendant attribute
+     * @param {Number} activeDescendant ID of active descendant
+     */
+
+  }, {
+    key: 'setActiveDescendant',
+    value: function setActiveDescendant(activeDescendantID) {
+      this.element.setAttribute('aria-activedescendant', activeDescendantID);
+    }
+
+    /**
+     * Remove active descendant attribute
+     */
+
+  }, {
+    key: 'removeActiveDescendant',
+    value: function removeActiveDescendant() {
+      this.element.removeAttribute('aria-activedescendant');
+    }
+  }, {
+    key: 'open',
+    value: function open(dropdownPos) {
+      this.element.classList.add(this.classNames.openState);
+      this.element.setAttribute('aria-expanded', 'true');
+      this.isOpen = true;
+
+      if (this.shouldFlip(dropdownPos)) {
+        this.element.classList.add(this.classNames.flippedState);
+        this.isFlipped = true;
+      }
+    }
+  }, {
+    key: 'close',
+    value: function close() {
+      this.element.classList.remove(this.classNames.openState);
+      this.element.setAttribute('aria-expanded', 'false');
+      this.removeActiveDescendant();
+      this.isOpen = false;
+
+      // A dropdown flips if it does not have space within the page
+      if (this.isFlipped) {
+        this.element.classList.remove(this.classNames.flippedState);
+        this.isFlipped = false;
+      }
+    }
+  }, {
+    key: 'focus',
+    value: function focus() {
+      if (!this.isFocussed) {
+        this.element.focus();
+      }
+    }
+  }, {
+    key: 'addFocusState',
+    value: function addFocusState() {
+      this.element.classList.add(this.classNames.focusState);
+    }
+  }, {
+    key: 'removeFocusState',
+    value: function removeFocusState() {
+      this.element.classList.remove(this.classNames.focusState);
+    }
+
+    /**
+     * Remove disabled state
+     */
+
+  }, {
+    key: 'enable',
+    value: function enable() {
+      this.element.classList.remove(this.config.classNames.disabledState);
+      this.element.removeAttribute('aria-disabled');
+      if (this.parentInstance.isSelectOneElement) {
+        this.element.setAttribute('tabindex', '0');
+      }
+      this.isDisabled = false;
+    }
+
+    /**
+     * Set disabled state
+     */
+
+  }, {
+    key: 'disable',
+    value: function disable() {
+      this.element.classList.add(this.config.classNames.disabledState);
+      this.element.setAttribute('aria-disabled', 'true');
+      if (this.parentInstance.isSelectOneElement) {
+        this.element.setAttribute('tabindex', '-1');
+      }
+      this.isDisabled = true;
+    }
+  }, {
+    key: 'revert',
+    value: function revert(originalElement) {
+      // Move passed element back to original position
+      this.element.parentNode.insertBefore(originalElement, this.element);
+      // Remove container
+      this.element.parentNode.removeChild(this.element);
+    }
+
+    /**
+     * Add loading state to element
+     */
+
+  }, {
+    key: 'addLoadingState',
+    value: function addLoadingState() {
+      this.element.classList.add(this.classNames.loadingState);
+      this.element.setAttribute('aria-busy', 'true');
+      this.isLoading = true;
+    }
+
+    /**
+     * Remove loading state from element
+     */
+
+  }, {
+    key: 'removeLoadingState',
+    value: function removeLoadingState() {
+      this.element.classList.remove(this.classNames.loadingState);
+      this.element.removeAttribute('aria-busy');
+      this.isLoading = false;
+    }
+  }]);
+
+  return Container;
+}();
+
+exports.default = Container;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utils = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Input = function () {
+  function Input(instance, element, classNames) {
+    _classCallCheck(this, Input);
+
+    this.parentInstance = instance;
+    this.element = element;
+    this.classNames = classNames;
+    this.isFocussed = this.element === document.activeElement;
+    this.isDisabled = false;
+
+    // Bind event listeners
+    this.onPaste = this.onPaste.bind(this);
+    this.onInput = this.onInput.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+
+  _createClass(Input, [{
+    key: 'getElement',
+    value: function getElement() {
+      return this.element;
+    }
+  }, {
+    key: 'addEventListeners',
+    value: function addEventListeners() {
+      this.element.addEventListener('input', this.onInput);
+      this.element.addEventListener('paste', this.onPaste);
+      this.element.addEventListener('focus', this.onFocus);
+      this.element.addEventListener('blur', this.onBlur);
+    }
+  }, {
+    key: 'removeEventListeners',
+    value: function removeEventListeners() {
+      this.element.removeEventListener('input', this.onInput);
+      this.element.removeEventListener('paste', this.onPaste);
+      this.element.removeEventListener('focus', this.onFocus);
+      this.element.removeEventListener('blur', this.onBlur);
+    }
+
+    /**
+     * Input event
+     * @return
+     * @private
+     */
+
+  }, {
+    key: 'onInput',
+    value: function onInput() {
+      if (!this.parentInstance.isSelectOneElement) {
+        this.setWidth();
+      }
+    }
+
+    /**
+     * Paste event
+     * @param  {Object} e Event
+     * @return
+     * @private
+     */
+
+  }, {
+    key: 'onPaste',
+    value: function onPaste(e) {
+      // Disable pasting into the input if option has been set
+      if (e.target === this.element && !this.parentInstance.config.paste) {
+        e.preventDefault();
+      }
+    }
+
+    /**
+     * Set focussed state
+     */
+
+  }, {
+    key: 'onFocus',
+    value: function onFocus() {
+      this.isFocussed = true;
+    }
+
+    /**
+     * Remove focussed state
+     */
+
+  }, {
+    key: 'onBlur',
+    value: function onBlur() {
+      this.isFocussed = false;
+    }
+  }, {
+    key: 'activate',
+    value: function activate(focusInput) {
+      // Optionally focus the input if we have a search input
+      if (focusInput && this.parentInstance.canSearch && document.activeElement !== this.element) {
+        this.element.focus();
+      }
+    }
+  }, {
+    key: 'deactivate',
+    value: function deactivate(blurInput) {
+      this.removeActiveDescendant();
+      // Optionally blur the input if we have a search input
+      if (blurInput && this.parentInstance.canSearch && document.activeElement === this.element) {
+        this.element.blur();
+      }
+    }
+  }, {
+    key: 'enable',
+    value: function enable() {
+      this.element.removeAttribute('disabled');
+      this.isDisabled = false;
+    }
+  }, {
+    key: 'disable',
+    value: function disable() {
+      this.element.setAttribute('disabled', '');
+      this.isDisabled = true;
+    }
+  }, {
+    key: 'focus',
+    value: function focus() {
+      if (!this.isFocussed) {
+        this.element.focus();
+      }
+    }
+
+    /**
+     * Set value of input to blank
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: 'clear',
+    value: function clear() {
+      var setWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+      if (this.element.value) {
+        this.element.value = '';
+      }
+
+      if (setWidth) {
+        this.setWidth();
+      }
+
+      return this.parentInstance;
+    }
+
+    /**
+     * Set the correct input width based on placeholder
+     * value or input value
+     * @return
+     */
+
+  }, {
+    key: 'setWidth',
+    value: function setWidth(enforceWidth) {
+      if (this.parentInstance.placeholder) {
+        // If there is a placeholder, we only want to set the width of the input when it is a greater
+        // length than 75% of the placeholder. This stops the input jumping around.
+        if (this.element.value && this.element.value.length >= this.parentInstance.placeholder.length / 1.25 || enforceWidth) {
+          this.element.style.width = this.getWidth();
+        }
+      } else {
+        // If there is no placeholder, resize input to contents
+        this.element.style.width = this.getWidth();
+      }
+    }
+  }, {
+    key: 'getWidth',
+    value: function getWidth() {
+      return (0, _utils.getWidthOfInput)(this.element);
+    }
+  }, {
+    key: 'setPlaceholder',
+    value: function setPlaceholder(placeholder) {
+      this.element.placeholder = placeholder;
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      this.element.value = value;
+    }
+  }, {
+    key: 'getValue',
+    value: function getValue() {
+      return this.element.value;
+    }
+  }, {
+    key: 'setActiveDescendant',
+    value: function setActiveDescendant(activeDescendantID) {
+      this.element.setAttribute('aria-activedescendant', activeDescendantID);
+    }
+  }, {
+    key: 'removeActiveDescendant',
+    value: function removeActiveDescendant() {
+      this.element.removeAttribute('aria-activedescendant');
+    }
+  }]);
+
+  return Input;
+}();
+
+exports.default = Input;
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var List = function () {
+  function List(instance, element, classNames) {
+    _classCallCheck(this, List);
+
+    this.parentInstance = instance;
+    this.element = element;
+    this.classNames = classNames;
+    this.scrollPos = this.element.scrollTop;
+    this.height = this.element.offsetHeight;
+    this.hasChildren = !!this.element.children;
+  }
+
+  _createClass(List, [{
+    key: 'getElement',
+    value: function getElement() {
+      return this.element;
+    }
+
+    /**
+     * Clear List contents
+     */
+
+  }, {
+    key: 'clear',
+    value: function clear() {
+      this.element.innerHTML = '';
+    }
+
+    /**
+     * Scroll to passed position on Y axis
+     */
+
+  }, {
+    key: 'scrollTo',
+    value: function scrollTo() {
+      var scrollPos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      this.element.scrollTop = scrollPos;
+    }
+    /**
+     * Append node to element
+     */
+
+  }, {
+    key: 'append',
+    value: function append(node) {
+      this.element.appendChild(node);
+    }
+
+    /**
+     * Find element that matches passed selector
+     * @return {HTMLElement}
+    */
+
+  }, {
+    key: 'getChild',
+    value: function getChild(selector) {
+      return this.element.querySelector(selector);
+    }
+  }]);
+
+  return List;
+}();
+
+exports.default = List;
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _wrappedElement = __webpack_require__(4);
+
+var _wrappedElement2 = _interopRequireDefault(_wrappedElement);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var WrappedInput = function (_WrappedElement) {
+  _inherits(WrappedInput, _WrappedElement);
+
+  function WrappedInput(instance, element, classNames) {
+    _classCallCheck(this, WrappedInput);
+
+    var _this = _possibleConstructorReturn(this, (WrappedInput.__proto__ || Object.getPrototypeOf(WrappedInput)).call(this, instance, element, classNames));
+
+    _this.parentInstance = instance;
+    _this.element = element;
+    _this.classNames = classNames;
+    return _this;
+  }
+
+  _createClass(WrappedInput, [{
+    key: 'getElement',
+    value: function getElement() {
+      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'getElement', this).call(this);
+    }
+  }, {
+    key: 'conceal',
+    value: function conceal() {
+      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'conceal', this).call(this);
+    }
+  }, {
+    key: 'reveal',
+    value: function reveal() {
+      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'reveal', this).call(this);
+    }
+  }, {
+    key: 'enable',
+    value: function enable() {
+      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'enable', this).call(this);
+    }
+  }, {
+    key: 'disable',
+    value: function disable() {
+      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'enable', this).call(this);
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      this.element.setAttribute('value', value);
+      this.element.value = value;
+    }
+  }]);
+
+  return WrappedInput;
+}(_wrappedElement2.default);
+
+exports.default = WrappedInput;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _wrappedElement = __webpack_require__(4);
+
+var _wrappedElement2 = _interopRequireDefault(_wrappedElement);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var WrappedSelect = function (_WrappedElement) {
+  _inherits(WrappedSelect, _WrappedElement);
+
+  function WrappedSelect(instance, element, classNames) {
+    _classCallCheck(this, WrappedSelect);
+
+    var _this = _possibleConstructorReturn(this, (WrappedSelect.__proto__ || Object.getPrototypeOf(WrappedSelect)).call(this, instance, element, classNames));
+
+    _this.parentInstance = instance;
+    _this.element = element;
+    _this.classNames = classNames;
+    return _this;
+  }
+
+  _createClass(WrappedSelect, [{
+    key: 'getElement',
+    value: function getElement() {
+      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'getElement', this).call(this);
+    }
+  }, {
+    key: 'conceal',
+    value: function conceal() {
+      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'conceal', this).call(this);
+    }
+  }, {
+    key: 'reveal',
+    value: function reveal() {
+      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'reveal', this).call(this);
+    }
+  }, {
+    key: 'enable',
+    value: function enable() {
+      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'enable', this).call(this);
+    }
+  }, {
+    key: 'disable',
+    value: function disable() {
+      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'enable', this).call(this);
+    }
+  }, {
+    key: 'setOptions',
+    value: function setOptions(options) {
+      this.element.innerHTML = '';
+      this.element.appendChild(options);
+    }
+  }, {
+    key: 'getPlaceholderOption',
+    value: function getPlaceholderOption() {
+      return this.element.querySelector('option[placeholder]');
+    }
+  }, {
+    key: 'getOptions',
+    value: function getOptions() {
+      return Array.from(this.element.options);
+    }
+  }, {
+    key: 'getOptionGroups',
+    value: function getOptionGroups() {
+      return Array.from(this.element.getElementsByTagName('OPTGROUP'));
+    }
+  }]);
+
+  return WrappedSelect;
+}(_wrappedElement2.default);
+
+exports.default = WrappedSelect;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TEMPLATES = undefined;
+
+var _classnames = __webpack_require__(25);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _utils = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var TEMPLATES = exports.TEMPLATES = {
+  containerOuter: function containerOuter(globalClasses, direction, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
+    var tabIndex = isSelectOneElement ? 'tabindex="0"' : '';
+    var role = isSelectElement ? 'role="listbox"' : '';
+    var ariaAutoComplete = '';
+
+    if (isSelectElement && searchEnabled) {
+      role = 'role="combobox"';
+      ariaAutoComplete = 'aria-autocomplete="list"';
+    }
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + globalClasses.containerOuter + '"\n        data-type="' + passedElementType + '"\n        ' + role + '\n        ' + tabIndex + '\n        ' + ariaAutoComplete + '\n        aria-haspopup="true"\n        aria-expanded="false"\n        dir="' + direction + '"\n        >\n      </div>\n    ');
+  },
+  containerInner: function containerInner(globalClasses) {
+    return (0, _utils.strToEl)('\n      <div class="' + globalClasses.containerInner + '"></div>\n    ');
+  },
+  itemList: function itemList(globalClasses, isSelectOneElement) {
+    var _classNames;
+
+    var localClasses = (0, _classnames2.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !isSelectOneElement), _classNames));
+
+    return (0, _utils.strToEl)('\n      <div class="' + localClasses + '"></div>\n    ');
+  },
+  placeholder: function placeholder(globalClasses, value) {
+    return (0, _utils.strToEl)('\n      <div class="' + globalClasses.placeholder + '">\n        ' + value + '\n      </div>\n    ');
+  },
+  item: function item(globalClasses, data, removeItemButton) {
+    var _classNames2;
+
+    var ariaSelected = data.active ? 'aria-selected="true"' : '';
+    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
+
+    var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _defineProperty(_classNames2, globalClasses.placeholder, data.placeholder), _classNames2));
+
+    if (removeItemButton) {
+      var _classNames3;
+
+      localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames3, globalClasses.placeholder, data.placeholder), _classNames3));
+
+      return (0, _utils.strToEl)('\n        <div\n          class="' + localClasses + '"\n          data-item\n          data-id="' + data.id + '"\n          data-value="' + data.value + '"\n          data-deletable\n          ' + ariaSelected + '\n          ' + ariaDisabled + '\n          >\n          ' + data.label + '<!--\n       --><button\n            type="button"\n            class="' + globalClasses.button + '"\n            data-button\n            aria-label="Remove item: \'' + data.value + '\'"\n            >\n            Remove item\n          </button>\n        </div>\n      ');
+    }
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + localClasses + '"\n        data-item\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        ' + ariaSelected + '\n        ' + ariaDisabled + '\n        >\n        ' + data.label + '\n      </div>\n    ');
+  },
+  choiceList: function choiceList(globalClasses, isSelectOneElement) {
+    var ariaMultiSelectable = !isSelectOneElement ? 'aria-multiselectable="true"' : '';
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + globalClasses.list + '"\n        dir="ltr"\n        role="listbox"\n        ' + ariaMultiSelectable + '\n        >\n      </div>\n    ');
+  },
+  choiceGroup: function choiceGroup(globalClasses, data) {
+    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
+    var localClasses = (0, _classnames2.default)(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + localClasses + '"\n        data-group\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        role="group"\n        ' + ariaDisabled + '\n        >\n        <div class="' + globalClasses.groupHeading + '">' + data.value + '</div>\n      </div>\n    ');
+  },
+  choice: function choice(globalClasses, data, itemSelectText) {
+    var _classNames5;
+
+    var role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
+    var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames5, globalClasses.placeholder, data.placeholder), _classNames5));
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + localClasses + '"\n        data-select-text="' + itemSelectText + '"\n        data-choice\n        data-id="' + data.id + '"\n        data-value="' + data.value + '"\n        ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n        id="' + data.elementId + '"\n        ' + role + '\n        >\n        ' + data.label + '\n      </div>\n    ');
+  },
+  input: function input(globalClasses) {
+    var localClasses = (0, _classnames2.default)(globalClasses.input, globalClasses.inputCloned);
+
+    return (0, _utils.strToEl)('\n      <input\n        type="text"\n        class="' + localClasses + '"\n        autocomplete="off"\n        autocapitalize="off"\n        spellcheck="false"\n        role="textbox"\n        aria-autocomplete="list"\n        >\n    ');
+  },
+  dropdown: function dropdown(globalClasses) {
+    var localClasses = (0, _classnames2.default)(globalClasses.list, globalClasses.listDropdown);
+
+    return (0, _utils.strToEl)('\n      <div\n        class="' + localClasses + '"\n        aria-expanded="false"\n        >\n      </div>\n    ');
+  },
+  notice: function notice(globalClasses, label) {
+    var _classNames6;
+
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+    var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
+
+    return (0, _utils.strToEl)('\n      <div class="' + localClasses + '">\n        ' + label + '\n      </div>\n    ');
+  },
+  option: function option(globalClasses, data) {
+    return (0, _utils.strToEl)('\n      <option value="' + data.value + '" selected>' + data.label + '</option>\n    ');
+  }
+};
+
+exports.default = TEMPLATES;
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -6796,8 +6936,147 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports) {
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.addChoice = undefined;
+
+var _constants = __webpack_require__(1);
+
+var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
+  return {
+    type: _constants.ACTION_TYPES.ADD_CHOICE,
+    value: value,
+    label: label,
+    id: id,
+    groupId: groupId,
+    disabled: disabled,
+    elementId: elementId,
+    customProperties: customProperties,
+    placeholder: placeholder,
+    keyCode: keyCode
+  };
+};
+
+var filterChoices = exports.filterChoices = function filterChoices(results) {
+  return {
+    type: _constants.ACTION_TYPES.FILTER_CHOICES,
+    results: results
+  };
+};
+
+var activateChoices = exports.activateChoices = function activateChoices() {
+  var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+  return {
+    type: _constants.ACTION_TYPES.ACTIVATE_CHOICES,
+    active: active
+  };
+};
+
+var clearChoices = exports.clearChoices = function clearChoices() {
+  return {
+    type: _constants.ACTION_TYPES.CLEAR_CHOICES
+  };
+};
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.highlightItem = exports.removeItem = exports.addItem = undefined;
+
+var _constants = __webpack_require__(1);
+
+var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
+  return {
+    type: _constants.ACTION_TYPES.ADD_ITEM,
+    value: value,
+    label: label,
+    id: id,
+    choiceId: choiceId,
+    groupId: groupId,
+    customProperties: customProperties,
+    placeholder: placeholder,
+    keyCode: keyCode
+  };
+};
+
+var removeItem = exports.removeItem = function removeItem(id, choiceId) {
+  return {
+    type: _constants.ACTION_TYPES.REMOVE_ITEM,
+    id: id,
+    choiceId: choiceId
+  };
+};
+
+var highlightItem = exports.highlightItem = function highlightItem(id, highlighted) {
+  return {
+    type: _constants.ACTION_TYPES.HIGHLIGHT_ITEM,
+    id: id,
+    highlighted: highlighted
+  };
+};
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addGroup = undefined;
+
+var _constants = __webpack_require__(1);
+
+/* eslint-disable import/prefer-default-export */
+var addGroup = exports.addGroup = function addGroup(value, id, active, disabled) {
+  return {
+    type: _constants.ACTION_TYPES.ADD_GROUP,
+    value: value,
+    id: id,
+    active: active,
+    disabled: disabled
+  };
+};
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* eslint-disable import/prefer-default-export */
+var clearAll = exports.clearAll = function clearAll() {
+  return {
+    type: 'CLEAR_ALL'
+  };
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 /* eslint-disable */
 (function () {

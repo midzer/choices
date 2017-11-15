@@ -32,7 +32,7 @@ import './lib/polyfills';
 /**
  * Choices
  */
-export default class Choices {
+class Choices {
   constructor(element = '[data-choice]', userConfig = {}) {
     // If there are multiple elements, create a new instance
     // for each element besides the first one (as that already has an instance)
@@ -2405,3 +2405,6 @@ export default class Choices {
 }
 
 Choices.userDefaults = {};
+
+// We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
+module.exports = Choices;
