@@ -811,10 +811,10 @@ var SCROLLING_SPEED = exports.SCROLLING_SPEED = 4;
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
-// EXTERNAL MODULE: ./node_modules/redux/node_modules/lodash-es/_freeGlobal.js
+// EXTERNAL MODULE: ./node_modules/lodash-es/_freeGlobal.js
 var _freeGlobal = __webpack_require__(9);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_root.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_root.js
 
 
 /** Detect free variable `self`. */
@@ -825,7 +825,7 @@ var root = _freeGlobal["a" /* default */] || freeSelf || Function('return this')
 
 /* harmony default export */ var _root = (root);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_Symbol.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_Symbol.js
 
 
 /** Built-in value references. */
@@ -833,7 +833,7 @@ var Symbol = _root.Symbol;
 
 /* harmony default export */ var _Symbol = (Symbol);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_getRawTag.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getRawTag.js
 
 
 /** Used for built-in method references. */
@@ -881,7 +881,7 @@ function getRawTag(value) {
 
 /* harmony default export */ var _getRawTag = (getRawTag);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_objectToString.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_objectToString.js
 /** Used for built-in method references. */
 var _objectToString_objectProto = Object.prototype;
 
@@ -905,7 +905,7 @@ function objectToString(value) {
 
 /* harmony default export */ var _objectToString = (objectToString);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_baseGetTag.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseGetTag.js
 
 
 
@@ -935,7 +935,7 @@ function baseGetTag(value) {
 
 /* harmony default export */ var _baseGetTag = (baseGetTag);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_overArg.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_overArg.js
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -952,7 +952,7 @@ function overArg(func, transform) {
 
 /* harmony default export */ var _overArg = (overArg);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/_getPrototype.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getPrototype.js
 
 
 /** Built-in value references. */
@@ -960,7 +960,7 @@ var getPrototype = _overArg(Object.getPrototypeOf, Object);
 
 /* harmony default export */ var _getPrototype = (getPrototype);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/isObjectLike.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/isObjectLike.js
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -991,7 +991,7 @@ function isObjectLike(value) {
 
 /* harmony default export */ var lodash_es_isObjectLike = (isObjectLike);
 
-// CONCATENATED MODULE: ./node_modules/redux/node_modules/lodash-es/isPlainObject.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/isPlainObject.js
 
 
 
@@ -1055,7 +1055,7 @@ function isPlainObject(value) {
 
 /* harmony default export */ var lodash_es_isPlainObject = (isPlainObject);
 
-// EXTERNAL MODULE: ./node_modules/redux/node_modules/symbol-observable/index.js
+// EXTERNAL MODULE: ./node_modules/symbol-observable/index.js
 var symbol_observable = __webpack_require__(10);
 var symbol_observable_default = /*#__PURE__*/__webpack_require__.n(symbol_observable);
 
@@ -4282,6 +4282,8 @@ var Choices = function () {
 }();
 
 Choices.userDefaults = {};
+
+// We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
 module.exports = Choices;
 
 /***/ }),
@@ -4289,7 +4291,7 @@ module.exports = Choices;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
- * Fuse.js v3.2.0 - Lightweight fuzzy-search (http://fusejs.io)
+ * Fuse.js v3.1.0 - Lightweight fuzzy-search (http://fusejs.io)
  * 
  * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
  * All Rights Reserved. Apache Software License 2.0
@@ -5174,8 +5176,8 @@ var Fuse = function () {
         var bestScore = 1;
 
         for (var j = 0; j < scoreLen; j += 1) {
+          var score = output[j].score;
           var weight = weights ? weights[output[j].key].weight : 1;
-          var score = weight === 1 ? output[j].score : output[j].score || 0.001;
           var nScore = score * weight;
 
           if (weight !== 1) {
