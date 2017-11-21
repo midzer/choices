@@ -1118,7 +1118,7 @@ class Choices {
       }
     }
 
-    if (this.isTextElement && this.config.addItems && canAddItem && this.config.regexFilter) {
+    if (this.config.regexFilter && this.isTextElement && this.config.addItems && canAddItem) {
       // If a user has supplied a regular expression filter
       // determine whether we can update based on whether
       // our regular expression passes
@@ -1739,14 +1739,8 @@ class Choices {
         },
         'select-one': () => {
           this.containerOuter.removeFocusState();
-          if (target === this.containerOuter.element) {
-            // Hide dropdown if it is showing
-            if (!this.canSearch) {
-              this.hideDropdown();
-            }
-          }
-          if (target === this.input.element) {
-            // Hide dropdown if it is showing
+          if (target === this.input.element ||
+            (target === this.containerOuter.element && !this.canSearch)) {
             this.hideDropdown();
           }
         },
@@ -1842,47 +1836,49 @@ class Choices {
   _highlightChoice(el = null) {
     // Highlight first element in dropdown
     const choices = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]'));
+
+    if (!choices.length) {
+      return;
+    }
+
     let passedEl = el;
+    const highlightedChoices = Array.from(
+      this.dropdown.element.querySelectorAll(`.${this.config.classNames.highlightedState}`),
+    );
+    const hasActiveDropdown = this.dropdown.isActive;
 
-    if (choices && choices.length) {
-      const highlightedChoices = Array.from(
-        this.dropdown.element.querySelectorAll(`.${this.config.classNames.highlightedState}`),
-      );
-      const hasActiveDropdown = this.dropdown.isActive;
+    // Remove any highlighted choices
+    highlightedChoices.forEach((choice) => {
+      choice.classList.remove(this.config.classNames.highlightedState);
+      choice.setAttribute('aria-selected', 'false');
+    });
 
-      // Remove any highlighted choices
-      highlightedChoices.forEach((choice) => {
-        choice.classList.remove(this.config.classNames.highlightedState);
-        choice.setAttribute('aria-selected', 'false');
-      });
-
-      if (passedEl) {
-        this.highlightPosition = choices.indexOf(passedEl);
+    if (passedEl) {
+      this.highlightPosition = choices.indexOf(passedEl);
+    } else {
+      // Highlight choice based on last known highlight location
+      if (choices.length > this.highlightPosition) {
+        // If we have an option to highlight
+        passedEl = choices[this.highlightPosition];
       } else {
-        // Highlight choice based on last known highlight location
-        if (choices.length > this.highlightPosition) {
-          // If we have an option to highlight
-          passedEl = choices[this.highlightPosition];
-        } else {
-          // Otherwise highlight the option before
-          passedEl = choices[choices.length - 1];
-        }
-
-        if (!passedEl) {
-          passedEl = choices[0];
-        }
+        // Otherwise highlight the option before
+        passedEl = choices[choices.length - 1];
       }
 
-      // Highlight given option, and set accessiblity attributes
-      passedEl.classList.add(this.config.classNames.highlightedState);
-      passedEl.setAttribute('aria-selected', 'true');
-
-      if (hasActiveDropdown) {
-        // IE11 ignores aria-label and blocks virtual keyboard
-        // if aria-activedescendant is set without a dropdown
-        this.input.setActiveDescendant(passedEl.id);
-        this.containerOuter.setActiveDescendant(passedEl.id);
+      if (!passedEl) {
+        passedEl = choices[0];
       }
+    }
+
+    // Highlight given option, and set accessiblity attributes
+    passedEl.classList.add(this.config.classNames.highlightedState);
+    passedEl.setAttribute('aria-selected', 'true');
+
+    if (hasActiveDropdown) {
+      // IE11 ignores aria-label and blocks virtual keyboard
+      // if aria-activedescendant is set without a dropdown
+      this.input.setActiveDescendant(passedEl.id);
+      this.containerOuter.setActiveDescendant(passedEl.id);
     }
   }
 
@@ -1976,11 +1972,7 @@ class Choices {
       return this;
     }
 
-    const id = item.id;
-    const value = item.value;
-    const label = item.label;
-    const choiceId = item.choiceId;
-    const groupId = item.groupId;
+    const { id, value, label, choiceId, groupId } = item;
     const group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
 
     this.store.dispatch(removeItem(id, choiceId));
