@@ -610,7 +610,7 @@ class Choices {
    * @public
    */
   removeActiveItemsByValue(value) {
-    if (!value || !isType('String', value)) {
+    if (!value) {
       return this;
     }
 

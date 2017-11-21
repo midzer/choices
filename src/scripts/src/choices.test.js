@@ -1147,13 +1147,111 @@ describe('choices', () => {
     });
 
     describe('removeActiveItemsByValue', () => {
-      beforeEach(() => {});
-      it('removes each active item in store with matching value', () => {});
+      describe('passing invalid value', () => {
+        beforeEach(() => {
+          output = instance.removeActiveItemsByValue(null);
+        });
+
+        returnsInstance(output);
+      });
+
+      describe('passing valid value', () => {
+        let getItemsFilteredByActiveStub;
+        let removeItemStub;
+        const value = 'Removed';
+        const items = [
+          {
+            id: '1',
+            value: 'Not removed',
+          },
+          {
+            id: '2',
+            value: 'Removed',
+          },
+          {
+            id: '3',
+            value: 'Removed',
+          },
+        ];
+
+        beforeEach(() => {
+          removeItemStub = stub();
+          getItemsFilteredByActiveStub = stub().returns(items);
+          instance.store.getItemsFilteredByActive = getItemsFilteredByActiveStub;
+          instance._removeItem = removeItemStub;
+
+          output = instance.removeActiveItemsByValue(value);
+        });
+
+        afterEach(() => {
+          instance.store.getItemsFilteredByActive.reset();
+          instance._removeItem.reset();
+        });
+
+        it('removes each active item in store with matching value', () => {
+          expect(removeItemStub.callCount).to.equal(2);
+          expect(removeItemStub.firstCall.args[0]).to.equal(items[1]);
+          expect(removeItemStub.secondCall.args[0]).to.equal(items[2]);
+        });
+      });
     });
 
     describe('removeActiveItems', () => {
-      beforeEach(() => {});
-      it('removes each active item in store', () => {});
+      let getItemsFilteredByActiveStub;
+      let removeItemStub;
+      const items = [
+        {
+          id: '1',
+          value: 'Not removed',
+        },
+        {
+          id: '2',
+          value: 'Removed',
+        },
+        {
+          id: '3',
+          value: 'Removed',
+        },
+      ];
+
+      beforeEach(() => {
+        removeItemStub = stub();
+        getItemsFilteredByActiveStub = stub().returns(items);
+        instance.store.getItemsFilteredByActive = getItemsFilteredByActiveStub;
+        instance._removeItem = removeItemStub;
+      });
+
+      afterEach(() => {
+        instance.store.getItemsFilteredByActive.reset();
+        instance._removeItem.reset();
+      });
+
+      describe('not passing id to exclude', () => {
+        beforeEach(() => {
+          output = instance.removeActiveItems();
+        });
+
+        it('removes all active items in store', () => {
+          expect(removeItemStub.callCount).to.equal(items.length);
+          expect(removeItemStub.firstCall.args[0]).to.equal(items[0]);
+          expect(removeItemStub.secondCall.args[0]).to.equal(items[1]);
+          expect(removeItemStub.thirdCall.args[0]).to.equal(items[2]);
+        });
+      });
+
+      describe('passing id to exclude', () => {
+        const idToExclude = '2';
+
+        beforeEach(() => {
+          output = instance.removeActiveItems(idToExclude);
+        });
+
+        it('removes all active items in store with id that does match excludedId', () => {
+          expect(removeItemStub.callCount).to.equal(2);
+          expect(removeItemStub.firstCall.args[0]).to.equal(items[0]);
+          expect(removeItemStub.secondCall.args[0]).to.equal(items[2]);
+        });
+      });
     });
 
     describe('removeHighlightedItems', () => {
