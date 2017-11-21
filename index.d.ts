@@ -91,7 +91,7 @@ declare module "choices.js" {
 		 * @return {Object} Class instance
 		 * @public
 		 */
-		removeItemsByValue(value: string): this;
+		removeActiveItemsByValue(value: string): this;
 
 		/**
 		 * Remove all items from store array

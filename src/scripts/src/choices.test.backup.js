@@ -101,7 +101,7 @@ describe('Choices', () => {
       expect(instance.unhighlightItem).to.be.a('function');
       expect(instance.highlightAll).to.be.a('function');
       expect(instance.unhighlightAll).to.be.a('function');
-      expect(instance.removeItemsByValue).to.be.a('function');
+      expect(instance.removeActiveItemsByValue).to.be.a('function');
       expect(instance.removeActiveItems).to.be.a('function');
       expect(instance.removeHighlightedItems).to.be.a('function');
       expect(instance.showDropdown).to.be.a('function');
@@ -940,11 +940,11 @@ describe('Choices', () => {
       expect(instance.input.element.value).to.equal('');
     });
 
-    it('handles removeItemsByValue()', () => {
+    it('handles removeActiveItemsByValue()', () => {
       const items = instance.currentState.items;
       const randomItem = items[Math.floor(Math.random() * items.length)];
 
-      instance.removeItemsByValue(randomItem.value);
+      instance.removeActiveItemsByValue(randomItem.value);
       expect(randomItem.active).to.be.false;
     });
   });

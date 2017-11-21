@@ -2482,8 +2482,8 @@ var Choices = function () {
      */
 
   }, {
-    key: 'removeItemsByValue',
-    value: function removeItemsByValue(value) {
+    key: 'removeActiveItemsByValue',
+    value: function removeActiveItemsByValue(value) {
       var _this6 = this;
 
       if (!value || !(0, _utils.isType)('String', value)) {

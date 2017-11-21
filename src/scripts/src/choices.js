@@ -470,11 +470,11 @@ class Choices {
         choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
       }
 
-      const activeItems = this.store.getItemsFilteredByActive();
-      const canAddItem = this._canAddItem(activeItems, this.input.getValue());
-
       // If we have choices to show
       if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+        const activeItems = this.store.getItemsFilteredByActive();
+        const canAddItem = this._canAddItem(activeItems, this.input.getValue());
+
         // ...and we can select them
         if (canAddItem.response) {
           // ...append them and highlight the first choice
@@ -511,17 +511,15 @@ class Choices {
 
     // Get active items (items that can be selected)
     const activeItems = this.store.getItemsFilteredByActive() || [];
-    // Clear list
-    this.itemList.clear();
-
     if (activeItems.length) {
+      // Clear list
+      this.itemList.clear();
       // Create a fragment to store our list items
       // (so we don't have to update the DOM for each item)
       const itemListFragment = this.renderItems(activeItems);
 
-      // If we have items to add
+      // If we have items to add, append them
       if (itemListFragment.childNodes) {
-        // Update list
         this.itemList.append(itemListFragment);
       }
     }
@@ -611,7 +609,7 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  removeItemsByValue(value) {
+  removeActiveItemsByValue(value) {
     if (!value || !isType('String', value)) {
       return this;
     }
@@ -638,7 +636,7 @@ class Choices {
     const items = this.store.getItemsFilteredByActive();
 
     items.forEach((item) => {
-      if (item.active && excludedId !== item.id) {
+      if (excludedId !== item.id) {
         this._removeItem(item);
       }
     });
@@ -656,13 +654,15 @@ class Choices {
     const items = this.store.getItemsFilteredByActive();
 
     items.forEach((item) => {
-      if (item.highlighted && item.active) {
-        this._removeItem(item);
-        // If this action was performed by the user
-        // trigger the event
-        if (runEvent) {
-          this._triggerChange(item.value);
-        }
+      if (item.highlighted) {
+        return;
+      }
+
+      this._removeItem(item);
+      // If this action was performed by the user
+      // trigger the event
+      if (runEvent) {
+        this._triggerChange(item.value);
       }
     });
 
@@ -792,6 +792,7 @@ class Choices {
       !this.initialised ||
       !this.isSelectElement ||
       !isType('Array', choices) ||
+      !choices.length ||
       !value
     ) {
       return this;
@@ -802,32 +803,29 @@ class Choices {
       this._clearChoices();
     }
 
-    // Add choices if passed
-    if (choices.length) {
-      this.containerOuter.removeLoadingState();
-      const addGroupsAndChoices = (groupOrChoice) => {
-        if (groupOrChoice.choices) {
-          this._addGroup(
-            groupOrChoice,
-            (groupOrChoice.id || null),
-            value,
-            label,
-          );
-        } else {
-          this._addChoice(
-            groupOrChoice[value],
-            groupOrChoice[label],
-            groupOrChoice.selected,
-            groupOrChoice.disabled,
-            undefined,
-            groupOrChoice.customProperties,
-            groupOrChoice.placeholder,
-          );
-        }
-      };
+    this.containerOuter.removeLoadingState();
+    const addGroupsAndChoices = (groupOrChoice) => {
+      if (groupOrChoice.choices) {
+        this._addGroup(
+          groupOrChoice,
+          (groupOrChoice.id || null),
+          value,
+          label,
+        );
+      } else {
+        this._addChoice(
+          groupOrChoice[value],
+          groupOrChoice[label],
+          groupOrChoice.selected,
+          groupOrChoice.disabled,
+          undefined,
+          groupOrChoice.customProperties,
+          groupOrChoice.placeholder,
+        );
+      }
+    };
 
-      choices.forEach(addGroupsAndChoices);
-    }
+    choices.forEach(addGroupsAndChoices);
 
     return this;
   }

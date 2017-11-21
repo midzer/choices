@@ -34,7 +34,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         beforeEach(() => {
           instance.initialised = true;
           instance.init();
@@ -123,7 +123,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         let removeEventListenersSpy;
         let passedElementRevealSpy;
         let containerOuterRevertSpy;
@@ -209,7 +209,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         describe('containerOuter enabled', () => {
           beforeEach(() => {
             instance.initialised = true;
@@ -282,7 +282,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         describe('containerOuter disabled', () => {
           beforeEach(() => {
             instance.initialised = true;
@@ -995,7 +995,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         beforeEach(() => {
           instance.initialised = true;
           output = instance.setValue(values);
@@ -1036,7 +1036,7 @@ describe('choices', () => {
         });
       });
 
-      describe('already initialised', () => {
+      describe('when already initialised', () => {
         describe('passing a string value', () => {
           const value = 'Test value';
 
@@ -1146,14 +1146,89 @@ describe('choices', () => {
       });
     });
 
-    describe('renderGroups', () => {});
-    describe('renderChoices', () => {});
-    describe('renderItems', () => {});
-    describe('render', () => {});
-    describe('removeItemsByValue', () => {});
-    describe('removeActiveItems', () => {});
-    describe('removeHighlightedItems', () => {});
-    describe('setChoices', () => {});
+    describe('removeActiveItemsByValue', () => {
+      beforeEach(() => {});
+      it('removes each active item in store with matching value', () => {});
+    });
+
+    describe('removeActiveItems', () => {
+      beforeEach(() => {});
+      it('removes each active item in store', () => {});
+    });
+
+    describe('removeHighlightedItems', () => {
+      beforeEach(() => {});
+      it('removes each highlighted item in store', () => {});
+      it('triggers event with item value if runEvent passed', () => {});
+    });
+
+    describe('setChoices', () => {
+      beforeEach(() => {});
+
+      describe('when not initialised', () => {});
+      describe('when element is not select element', () => {});
+      describe('when passing invalid arguments', () => {});
+
+      it('removes loading state', () => {});
+
+      describe('passing choices with children choices', () => {
+        it('adds groups ', () => {});
+      });
+
+      describe('passing choices without children choices', () => {
+        it('adds passed choices', () => {});
+      });
+
+      describe('passing truthy replaceChoices flag', () => {
+        it('choices are cleared', () => {});
+      });
+
+      describe('passing falsey replaceChoices flag', () => {
+        it('choices are not cleared', () => {});
+      });
+    });
+
+    describe('renderGroups', () => {
+      beforeEach(() => {});
+      it('returns a fragment of groups', () => {});
+    });
+
+    describe('renderChoices', () => {
+      beforeEach(() => {});
+      it('returns a fragment of choices', () => {});
+    });
+
+    describe('renderItems', () => {
+      beforeEach(() => {});
+      it('returns a fragment of items', () => {});
+    });
+
+    describe('render', () => {
+      beforeEach(() => {});
+
+      describe('no change to state', () => {
+        it('returns early', () => {});
+      });
+
+      describe('change to state', () => {
+        it('updates previous state to current state', () => {});
+
+        describe('select element', () => {
+          it('clears choice list', () => {});
+
+          describe('when resetScrollPosition config option is set to true', () => {
+            it('scrolls to top of choice list', () => {});
+          });
+        });
+
+        describe('text element', () => {
+          describe('active items in store', () => {
+            it('clears item list', () => {});
+            it('renders active items inside item list', () => {});
+          });
+        });
+      });
+    });
   });
 
   describe.skip('private methods', () => {

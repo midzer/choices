@@ -670,7 +670,7 @@ choices.disable();
 **Usage:** Un-highlight each chosen item.
 
 
-### removeItemsByValue(value);
+### removeActiveItemsByValue(value);
 **Input types affected:** `text`, `select-multiple`
 
 **Usage:** Remove each item by a given value.
