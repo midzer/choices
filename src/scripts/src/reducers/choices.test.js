@@ -184,6 +184,19 @@ describe('reducers/choices', () => {
         expect(actualResponse[0].active).to.equal(true);
         expect(actualResponse[1].active).to.equal(true);
       });
+
+      describe('neither of the above conditions are satisified', () => {
+        it('returns state', () => {
+          const clonedState = state.slice(0);
+          const actualResponse = choices(clonedState, {
+            type: 'ADD_ITEM',
+            activateOptions: false,
+            choiceId: undefined,
+          });
+
+          expect(actualResponse).to.equal(clonedState);
+        });
+      });
     });
 
     describe('REMOVE_ITEM', () => {
@@ -206,6 +219,18 @@ describe('reducers/choices', () => {
         });
 
         expect(actualResponse).to.eql(expectedResponse);
+      });
+
+      describe('passing no id', () => {
+        it('returns state', () => {
+          const clonedState = state.slice(0);
+          const actualResponse = choices(clonedState, {
+            type: 'REMOVE_ITEM',
+            choiceId: undefined,
+          });
+
+          expect(actualResponse).to.equal(clonedState);
+        });
       });
     });
   });

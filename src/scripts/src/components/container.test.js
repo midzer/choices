@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import sinon from 'sinon';
+import { stub } from 'sinon';
 import Container from './container';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
@@ -34,7 +34,7 @@ describe('components/container', () => {
     let addEventListenerStub;
 
     beforeEach(() => {
-      addEventListenerStub = sinon.stub(instance.element, 'addEventListener');
+      addEventListenerStub = stub(instance.element, 'addEventListener');
     });
 
     afterEach(() => {
@@ -53,7 +53,7 @@ describe('components/container', () => {
     let removeEventListenerStub;
 
     beforeEach(() => {
-      removeEventListenerStub = sinon.stub(instance.element, 'removeEventListener');
+      removeEventListenerStub = stub(instance.element, 'removeEventListener');
     });
 
     afterEach(() => {
@@ -84,7 +84,7 @@ describe('components/container', () => {
     });
   });
 
-  // describe('shouldFlip', () => { });
+  // describe('shouldFlip', () => {});
 
   describe('setActiveDescendant', () => {
     it('sets element\'s aria-activedescendant attribute with passed descendant ID', () => {
@@ -105,14 +105,84 @@ describe('components/container', () => {
     });
   });
 
-  // describe('open', () => { });
-  // describe('close', () => { });
+  describe('open', () => {
+    beforeEach(() => {
+      instance.open();
+    });
+
+    it('adds open state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.openState)).to.equal(true);
+    });
+
+    it('sets aria-expanded attribute to true', () => {
+      expect(instance.element.getAttribute('aria-expanded')).to.equal('true');
+    });
+
+    it('sets isOpen flag to true', () => {
+      expect(instance.isOpen).to.equal(true);
+    });
+
+    describe('flipping dropdown', () => {
+      let shouldFlipStub;
+      beforeEach(() => {
+        shouldFlipStub = stub().returns(true);
+
+        instance.shouldFlip = shouldFlipStub;
+        instance.open();
+      });
+
+      afterEach(() => {
+        instance.shouldFlip.reset();
+      });
+
+      it('adds adds flipped state class', () => {
+        expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.flippedState)).to.equal(true);
+      });
+
+      it('sets isFlipped flag to true', () => {
+        expect(instance.isFlipped).to.equal(true);
+      });
+    });
+  });
+
+  describe('close', () => {
+    beforeEach(() => {
+      instance.close();
+    });
+
+    it('adds open state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.openState)).to.equal(false);
+    });
+
+    it('sets aria-expanded attribute to true', () => {
+      expect(instance.element.getAttribute('aria-expanded')).to.equal('false');
+    });
+
+    it('sets isOpen flag to true', () => {
+      expect(instance.isOpen).to.equal(false);
+    });
+
+    describe('flipped dropdown', () => {
+      beforeEach(() => {
+        instance.isFlipped = true;
+        instance.close();
+      });
+
+      it('removes adds flipped state class', () => {
+        expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.flippedState)).to.equal(false);
+      });
+
+      it('sets isFlipped flag to false', () => {
+        expect(instance.isFlipped).to.equal(false);
+      });
+    });
+  });
 
   describe('focus', () => {
     let focusStub;
 
     beforeEach(() => {
-      focusStub = sinon.stub(instance.element, 'focus');
+      focusStub = stub(instance.element, 'focus');
     });
 
     afterEach(() => {
@@ -126,10 +196,41 @@ describe('components/container', () => {
     });
   });
 
-  // describe('addFocusState', () => { });
-  // describe('removeFocusState', () => { });
-  // describe('enable', () => {});
-  // describe('disable', () => {});
+  describe('addFocusState', () => {
+    beforeEach(() => {
+      instance.removeLoadingState();
+    });
+
+    it('adds focus state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.focusState)).to.equal(false);
+      instance.addFocusState();
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.focusState)).to.equal(true);
+    });
+  });
+
+  describe('removeFocusState', () => {
+    beforeEach(() => {
+      instance.addFocusState();
+    });
+
+    it('removes focus state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.focusState)).to.equal(true);
+      instance.removeFocusState();
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.focusState)).to.equal(false);
+    });
+  });
+
+  // describe('enable', () => {
+  //   it('removes disabled state class', () => {});
+  //   it('removes aria-disabled attribute', () => { });
+  //   it('sets isDisabled flag to true', () => {});
+  // });
+
+  // describe('disable', () => {
+  //   it('adds disabled state class', () => {});
+  //   it('adds aria-disabled attribute', () => { });
+  //   it('sets isDisabled flag to false', () => { });
+  // });
 
   describe('addLoadingState', () => {
     beforeEach(() => {
