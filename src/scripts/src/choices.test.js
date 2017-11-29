@@ -1255,34 +1255,198 @@ describe('choices', () => {
     });
 
     describe('removeHighlightedItems', () => {
-      beforeEach(() => {});
-      it('removes each highlighted item in store', () => {});
-      it('triggers event with item value if runEvent passed', () => {});
+      let getItemsFilteredByHighlightedStub;
+      let removeItemStub;
+      let triggerChangeStub;
+
+      const items = [
+        {
+          id: 1,
+          value: 'Test 1',
+        },
+        {
+          id: 2,
+          value: 'Test 2',
+        },
+      ];
+
+
+      beforeEach(() => {
+        getItemsFilteredByHighlightedStub = stub().returns(items);
+        removeItemStub = stub();
+        triggerChangeStub = stub();
+
+        instance.store.getItemsFilteredByHighlighted = getItemsFilteredByHighlightedStub;
+        instance._removeItem = removeItemStub;
+        instance._triggerChange = triggerChangeStub;
+      });
+
+      afterEach(() => {
+        instance.store.getItemsFilteredByHighlighted.reset();
+        instance._removeItem.reset();
+        instance._triggerChange.reset();
+      });
+
+      describe('runEvent parameter being passed', () => {
+        beforeEach(() => {
+          output = instance.removeHighlightedItems();
+        });
+
+        returnsInstance(output);
+
+        it('removes each highlighted item in store', () => {
+          expect(removeItemStub.callCount).to.equal(2);
+        });
+      });
+
+      describe('runEvent parameter not being passed', () => {
+        beforeEach(() => {
+          output = instance.removeHighlightedItems(true);
+        });
+
+        returnsInstance(output);
+
+        it('triggers event with item value', () => {
+          expect(triggerChangeStub.callCount).to.equal(2);
+          expect(triggerChangeStub.firstCall.args[0]).to.equal(items[0].value);
+          expect(triggerChangeStub.secondCall.args[0]).to.equal(items[1].value);
+        });
+      });
     });
 
     describe('setChoices', () => {
-      beforeEach(() => {});
+      let clearChoicesStub;
+      let addGroupStub;
+      let addChoiceStub;
+      let containerOuterRemoveLoadingStateStub;
+      const value = 'value';
+      const label = 'label';
+      const choices = [
+        {
+          id: '1',
+          value: '1',
+          label: 'Test 1',
+        },
+        {
+          id: '2',
+          value: '2',
+          label: 'Test 2',
+        },
+      ];
+      const groups = [
+        {
+          ...choices[0],
+          choices,
+        },
+        ...choices[1],
+      ];
 
-      describe('when not initialised', () => {});
-      describe('when element is not select element', () => {});
-      describe('when passing invalid arguments', () => {});
+      beforeEach(() => {
+        clearChoicesStub = stub();
+        addGroupStub = stub();
+        addChoiceStub = stub();
+        containerOuterRemoveLoadingStateStub = stub();
 
-      it('removes loading state', () => {});
-
-      describe('passing choices with children choices', () => {
-        it('adds groups ', () => {});
+        instance._clearChoices = clearChoicesStub;
+        instance._addGroup = addGroupStub;
+        instance._addChoice = addChoiceStub;
+        instance.containerOuter.removeLoadingState = containerOuterRemoveLoadingStateStub;
       });
 
-      describe('passing choices without children choices', () => {
-        it('adds passed choices', () => {});
+      afterEach(() => {
+        instance._clearChoices.reset();
+        instance._addGroup.reset();
+        instance._addChoice.reset();
+        instance.containerOuter.removeLoadingState.reset();
       });
 
-      describe('passing truthy replaceChoices flag', () => {
-        it('choices are cleared', () => {});
+      const returnsEarly = () => {
+        it('returns early', () => {
+          expect(addGroupStub.called).to.equal(false);
+          expect(addChoiceStub.called).to.equal(false);
+          expect(clearChoicesStub.called).to.equal(false);
+        });
+      };
+
+      describe('when element is not select element', () => {
+        beforeEach(() => {
+          instance.isSelectElement = false;
+          instance.setChoices(choices, value, label, false);
+        });
+
+        returnsEarly();
       });
 
-      describe('passing falsey replaceChoices flag', () => {
-        it('choices are not cleared', () => {});
+      describe('passing invalid arguments', () => {
+        describe('passing an empty array', () => {
+          beforeEach(() => {
+            instance.isSelectElement = true;
+            instance.setChoices([], value, label, false);
+          });
+
+          returnsEarly();
+        });
+
+        describe('passing no value', () => {
+          beforeEach(() => {
+            instance.isSelectElement = true;
+            instance.setChoices(choices, undefined, 'label', false);
+          });
+
+          returnsEarly();
+        });
+      });
+
+      describe('passing valid arguments', () => {
+        beforeEach(() => {
+          instance.isSelectElement = true;
+        });
+
+        it('removes loading state', () => {
+          instance.setChoices(choices, value, label, false);
+          expect(containerOuterRemoveLoadingStateStub.called).to.equal(true);
+        });
+
+        describe('passing choices with children choices', () => {
+          it('adds groups', () => {
+            instance.setChoices(groups, value, label, false);
+            expect(addGroupStub.callCount).to.equal(1);
+            expect(addGroupStub.firstCall.args[0]).to.equal(groups[0]);
+            expect(addGroupStub.firstCall.args[1]).to.equal(groups[0].id);
+            expect(addGroupStub.firstCall.args[2]).to.equal(value);
+            expect(addGroupStub.firstCall.args[3]).to.equal(label);
+          });
+        });
+
+        describe('passing choices without children choices', () => {
+          it('adds passed choices', () => {
+            instance.setChoices(choices, value, label, false);
+            expect(addChoiceStub.callCount).to.equal(2);
+            addChoiceStub.getCalls().forEach((call, index) => {
+              expect(call.args[0]).to.equal(choices[index][value]);
+              expect(call.args[1]).to.equal(choices[index][label]);
+              expect(call.args[2]).to.equal(choices[index].selected);
+              expect(call.args[3]).to.equal(choices[index].disabled);
+              expect(call.args[4]).to.equal(undefined);
+              expect(call.args[5]).to.equal(choices[index].customProperties);
+              expect(call.args[6]).to.equal(choices[index].placeholder);
+            });
+          });
+        });
+
+        describe('passing truthy replaceChoices flag', () => {
+          it('choices are cleared', () => {
+            instance.setChoices(choices, value, label, true);
+            expect(clearChoicesStub.called).to.equal(true);
+          });
+        });
+
+        describe('passing falsey replaceChoices flag', () => {
+          it('choices are not cleared', () => {
+            instance.setChoices(choices, value, label, false);
+            expect(clearChoicesStub.called).to.equal(false);
+          });
+        });
       });
     });
 

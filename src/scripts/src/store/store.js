@@ -52,7 +52,18 @@ export default class Store {
    */
   getItemsFilteredByActive() {
     const items = this.getItems();
-    const values = items.filter(item => item.active === true, []);
+    const values = items.filter(item => item.active === true);
+
+    return values;
+  }
+
+  /**
+  * Get highlighted items from store
+  * @return {Array} Item objects
+  */
+  getItemsFilteredByHighlighted() {
+    const items = this.getItems();
+    const values = items.filter(item => item.active && item.highlighted);
 
     return values;
   }

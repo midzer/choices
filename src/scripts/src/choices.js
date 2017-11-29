@@ -651,13 +651,9 @@ class Choices {
    * @public
    */
   removeHighlightedItems(runEvent = false) {
-    const items = this.store.getItemsFilteredByActive();
+    const items = this.store.getItemsFilteredByHighlighted();
 
     items.forEach((item) => {
-      if (item.highlighted) {
-        return;
-      }
-
       this._removeItem(item);
       // If this action was performed by the user
       // trigger the event
@@ -789,9 +785,7 @@ class Choices {
    */
   setChoices(choices = [], value = '', label = '', replaceChoices = false) {
     if (
-      !this.initialised ||
       !this.isSelectElement ||
-      !isType('Array', choices) ||
       !choices.length ||
       !value
     ) {
