@@ -508,19 +508,21 @@ class Choices {
     }
 
     /* Items */
-
-    // Get active items (items that can be selected)
-    const activeItems = this.store.getItemsFilteredByActive() || [];
-    if (activeItems.length) {
+    if (this.currentState.items !== this.prevState.items) {
+      // Get active items (items that can be selected)
+      const activeItems = this.store.getItemsFilteredByActive() || [];
       // Clear list
       this.itemList.clear();
-      // Create a fragment to store our list items
-      // (so we don't have to update the DOM for each item)
-      const itemListFragment = this.renderItems(activeItems);
 
-      // If we have items to add, append them
-      if (itemListFragment.childNodes) {
-        this.itemList.append(itemListFragment);
+      if (activeItems.length) {
+        // Create a fragment to store our list items
+        // (so we don't have to update the DOM for each item)
+        const itemListFragment = this.renderItems(activeItems);
+
+        // If we have items to add, append them
+        if (itemListFragment.childNodes) {
+          this.itemList.append(itemListFragment);
+        }
       }
     }
 
