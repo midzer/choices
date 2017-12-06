@@ -3,6 +3,10 @@ A vanilla, lightweight (~20kb gzipped 🎉), configurable select box/text input 
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
+---
+### 👉 Please use [develop](https://github.com/jshjohnson/Choices/tree/develop) as the base branch for pull requests 👈
+---
+
 ## TL;DR
 * Lightweight
 * No jQuery dependency
