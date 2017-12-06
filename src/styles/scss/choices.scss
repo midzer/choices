@@ -112,6 +112,7 @@ $choices-icon-cross-inverse: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEiI
     width: $choices-button-dimension;
     line-height: 1;
     opacity: .75;
+    border-radius: 0;
     &:hover, &:focus { opacity: 1; }
   }
 }

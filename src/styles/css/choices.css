@@ -117,6 +117,7 @@
   width: 8px;
   line-height: 1;
   opacity: .75;
+  border-radius: 0;
 }
 
 .choices[data-type*="select-multiple"] .choices__button:hover, .choices[data-type*="select-multiple"] .choices__button:focus, .choices[data-type*="text"] .choices__button:hover, .choices[data-type*="text"] .choices__button:focus {
