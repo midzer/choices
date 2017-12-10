@@ -582,3 +582,15 @@ export const regexFilter = (value, regex) => {
   const expression = new RegExp(regex.source, 'i');
   return expression.test(value);
 };
+
+export const getWindowHeight = () => {
+  const body = document.body;
+  const html = document.documentElement;
+  return Math.max(
+    body.scrollHeight,
+    body.offsetHeight,
+    html.clientHeight,
+    html.scrollHeight,
+    html.offsetHeight,
+  );
+};

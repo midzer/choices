@@ -87,7 +87,8 @@
       "src/**/**/**/**/**/*.js"
     ],
     "exclude": [
-      "src/**/**/**/**/**/*.test.js"
+      "src/**/**/**/**/**/*.test.js",
+      "src/scripts/src/lib/polyfills.js"
     ]
   }
 }

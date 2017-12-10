@@ -18,16 +18,18 @@ describe('components/container', () => {
     instance = new Container(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
-  it('assigns choices instance to class', () => {
-    expect(instance.parentInstance).to.eql(choicesInstance);
-  });
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
 
-  it('assigns choices element to class', () => {
-    expect(instance.element).to.eql(choicesElement);
-  });
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(choicesElement);
+    });
 
-  it('assigns classnames to class', () => {
-    expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
   describe('getElement', () => {
@@ -90,7 +92,43 @@ describe('components/container', () => {
     });
   });
 
-  // describe('shouldFlip', () => {});
+  describe('shouldFlip', () => {
+    describe('not passing dropdownPos', () => {
+      it('returns false', () => {
+        expect(instance.shouldFlip()).to.equal(false);
+      });
+    });
+
+    describe('passing dropdownPos', () => {
+      describe('position config option set to "auto"', () => {
+        beforeEach(() => {
+          instance.config.position = 'auto';
+        });
+
+        describe('dropdownPos is greater than window height', () => {
+          it('returns false', () => {
+            expect(instance.shouldFlip(100, 1000)).to.equal(false);
+          });
+        });
+
+        describe('dropdownPos is less than window height', () => {
+          it('returns true', () => {
+            expect(instance.shouldFlip(100, 50)).to.equal(true);
+          });
+        });
+      });
+
+      describe('position config option set to "top"', () => {
+        beforeEach(() => {
+          instance.config.position = 'top';
+        });
+
+        it('returns true', () => {
+          expect(instance.shouldFlip(100)).to.equal(true);
+        });
+      });
+    });
+  });
 
   describe('setActiveDescendant', () => {
     it('sets element\'s aria-activedescendant attribute with passed descendant ID', () => {

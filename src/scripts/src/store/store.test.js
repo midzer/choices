@@ -21,13 +21,17 @@ describe('reducers/store', () => {
     getStateStub.restore();
   });
 
-  it('creates redux store on construction', () => {
-    expect(instance.store).to.contain.keys([
-      'subscribe',
-      'dispatch',
-      'getState',
-    ]);
+
+  describe('constructor', () => {
+    it('creates redux store', () => {
+      expect(instance.store).to.contain.keys([
+        'subscribe',
+        'dispatch',
+        'getState',
+      ]);
+    });
   });
+
 
   describe('subscribe', () => {
     it('wraps redux subscribe method', () => {
@@ -79,10 +83,22 @@ describe('reducers/store', () => {
             id: 2,
             choiceId: 2,
             groupId: -1,
-            value: 'Item one',
-            label: 'Item one',
+            value: 'Item two',
+            label: 'Item two',
             active: true,
             highlighted: false,
+            customProperties: null,
+            placeholder: false,
+            keyCode: null,
+          },
+          {
+            id: 3,
+            choiceId: 3,
+            groupId: -1,
+            value: 'Item three',
+            label: 'Item three',
+            active: true,
+            highlighted: true,
             customProperties: null,
             placeholder: false,
             keyCode: null,
@@ -153,13 +169,21 @@ describe('reducers/store', () => {
       });
     });
 
+    describe('getItemsFilteredByHighlighted', () => {
+      it('returns items that are active and highlighted', () => {
+        const expectedResponse = state.items.filter((item => item.highlighted && item.active));
+        const actualResponse = instance.getItemsFilteredByHighlighted();
+        expect(actualResponse).to.eql(expectedResponse);
+      });
+    });
+
     describe('getItemsReducedToValues', () => {
       it('returns an array of item values', () => {
         const expectedResponse = state.items.reduce((items, item) => {
           items.push(item.value);
           return items;
         }, []);
-        const actualResponse = instance.getItemsReducedToValues();
+        const actualResponse = instance.getItemsReducedToValues(state.items);
         expect(actualResponse).to.eql(expectedResponse);
       });
     });
@@ -197,11 +221,20 @@ describe('reducers/store', () => {
     });
 
     describe('getChoiceById', () => {
-      it('returns active choice by id', () => {
-        const id = '1';
-        const expectedResponse = state.choices.find((choice => choice.id === parseInt(id, 10)));
-        const actualResponse = instance.getChoiceById(id);
-        expect(actualResponse).to.eql(expectedResponse);
+      describe('passing id', () => {
+        it('returns active choice by passed id', () => {
+          const id = '1';
+          const expectedResponse = state.choices.find((choice => choice.id === parseInt(id, 10)));
+          const actualResponse = instance.getChoiceById(id);
+          expect(actualResponse).to.eql(expectedResponse);
+        });
+      });
+
+      describe('passing no id', () => {
+        it('returns false', () => {
+          const actualResponse = instance.getChoiceById();
+          expect(actualResponse).to.equal(false);
+        });
       });
     });
 

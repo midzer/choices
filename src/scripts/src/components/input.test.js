@@ -152,30 +152,6 @@ describe('components/input', () => {
     });
   });
 
-  // describe('activate', () => {
-  //   describe('when passed focusInput argument is true, canSearch is true and current element is not in focus', () => {
-  //     let focusSpy;
-  //     beforeEach(() => {
-  //       instance.parentInstance.canSearch = true;
-  //       focusSpy = spy(instance.element, 'focus');
-  //     });
-
-  //     afterEach(() => {
-  //       focusSpy.restore();
-  //     });
-
-  //     it('focuses element', () => {
-  //       expect(focusSpy.callCount).to.equal(0);
-  //       instance.activate(true);
-  //       expect(focusSpy.callCount).to.equal(1);
-  //     });
-  //   });
-  // });
-
-  describe('deactivate', () => {
-
-  });
-
   describe('enable', () => {
     beforeEach(() => {
       instance.element.setAttribute('disabled', '');
@@ -219,10 +195,49 @@ describe('components/input', () => {
       focusStub.restore();
     });
 
-    it('focuses element if isFocussed flag is set to false', () => {
-      instance.isFocussed = false;
-      instance.focus();
-      expect(focusStub.callCount).to.equal(1);
+    describe('when element is not focussed', () => {
+      it('focuses element if isFocussed flag is set to false', () => {
+        instance.isFocussed = true;
+        instance.focus();
+        expect(focusStub.callCount).to.equal(0);
+      });
+    });
+
+    describe('when element is focussed', () => {
+      it('focuses element if isFocussed flag is set to false', () => {
+        instance.isFocussed = false;
+        instance.focus();
+        expect(focusStub.callCount).to.equal(1);
+      });
+    });
+  });
+
+
+  describe('blur', () => {
+    let blurStub;
+
+    beforeEach(() => {
+      blurStub = stub(instance.element, 'blur');
+    });
+
+    afterEach(() => {
+      blurStub.restore();
+    });
+
+    describe('when element is not focussed', () => {
+      it('doesn\'t blur element', () => {
+        instance.isFocussed = false;
+        instance.blur();
+        expect(blurStub.callCount).to.equal(0);
+      });
+    });
+
+    describe('when element is focussed', () => {
+      it('blurs element', () => {
+        instance.isFocussed = true;
+        instance.blur();
+        expect(blurStub.callCount).to.equal(1);
+      });
     });
   });
 

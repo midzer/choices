@@ -20,16 +20,18 @@ describe('components/dropdown', () => {
     instance = new Dropdown(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
-  it('assigns choices instance to instance', () => {
-    expect(instance.parentInstance).to.eql(choicesInstance);
-  });
+  describe('constructor', () => {
+    it('assigns choices instance to instance', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
 
-  it('assigns choices element to instance', () => {
-    expect(instance.element).to.eql(choicesElement);
-  });
+    it('assigns choices element to instance', () => {
+      expect(instance.element).to.eql(choicesElement);
+    });
 
-  it('assigns classnames to instance', () => {
-    expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    it('assigns classnames to instance', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
   describe('getElement', () => {

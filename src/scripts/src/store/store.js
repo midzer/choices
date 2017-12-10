@@ -72,7 +72,7 @@ export default class Store {
    * Get items from store reduced to just their values
    * @return {Array} Item objects
    */
-  getItemsReducedToValues(items = this.getItems()) {
+  getItemsReducedToValues(items) {
     const values = items.reduce((prev, current) => {
       prev.push(current.value);
       return prev;

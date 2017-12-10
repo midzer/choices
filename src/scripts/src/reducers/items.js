@@ -19,9 +19,7 @@ export default function items(state = defaultState, action) {
 
       return newState.map((obj) => {
         const item = obj;
-        if (item.highlighted) {
-          item.highlighted = false;
-        }
+        item.highlighted = false;
         return item;
       });
     }

@@ -8,18 +8,36 @@ describe('reducers/choices', () => {
 
   describe('when choices do not exist', () => {
     describe('ADD_CHOICE', () => {
-      it('adds choice', () => {
-        const value = 'test';
-        const label = 'test';
-        const id = 'test';
-        const groupId = 'test';
-        const disabled = false;
-        const elementId = 'test';
-        const customProperties = 'test';
-        const placeholder = 'test';
+      const value = 'test';
+      const label = 'test';
+      const id = 'test';
+      const groupId = 'test';
+      const disabled = false;
+      const elementId = 'test';
+      const customProperties = 'test';
+      const placeholder = 'test';
 
-        const expectedResponse = [
-          {
+      describe('passing expected values', () => {
+        it('adds choice', () => {
+          const expectedResponse = [
+            {
+              value,
+              label,
+              id,
+              groupId,
+              disabled,
+              elementId,
+              customProperties,
+              placeholder,
+              selected: false,
+              active: true,
+              score: 9999,
+              keyCode: null,
+            },
+          ];
+
+          const actualResponse = choices(undefined, {
+            type: 'ADD_CHOICE',
             value,
             label,
             id,
@@ -28,26 +46,82 @@ describe('reducers/choices', () => {
             elementId,
             customProperties,
             placeholder,
-            selected: false,
-            active: true,
-            score: 9999,
-            keyCode: null,
-          },
-        ];
+          });
 
-        const actualResponse = choices(undefined, {
-          type: 'ADD_CHOICE',
-          value,
-          label,
-          id,
-          groupId,
-          disabled,
-          elementId,
-          customProperties,
-          placeholder,
+          expect(actualResponse).to.eql(expectedResponse);
+        });
+      });
+
+      describe('fallback values', () => {
+        describe('passing no label', () => {
+          it('adds choice using value as label', () => {
+            const expectedResponse = [
+              {
+                value,
+                label: value,
+                id,
+                groupId,
+                disabled,
+                elementId,
+                customProperties,
+                placeholder,
+                selected: false,
+                active: true,
+                score: 9999,
+                keyCode: null,
+              },
+            ];
+
+            const actualResponse = choices(undefined, {
+              type: 'ADD_CHOICE',
+              value,
+              label: null,
+              id,
+              groupId,
+              disabled,
+              elementId,
+              customProperties,
+              placeholder,
+            });
+
+            expect(actualResponse).to.eql(expectedResponse);
+          });
         });
 
-        expect(actualResponse).to.eql(expectedResponse);
+        describe('passing no placeholder value', () => {
+          it('adds choice with placeholder set to false', () => {
+            const expectedResponse = [
+              {
+                value,
+                label: value,
+                id,
+                groupId,
+                disabled,
+                elementId,
+                customProperties,
+                placeholder: false,
+                selected: false,
+                active: true,
+                score: 9999,
+                keyCode: null,
+              },
+            ];
+
+            const actualResponse = choices(undefined, {
+              type: 'ADD_CHOICE',
+              value,
+              label: null,
+              id,
+              groupId,
+              disabled,
+              elementId,
+              customProperties,
+              placeholder: undefined,
+            });
+
+            expect(actualResponse).to.eql(expectedResponse);
+          });
+        });
       });
     });
   });

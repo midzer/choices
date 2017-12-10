@@ -1,3 +1,5 @@
+import { getWindowHeight } from '../lib/utils';
+
 export default class Container {
   constructor(instance, element, classNames) {
     this.parentInstance = instance;
@@ -55,26 +57,15 @@ export default class Container {
    * @param {Number} dropdownPos
    * @returns
    */
-  shouldFlip(dropdownPos) {
+  shouldFlip(dropdownPos, windowHeight = getWindowHeight()) {
     if (dropdownPos === undefined) {
       return false;
     }
-
-    const body = document.body;
-    const html = document.documentElement;
-    const winHeight = Math.max(
-      body.scrollHeight,
-      body.offsetHeight,
-      html.clientHeight,
-      html.scrollHeight,
-      html.offsetHeight,
-    );
-
     // If flip is enabled and the dropdown bottom position is
     // greater than the window height flip the dropdown.
     let shouldFlip = false;
     if (this.config.position === 'auto') {
-      shouldFlip = dropdownPos >= winHeight;
+      shouldFlip = dropdownPos >= windowHeight;
     } else if (this.config.position === 'top') {
       shouldFlip = true;
     }

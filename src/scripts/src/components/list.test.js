@@ -17,16 +17,18 @@ describe('components/list', () => {
     instance = new List(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
-  it('assigns choices instance to class', () => {
-    expect(instance.parentInstance).to.eql(choicesInstance);
-  });
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
 
-  it('assigns choices element to class', () => {
-    expect(instance.element).to.eql(choicesElement);
-  });
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(choicesElement);
+    });
 
-  it('assigns classnames to class', () => {
-    expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
   describe('getElement', () => {
@@ -46,11 +48,21 @@ describe('components/list', () => {
   });
 
   describe('scrollTo', () => {
-    it('scrolls element to passed position', () => {
-      const scrollPosition = 20;
-      expect(instance.element.scrollTop).to.equal(0);
-      instance.scrollTo(scrollPosition);
-      expect(instance.element.scrollTop).to.equal(scrollPosition);
+    describe('passing position', () => {
+      it('scrolls element to passed position', () => {
+        const scrollPosition = 20;
+        expect(instance.element.scrollTop).to.equal(0);
+        instance.scrollTo(scrollPosition);
+        expect(instance.element.scrollTop).to.equal(scrollPosition);
+      });
+    });
+
+    describe('not passing position', () => {
+      it('scrolls element to default position', () => {
+        expect(instance.element.scrollTop).to.equal(0);
+        instance.scrollTo();
+        expect(instance.element.scrollTop).to.equal(0);
+      });
     });
   });
 

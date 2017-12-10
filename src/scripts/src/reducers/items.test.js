@@ -19,34 +19,83 @@ describe('reducers/items', () => {
       const placeholder = 'This is a placeholder';
       const keyCode = 10;
 
-      const expectedResponse = [
-        {
-          id,
-          choiceId,
-          groupId,
-          value,
-          label,
-          active: true,
-          highlighted: false,
-          customProperties,
-          placeholder,
-          keyCode: null,
-        },
-      ];
+      describe('passing expected values', () => {
+        let actualResponse;
 
-      const actualResponse = items(undefined, {
-        type: 'ADD_ITEM',
-        value,
-        label,
-        id,
-        choiceId,
-        groupId,
-        customProperties,
-        placeholder,
-        keyCode,
+        beforeEach(() => {
+          actualResponse = items(undefined, {
+            type: 'ADD_ITEM',
+            value,
+            label,
+            id,
+            choiceId,
+            groupId,
+            customProperties,
+            placeholder,
+            keyCode,
+          });
+        });
+
+        it('adds item', () => {
+          const expectedResponse = [
+            {
+              id,
+              choiceId,
+              groupId,
+              value,
+              label,
+              active: true,
+              highlighted: false,
+              customProperties,
+              placeholder,
+              keyCode: null,
+            },
+          ];
+
+          expect(actualResponse).to.eql(expectedResponse);
+        });
+
+        it('unhighlights all highlighted items', () => {
+          actualResponse.forEach((item) => {
+            expect(item.highlighted).to.equal(false);
+          });
+        });
       });
 
-      expect(actualResponse).to.eql(expectedResponse);
+      describe('fallback values', () => {
+        describe('passing no placeholder value', () => {
+          it('adds item with placeholder set to false', () => {
+            const expectedResponse = [
+              {
+                id,
+                choiceId,
+                groupId,
+                value,
+                label,
+                active: true,
+                highlighted: false,
+                customProperties,
+                placeholder: false,
+                keyCode: null,
+              },
+            ];
+
+            const actualResponse = items(undefined, {
+              type: 'ADD_ITEM',
+              value,
+              label,
+              id,
+              choiceId,
+              groupId,
+              customProperties,
+              placeholder: undefined,
+              keyCode,
+            });
+
+            expect(actualResponse).to.eql(expectedResponse);
+          });
+        });
+      });
     });
   });
 
