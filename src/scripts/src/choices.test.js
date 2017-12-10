@@ -9,26 +9,31 @@ describe('choices', () => {
   let output;
   let passedElement;
 
+  const returnsInstance = () => {
+    it('returns this', () => {
+      expect(output).to.eql(instance);
+    });
+  };
+
   describe('public methods', () => {
-    const returnsInstance = () => {
-      it('returns this', () => {
-        expect(output).to.eql(instance);
-      });
-    };
+    beforeEach(() => {
+      passedElement = document.createElement('input');
+      passedElement.type = 'text';
+      passedElement.className = 'js-choices';
+      document.body.appendChild(passedElement);
+
+      instance = new Choices(passedElement);
+    });
 
     afterEach(() => {
       output = null;
+      instance = null;
     });
 
     describe('init', () => {
       const callbackOnInitSpy = spy();
 
       beforeEach(() => {
-        passedElement = document.createElement('input');
-        passedElement.type = 'text';
-        passedElement.className = 'js-choices';
-        document.body.appendChild(passedElement);
-
         instance = new Choices(passedElement, {
           callbackOnInit: callbackOnInitSpy,
         });
@@ -322,13 +327,13 @@ describe('choices', () => {
     describe('showDropdown', () => {
       let containerOuterOpenSpy;
       let dropdownShowSpy;
-      let inputActivateSpy;
+      let inputFocusSpy;
       let passedElementTriggerEventStub;
 
       beforeEach(() => {
         containerOuterOpenSpy = spy(instance.containerOuter, 'open');
         dropdownShowSpy = spy(instance.dropdown, 'show');
-        inputActivateSpy = spy(instance.input, 'activate');
+        inputFocusSpy = spy(instance.input, 'focus');
         passedElementTriggerEventStub = stub();
 
         instance.passedElement.triggerEvent = passedElementTriggerEventStub;
@@ -337,13 +342,11 @@ describe('choices', () => {
       afterEach(() => {
         containerOuterOpenSpy.restore();
         dropdownShowSpy.restore();
-        inputActivateSpy.restore();
+        inputFocusSpy.restore();
         instance.passedElement.triggerEvent.reset();
       });
 
       describe('dropdown active', () => {
-        let output;
-
         beforeEach(() => {
           instance.dropdown.isActive = true;
           output = instance.showDropdown();
@@ -356,7 +359,7 @@ describe('choices', () => {
         it('returns early', () => {
           expect(containerOuterOpenSpy.called).to.equal(false);
           expect(dropdownShowSpy.called).to.equal(false);
-          expect(inputActivateSpy.called).to.equal(false);
+          expect(inputFocusSpy.called).to.equal(false);
           expect(passedElementTriggerEventStub.called).to.equal(false);
         });
       });
@@ -379,14 +382,22 @@ describe('choices', () => {
           expect(dropdownShowSpy.called).to.equal(true);
         });
 
-        it('activates input', () => {
-          expect(inputActivateSpy.called).to.equal(true);
-        });
-
         it('triggers event on passedElement', () => {
           expect(passedElementTriggerEventStub.called).to.equal(true);
           expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.showDropdown);
           expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
+        });
+
+        describe('passing true focusInput flag with canSearch set to true', () => {
+          beforeEach(() => {
+            instance.dropdown.isActive = false;
+            instance.canSearch = true;
+            output = instance.showDropdown(true);
+          });
+
+          it('focuses input', () => {
+            expect(inputFocusSpy.called).to.equal(true);
+          });
         });
       });
     });
@@ -394,13 +405,15 @@ describe('choices', () => {
     describe('hideDropdown', () => {
       let containerOuterCloseSpy;
       let dropdownHideSpy;
-      let inputDeactivateSpy;
+      let inputBlurSpy;
+      let inputRemoveActiveDescendantSpy;
       let passedElementTriggerEventStub;
 
       beforeEach(() => {
         containerOuterCloseSpy = spy(instance.containerOuter, 'close');
         dropdownHideSpy = spy(instance.dropdown, 'hide');
-        inputDeactivateSpy = spy(instance.input, 'deactivate');
+        inputBlurSpy = spy(instance.input, 'blur');
+        inputRemoveActiveDescendantSpy = spy(instance.input, 'removeActiveDescendant');
         passedElementTriggerEventStub = stub();
 
         instance.passedElement.triggerEvent = passedElementTriggerEventStub;
@@ -409,7 +422,8 @@ describe('choices', () => {
       afterEach(() => {
         containerOuterCloseSpy.restore();
         dropdownHideSpy.restore();
-        inputDeactivateSpy.restore();
+        inputBlurSpy.restore();
+        inputRemoveActiveDescendantSpy.restore();
         instance.passedElement.triggerEvent.reset();
       });
 
@@ -424,7 +438,7 @@ describe('choices', () => {
         it('returns early', () => {
           expect(containerOuterCloseSpy.called).to.equal(false);
           expect(dropdownHideSpy.called).to.equal(false);
-          expect(inputDeactivateSpy.called).to.equal(false);
+          expect(inputBlurSpy.called).to.equal(false);
           expect(passedElementTriggerEventStub.called).to.equal(false);
         });
       });
@@ -447,30 +461,45 @@ describe('choices', () => {
           expect(dropdownHideSpy.called).to.equal(true);
         });
 
-        it('deactivates input', () => {
-          expect(inputDeactivateSpy.called).to.equal(true);
-        });
-
         it('triggers event on passedElement', () => {
           expect(passedElementTriggerEventStub.called).to.equal(true);
           expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.hideDropdown);
           expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
         });
+
+        describe('passing true blurInput flag with canSearch set to true', () => {
+          beforeEach(() => {
+            instance.dropdown.isActive = true;
+            instance.canSearch = true;
+            output = instance.hideDropdown(true);
+          });
+
+          it('removes active descendants', () => {
+            expect(inputRemoveActiveDescendantSpy.called).to.equal(true);
+          });
+
+          it('blurs input', () => {
+            expect(inputBlurSpy.called).to.equal(true);
+          });
+        });
       });
     });
 
     describe('toggleDropdown', () => {
-      let hideDropdownSpy;
-      let showDropdownSpy;
+      let hideDropdownStub;
+      let showDropdownStub;
 
       beforeEach(() => {
-        hideDropdownSpy = spy(instance, 'hideDropdown');
-        showDropdownSpy = spy(instance, 'showDropdown');
+        hideDropdownStub = stub();
+        showDropdownStub = stub();
+
+        instance.hideDropdown = hideDropdownStub;
+        instance.showDropdown = showDropdownStub;
       });
 
       afterEach(() => {
-        hideDropdownSpy.restore();
-        showDropdownSpy.restore();
+        instance.hideDropdown.reset();
+        instance.showDropdown.reset();
       });
 
       describe('dropdown active', () => {
@@ -480,7 +509,7 @@ describe('choices', () => {
         });
 
         it('hides dropdown', () => {
-          expect(hideDropdownSpy.called).to.equal(true);
+          expect(hideDropdownStub.called).to.equal(true);
         });
 
         returnsInstance(output);
@@ -493,7 +522,7 @@ describe('choices', () => {
         });
 
         it('shows dropdown', () => {
-          expect(showDropdownSpy.called).to.equal(true);
+          expect(showDropdownStub.called).to.equal(true);
         });
 
         returnsInstance(output);
@@ -724,7 +753,7 @@ describe('choices', () => {
 
     describe('highlightAll', () => {
       let storeGetItemsStub;
-      let highlightItemSpy;
+      let highlightItemStub;
 
       const items = [
         {
@@ -739,30 +768,31 @@ describe('choices', () => {
 
       beforeEach(() => {
         storeGetItemsStub = stub().returns(items);
-        highlightItemSpy = spy(instance, 'highlightItem');
+        highlightItemStub = stub();
 
+        instance.highlightItem = highlightItemStub;
         instance.store.getItems = storeGetItemsStub;
 
         output = instance.highlightAll();
       });
 
       afterEach(() => {
-        highlightItemSpy.restore();
+        highlightItemStub.reset();
         instance.store.getItems.reset();
       });
 
       returnsInstance(output);
 
       it('highlights each item in store', () => {
-        expect(highlightItemSpy.callCount).to.equal(items.length);
-        expect(highlightItemSpy.firstCall.args[0]).to.equal(items[0]);
-        expect(highlightItemSpy.lastCall.args[0]).to.equal(items[1]);
+        expect(highlightItemStub.callCount).to.equal(items.length);
+        expect(highlightItemStub.firstCall.args[0]).to.equal(items[0]);
+        expect(highlightItemStub.lastCall.args[0]).to.equal(items[1]);
       });
     });
 
     describe('unhighlightAll', () => {
       let storeGetItemsStub;
-      let unhighlightItemSpy;
+      let unhighlightItemStub;
 
       const items = [
         {
@@ -777,24 +807,25 @@ describe('choices', () => {
 
       beforeEach(() => {
         storeGetItemsStub = stub().returns(items);
-        unhighlightItemSpy = spy(instance, 'unhighlightItem');
+        unhighlightItemStub = stub();
 
+        instance.unhighlightItem = unhighlightItemStub;
         instance.store.getItems = storeGetItemsStub;
 
         output = instance.unhighlightAll();
       });
 
       afterEach(() => {
-        unhighlightItemSpy.restore();
+        instance.unhighlightItem.reset();
         instance.store.getItems.reset();
       });
 
       returnsInstance(output);
 
       it('unhighlights each item in store', () => {
-        expect(unhighlightItemSpy.callCount).to.equal(items.length);
-        expect(unhighlightItemSpy.firstCall.args[0]).to.equal(items[0]);
-        expect(unhighlightItemSpy.lastCall.args[0]).to.equal(items[1]);
+        expect(unhighlightItemStub.callCount).to.equal(items.length);
+        expect(unhighlightItemStub.firstCall.args[0]).to.equal(items[0]);
+        expect(unhighlightItemStub.lastCall.args[0]).to.equal(items[1]);
       });
     });
 
@@ -829,6 +860,7 @@ describe('choices', () => {
         inputClearSpy = spy(instance.input, 'clear');
         storeDispatchStub = stub();
         instance.store.dispatch = storeDispatchStub;
+        output = instance.clearInput();
       });
 
       afterEach(() => {
@@ -836,10 +868,7 @@ describe('choices', () => {
         instance.store.dispatch.reset();
       });
 
-      it('returnsInstance(output)', () => {
-        output = instance.clearInput();
-        expect(output).to.eql(instance);
-      });
+      returnsInstance(output);
 
       describe('text element', () => {
         beforeEach(() => {
@@ -951,9 +980,10 @@ describe('choices', () => {
 
         returnsInstance(output);
 
-        it('sets loading state', () => {
+        it('sets loading state', (done) => {
           requestAnimationFrame(() => {
             expect(handleLoadingStateStub.called).to.equal(true);
+            done();
           });
         });
 
@@ -1036,12 +1066,16 @@ describe('choices', () => {
         });
       });
 
-      describe('when already initialised', () => {
+      describe('when already initialised and not text element', () => {
+        beforeEach(() => {
+          instance.initialised = true;
+          instance.isTextElement = false;
+        });
+
         describe('passing a string value', () => {
           const value = 'Test value';
 
           beforeEach(() => {
-            instance.initialised = true;
             output = instance.setChoiceByValue(value);
           });
 
@@ -1060,7 +1094,6 @@ describe('choices', () => {
           ];
 
           beforeEach(() => {
-            instance.initialised = true;
             output = instance.setChoiceByValue(values);
           });
 
@@ -1434,14 +1467,14 @@ describe('choices', () => {
           });
         });
 
-        describe('passing truthy replaceChoices flag', () => {
+        describe('passing true replaceChoices flag', () => {
           it('choices are cleared', () => {
             instance.setChoices(choices, value, label, true);
             expect(clearChoicesStub.called).to.equal(true);
           });
         });
 
-        describe('passing falsey replaceChoices flag', () => {
+        describe('passing false replaceChoices flag', () => {
           it('choices are not cleared', () => {
             instance.setChoices(choices, value, label, false);
             expect(clearChoicesStub.called).to.equal(false);

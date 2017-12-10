@@ -18,6 +18,12 @@ describe('components/wrappedElement', () => {
     instance = new WrappedElement(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
+  describe('getElement', () => {
+    it('returns DOM reference of element', () => {
+      expect(instance.getElement()).to.eql(choicesElement);
+    });
+  });
+
   describe('conceal', () => {
     let originalStyling;
 

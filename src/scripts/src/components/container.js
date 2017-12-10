@@ -79,6 +79,7 @@ export default class Container {
       shouldFlip = true;
     }
 
+
     return shouldFlip;
   }
 

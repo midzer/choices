@@ -672,14 +672,18 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  showDropdown(focusInput = false) {
+  showDropdown(focusInput) {
     if (this.dropdown.isActive) {
       return this;
     }
 
-    this.containerOuter.open(this.dropdown.getVerticalPos());
     this.dropdown.show();
-    this.input.activate(focusInput);
+    this.containerOuter.open(this.dropdown.getVerticalPos());
+
+    if (focusInput && this.canSearch) {
+      this.input.focus();
+    }
+
     this.passedElement.triggerEvent(EVENTS.showDropdown, {});
 
     return this;
@@ -690,14 +694,19 @@ class Choices {
    * @return {Object} Class instance
    * @public
    */
-  hideDropdown(blurInput = false) {
+  hideDropdown(blurInput) {
     if (!this.dropdown.isActive) {
       return this;
     }
 
-    this.containerOuter.close();
     this.dropdown.hide();
-    this.input.deactivate(blurInput);
+    this.containerOuter.close();
+
+    if (blurInput && this.canSearch) {
+      this.input.removeActiveDescendant();
+      this.input.blur();
+    }
+
     this.passedElement.triggerEvent(EVENTS.hideDropdown, {});
 
     return this;
@@ -763,7 +772,7 @@ class Choices {
    * @public
    */
   setChoiceByValue(value) {
-    if (this.isTextElement || !this.initialised) {
+    if (!this.initialised || this.isTextElement) {
       return this;
     }
 

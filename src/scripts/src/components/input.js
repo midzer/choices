@@ -71,21 +71,6 @@ export default class Input {
     this.isFocussed = false;
   }
 
-  activate(focusInput) {
-    // Optionally focus the input if we have a search input
-    if (focusInput && this.parentInstance.canSearch && document.activeElement !== this.element) {
-      this.element.focus();
-    }
-  }
-
-  deactivate(blurInput) {
-    this.removeActiveDescendant();
-    // Optionally blur the input if we have a search input
-    if (blurInput && this.parentInstance.canSearch && document.activeElement === this.element) {
-      this.element.blur();
-    }
-  }
-
   enable() {
     this.element.removeAttribute('disabled');
     this.isDisabled = false;
@@ -99,6 +84,12 @@ export default class Input {
   focus() {
     if (!this.isFocussed) {
       this.element.focus();
+    }
+  }
+
+  blur() {
+    if (this.isFocussed) {
+      this.element.blur();
     }
   }
 

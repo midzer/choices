@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import sinon from 'sinon';
+import { stub } from 'sinon';
 import Input from './input';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
@@ -18,23 +18,31 @@ describe('components/input', () => {
     instance = new Input(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
-  it('assigns choices instance to class', () => {
-    expect(instance.parentInstance).to.eql(choicesInstance);
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
+
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(choicesElement);
+    });
+
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
-  it('assigns choices element to class', () => {
-    expect(instance.element).to.eql(choicesElement);
-  });
-
-  it('assigns classnames to class', () => {
-    expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+  describe('getElement', () => {
+    it('returns DOM reference of element', () => {
+      expect(instance.getElement()).to.eql(choicesElement);
+    });
   });
 
   describe('addEventListeners', () => {
     let addEventListenerStub;
 
     beforeEach(() => {
-      addEventListenerStub = sinon.stub(instance.element, 'addEventListener');
+      addEventListenerStub = stub(instance.element, 'addEventListener');
     });
 
     afterEach(() => {
@@ -55,7 +63,7 @@ describe('components/input', () => {
     let removeEventListenerStub;
 
     beforeEach(() => {
-      removeEventListenerStub = sinon.stub(instance.element, 'removeEventListener');
+      removeEventListenerStub = stub(instance.element, 'removeEventListener');
     });
 
     afterEach(() => {
@@ -76,7 +84,7 @@ describe('components/input', () => {
     let setWidthStub;
 
     beforeEach(() => {
-      setWidthStub = sinon.stub(instance, 'setWidth');
+      setWidthStub = stub(instance, 'setWidth');
     });
 
     afterEach(() => {
@@ -106,7 +114,7 @@ describe('components/input', () => {
 
     beforeEach(() => {
       eventMock = {
-        preventDefault: sinon.stub(),
+        preventDefault: stub(),
         target: instance.element,
       };
     });
@@ -142,6 +150,30 @@ describe('components/input', () => {
       instance.onBlur();
       expect(instance.isFocussed).to.equal(false);
     });
+  });
+
+  // describe('activate', () => {
+  //   describe('when passed focusInput argument is true, canSearch is true and current element is not in focus', () => {
+  //     let focusSpy;
+  //     beforeEach(() => {
+  //       instance.parentInstance.canSearch = true;
+  //       focusSpy = spy(instance.element, 'focus');
+  //     });
+
+  //     afterEach(() => {
+  //       focusSpy.restore();
+  //     });
+
+  //     it('focuses element', () => {
+  //       expect(focusSpy.callCount).to.equal(0);
+  //       instance.activate(true);
+  //       expect(focusSpy.callCount).to.equal(1);
+  //     });
+  //   });
+  // });
+
+  describe('deactivate', () => {
+
   });
 
   describe('enable', () => {
@@ -180,7 +212,7 @@ describe('components/input', () => {
     let focusStub;
 
     beforeEach(() => {
-      focusStub = sinon.stub(instance.element, 'focus');
+      focusStub = stub(instance.element, 'focus');
     });
 
     afterEach(() => {
@@ -198,7 +230,7 @@ describe('components/input', () => {
     let setWidthStub;
 
     beforeEach(() => {
-      setWidthStub = sinon.stub(instance, 'setWidth');
+      setWidthStub = stub(instance, 'setWidth');
     });
 
     afterEach(() => {
@@ -230,7 +262,7 @@ describe('components/input', () => {
     const inputWidth = '200px';
 
     beforeEach(() => {
-      getWidthStub = sinon.stub(instance, 'getWidth').returns(inputWidth);
+      getWidthStub = stub(instance, 'getWidth').returns(inputWidth);
     });
 
     afterEach(() => {

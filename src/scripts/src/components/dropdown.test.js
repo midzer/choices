@@ -32,6 +32,12 @@ describe('components/dropdown', () => {
     expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
   });
 
+  describe('getElement', () => {
+    it('returns DOM reference of element', () => {
+      expect(instance.getElement()).to.eql(choicesElement);
+    });
+  });
+
   describe('getVerticalPos', () => {
     let top;
     let offset;

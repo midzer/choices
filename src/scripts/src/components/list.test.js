@@ -29,6 +29,12 @@ describe('components/list', () => {
     expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
   });
 
+  describe('getElement', () => {
+    it('returns DOM reference of element', () => {
+      expect(instance.getElement()).to.eql(choicesElement);
+    });
+  });
+
   describe('clear', () => {
     it('clears element\'s inner HTML', () => {
       const innerHTML = 'test';
