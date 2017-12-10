@@ -264,16 +264,76 @@ describe('components/container', () => {
     });
   });
 
-  // describe('enable', () => {
-  //   it('removes disabled state class', () => {});
-  //   it('removes aria-disabled attribute', () => { });
-  //   it('sets isDisabled flag to true', () => {});
-  // });
+  describe('enable', () => {
+    beforeEach(() => {
+      instance.disable();
+    });
 
-  // describe('disable', () => {
-  //   it('adds disabled state class', () => {});
-  //   it('adds aria-disabled attribute', () => { });
-  //   it('sets isDisabled flag to false', () => { });
+    it('removes disabled state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.disabledState)).to.equal(true);
+      instance.enable();
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.disabledState)).to.equal(false);
+    });
+
+    it('removes aria-disabled attribute', () => {
+      expect(instance.element.getAttribute('aria-disabled')).to.equal('true');
+      instance.enable();
+      expect(instance.element.getAttribute('aria-disabled')).to.equal(null);
+    });
+
+    it('sets isDisabled flag to true', () => {
+      instance.enable();
+      expect(instance.isDisabled).to.equal(false);
+    });
+
+    describe('select one element', () => {
+      beforeEach(() => {
+        instance.parentInstance.isSelectOneElement = true;
+        instance.enable();
+      });
+
+      it('sets tabindex attribute', () => {
+        expect(instance.element.getAttribute('tabindex')).to.equal('0');
+      });
+    });
+  });
+
+  describe('disable', () => {
+    beforeEach(() => {
+      instance.enable();
+    });
+
+    it('removes disabled state class', () => {
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.disabledState)).to.equal(false);
+      instance.disable();
+      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.disabledState)).to.equal(true);
+    });
+
+    it('removes aria-disabled attribute', () => {
+      expect(instance.element.getAttribute('aria-disabled')).to.equal(null);
+      instance.disable();
+      expect(instance.element.getAttribute('aria-disabled')).to.equal('true');
+    });
+
+    it('sets isDisabled flag to true', () => {
+      instance.disable();
+      expect(instance.isDisabled).to.equal(true);
+    });
+
+    describe('select one element', () => {
+      beforeEach(() => {
+        instance.parentInstance.isSelectOneElement = true;
+        instance.disable();
+      });
+
+      it('sets tabindex attribute', () => {
+        expect(instance.element.getAttribute('tabindex')).to.equal('-1');
+      });
+    });
+  });
+
+  // describe('revert', () => {
+
   // });
 
   describe('addLoadingState', () => {

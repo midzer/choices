@@ -131,7 +131,7 @@ export default class Container {
    * Remove disabled state
    */
   enable() {
-    this.element.classList.remove(this.config.classNames.disabledState);
+    this.element.classList.remove(this.classNames.disabledState);
     this.element.removeAttribute('aria-disabled');
     if (this.parentInstance.isSelectOneElement) {
       this.element.setAttribute('tabindex', '0');
@@ -143,7 +143,7 @@ export default class Container {
    * Set disabled state
    */
   disable() {
-    this.element.classList.add(this.config.classNames.disabledState);
+    this.element.classList.add(this.classNames.disabledState);
     this.element.setAttribute('aria-disabled', 'true');
     if (this.parentInstance.isSelectOneElement) {
       this.element.setAttribute('tabindex', '-1');
