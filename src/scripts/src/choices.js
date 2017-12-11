@@ -218,7 +218,7 @@ class Choices {
     // Remove all event listeners
     this._removeEventListeners();
     this.passedElement.reveal();
-    this.containerOuter.revert(this.passedElement.element);
+    this.containerOuter.unwrap(this.passedElement.element);
 
     // Clear data store
     this.clearStore();
@@ -2183,9 +2183,9 @@ class Choices {
     this.passedElement.conceal();
 
     // Wrap input in container preserving DOM ordering
-    wrap(this.passedElement.element, this.containerInner.element);
+    this.containerInner.wrap(this.passedElement.element);
     // Wrapper inner container with outer container
-    wrap(this.containerInner.element, this.containerOuter.element);
+    this.containerOuter.wrap(this.containerInner.element);
 
     if (this.isSelectOneElement) {
       this.input.setPlaceholder(this.config.searchPlaceholderValue || '');

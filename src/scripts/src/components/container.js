@@ -1,4 +1,4 @@
-import { getWindowHeight } from '../lib/utils';
+import { getWindowHeight, wrap } from '../lib/utils';
 
 export default class Container {
   constructor(instance, element, classNames) {
@@ -151,10 +151,15 @@ export default class Container {
     this.isDisabled = true;
   }
 
-  revert(originalElement) {
+  wrap(element) {
+    this.wrappedElement = element;
+    wrap(this.wrappedElement, this.element);
+  }
+
+  unwrap() {
     // Move passed element back to original position
     this.element.parentNode.insertBefore(
-      originalElement,
+      this.wrappedElement,
       this.element,
     );
     // Remove container

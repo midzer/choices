@@ -6,7 +6,7 @@ import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 describe('components/container', () => {
   let instance;
   let choicesInstance;
-  let choicesElement;
+  let element;
 
   beforeEach(() => {
     choicesInstance = {
@@ -14,8 +14,9 @@ describe('components/container', () => {
         ...DEFAULT_CONFIG,
       },
     };
-    choicesElement = document.createElement('select');
-    instance = new Container(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
+    element = document.createElement('div');
+    element.id = 'container';
+    instance = new Container(choicesInstance, element, DEFAULT_CLASSNAMES);
   });
 
   describe('constructor', () => {
@@ -24,7 +25,7 @@ describe('components/container', () => {
     });
 
     it('assigns choices element to class', () => {
-      expect(instance.element).to.eql(choicesElement);
+      expect(instance.element).to.eql(element);
     });
 
     it('assigns classnames to class', () => {
@@ -34,7 +35,7 @@ describe('components/container', () => {
 
   describe('getElement', () => {
     it('returns DOM reference of element', () => {
-      expect(instance.getElement()).to.eql(choicesElement);
+      expect(instance.getElement()).to.eql(element);
     });
   });
 
@@ -332,9 +333,59 @@ describe('components/container', () => {
     });
   });
 
-  // describe('revert', () => {
+  describe('wrap', () => {
+    let elementToWrap;
 
-  // });
+    beforeEach(() => {
+      elementToWrap = document.createElement('div');
+      elementToWrap.id = 'wrap-test';
+      document.body.appendChild(elementToWrap);
+    });
+
+    afterEach(() => {
+      document.getElementById('wrap-test').remove();
+    });
+
+    it('wraps passed element inside element', () => {
+      expect(instance.element.querySelector('div#wrap-test')).to.equal(null);
+      instance.wrap(document.querySelector('div#wrap-test'));
+      expect(instance.element.querySelector('div#wrap-test')).to.equal(elementToWrap);
+    });
+
+    it('assigns reference to element to instance', () => {
+      expect(instance.wrappedElement).to.equal(undefined);
+      instance.wrap(document.querySelector('div#wrap-test'));
+      expect(instance.wrappedElement).to.equal(elementToWrap);
+    });
+  });
+
+  describe('unwrap', () => {
+    let elementToWrap;
+
+    beforeEach(() => {
+      elementToWrap = document.createElement('div');
+      elementToWrap.id = 'unwrap-test';
+      document.body.appendChild(elementToWrap);
+      instance.wrap(document.getElementById('unwrap-test'));
+    });
+
+    afterEach(() => {
+      document.body.removeChild(document.getElementById('unwrap-test'));
+    });
+
+    it('moves wrapped element outside of element', () => {
+      expect(instance.element.querySelector('div#unwrap-test')).to.be.instanceof(HTMLElement);
+      instance.unwrap(elementToWrap);
+      expect(instance.element.querySelector('div#unwrap-test')).to.equal(null);
+      expect(document.querySelector('div#unwrap-test')).to.be.instanceof(HTMLElement);
+    });
+
+    // it('removes element from DOM', () => {
+    //   expect(document.getElementById('container')).to.not.equal(null);
+    //   instance.unwrap(elementToWrap);
+    //   expect(document.getElementById('container')).to.equal(null);
+    // });
+  });
 
   describe('addLoadingState', () => {
     beforeEach(() => {

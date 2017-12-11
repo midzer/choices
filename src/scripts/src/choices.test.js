@@ -131,13 +131,13 @@ describe('choices', () => {
       describe('when already initialised', () => {
         let removeEventListenersSpy;
         let passedElementRevealSpy;
-        let containerOuterRevertSpy;
+        let containerOuterUnwrapSpy;
         let clearStoreSpy;
 
         beforeEach(() => {
           removeEventListenersSpy = spy(instance, '_removeEventListeners');
           passedElementRevealSpy = spy(instance.passedElement, 'reveal');
-          containerOuterRevertSpy = spy(instance.containerOuter, 'revert');
+          containerOuterUnwrapSpy = spy(instance.containerOuter, 'unwrap');
           clearStoreSpy = spy(instance, 'clearStore');
 
           instance.initialised = true;
@@ -147,7 +147,7 @@ describe('choices', () => {
         afterEach(() => {
           removeEventListenersSpy.restore();
           passedElementRevealSpy.restore();
-          containerOuterRevertSpy.restore();
+          containerOuterUnwrapSpy.restore();
           clearStoreSpy.restore();
         });
 
@@ -160,8 +160,8 @@ describe('choices', () => {
         });
 
         it('reverts outer container', () => {
-          expect(containerOuterRevertSpy.called).to.equal(true);
-          expect(containerOuterRevertSpy.lastCall.args[0]).to.equal(instance.passedElement.element);
+          expect(containerOuterUnwrapSpy.called).to.equal(true);
+          expect(containerOuterUnwrapSpy.lastCall.args[0]).to.equal(instance.passedElement.element);
         });
 
         it('clears store', () => {
