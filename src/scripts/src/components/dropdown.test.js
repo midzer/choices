@@ -20,6 +20,11 @@ describe('components/dropdown', () => {
     instance = new Dropdown(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+    instance = null;
+  });
+
   describe('constructor', () => {
     it('assigns choices instance to instance', () => {
       expect(instance.parentInstance).to.eql(choicesInstance);

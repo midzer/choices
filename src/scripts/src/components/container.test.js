@@ -16,7 +16,14 @@ describe('components/container', () => {
     };
     element = document.createElement('div');
     element.id = 'container';
-    instance = new Container(choicesInstance, element, DEFAULT_CLASSNAMES);
+    document.body.appendChild(element);
+    instance = new Container(choicesInstance, document.getElementById('container'), DEFAULT_CLASSNAMES);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    element = null;
+    instance = null;
   });
 
   describe('constructor', () => {
@@ -351,21 +358,15 @@ describe('components/container', () => {
       instance.wrap(document.querySelector('div#wrap-test'));
       expect(instance.element.querySelector('div#wrap-test')).to.equal(elementToWrap);
     });
-
-    it('assigns reference to element to instance', () => {
-      expect(instance.wrappedElement).to.equal(undefined);
-      instance.wrap(document.querySelector('div#wrap-test'));
-      expect(instance.wrappedElement).to.equal(elementToWrap);
-    });
   });
 
   describe('unwrap', () => {
-    let elementToWrap;
+    let elementToUnwrap;
 
     beforeEach(() => {
-      elementToWrap = document.createElement('div');
-      elementToWrap.id = 'unwrap-test';
-      document.body.appendChild(elementToWrap);
+      elementToUnwrap = document.createElement('div');
+      elementToUnwrap.id = 'unwrap-test';
+      document.body.appendChild(elementToUnwrap);
       instance.wrap(document.getElementById('unwrap-test'));
     });
 
@@ -375,16 +376,16 @@ describe('components/container', () => {
 
     it('moves wrapped element outside of element', () => {
       expect(instance.element.querySelector('div#unwrap-test')).to.be.instanceof(HTMLElement);
-      instance.unwrap(elementToWrap);
+      instance.unwrap(elementToUnwrap);
       expect(instance.element.querySelector('div#unwrap-test')).to.equal(null);
       expect(document.querySelector('div#unwrap-test')).to.be.instanceof(HTMLElement);
     });
 
-    // it('removes element from DOM', () => {
-    //   expect(document.getElementById('container')).to.not.equal(null);
-    //   instance.unwrap(elementToWrap);
-    //   expect(document.getElementById('container')).to.equal(null);
-    // });
+    it('removes element from DOM', () => {
+      expect(document.getElementById('container')).to.not.equal(null);
+      instance.unwrap(elementToUnwrap);
+      expect(document.getElementById('container')).to.equal(null);
+    });
   });
 
   describe('addLoadingState', () => {

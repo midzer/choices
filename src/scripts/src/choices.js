@@ -15,7 +15,6 @@ import { clearAll } from './actions/misc';
 import {
   isScrolledIntoView,
   getAdjacentEl,
-  wrap,
   getType,
   isType,
   isElement,
@@ -220,6 +219,10 @@ class Choices {
     this.passedElement.reveal();
     this.containerOuter.unwrap(this.passedElement.element);
 
+    if (this.isSelectElement) {
+      this.passedElement.setOptions(this.presetChoices);
+    }
+
     // Clear data store
     this.clearStore();
 
@@ -388,25 +391,11 @@ class Choices {
     }
 
     if (this.isTextElement) {
-      // Simplify store data to just values
-      const itemsFiltered = this.store.getItemsReducedToValues(items);
-      const itemsFilteredString = itemsFiltered.join(this.config.delimiter);
-
       // Update the value of the hidden input
-      this.passedElement.setValue(itemsFilteredString);
+      this.passedElement.setValue(items);
     } else {
-      const selectedOptionsFragment = document.createDocumentFragment();
-      const addOptionToFragment = (item) => {
-        // Create a standard select option
-        const option = this._getTemplate('option', item);
-        // Append it to fragment
-        selectedOptionsFragment.appendChild(option);
-      };
-
-      // Add each list item to list
-      items.forEach(item => addOptionToFragment(item));
       // Update the options of the hidden input
-      this.passedElement.setOptions(selectedOptionsFragment);
+      this.passedElement.setOptions(items);
     }
 
     const addItemToFragment = (item) => {

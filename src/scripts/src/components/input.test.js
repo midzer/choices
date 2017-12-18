@@ -18,6 +18,11 @@ describe('components/input', () => {
     instance = new Input(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+    instance = null;
+  });
+
   describe('constructor', () => {
     it('assigns choices instance to class', () => {
       expect(instance.parentInstance).to.eql(choicesInstance);

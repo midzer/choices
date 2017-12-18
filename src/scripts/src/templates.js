@@ -226,9 +226,9 @@ export const TEMPLATES = {
       </div>
     `);
   },
-  option(globalClasses, data) {
+  option(data) {
     return strToEl(`
-      <option value="${data.value}" selected>${data.label}</option>
+      <option value="${data.value}" ${data.selected ? 'selected' : ''} ${data.disabled ? 'disabled' : ''}>${data.label}</option>
     `);
   },
 };

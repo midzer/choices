@@ -152,17 +152,16 @@ export default class Container {
   }
 
   wrap(element) {
-    this.wrappedElement = element;
-    wrap(this.wrappedElement, this.element);
+    wrap(element, this.element);
   }
 
-  unwrap() {
-    // Move passed element back to original position
+  unwrap(element) {
+    // Move passed element outside this element
     this.element.parentNode.insertBefore(
-      this.wrappedElement,
+      element,
       this.element,
     );
-    // Remove container
+    // Remove this element
     this.element.parentNode.removeChild(this.element);
   }
 
