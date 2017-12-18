@@ -1437,7 +1437,7 @@ class Choices {
         if (nextEl) {
           // We prevent default to stop the cursor moving
           // when pressing the arrow
-          if (!isScrolledIntoView(nextEl, this.choiceList, directionInt)) {
+          if (!isScrolledIntoView(nextEl, this.choiceList.element, directionInt)) {
             this._scrollToChoice(nextEl, directionInt);
           }
           this._highlightChoice(nextEl);
@@ -1773,20 +1773,20 @@ class Choices {
       return;
     }
 
-    const dropdownHeight = this.choiceList.height;
+    const dropdownHeight = this.choiceList.element.offsetHeight;
     const choiceHeight = choice.offsetHeight;
     // Distance from bottom of element to top of parent
     const choicePos = choice.offsetTop + choiceHeight;
     // Scroll position of dropdown
-    const containerScrollPos = this.choiceList.scrollPos + dropdownHeight;
+    const containerScrollPos = this.choiceList.element.scrollTop + dropdownHeight;
     // Difference between the choice and scroll position
     const endPoint = direction > 0 ? (
-        (this.choiceList.scrollPos + choicePos) - containerScrollPos) :
-      choice.offsetTop;
+      (this.choiceList.element.scrollTop + choicePos) - containerScrollPos
+    ) : choice.offsetTop;
 
     const animateScroll = () => {
       const strength = SCROLLING_SPEED;
-      const choiceListScrollTop = this.choiceList.scrollPos;
+      const choiceListScrollTop = this.choiceList.element.scrollTop;
       let continueAnimation = false;
       let easing;
       let distance;
