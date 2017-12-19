@@ -16,4 +16,32 @@ describe('components/wrappedInput', () => {
     choicesElement = document.createElement('input');
     instance = new WrappedInput(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    instance = null;
+  });
+
+  describe('setValue', () => {
+    const data = [
+      {
+        id: 'ID 1',
+        value: 'Value 1',
+      },
+      {
+        id: 'ID 2',
+        value: 'Value 2',
+      },
+      {
+        id: 'ID 3',
+        value: 'Value 3',
+      },
+    ];
+
+    it('sets delimited value of element based on passed data', () => {
+      expect(instance.element.value).to.equal('');
+      instance.setValue(data);
+      expect(instance.element.value).to.equal('Value 1,Value 2,Value 3');
+    });
+  });
 });

@@ -18,6 +18,11 @@ describe('components/wrappedElement', () => {
     instance = new WrappedElement(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+    instance = null;
+  });
+
   describe('getElement', () => {
     it('returns DOM reference of element', () => {
       expect(instance.getElement()).to.eql(choicesElement);

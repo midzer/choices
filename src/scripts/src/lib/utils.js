@@ -594,3 +594,12 @@ export const getWindowHeight = () => {
     html.offsetHeight,
   );
 };
+
+export const reduceToValues = (items, key = 'value') => {
+  const values = items.reduce((prev, current) => {
+    prev.push(current[key]);
+    return prev;
+  }, []);
+
+  return values;
+}

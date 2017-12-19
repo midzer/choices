@@ -15,7 +15,6 @@ import { clearAll } from './actions/misc';
 import {
   isScrolledIntoView,
   getAdjacentEl,
-  wrap,
   getType,
   isType,
   isElement,
@@ -220,6 +219,10 @@ class Choices {
     this.passedElement.reveal();
     this.containerOuter.unwrap(this.passedElement.element);
 
+    if (this.isSelectElement) {
+      this.passedElement.setOptions(this.presetChoices);
+    }
+
     // Clear data store
     this.clearStore();
 
@@ -388,25 +391,11 @@ class Choices {
     }
 
     if (this.isTextElement) {
-      // Simplify store data to just values
-      const itemsFiltered = this.store.getItemsReducedToValues(items);
-      const itemsFilteredString = itemsFiltered.join(this.config.delimiter);
-
       // Update the value of the hidden input
-      this.passedElement.setValue(itemsFilteredString);
+      this.passedElement.setValue(items);
     } else {
-      const selectedOptionsFragment = document.createDocumentFragment();
-      const addOptionToFragment = (item) => {
-        // Create a standard select option
-        const option = this._getTemplate('option', item);
-        // Append it to fragment
-        selectedOptionsFragment.appendChild(option);
-      };
-
-      // Add each list item to list
-      items.forEach(item => addOptionToFragment(item));
       // Update the options of the hidden input
-      this.passedElement.setOptions(selectedOptionsFragment);
+      this.passedElement.setOptions(items);
     }
 
     const addItemToFragment = (item) => {
@@ -1448,7 +1437,7 @@ class Choices {
         if (nextEl) {
           // We prevent default to stop the cursor moving
           // when pressing the arrow
-          if (!isScrolledIntoView(nextEl, this.choiceList, directionInt)) {
+          if (!isScrolledIntoView(nextEl, this.choiceList.element, directionInt)) {
             this._scrollToChoice(nextEl, directionInt);
           }
           this._highlightChoice(nextEl);
@@ -1784,20 +1773,20 @@ class Choices {
       return;
     }
 
-    const dropdownHeight = this.choiceList.height;
+    const dropdownHeight = this.choiceList.element.offsetHeight;
     const choiceHeight = choice.offsetHeight;
     // Distance from bottom of element to top of parent
     const choicePos = choice.offsetTop + choiceHeight;
     // Scroll position of dropdown
-    const containerScrollPos = this.choiceList.scrollPos + dropdownHeight;
+    const containerScrollPos = this.choiceList.element.scrollTop + dropdownHeight;
     // Difference between the choice and scroll position
     const endPoint = direction > 0 ? (
-        (this.choiceList.scrollPos + choicePos) - containerScrollPos) :
-      choice.offsetTop;
+      (this.choiceList.element.scrollTop + choicePos) - containerScrollPos
+    ) : choice.offsetTop;
 
     const animateScroll = () => {
       const strength = SCROLLING_SPEED;
-      const choiceListScrollTop = this.choiceList.scrollPos;
+      const choiceListScrollTop = this.choiceList.element.scrollTop;
       let continueAnimation = false;
       let easing;
       let distance;

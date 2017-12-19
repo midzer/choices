@@ -16,4 +16,9 @@ describe('components/wrappedSelect', () => {
     choicesElement = document.createElement('select');
     instance = new WrappedSelect(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
   });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    instance = null;
+  });
 });

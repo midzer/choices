@@ -177,17 +177,6 @@ describe('reducers/store', () => {
       });
     });
 
-    describe('getItemsReducedToValues', () => {
-      it('returns an array of item values', () => {
-        const expectedResponse = state.items.reduce((items, item) => {
-          items.push(item.value);
-          return items;
-        }, []);
-        const actualResponse = instance.getItemsReducedToValues(state.items);
-        expect(actualResponse).to.eql(expectedResponse);
-      });
-    });
-
     describe('getChoices', () => {
       it('returns choices', () => {
         const expectedResponse = state.choices;
