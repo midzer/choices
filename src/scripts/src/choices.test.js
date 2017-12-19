@@ -1484,8 +1484,84 @@ describe('choices', () => {
     });
 
     describe('renderGroups', () => {
-      beforeEach(() => {});
-      it('returns a fragment of groups', () => {});
+      let renderChoicesStub;
+      const choices = [
+        {
+          id: 1,
+          selected: true,
+          groupId: 1,
+        },
+        {
+          id: 1,
+          selected: false,
+          groupId: 2,
+        },
+        {
+          id: 2,
+          selected: false,
+          groupId: 1,
+        },
+      ];
+
+      const groups = [
+        {
+          id: 1,
+          value: 'Group 1',
+          active: true,
+          disabled: false,
+        },
+        {
+          id: 2,
+          value: 'Group 2',
+          active: true,
+          disabled: false,
+        },
+      ];
+
+      beforeEach(() => {
+        renderChoicesStub = stub();
+        instance.renderChoices = renderChoicesStub;
+      });
+
+      describe('returning a fragment of groups', () => {
+        describe('passing fragment argument', () => {
+          it('updates fragment with groups', () => {
+
+          });
+        });
+
+        describe('not passing fragment argument', () => {
+          it('returns new groups fragment', () => {
+
+          });
+        });
+
+        describe('select-one element', () => {
+          it('renders group choices', () => {
+
+          });
+        });
+
+        describe('text/select-multiple element', () => {
+          describe('renderSelectedChoices set to true', () => {
+            it('renders group choices', () => {
+
+            });
+          });
+
+          describe('renderSelectedChoices set to false', () => {
+            it('renders group choices that are not already selected', () => {
+
+            });
+          });
+        });
+
+        describe('sorting groups', () => {
+          it('returns groups fragment sorted by config.sortFn', () => {
+
+          });
+        });
+      });
     });
 
     describe('renderChoices', () => {
