@@ -82,7 +82,7 @@ Or include Choices directly:
     regexFilter: null,
     shouldSort: true,
     shouldSortItems: false,
-    sortFilter: () => {...},
+    sortFn: () => {...},
     placeholder: true,
     placeholderValue: null,
     searchPlaceholderValue: null,
@@ -345,7 +345,7 @@ Pass an array of objects:
 
 **Usage:** Whether items should be sorted. If false, items will appear in the order they were selected.
 
-### sortFilter
+### sortFn
 **Type:** `Function` **Default:** sortByAlpha
 
 **Input types affected:** `select-one`, `select-multiple`
@@ -357,7 +357,7 @@ Pass an array of objects:
 ```js
 // Sorting via length of label from largest to smallest
 const example = new Choices(element, {
-  sortFilter: function(a, b) {
+  sortFn: function(a, b) {
     return b.label.length - a.label.length;
   },
 };

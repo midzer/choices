@@ -52,7 +52,7 @@ class Choices {
       items: [],
       choices: [],
       classNames: DEFAULT_CLASSNAMES,
-      sortFilter: sortByAlpha,
+      sortFn: sortByAlpha,
     };
 
     // Merge options with user options
@@ -281,7 +281,7 @@ class Choices {
    */
   renderGroups(groups, choices, fragment) {
     const groupFragment = fragment || document.createDocumentFragment();
-    const filter = this.config.sortFilter;
+    const filter = this.config.sortFn;
     const getGroupChoices = group => choices.filter((choice) => {
       if (this.isSelectOneElement) {
         return choice.groupId === group.id;
@@ -318,7 +318,7 @@ class Choices {
     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
     const choicesFragment = fragment || document.createDocumentFragment();
     const { renderSelectedChoices, searchResultLimit, renderChoiceLimit } = this.config;
-    const filter = this.isSearching ? sortByScore : this.config.sortFilter;
+    const filter = this.isSearching ? sortByScore : this.config.sortFn;
     const appendChoice = (choice) => {
       const shouldRender = renderSelectedChoices === 'auto' ?
         (this.isSelectOneElement || !choice.selected) :
@@ -384,7 +384,7 @@ class Choices {
 
     // If sorting is enabled, filter items
     if (this.config.shouldSortItems && !this.isSelectOneElement) {
-      items.sort(this.config.sortFilter);
+      items.sort(this.config.sortFn);
     }
 
     if (this.isTextElement) {
@@ -2245,7 +2245,7 @@ class Choices {
       });
     } else {
       const passedOptions = this.passedElement.getOptions();
-      const filter = this.config.sortFilter;
+      const filter = this.config.sortFn;
       const allChoices = this.presetChoices;
 
       // Create array of options from option elements
