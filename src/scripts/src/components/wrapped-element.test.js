@@ -68,4 +68,67 @@ describe('components/wrappedElement', () => {
       expect(instance.element.getAttribute('data-choice-orig-style')).to.equal(null);
     });
   });
+
+  describe('enable', () => {
+    beforeEach(() => {
+      instance.disable();
+    });
+
+    it('removes disabled attribute', () => {
+      expect(instance.element.hasAttribute('disabled')).to.equal(true);
+      instance.enable();
+      expect(instance.element.hasAttribute('disabled')).to.equal(false);
+    });
+
+    it('sets elements disabled state to false', () => {
+      expect(instance.element.disabled).to.equal(true);
+      instance.enable();
+      expect(instance.element.disabled).to.equal(false);
+    });
+
+    it('sets isDisabled flag to false', () => {
+      expect(instance.isDisabled).to.equal(true);
+      instance.enable();
+      expect(instance.isDisabled).to.equal(false);
+    });
+  });
+
+  describe('disable', () => {
+    beforeEach(() => {
+      instance.enable();
+    });
+
+    it('sets disabled attribute (to blank string)', () => {
+      expect(instance.element.hasAttribute('disabled')).to.equal(false);
+      instance.disable();
+      expect(instance.element.getAttribute('disabled')).to.equal('');
+    });
+
+    it('sets elements disabled state to true', () => {
+      expect(instance.element.disabled).to.equal(false);
+      instance.disable();
+      expect(instance.element.disabled).to.equal(true);
+    });
+
+    it('sets isDisabled flag to true', () => {
+      expect(instance.isDisabled).to.equal(false);
+      instance.disable();
+      expect(instance.isDisabled).to.equal(true);
+    });
+  });
+
+  describe('triggerEvent', () => {
+    it('fires event on element using passed eventType and data', (done) => {
+      const data = {
+        test: true,
+      };
+
+      instance.element.addEventListener('testEvent', ({ detail }) => {
+        expect(detail).to.eql(data);
+        done();
+      });
+
+      instance.triggerEvent('testEvent', data);
+    });
+  });
 });

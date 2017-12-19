@@ -26,7 +26,7 @@ export default class WrappedSelect extends WrappedElement {
   }
 
   disable() {
-    super.enable();
+    super.disable();
   }
 
   getPlaceholderOption() {

@@ -135,6 +135,16 @@ describe('components/container', () => {
           expect(instance.shouldFlip(100)).to.equal(true);
         });
       });
+
+      describe('position config option set to "bottom"', () => {
+        beforeEach(() => {
+          instance.config.position = 'bottom';
+        });
+
+        it('returns false', () => {
+          expect(instance.shouldFlip(100)).to.equal(false);
+        });
+      });
     });
   });
 
@@ -241,10 +251,20 @@ describe('components/container', () => {
       focusStub.restore();
     });
 
-    it('focuses element if isFocussed flag is set to false', () => {
-      instance.isFocussed = false;
-      instance.focus();
-      expect(focusStub.callCount).to.equal(1);
+    describe('isFocussed flag being set to false', () => {
+      it('focuses element', () => {
+        instance.isFocussed = false;
+        instance.focus();
+        expect(focusStub.called).to.equal(true);
+      });
+    });
+
+    describe('isFocussed flag being set to true', () => {
+      it('does not focus element', () => {
+        instance.isFocussed = true;
+        instance.focus();
+        expect(focusStub.called).to.equal(false);
+      });
     });
   });
 

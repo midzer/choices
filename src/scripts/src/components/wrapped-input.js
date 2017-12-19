@@ -26,7 +26,7 @@ export default class WrappedInput extends WrappedElement {
   }
 
   disable() {
-    super.enable();
+    super.disable();
   }
 
   setValue(items) {

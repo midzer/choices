@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { stub } from 'sinon';
+import WrappedElement from './wrapped-element';
 import WrappedInput from './wrapped-input';
 import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 
@@ -20,6 +22,25 @@ describe('components/wrappedInput', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     instance = null;
+  });
+
+  describe('inherited methods', () => {
+    ['getElement', 'conceal', 'reveal', 'enable', 'disable'].forEach((method) => {
+      describe(method, () => {
+        beforeEach(() => {
+          stub(WrappedElement.prototype, method);
+        });
+
+        afterEach(() => {
+          WrappedElement.prototype[method].restore();
+        });
+
+        it(`calls super.${method}`, () => {
+          instance[method]();
+          expect(WrappedElement.prototype[method].called).to.equal(true);
+        });
+      });
+    });
   });
 
   describe('setValue', () => {
