@@ -282,9 +282,8 @@ class Choices {
    * @return {DocumentFragment} Populated options fragment
    * @private
    */
-  renderGroups(groups, choices, fragment) {
+  createGroupsFragment(groups, choices, fragment) {
     const groupFragment = fragment || document.createDocumentFragment();
-    const filter = this.config.sortFn;
     const getGroupChoices = group => choices.filter((choice) => {
       if (this.isSelectOneElement) {
         return choice.groupId === group.id;
@@ -292,18 +291,18 @@ class Choices {
       return choice.groupId === group.id && (this.config.renderSelectedChoices === 'always' || !choice.selected);
     });
 
+
     // If sorting is enabled, filter groups
     if (this.config.shouldSort) {
-      groups.sort(filter);
+      groups.sort(this.config.sortFn);
     }
 
     groups.forEach((group) => {
       const groupChoices = getGroupChoices(group);
-
       if (groupChoices.length >= 1) {
         const dropdownGroup = this._getTemplate('choiceGroup', group);
         groupFragment.appendChild(dropdownGroup);
-        this.renderChoices(groupChoices, groupFragment, true);
+        this.createChoicesFragment(groupChoices, groupFragment, true);
       }
     });
 
@@ -317,7 +316,7 @@ class Choices {
    * @return {DocumentFragment} Populated choices fragment
    * @private
    */
-  renderChoices(choices, fragment, withinGroup = false) {
+  createChoicesFragment(choices, fragment, withinGroup = false) {
     // Create a fragment to store our list items (so we don't have to update the DOM for each item)
     const choicesFragment = fragment || document.createDocumentFragment();
     const { renderSelectedChoices, searchResultLimit, renderChoiceLimit } = this.config;
@@ -381,7 +380,7 @@ class Choices {
    * @return
    * @private
    */
-  renderItems(items, fragment = null) {
+  createItemsFragment(items, fragment = null) {
     // Create fragment to add elements to
     const itemListFragment = fragment || document.createDocumentFragment();
 
@@ -452,11 +451,11 @@ class Choices {
           activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
         );
         if (activePlaceholders.length >= 1) {
-          choiceListFragment = this.renderChoices(activePlaceholders, choiceListFragment);
+          choiceListFragment = this.createChoicesFragment(activePlaceholders, choiceListFragment);
         }
-        choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+        choiceListFragment = this.createGroupsFragment(activeGroups, activeChoices, choiceListFragment);
       } else if (activeChoices.length >= 1) {
-        choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
+        choiceListFragment = this.createChoicesFragment(activeChoices, choiceListFragment);
       }
 
       // If we have choices to show
@@ -506,7 +505,7 @@ class Choices {
       if (activeItems.length) {
         // Create a fragment to store our list items
         // (so we don't have to update the DOM for each item)
-        const itemListFragment = this.renderItems(activeItems);
+        const itemListFragment = this.createItemsFragment(activeItems);
 
         // If we have items to add, append them
         if (itemListFragment.childNodes) {

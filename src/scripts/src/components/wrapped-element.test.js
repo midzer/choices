@@ -5,7 +5,7 @@ import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 describe('components/wrappedElement', () => {
   let instance;
   let choicesInstance;
-  let choicesElement;
+  let element;
 
   beforeEach(() => {
     choicesInstance = {
@@ -14,8 +14,8 @@ describe('components/wrappedElement', () => {
       },
     };
 
-    choicesElement = document.createElement('select');
-    instance = new WrappedElement(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
+    element = document.createElement('select');
+    instance = new WrappedElement(choicesInstance, element, DEFAULT_CLASSNAMES);
   });
 
   afterEach(() => {
@@ -23,9 +23,27 @@ describe('components/wrappedElement', () => {
     instance = null;
   });
 
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
+
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(element);
+    });
+
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
+
+    it('sets isDisabled flag to false', () => {
+      expect(instance.isDisabled).to.eql(false);
+    });
+  });
+
   describe('getElement', () => {
     it('returns DOM reference of element', () => {
-      expect(instance.getElement()).to.eql(choicesElement);
+      expect(instance.getElement()).to.eql(element);
     });
   });
 

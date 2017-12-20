@@ -1483,93 +1483,239 @@ describe('choices', () => {
       });
     });
 
-    describe('renderGroups', () => {
-      let renderChoicesStub;
+    describe('createGroupsFragment', () => {
+      let createChoicesFragmentStub;
       const choices = [
         {
           id: 1,
           selected: true,
           groupId: 1,
-        },
-        {
-          id: 1,
-          selected: false,
-          groupId: 2,
+          value: 'Choice 1',
+          label: 'Choice 1',
         },
         {
           id: 2,
           selected: false,
+          groupId: 2,
+          value: 'Choice 2',
+          label: 'Choice 2',
+        },
+        {
+          id: 3,
+          selected: false,
           groupId: 1,
+          value: 'Choice 3',
+          label: 'Choice 3',
         },
       ];
 
       const groups = [
-        {
-          id: 1,
-          value: 'Group 1',
-          active: true,
-          disabled: false,
-        },
         {
           id: 2,
           value: 'Group 2',
           active: true,
           disabled: false,
         },
+        {
+          id: 1,
+          value: 'Group 1',
+          active: true,
+          disabled: false,
+        },
       ];
 
       beforeEach(() => {
-        renderChoicesStub = stub();
-        instance.renderChoices = renderChoicesStub;
+        createChoicesFragmentStub = stub();
+        instance.createChoicesFragment = createChoicesFragmentStub;
+      });
+
+      afterEach(() => {
+        instance.createChoicesFragment.reset();
       });
 
       describe('returning a fragment of groups', () => {
         describe('passing fragment argument', () => {
           it('updates fragment with groups', () => {
+            const fragment = document.createDocumentFragment();
+            const childElement = document.createElement('div');
+            fragment.appendChild(childElement);
 
+            output = instance.createGroupsFragment(groups, choices, fragment);
+            const elementToWrapFragment = document.createElement('div');
+            elementToWrapFragment.appendChild(output);
+
+            expect(output).to.be.instanceOf(DocumentFragment);
+            expect(elementToWrapFragment.children[0]).to.eql(childElement);
+            expect(elementToWrapFragment.querySelectorAll('[data-group]').length).to.equal(2);
           });
         });
 
         describe('not passing fragment argument', () => {
           it('returns new groups fragment', () => {
+            output = instance.createGroupsFragment(groups, choices);
+            const elementToWrapFragment = document.createElement('div');
+            elementToWrapFragment.appendChild(output);
 
-          });
-        });
-
-        describe('select-one element', () => {
-          it('renders group choices', () => {
-
-          });
-        });
-
-        describe('text/select-multiple element', () => {
-          describe('renderSelectedChoices set to true', () => {
-            it('renders group choices', () => {
-
-            });
-          });
-
-          describe('renderSelectedChoices set to false', () => {
-            it('renders group choices that are not already selected', () => {
-
-            });
+            expect(output).to.be.instanceOf(DocumentFragment);
+            expect(elementToWrapFragment.querySelectorAll('[data-group]').length).to.equal(2);
           });
         });
 
         describe('sorting groups', () => {
-          it('returns groups fragment sorted by config.sortFn', () => {
+          let sortFnStub;
 
+          beforeEach(() => {
+            sortFnStub = stub();
+            instance.config.sortFn = sortFnStub;
+            instance.config.shouldSort = true;
+          });
+
+          afterEach(() => {
+            instance.config.sortFn.reset();
+          });
+
+          it('sorts groups by config.sortFn', () => {
+            expect(sortFnStub.called).to.equal(false);
+            instance.createGroupsFragment(groups, choices);
+            expect(sortFnStub.called).to.equal(true);
+          });
+        });
+
+        describe('not sorting groups', () => {
+          let sortFnStub;
+
+          beforeEach(() => {
+            sortFnStub = stub();
+            instance.config.sortFn = sortFnStub;
+            instance.config.shouldSort = false;
+          });
+
+          afterEach(() => {
+            instance.config.sortFn.reset();
+          });
+
+          it('does not sort groups', () => {
+            instance.createGroupsFragment(groups, choices);
+            expect(sortFnStub.called).to.equal(false);
+          });
+        });
+
+        describe('select-one element', () => {
+          beforeEach(() => {
+            instance.isSelectOneElement = true;
+          });
+
+          it('calls createChoicesFragment with choices that belong to each group', () => {
+            expect(createChoicesFragmentStub.called).to.equal(false);
+            instance.createGroupsFragment(groups, choices);
+            expect(createChoicesFragmentStub.called).to.equal(true);
+            expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+              {
+                id: 1,
+                selected: true,
+                groupId: 1,
+                value: 'Choice 1',
+                label: 'Choice 1',
+              },
+              {
+                id: 3,
+                selected: false,
+                groupId: 1,
+                value: 'Choice 3',
+                label: 'Choice 3',
+              },
+            ]);
+            expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+              {
+                id: 2,
+                selected: false,
+                groupId: 2,
+                value: 'Choice 2',
+                label: 'Choice 2',
+              },
+            ]);
+          });
+        });
+
+        describe('text/select-multiple element', () => {
+          describe('renderSelectedChoices set to "always"', () => {
+            beforeEach(() => {
+              instance.isSelectOneElement = false;
+              instance.config.renderSelectedChoices = 'always';
+            });
+
+            it('calls createChoicesFragment with choices that belong to each group', () => {
+              expect(createChoicesFragmentStub.called).to.equal(false);
+              instance.createGroupsFragment(groups, choices);
+              expect(createChoicesFragmentStub.called).to.equal(true);
+              expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+                {
+                  id: 1,
+                  selected: true,
+                  groupId: 1,
+                  value: 'Choice 1',
+                  label: 'Choice 1',
+                },
+                {
+                  id: 3,
+                  selected: false,
+                  groupId: 1,
+                  value: 'Choice 3',
+                  label: 'Choice 3',
+                },
+              ]);
+              expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+                {
+                  id: 2,
+                  selected: false,
+                  groupId: 2,
+                  value: 'Choice 2',
+                  label: 'Choice 2',
+                },
+              ]);
+            });
+          });
+
+          describe('renderSelectedChoices not set to "always"', () => {
+            beforeEach(() => {
+              instance.isSelectOneElement = false;
+              instance.config.renderSelectedChoices = false;
+            });
+
+            it('calls createChoicesFragment with choices that belong to each group that are not already selected', () => {
+              expect(createChoicesFragmentStub.called).to.equal(false);
+              instance.createGroupsFragment(groups, choices);
+              expect(createChoicesFragmentStub.called).to.equal(true);
+              expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+                {
+                  id: 3,
+                  selected: false,
+                  groupId: 1,
+                  value: 'Choice 3',
+                  label: 'Choice 3',
+                },
+              ]);
+              expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+                {
+                  id: 2,
+                  selected: false,
+                  groupId: 2,
+                  value: 'Choice 2',
+                  label: 'Choice 2',
+                },
+              ]);
+            });
           });
         });
       });
     });
 
-    describe('renderChoices', () => {
+    describe('createChoicesFragment', () => {
       beforeEach(() => {});
       it('returns a fragment of choices', () => {});
     });
 
-    describe('renderItems', () => {
+    describe('createItemsFragment', () => {
       beforeEach(() => {});
       it('returns a fragment of items', () => {});
     });

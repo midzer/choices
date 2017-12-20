@@ -911,13 +911,13 @@ export default class Choices {
   ajax(fn: (values: any) => any): this;
 
   /** Render group choices into a DOM fragment and append to choice list */
-  private renderGroups(groups: any[], choices: any[], fragment: DocumentFragment): DocumentFragment;
+  private createGroupsFragment(groups: any[], choices: any[], fragment: DocumentFragment): DocumentFragment;
 
   /** Render choices into a DOM fragment and append to choice list */
-  private renderChoices(choices: any[], fragment: DocumentFragment, withinGroup?: boolean): DocumentFragment;
+  private createChoicesFragment(choices: any[], fragment: DocumentFragment, withinGroup?: boolean): DocumentFragment;
 
   /** Render items into a DOM fragment and append to items list */
-  private renderItems(items: any[], fragment?: DocumentFragment): void;
+  private createItemsFragment(items: any[], fragment?: DocumentFragment): void;
 
   /** Render DOM with values */
   private render(): void;

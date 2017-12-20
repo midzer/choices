@@ -7,7 +7,7 @@ import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 describe('components/wrappedSelect', () => {
   let instance;
   let choicesInstance;
-  let selectElement;
+  let element;
 
   beforeEach(() => {
     choicesInstance = {
@@ -16,8 +16,8 @@ describe('components/wrappedSelect', () => {
       },
     };
 
-    selectElement = document.createElement('select');
-    selectElement.id = 'target';
+    element = document.createElement('select');
+    element.id = 'target';
     for (let i = 1; i <= 4; i++) {
       const option = document.createElement('option');
 
@@ -28,9 +28,9 @@ describe('components/wrappedSelect', () => {
         option.setAttribute('placeholder', '');
       }
 
-      selectElement.appendChild(option);
+      element.appendChild(option);
     }
-    document.body.appendChild(selectElement);
+    document.body.appendChild(element);
 
     instance = new WrappedSelect(choicesInstance, document.getElementById('target'), DEFAULT_CLASSNAMES);
   });
@@ -38,6 +38,20 @@ describe('components/wrappedSelect', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     instance = null;
+  });
+
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
+
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(element);
+    });
+
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
   describe('inherited methods', () => {
@@ -77,15 +91,62 @@ describe('components/wrappedSelect', () => {
     });
   });
 
-  // describe('getOptionGroups', () => {
-  //   it('returns all option groups', () => {
+  describe('getOptionGroups', () => {
+    it('returns an array of all option groups', () => {
+      for (let i = 1; i <= 3; i++) {
+        const group = document.createElement('optgroup');
+        instance.element.appendChild(group);
+      }
 
-  //   });
-  // });
+      const output = instance.getOptionGroups();
+      expect(output.length).to.equal(3);
+      output.forEach((option) => {
+        expect(option).to.be.instanceOf(HTMLOptGroupElement);
+      });
+    });
+  });
 
-  // describe('setOptions', () => {
+  describe('setOptions', () => {
+    let appendDocFragmentStub;
+    const options = [
+      {
+        value: '1',
+        label: 'Test 1',
+        selected: false,
+        disabled: true,
+      },
+      {
+        value: '2',
+        label: 'Test 2',
+        selected: true,
+        disabled: false,
+      },
+    ];
 
-  // });
+    beforeEach(() => {
+      appendDocFragmentStub = stub();
+      instance.appendDocFragment = appendDocFragmentStub;
+    });
+
+    afterEach(() => {
+      instance.appendDocFragment.reset();
+    });
+
+    it('creates an option element for each passed object, adds it to a fragment and calls appendDocFragment with created fragment', () => {
+      expect(appendDocFragmentStub.called).to.equal(false);
+      instance.setOptions(options);
+      expect(appendDocFragmentStub.called).to.equal(true);
+
+      const fragment = appendDocFragmentStub.firstCall.args[0];
+      const selectElement = document.createElement('select');
+      selectElement.appendChild(fragment);
+
+      expect(fragment).to.be.instanceOf(DocumentFragment);
+      expect(selectElement.options.length).to.equal(2);
+      expect(selectElement.options[0].value).to.equal(options[0].value);
+      expect(selectElement.options[1].value).to.equal(options[1].value);
+    });
+  });
 
   describe('appendDocFragment', () => {
     it('empties contents of element', () => {

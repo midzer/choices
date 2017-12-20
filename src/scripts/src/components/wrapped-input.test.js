@@ -7,7 +7,7 @@ import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 describe('components/wrappedInput', () => {
   let instance;
   let choicesInstance;
-  let inputElement;
+  let element;
 
   beforeEach(() => {
     choicesInstance = {
@@ -15,13 +15,27 @@ describe('components/wrappedInput', () => {
         ...DEFAULT_CONFIG,
       },
     };
-    inputElement = document.createElement('input');
-    instance = new WrappedInput(choicesInstance, inputElement, DEFAULT_CLASSNAMES);
+    element = document.createElement('input');
+    instance = new WrappedInput(choicesInstance, element, DEFAULT_CLASSNAMES);
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
     instance = null;
+  });
+
+  describe('constructor', () => {
+    it('assigns choices instance to class', () => {
+      expect(instance.parentInstance).to.eql(choicesInstance);
+    });
+
+    it('assigns choices element to class', () => {
+      expect(instance.element).to.eql(element);
+    });
+
+    it('assigns classnames to class', () => {
+      expect(instance.classNames).to.eql(DEFAULT_CLASSNAMES);
+    });
   });
 
   describe('inherited methods', () => {

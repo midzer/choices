@@ -2085,8 +2085,8 @@ var Choices = function () {
      */
 
   }, {
-    key: 'renderGroups',
-    value: function renderGroups(groups, choices, fragment) {
+    key: 'createGroupsFragment',
+    value: function createGroupsFragment(groups, choices, fragment) {
       var _this = this;
 
       var groupFragment = fragment || document.createDocumentFragment();
@@ -2111,7 +2111,7 @@ var Choices = function () {
         if (groupChoices.length >= 1) {
           var dropdownGroup = _this._getTemplate('choiceGroup', group);
           groupFragment.appendChild(dropdownGroup);
-          _this.renderChoices(groupChoices, groupFragment, true);
+          _this.createChoicesFragment(groupChoices, groupFragment, true);
         }
       });
 
@@ -2127,8 +2127,8 @@ var Choices = function () {
      */
 
   }, {
-    key: 'renderChoices',
-    value: function renderChoices(choices, fragment) {
+    key: 'createChoicesFragment',
+    value: function createChoicesFragment(choices, fragment) {
       var _this2 = this;
 
       var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -2207,8 +2207,8 @@ var Choices = function () {
      */
 
   }, {
-    key: 'renderItems',
-    value: function renderItems(items) {
+    key: 'createItemsFragment',
+    value: function createItemsFragment(items) {
       var _this3 = this;
 
       var fragment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -2300,11 +2300,11 @@ var Choices = function () {
             return activeChoice.placeholder === true && activeChoice.groupId === -1;
           });
           if (activePlaceholders.length >= 1) {
-            choiceListFragment = this.renderChoices(activePlaceholders, choiceListFragment);
+            choiceListFragment = this.createChoicesFragment(activePlaceholders, choiceListFragment);
           }
-          choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
+          choiceListFragment = this.createGroupsFragment(activeGroups, activeChoices, choiceListFragment);
         } else if (activeChoices.length >= 1) {
-          choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
+          choiceListFragment = this.createChoicesFragment(activeChoices, choiceListFragment);
         }
 
         var _activeItems = this.store.getItemsFilteredByActive();
@@ -2350,7 +2350,7 @@ var Choices = function () {
       if (activeItems.length) {
         // Create a fragment to store our list items
         // (so we don't have to update the DOM for each item)
-        var itemListFragment = this.renderItems(activeItems);
+        var itemListFragment = this.createItemsFragment(activeItems);
 
         // If we have items to add
         if (itemListFragment.childNodes) {

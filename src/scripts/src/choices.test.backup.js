@@ -94,9 +94,9 @@ describe('Choices', () => {
       expect(instance.init).to.be.a('function');
       expect(instance.destroy).to.be.a('function');
       expect(instance.render).to.be.a('function');
-      expect(instance.renderGroups).to.be.a('function');
-      expect(instance.renderItems).to.be.a('function');
-      expect(instance.renderChoices).to.be.a('function');
+      expect(instance.createGroupsFragment).to.be.a('function');
+      expect(instance.createItemsFragment).to.be.a('function');
+      expect(instance.createChoicesFragment).to.be.a('function');
       expect(instance.highlightItem).to.be.a('function');
       expect(instance.unhighlightItem).to.be.a('function');
       expect(instance.highlightAll).to.be.a('function');

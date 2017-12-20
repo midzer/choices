@@ -48,6 +48,8 @@ global.navigator = {
 global.CustomEvent = window.CustomEvent;
 global.HTMLElement = window.HTMLElement;
 global.HTMLOptionElement = window.HTMLOptionElement;
+global.HTMLOptGroupElement = window.HTMLOptGroupElement;
+global.DocumentFragment = window.DocumentFragment;
 
 copyProps(window, global);
 mockRAF(global);
