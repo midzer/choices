@@ -7,7 +7,7 @@ import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
 describe('components/wrappedInput', () => {
   let instance;
   let choicesInstance;
-  let choicesElement;
+  let inputElement;
 
   beforeEach(() => {
     choicesInstance = {
@@ -15,8 +15,8 @@ describe('components/wrappedInput', () => {
         ...DEFAULT_CONFIG,
       },
     };
-    choicesElement = document.createElement('input');
-    instance = new WrappedInput(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
+    inputElement = document.createElement('input');
+    instance = new WrappedInput(choicesInstance, inputElement, DEFAULT_CLASSNAMES);
   });
 
   afterEach(() => {
@@ -36,6 +36,7 @@ describe('components/wrappedInput', () => {
         });
 
         it(`calls super.${method}`, () => {
+          expect(WrappedElement.prototype[method].called).to.equal(false);
           instance[method]();
           expect(WrappedElement.prototype[method].called).to.equal(true);
         });

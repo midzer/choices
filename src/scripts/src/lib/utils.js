@@ -559,7 +559,7 @@ export const sortByScore = (a, b) => a.score - b.score;
  * @return {Object}              Triggered event
  */
 export const dispatchEvent = (element, type, customArgs = null) => {
-  const event = new window.CustomEvent(type, {
+  const event = new CustomEvent(type, {
     detail: customArgs,
     bubbles: true,
     cancelable: true,

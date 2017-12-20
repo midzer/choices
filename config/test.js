@@ -45,7 +45,9 @@ global.document = window.document;
 global.navigator = {
   userAgent: 'node.js',
 };
+global.CustomEvent = window.CustomEvent;
 global.HTMLElement = window.HTMLElement;
+global.HTMLOptionElement = window.HTMLOptionElement;
 
 copyProps(window, global);
 mockRAF(global);
