@@ -25,6 +25,7 @@ import {
   generateId,
   findAncestorByAttrName,
   regexFilter,
+  fetchFromObject,
 } from './lib/utils';
 import './lib/polyfills';
 
@@ -1177,8 +1178,8 @@ class Choices {
             );
           } else {
             this._addChoice(
-              result[value],
-              result[label],
+              fetchFromObject(result, value),
+              fetchFromObject(result, label),
               result.selected,
               result.disabled,
               undefined,
