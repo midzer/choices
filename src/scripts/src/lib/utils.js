@@ -612,7 +612,7 @@ export const reduceToValues = (items, key = 'value') => {
 export const fetchFromObject = function (object, properties){
   const index = properties.indexOf('.');
 
-  if(index > -1){
+  if (index > -1){
     return fetchFromObject(object[properties.substring(0, index)], properties.substr(index + 1));
   }
 
