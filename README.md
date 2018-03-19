@@ -867,6 +867,24 @@ example.ajax(function(callback) {
 });
 ```
 
+**Example 2:**
+If your structure differs from `data.value` and `data.key` syntax you can write your own `key` and `value` into the `callback` function. This could be useful when you don't want to transform the given response.
+
+```js
+const example = new Choices(element)
+
+example.ajax(function(callback) {
+  fetch(url)
+    .then(function(response) {
+      response.json().then(function(data) {
+        callback(data, 'data.key', 'data.value');
+      });
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+```
 
 ## Browser compatibility
 Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES5 browsers](http://caniuse.com/#feat=es5). If you need to support a browser that does not support one of the features listed below, I suggest including a polyfill from the very good [polyfill.io](https://cdn.polyfill.io/v2/docs/):
