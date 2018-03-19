@@ -868,7 +868,7 @@ example.ajax(function(callback) {
 ```
 
 **Example 2:**
-If your structure differs from `data.value` and `data.key` syntax you can write your own `key` and `value` into the `callback` function. This could be useful when you don't want to transform the given response.
+If your structure differs from `data.value` and `data.key` structure you can write your own `key` and `value` into the `callback` function. This could be useful when you don't want to transform the given response.
 
 ```js
 const example = new Choices(element)
