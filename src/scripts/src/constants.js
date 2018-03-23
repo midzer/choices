@@ -1,3 +1,4 @@
+import { stripHTML } from './lib/utils';
 
 export const DEFAULT_CLASSNAMES = {
   containerOuter: 'choices',
@@ -62,7 +63,7 @@ export const DEFAULT_CONFIG = {
   noChoicesText: 'No choices to choose from',
   itemSelectText: 'Press to select',
   uniqueItemText: 'Only unique values can be added.',
-  addItemText: value => `Press Enter to add <b>"${value}"</b>`,
+  addItemText: value => `Press Enter to add <b>"${stripHTML(value)}"</b>`,
   maxItemText: maxItemCount => `Only ${maxItemCount} values can be added.`,
   itemComparer: (choice, item) => (choice === item),
   fuseOptions: {
