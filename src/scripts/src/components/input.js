@@ -1,4 +1,4 @@
-import { getWidthOfInput } from '../lib/utils';
+import { getWidthOfInput, stripHTML } from '../lib/utils';
 
 export default class Input {
   constructor(instance, element, classNames) {
@@ -145,7 +145,7 @@ export default class Input {
   }
 
   getValue() {
-    return this.element.value;
+    return stripHTML(this.element.value);
   }
 
   setActiveDescendant(activeDescendantID) {
