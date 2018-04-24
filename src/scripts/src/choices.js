@@ -431,7 +431,7 @@ class Choices {
 
     if (this.isSelectElement) {
       // Get active groups/choices
-      const activeGroups = this.store.getGroupsFilteredByActive();
+      const activeGroups = this.store.groupsFilteredByActive;
       const activeChoices = this.store.choicesFilteredByActive;
 
       let choiceListFragment = document.createDocumentFragment();
@@ -898,7 +898,7 @@ class Choices {
    * Select placeholder choice
    */
   _selectPlaceholderChoice() {
-    const placeholderChoice = this.store.getPlaceholderChoice();
+    const placeholderChoice = this.store.placeholderChoice;
 
     if (placeholderChoice) {
       this._addItem(
@@ -1215,7 +1215,7 @@ class Choices {
     }
 
     // If new value matches the desired length and is not the same as the current value with a space
-    const haystack = this.store.getSearchableChoices();
+    const haystack = this.store.searchableChoices;
     const needle = newValue;
     const keys = isType('Array', this.config.searchFields) ?
       this.config.searchFields :

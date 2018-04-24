@@ -189,19 +189,17 @@ describe('reducers/store', () => {
       });
     });
 
-    describe('getChoicesFilteredBySelectable', () => {
+    describe('choicesFilteredBySelectable getter', () => {
       it('returns choices that are not disabled', () => {
         const expectedResponse = state.choices.filter((choice => !choice.disabled));
-        const actualResponse = instance.getChoicesFilteredBySelectable();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.choicesFilteredBySelectable).to.eql(expectedResponse);
       });
     });
 
-    describe('getSearchableChoices', () => {
+    describe('searchableChoices getter', () => {
       it('returns choices that are not placeholders and are selectable', () => {
         const expectedResponse = state.choices.filter((choice => !choice.disabled && !choice.placeholder));
-        const actualResponse = instance.getSearchableChoices();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.searchableChoices).to.eql(expectedResponse);
       });
     });
 
@@ -223,27 +221,24 @@ describe('reducers/store', () => {
       });
     });
 
-    describe('getPlaceholderChoice', () => {
+    describe('placeholderChoice getter', () => {
       it('returns placeholder choice', () => {
         const expectedResponse = state.choices.reverse().find(choice => choice.placeholder);
-        const actualResponse = instance.getPlaceholderChoice();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.getPlaceholderChoice).to.eql(expectedResponse);
       });
     });
 
-    describe('getGroups', () => {
+    describe('groups getter', () => {
       it('returns groups', () => {
         const expectedResponse = state.groups;
-        const actualResponse = instance.getGroups();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.groups).to.eql(expectedResponse);
       });
     });
 
-    describe('getGroupsFilteredByActive', () => {
+    describe('groupsFilteredByActive getter', () => {
       it('returns active groups', () => {
         const expectedResponse = state.groups.filter(group => group.active);
-        const actualResponse = instance.getGroupsFilteredByActive();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.groupsFilteredByActive).to.eql(expectedResponse);
       });
     });
 
