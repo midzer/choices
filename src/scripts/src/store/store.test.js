@@ -55,9 +55,7 @@ describe('reducers/store', () => {
 
   describe('state getter', () => {
     it('returns state', () => {
-      const state = {
-        items: [],
-      };
+      const state = { items: [] };
       getStateStub.returns(state);
 
       expect(instance.state).to.equal(state);
@@ -163,35 +161,31 @@ describe('reducers/store', () => {
       });
     });
 
-    describe('getItemsFilteredByActive', () => {
+    describe('itemsFilteredByActive getter', () => {
       it('returns items that are active', () => {
         const expectedResponse = state.items.filter((item => item.active));
-        const actualResponse = instance.getItemsFilteredByActive();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.itemsFilteredByActive).to.eql(expectedResponse);
       });
     });
 
-    describe('getItemsFilteredByHighlighted', () => {
+    describe('itemsFilteredByHighlighted getter', () => {
       it('returns items that are active and highlighted', () => {
         const expectedResponse = state.items.filter((item => item.highlighted && item.active));
-        const actualResponse = instance.getItemsFilteredByHighlighted();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.itemsFilteredByHighlighted).to.eql(expectedResponse);
       });
     });
 
-    describe('getChoices', () => {
+    describe('choices getter', () => {
       it('returns choices', () => {
         const expectedResponse = state.choices;
-        const actualResponse = instance.getChoices();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.choices).to.eql(expectedResponse);
       });
     });
 
-    describe('getChoicesFilteredByActive', () => {
+    describe('choicesFilteredByActive getter', () => {
       it('returns choices that are active', () => {
         const expectedResponse = state.choices.filter((choice => choice.active));
-        const actualResponse = instance.getChoicesFilteredByActive();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.choicesFilteredByActive).to.eql(expectedResponse);
       });
     });
 

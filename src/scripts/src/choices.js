@@ -432,7 +432,7 @@ class Choices {
     if (this.isSelectElement) {
       // Get active groups/choices
       const activeGroups = this.store.getGroupsFilteredByActive();
-      const activeChoices = this.store.getChoicesFilteredByActive();
+      const activeChoices = this.store.choicesFilteredByActive;
 
       let choiceListFragment = document.createDocumentFragment();
 
@@ -464,7 +464,7 @@ class Choices {
 
       // If we have choices to show
       if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-        const activeItems = this.store.getItemsFilteredByActive();
+        const activeItems = this.store.itemsFilteredByActive;
         const canAddItem = this._canAddItem(activeItems, this.input.value);
 
         // ...and we can select them
@@ -502,7 +502,7 @@ class Choices {
     /* Items */
     if (this.currentState.items !== this.prevState.items) {
       // Get active items (items that can be selected)
-      const activeItems = this.store.getItemsFilteredByActive() || [];
+      const activeItems = this.store.itemsFilteredByActive || [];
       // Clear list
       this.itemList.clear();
 
@@ -608,7 +608,7 @@ class Choices {
       return this;
     }
 
-    const items = this.store.getItemsFilteredByActive();
+    const items = this.store.itemsFilteredByActive;
 
     items.forEach((item) => {
       if (item.value === value) {
@@ -627,7 +627,7 @@ class Choices {
    * @public
    */
   removeActiveItems(excludedId) {
-    const items = this.store.getItemsFilteredByActive();
+    const items = this.store.itemsFilteredByActive;
 
     items.forEach((item) => {
       if (excludedId !== item.id) {
@@ -645,7 +645,7 @@ class Choices {
    * @public
    */
   removeHighlightedItems(runEvent = false) {
-    const items = this.store.getItemsFilteredByHighlighted();
+    const items = this.store.itemsFilteredByHighlighted;
 
     items.forEach((item) => {
       this._removeItem(item);
@@ -727,7 +727,7 @@ class Choices {
    * @public
    */
   getValue(valueOnly = false) {
-    const items = this.store.getItemsFilteredByActive();
+    const items = this.store.itemsFilteredByActive;
 
     const values = items.reduce((selectedItems, item) => {
       const itemValue = valueOnly ? item.value : item;
@@ -1243,7 +1243,7 @@ class Choices {
       return;
     }
 
-    const choices = this.store.getChoices();
+    const choices = this.store.choices;
     const hasUnactiveChoices = choices.some(option => !option.active);
 
     // Check that we have a value to search and the input was an alphanumeric character
@@ -1322,7 +1322,7 @@ class Choices {
     }
 
     const target = e.target;
-    const activeItems = this.store.getItemsFilteredByActive();
+    const activeItems = this.store.itemsFilteredByActive;
     const hasFocusedInput = this.input.isFocussed;
     const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList.hasChildren;
@@ -1491,7 +1491,7 @@ class Choices {
     }
 
     const value = this.input.value;
-    const activeItems = this.store.getItemsFilteredByActive();
+    const activeItems = this.store.itemsFilteredByActive;
     const canAddItem = this._canAddItem(activeItems, value);
 
     // We are typing into a text input and have a value, we want to show a dropdown
@@ -1587,7 +1587,7 @@ class Choices {
     }
 
     if (this.containerOuter.element.contains(target) && target !== this.input.element) {
-      const activeItems = this.store.getItemsFilteredByActive();
+      const activeItems = this.store.itemsFilteredByActive;
       const hasShiftKey = e.shiftKey;
 
       const buttonTarget = findAncestorByAttrName(target, 'data-button');
@@ -1633,7 +1633,7 @@ class Choices {
   _onClick(e) {
     const target = e.target;
     const hasActiveDropdown = this.dropdown.isActive;
-    const activeItems = this.store.getItemsFilteredByActive();
+    const activeItems = this.store.itemsFilteredByActive;
 
     // If target is something that concerns us
     if (this.containerOuter.element.contains(target)) {
@@ -1720,7 +1720,7 @@ class Choices {
     const target = e.target;
     // If target is something that concerns us
     if (this.containerOuter.element.contains(target) && !this.isScrollingOnIe) {
-      const activeItems = this.store.getItemsFilteredByActive();
+      const activeItems = this.store.itemsFilteredByActive;
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
         text: () => {
@@ -2021,7 +2021,7 @@ class Choices {
     }
 
     // Generate unique id
-    const choices = this.store.getChoices();
+    const choices = this.store.choices;
     const choiceLabel = label || value;
     const choiceId = choices ? choices.length + 1 : 1;
     const choiceElementId = `${this.baseId}-${this.idNames.itemChoice}-${choiceId}`;
@@ -2374,7 +2374,7 @@ class Choices {
   }
 
   _findAndSelectChoiceByValue(val) {
-    const choices = this.store.getChoices();
+    const choices = this.store.choices;
     // Check 'value' property exists and the choice isn't already selected
     const foundChoice = choices.find(choice => this.config.itemComparer(choice.value, val));
 

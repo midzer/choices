@@ -49,29 +49,23 @@ export default class Store {
    * Get active items from store
    * @return {Array} Item objects
    */
-  getItemsFilteredByActive() {
-    const items = this.items;
-    const values = items.filter(item => item.active === true);
-
-    return values;
+  get itemsFilteredByActive() {
+    return this.items.filter(item => item.active === true);
   }
 
   /**
   * Get highlighted items from store
   * @return {Array} Item objects
   */
-  getItemsFilteredByHighlighted() {
-    const items = this.items;
-    const values = items.filter(item => item.active && item.highlighted);
-
-    return values;
+  get itemsFilteredByHighlighted() {
+    return this.items.filter(item => item.active && item.highlighted);
   }
 
   /**
    * Get choices from store
    * @return {Array} Option objects
    */
-  getChoices() {
+  get choices() {
     return this.state.choices;
   }
 
@@ -79,8 +73,8 @@ export default class Store {
    * Get active choices from store
    * @return {Array} Option objects
    */
-  getChoicesFilteredByActive() {
-    const choices = this.getChoices();
+  get choicesFilteredByActive() {
+    const choices = this.choices;
     const values = choices.filter(choice => choice.active === true);
 
     return values;
@@ -91,7 +85,7 @@ export default class Store {
    * @return {Array} Option objects
    */
   getChoicesFilteredBySelectable() {
-    const choices = this.getChoices();
+    const choices = this.choices;
     const values = choices.filter(choice => choice.disabled !== true);
 
     return values;
@@ -112,7 +106,7 @@ export default class Store {
    */
   getChoiceById(id) {
     if (id) {
-      const choices = this.getChoicesFilteredByActive();
+      const choices = this.choicesFilteredByActive;
       const foundChoice = choices.find(choice => choice.id === parseInt(id, 10));
       return foundChoice;
     }
@@ -124,7 +118,7 @@ export default class Store {
    * @return {Object} Found placeholder
    */
   getPlaceholderChoice() {
-    const choices = this.getChoices();
+    const choices = this.choices;
     const placeholderChoice = [...choices]
       .reverse()
       .find(choice => choice.placeholder === true);
@@ -146,7 +140,7 @@ export default class Store {
    */
   getGroupsFilteredByActive() {
     const groups = this.getGroups();
-    const choices = this.getChoices();
+    const choices = this.choices;
 
     const values = groups.filter((group) => {
       const isActive = group.active === true && group.disabled === false;
