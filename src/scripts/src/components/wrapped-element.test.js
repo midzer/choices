@@ -41,9 +41,9 @@ describe('components/wrappedElement', () => {
     });
   });
 
-  describe('getElement', () => {
-    it('returns DOM reference of element', () => {
-      expect(instance.getElement()).to.eql(element);
+  describe('value getter', () => {
+    it('returns element value', () => {
+      expect(instance.value).to.eql(element.value);
     });
   });
 

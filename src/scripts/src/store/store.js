@@ -33,7 +33,7 @@ export default class Store {
    * Get store object (wrapping Redux method)
    * @return {Object} State
    */
-  getState() {
+  get state() {
     return this.store.getState();
   }
 
@@ -41,9 +41,8 @@ export default class Store {
    * Get items from store
    * @return {Array} Item objects
    */
-  getItems() {
-    const state = this.store.getState();
-    return state.items;
+  get items() {
+    return this.state.items;
   }
 
   /**
@@ -51,7 +50,7 @@ export default class Store {
    * @return {Array} Item objects
    */
   getItemsFilteredByActive() {
-    const items = this.getItems();
+    const items = this.items;
     const values = items.filter(item => item.active === true);
 
     return values;
@@ -62,7 +61,7 @@ export default class Store {
   * @return {Array} Item objects
   */
   getItemsFilteredByHighlighted() {
-    const items = this.getItems();
+    const items = this.items;
     const values = items.filter(item => item.active && item.highlighted);
 
     return values;
@@ -73,8 +72,7 @@ export default class Store {
    * @return {Array} Option objects
    */
   getChoices() {
-    const state = this.store.getState();
-    return state.choices;
+    return this.state.choices;
   }
 
   /**
@@ -139,8 +137,7 @@ export default class Store {
    * @return {Array} Group objects
    */
   getGroups() {
-    const state = this.store.getState();
-    return state.groups;
+    return this.state.groups;
   }
 
   /**

@@ -53,11 +53,14 @@ describe('reducers/store', () => {
     });
   });
 
-  describe('getState', () => {
-    it('wraps redux getState method', () => {
-      expect(getStateStub.callCount).to.equal(0);
-      instance.getState();
-      expect(getStateStub.callCount).to.equal(1);
+  describe('state getter', () => {
+    it('returns state', () => {
+      const state = {
+        items: [],
+      };
+      getStateStub.returns(state);
+
+      expect(instance.state).to.equal(state);
     });
   });
 
@@ -153,11 +156,10 @@ describe('reducers/store', () => {
       getStateStub.returns(state);
     });
 
-    describe('getItems', () => {
+    describe('items getter', () => {
       it('returns items', () => {
         const expectedResponse = state.items;
-        const actualResponse = instance.getItems();
-        expect(actualResponse).to.eql(expectedResponse);
+        expect(instance.items).to.eql(expectedResponse);
       });
     });
 

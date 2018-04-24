@@ -767,18 +767,17 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        storeGetItemsStub = stub().returns(items);
+        storeGetItemsStub = stub(instance.store, 'items').get(() => items);
         highlightItemStub = stub();
 
         instance.highlightItem = highlightItemStub;
-        instance.store.getItems = storeGetItemsStub;
 
         output = instance.highlightAll();
       });
 
       afterEach(() => {
         highlightItemStub.reset();
-        instance.store.getItems.reset();
+        storeGetItemsStub.reset();
       });
 
       returnsInstance(output);
@@ -806,18 +805,17 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        storeGetItemsStub = stub().returns(items);
+        storeGetItemsStub = stub(instance.store, 'items').get(() => items);
         unhighlightItemStub = stub();
 
         instance.unhighlightItem = unhighlightItemStub;
-        instance.store.getItems = storeGetItemsStub;
 
         output = instance.unhighlightAll();
       });
 
       afterEach(() => {
         instance.unhighlightItem.reset();
-        instance.store.getItems.reset();
+        storeGetItemsStub.reset();
       });
 
       returnsInstance(output);

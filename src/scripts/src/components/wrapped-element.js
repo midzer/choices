@@ -8,11 +8,7 @@ export default class WrappedElement {
     this.isDisabled = false;
   }
 
-  getElement() {
-    return this.element;
-  }
-
-  getValue() {
+  get value() {
     return this.element.value;
   }
 
