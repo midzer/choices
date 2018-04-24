@@ -186,8 +186,10 @@ class Choices {
 
     // Set initialise flag
     this.initialised = true;
-    // Create required elements
+    // Create required templates
     this._createTemplates();
+    // Create required elements
+    this._createElements();
     // Generate input markup
     this._createStructure();
     // Subscribe store to render method
@@ -2059,9 +2061,7 @@ class Choices {
    * @private
    */
   _clearChoices() {
-    this.store.dispatch(
-      clearChoices(),
-    );
+    this.store.dispatch(clearChoices());
   }
 
   /**
@@ -2149,11 +2149,9 @@ class Choices {
   }
 
   /**
-   * Create DOM structure around passed select element
-   * @return
-   * @private
+   * Create DOM elements using templates
    */
-  _createStructure() {
+  _createElements() {
     const direction = this.passedElement.element.getAttribute('dir') || 'ltr';
     const containerOuter = this._getTemplate('containerOuter',
       direction,
@@ -2174,9 +2172,16 @@ class Choices {
     this.choiceList = new List(this, choiceList, this.config.classNames);
     this.itemList = new List(this, itemList, this.config.classNames);
     this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
+  }
 
+  /**
+   * Create DOM structure around passed select element
+   * @return
+   * @private
+   */
+  _createStructure() {
+    // Hide original element
     this.passedElement.conceal();
-
     // Wrap input in container preserving DOM ordering
     this.containerInner.wrap(this.passedElement.element);
     // Wrapper inner container with outer container
@@ -2195,16 +2200,16 @@ class Choices {
 
     this.containerOuter.element.appendChild(this.containerInner.element);
     this.containerOuter.element.appendChild(this.dropdown.element);
-    this.containerInner.element.appendChild(itemList);
+    this.containerInner.element.appendChild(this.itemList.element);
 
     if (!this.isTextElement) {
-      dropdown.appendChild(choiceList);
+      this.dropdown.element.appendChild(this.choiceList.element);
     }
 
     if (!this.isSelectOneElement) {
       this.containerInner.element.appendChild(this.input.element);
     } else if (this.canSearch) {
-      dropdown.insertBefore(input, dropdown.firstChild);
+      this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
     }
 
     if (this.isSelectElement) {
