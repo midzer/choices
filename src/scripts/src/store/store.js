@@ -49,7 +49,7 @@ export default class Store {
    * Get active items from store
    * @return {Array} Item objects
    */
-  get itemsFilteredByActive() {
+  get activeItems() {
     return this.items.filter(item => item.active === true);
   }
 
@@ -57,7 +57,7 @@ export default class Store {
   * Get highlighted items from store
   * @return {Array} Item objects
   */
-  get itemsFilteredByHighlighted() {
+  get highlightedActiveItems() {
     return this.items.filter(item => item.active && item.highlighted);
   }
 
@@ -73,7 +73,7 @@ export default class Store {
    * Get active choices from store
    * @return {Array} Option objects
    */
-  get choicesFilteredByActive() {
+  get activeChoices() {
     const choices = this.choices;
     const values = choices.filter(choice => choice.active === true);
 
@@ -84,7 +84,7 @@ export default class Store {
    * Get selectable choices from store
    * @return {Array} Option objects
    */
-  get choicesFilteredBySelectable() {
+  get selectableChoices() {
     return this.choices.filter(choice => choice.disabled !== true);
   }
 
@@ -93,7 +93,7 @@ export default class Store {
    * @return {Array} Option objects
    */
   get searchableChoices() {
-    return this.choicesFilteredBySelectable.filter(choice => choice.placeholder !== true);
+    return this.selectableChoices.filter(choice => choice.placeholder !== true);
   }
 
   /**
@@ -118,7 +118,7 @@ export default class Store {
    * Get active groups from store
    * @return {Array} Group objects
    */
-  get groupsFilteredByActive() {
+  get activeGroups() {
     const groups = this.groups;
     const choices = this.choices;
 
@@ -137,7 +137,7 @@ export default class Store {
    */
   getChoiceById(id) {
     if (id) {
-      const choices = this.choicesFilteredByActive;
+      const choices = this.activeChoices;
       const foundChoice = choices.find(choice => choice.id === parseInt(id, 10));
       return foundChoice;
     }
