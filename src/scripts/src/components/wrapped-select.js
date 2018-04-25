@@ -36,22 +36,6 @@ export default class WrappedSelect extends WrappedElement {
     this.appendDocFragment(fragment);
   }
 
-  conceal() {
-    super.conceal();
-  }
-
-  reveal() {
-    super.reveal();
-  }
-
-  enable() {
-    super.enable();
-  }
-
-  disable() {
-    super.disable();
-  }
-
   appendDocFragment(fragment) {
     this.element.innerHTML = '';
     this.element.appendChild(fragment);

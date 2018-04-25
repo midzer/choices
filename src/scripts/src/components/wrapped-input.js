@@ -20,20 +20,4 @@ export default class WrappedInput extends WrappedElement {
   get value() {
     return super.value;
   }
-
-  conceal() {
-    super.conceal();
-  }
-
-  reveal() {
-    super.reveal();
-  }
-
-  enable() {
-    super.enable();
-  }
-
-  disable() {
-    super.disable();
-  }
 }
