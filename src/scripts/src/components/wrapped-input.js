@@ -17,6 +17,7 @@ export default class WrappedInput extends WrappedElement {
     this.element.value = itemsFilteredString;
   }
 
+  // @todo figure out why we need this? Perhaps a babel issue
   get value() {
     return super.value;
   }
