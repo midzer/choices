@@ -40,7 +40,8 @@ export const TEMPLATES = {
   },
   itemList(globalClasses, isSelectOneElement) {
     const localClasses = classNames(
-      globalClasses.list, {
+      globalClasses.list,
+      {
         [globalClasses.listSingle]: (isSelectOneElement),
         [globalClasses.listItems]: (!isSelectOneElement),
       },
@@ -214,7 +215,8 @@ export const TEMPLATES = {
   notice(globalClasses, label, type = '') {
     const localClasses = classNames(
       globalClasses.item,
-      globalClasses.itemChoice, {
+      globalClasses.itemChoice,
+      {
         [globalClasses.noResults]: (type === 'no-results'),
         [globalClasses.noChoices]: (type === 'no-choices'),
       },

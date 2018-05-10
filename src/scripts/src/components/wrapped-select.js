@@ -9,39 +9,19 @@ export default class WrappedSelect extends WrappedElement {
     this.classNames = classNames;
   }
 
-  getElement() {
-    super.getElement();
-  }
-
-  conceal() {
-    super.conceal();
-  }
-
-  reveal() {
-    super.reveal();
-  }
-
-  enable() {
-    super.enable();
-  }
-
-  disable() {
-    super.disable();
-  }
-
-  getPlaceholderOption() {
+  get placeholderOption() {
     return this.element.querySelector('option[placeholder]');
   }
 
-  getOptions() {
-    return Array.from(this.element.options);
-  }
-
-  getOptionGroups() {
+  get optionGroups() {
     return Array.from(this.element.getElementsByTagName('OPTGROUP'));
   }
 
-  setOptions(options) {
+  get options() {
+    return Array.from(this.element.options);
+  }
+
+  set options(options) {
     const fragment = document.createDocumentFragment();
     const addOptionToFragment = (data) => {
       // Create a standard select option

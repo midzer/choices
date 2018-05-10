@@ -421,15 +421,15 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
 };
 
 /**
- * Remove html tags from a string
- * @param  {String}  Initial string/html
+ * Escape html in the string
+ * @param  {String} html Initial string/html
  * @return {String}  Sanitised string
  */
-export const stripHTML = function(html) {
-  const el = document.createElement('DIV');
-  el.innerHTML = html;
-  return el.textContent || el.innerText || '';
-};
+export const stripHTML = html =>
+  html.replace(/&/g, '&amp;')
+    .replace(/>/g, '&rt;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
 
 /**
  * Adds animation to an element and removes it upon animation completion
@@ -485,12 +485,12 @@ export const strToEl = (function() {
  * Sets the width of a passed input based on its value
  * @return {Number} Width of input
  */
-export const getWidthOfInput = (input) => {
+export const calcWidthOfInput = (input) => {
   const value = input.value || input.placeholder;
   let width = input.offsetWidth;
 
   if (value) {
-    const testEl = strToEl(`<span>${value}</span>`);
+    const testEl = strToEl(`<span>${stripHTML(value)}</span>`);
     testEl.style.position = 'absolute';
     testEl.style.padding = '0';
     testEl.style.top = '-9999px';

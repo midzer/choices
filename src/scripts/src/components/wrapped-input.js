@@ -9,31 +9,16 @@ export default class WrappedInput extends WrappedElement {
     this.classNames = classNames;
   }
 
-  getElement() {
-    super.getElement();
-  }
-
-  conceal() {
-    super.conceal();
-  }
-
-  reveal() {
-    super.reveal();
-  }
-
-  enable() {
-    super.enable();
-  }
-
-  disable() {
-    super.disable();
-  }
-
-  setValue(items) {
+  set value(items) {
     const itemsFiltered = reduceToValues(items);
     const itemsFilteredString = itemsFiltered.join(this.parentInstance.config.delimiter);
 
     this.element.setAttribute('value', itemsFilteredString);
     this.element.value = itemsFilteredString;
+  }
+
+  // @todo figure out why we need this? Perhaps a babel issue
+  get value() {
+    return super.value;
   }
 }

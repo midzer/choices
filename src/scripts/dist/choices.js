@@ -518,14 +518,12 @@ var isScrolledIntoView = exports.isScrolledIntoView = function isScrolledIntoVie
 };
 
 /**
- * Remove html tags from a string
- * @param  {String}  Initial string/html
+ * Escape html in the string
+ * @param  {String} html Initial string/html
  * @return {String}  Sanitised string
  */
 var stripHTML = exports.stripHTML = function stripHTML(html) {
-  var el = document.createElement('DIV');
-  el.innerHTML = html;
-  return el.textContent || el.innerText || '';
+  return html.replace(/&/g, '&amp;').replace(/>/g, '&rt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 };
 
 /**
@@ -581,12 +579,12 @@ var strToEl = exports.strToEl = function () {
  * Sets the width of a passed input based on its value
  * @return {Number} Width of input
  */
-var getWidthOfInput = exports.getWidthOfInput = function getWidthOfInput(input) {
+var calcWidthOfInput = exports.calcWidthOfInput = function calcWidthOfInput(input) {
   var value = input.value || input.placeholder;
   var width = input.offsetWidth;
 
   if (value) {
-    var testEl = strToEl('<span>' + value + '</span>');
+    var testEl = strToEl('<span>' + stripHTML(value) + '</span>');
     testEl.style.position = 'absolute';
     testEl.style.padding = '0';
     testEl.style.top = '-9999px';
@@ -725,6 +723,10 @@ var fetchFromObject = exports.fetchFromObject = function fetchFromObject(object,
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SCROLLING_SPEED = exports.KEY_CODES = exports.ACTION_TYPES = exports.EVENTS = exports.DEFAULT_CONFIG = exports.DEFAULT_CLASSNAMES = undefined;
+
+var _utils = __webpack_require__(0);
+
 var DEFAULT_CLASSNAMES = exports.DEFAULT_CLASSNAMES = {
   containerOuter: 'choices',
   containerInner: 'choices__inner',
@@ -789,7 +791,7 @@ var DEFAULT_CONFIG = exports.DEFAULT_CONFIG = {
   itemSelectText: 'Press to select',
   uniqueItemText: 'Only unique values can be added.',
   addItemText: function addItemText(value) {
-    return 'Press Enter to add <b>"' + value + '"</b>';
+    return 'Press Enter to add <b>"' + (0, _utils.stripHTML)(value) + '"</b>';
   },
   maxItemText: function maxItemText(maxItemCount) {
     return 'Only ' + maxItemCount + ' values can be added.';
@@ -1707,16 +1709,6 @@ var WrappedElement = function () {
   }
 
   _createClass(WrappedElement, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-  }, {
-    key: 'getValue',
-    value: function getValue() {
-      return this.element.value;
-    }
-  }, {
     key: 'conceal',
     value: function conceal() {
       // Hide passed input
@@ -1732,7 +1724,6 @@ var WrappedElement = function () {
         this.element.setAttribute('data-choice-orig-style', origStyle);
       }
 
-      this.element.setAttribute('style', 'display:none;');
       this.element.setAttribute('aria-hidden', 'true');
       this.element.setAttribute('data-choice', 'active');
     }
@@ -1776,6 +1767,11 @@ var WrappedElement = function () {
     key: 'triggerEvent',
     value: function triggerEvent(eventType, data) {
       (0, _utils.dispatchEvent)(this.element, eventType, data);
+    }
+  }, {
+    key: 'value',
+    get: function get() {
+      return this.element.value;
     }
   }]);
 
@@ -2060,8 +2056,8 @@ var Choices = function () {
     this.presetItems = this.config.items;
 
     // Then add any values passed from attribute
-    if (this.passedElement.getValue()) {
-      this.presetItems = this.presetItems.concat(this.passedElement.getValue().split(this.config.delimiter));
+    if (this.passedElement.value) {
+      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
     }
 
     // Set unique base Id
@@ -2129,8 +2125,10 @@ var Choices = function () {
 
       // Set initialise flag
       this.initialised = true;
-      // Create required elements
+      // Create required templates
       this._createTemplates();
+      // Create required elements
+      this._createElements();
       // Generate input markup
       this._createStructure();
       // Subscribe store to render method
@@ -2166,7 +2164,7 @@ var Choices = function () {
       this.containerOuter.unwrap(this.passedElement.element);
 
       if (this.isSelectElement) {
-        this.passedElement.setOptions(this.presetChoices);
+        this.passedElement.options = this.presetChoices;
       }
 
       // Clear data store
@@ -2372,10 +2370,10 @@ var Choices = function () {
 
       if (this.isTextElement) {
         // Update the value of the hidden input
-        this.passedElement.setValue(items);
+        this.passedElement.value = items;
       } else {
         // Update the options of the hidden input
-        this.passedElement.setOptions(items);
+        this.passedElement.options = items;
       }
 
       var addItemToFragment = function addItemToFragment(item) {
@@ -2402,7 +2400,7 @@ var Choices = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.currentState = this.store.getState();
+      this.currentState = this.store.state;
       var stateChanged = this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups || this.currentState.items !== this.prevState.items;
 
       if (!stateChanged) {
@@ -2413,8 +2411,8 @@ var Choices = function () {
 
       if (this.isSelectElement) {
         // Get active groups/choices
-        var activeGroups = this.store.getGroupsFilteredByActive();
-        var activeChoices = this.store.getChoicesFilteredByActive();
+        var activeGroups = this.store.activeGroups;
+        var activeChoices = this.store.activeChoices;
 
         var choiceListFragment = document.createDocumentFragment();
 
@@ -2442,8 +2440,8 @@ var Choices = function () {
 
         // If we have choices to show
         if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-          var activeItems = this.store.getItemsFilteredByActive();
-          var canAddItem = this._canAddItem(activeItems, this.input.getValue());
+          var activeItems = this.store.activeItems;
+          var canAddItem = this._canAddItem(activeItems, this.input.value);
 
           // ...and we can select them
           if (canAddItem.response) {
@@ -2476,7 +2474,7 @@ var Choices = function () {
       /* Items */
       if (this.currentState.items !== this.prevState.items) {
         // Get active items (items that can be selected)
-        var _activeItems = this.store.getItemsFilteredByActive() || [];
+        var _activeItems = this.store.activeItems || [];
         // Clear list
         this.itemList.clear();
 
@@ -2582,7 +2580,7 @@ var Choices = function () {
     value: function highlightAll() {
       var _this4 = this;
 
-      var items = this.store.getItems();
+      var items = this.store.items;
       items.forEach(function (item) {
         return _this4.highlightItem(item);
       });
@@ -2600,7 +2598,7 @@ var Choices = function () {
     value: function unhighlightAll() {
       var _this5 = this;
 
-      var items = this.store.getItems();
+      var items = this.store.items;
       items.forEach(function (item) {
         return _this5.unhighlightItem(item);
       });
@@ -2623,7 +2621,7 @@ var Choices = function () {
         return this;
       }
 
-      var items = this.store.getItemsFilteredByActive();
+      var items = this.store.activeItems;
 
       items.forEach(function (item) {
         if (item.value === value) {
@@ -2647,7 +2645,7 @@ var Choices = function () {
     value: function removeActiveItems(excludedId) {
       var _this7 = this;
 
-      var items = this.store.getItemsFilteredByActive();
+      var items = this.store.activeItems;
 
       items.forEach(function (item) {
         if (excludedId !== item.id) {
@@ -2672,7 +2670,7 @@ var Choices = function () {
 
       var runEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      var items = this.store.getItemsFilteredByHighlighted();
+      var items = this.store.highlightedActiveItems;
 
       items.forEach(function (item) {
         _this8._removeItem(item);
@@ -2700,7 +2698,7 @@ var Choices = function () {
       }
 
       this.dropdown.show();
-      this.containerOuter.open(this.dropdown.getVerticalPos());
+      this.containerOuter.open(this.dropdown.distanceFromTopWindow());
 
       if (focusInput && this.canSearch) {
         this.input.focus();
@@ -2768,7 +2766,7 @@ var Choices = function () {
     value: function getValue() {
       var valueOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      var items = this.store.getItemsFilteredByActive();
+      var items = this.store.activeItems;
 
       var values = items.reduce(function (selectedItems, item) {
         var itemValue = valueOnly ? item.value : item;
@@ -2966,7 +2964,7 @@ var Choices = function () {
   }, {
     key: '_selectPlaceholderChoice',
     value: function _selectPlaceholderChoice() {
-      var placeholderChoice = this.store.getPlaceholderChoice();
+      var placeholderChoice = this.store.placeholderChoice;
 
       if (placeholderChoice) {
         this._addItem(placeholderChoice.value, placeholderChoice.label, placeholderChoice.id, placeholderChoice.groupId, null, placeholderChoice.placeholder);
@@ -3108,7 +3106,7 @@ var Choices = function () {
       // If editing the last item is allowed and there are not other selected items,
       // we can edit the item value. Otherwise if we can remove items, remove all selected items
       if (this.config.editItems && !hasHighlightedItems && lastItem) {
-        this.input.setValue(lastItem.value);
+        this.input.value = lastItem.value;
         this.input.setWidth();
         this._removeItem(lastItem);
         this._triggerChange(lastItem.value);
@@ -3144,7 +3142,7 @@ var Choices = function () {
             placeholderItem.innerHTML = this.config.loadingText;
           }
         } else {
-          this.input.setPlaceholder(this.config.loadingText);
+          this.input.placeholder = this.config.loadingText;
         }
       } else {
         this.containerOuter.removeLoadingState();
@@ -3152,7 +3150,7 @@ var Choices = function () {
         if (this.isSelectOneElement) {
           placeholderItem.innerHTML = this.placeholder || '';
         } else {
-          this.input.setPlaceholder(this.placeholder || '');
+          this.input.placeholder = this.placeholder || '';
         }
       }
     }
@@ -3267,7 +3265,7 @@ var Choices = function () {
       }
 
       // If new value matches the desired length and is not the same as the current value with a space
-      var haystack = this.store.getSearchableChoices();
+      var haystack = this.store.searchableChoices;
       var needle = newValue;
       var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
       var options = Object.assign(this.config.fuseOptions, { keys: keys });
@@ -3296,7 +3294,7 @@ var Choices = function () {
         return;
       }
 
-      var choices = this.store.getChoices();
+      var choices = this.store.choices;
       var hasUnactiveChoices = choices.some(function (option) {
         return !option.active;
       });
@@ -3389,7 +3387,7 @@ var Choices = function () {
       }
 
       var target = e.target;
-      var activeItems = this.store.getItemsFilteredByActive();
+      var activeItems = this.store.activeItems;
       var hasFocusedInput = this.input.isFocussed;
       var hasActiveDropdown = this.dropdown.isActive;
       var hasItems = this.itemList.hasChildren;
@@ -3416,7 +3414,7 @@ var Choices = function () {
         // If CTRL + A or CMD + A have been pressed and there are items to select
         if (ctrlDownKey && hasItems) {
           _this15.canSearch = false;
-          if (_this15.config.removeItems && !_this15.input.getValue() && _this15.input.element === document.activeElement) {
+          if (_this15.config.removeItems && !_this15.input.value && _this15.input.element === document.activeElement) {
             // Highlight items
             _this15.highlightAll();
           }
@@ -3426,7 +3424,7 @@ var Choices = function () {
       var onEnterKey = function onEnterKey() {
         // If enter key is pressed and the input has a value
         if (_this15.isTextElement && target.value) {
-          var value = _this15.input.getValue();
+          var value = _this15.input.value;
           var canAddItem = _this15._canAddItem(activeItems, value);
 
           // All is good, add
@@ -3542,8 +3540,8 @@ var Choices = function () {
         return;
       }
 
-      var value = this.input.getValue();
-      var activeItems = this.store.getItemsFilteredByActive();
+      var value = this.input.value;
+      var activeItems = this.store.activeItems;
       var canAddItem = this._canAddItem(activeItems, value);
 
       // We are typing into a text input and have a value, we want to show a dropdown
@@ -3575,7 +3573,7 @@ var Choices = function () {
             this.store.dispatch((0, _choices.activateChoices)(true));
           }
         } else if (this.canSearch && canAddItem.response) {
-          this._handleSearch(this.input.getValue());
+          this._handleSearch(this.input.value);
         }
       }
       // Re-establish canSearch value from changes in _onKeyDown
@@ -3645,7 +3643,7 @@ var Choices = function () {
       }
 
       if (this.containerOuter.element.contains(target) && target !== this.input.element) {
-        var activeItems = this.store.getItemsFilteredByActive();
+        var activeItems = this.store.activeItems;
         var hasShiftKey = e.shiftKey;
 
         var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
@@ -3695,7 +3693,7 @@ var Choices = function () {
     value: function _onClick(e) {
       var target = e.target;
       var hasActiveDropdown = this.dropdown.isActive;
-      var activeItems = this.store.getItemsFilteredByActive();
+      var activeItems = this.store.activeItems;
 
       // If target is something that concerns us
       if (this.containerOuter.element.contains(target)) {
@@ -3790,7 +3788,7 @@ var Choices = function () {
       var target = e.target;
       // If target is something that concerns us
       if (this.containerOuter.element.contains(target) && !this.isScrollingOnIe) {
-        var activeItems = this.store.getItemsFilteredByActive();
+        var activeItems = this.store.activeItems;
         var hasHighlightedItems = activeItems.some(function (item) {
           return item.highlighted;
         });
@@ -3982,7 +3980,7 @@ var Choices = function () {
       var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
       var passedKeyCode = keyCode;
       var passedCustomProperties = customProperties;
-      var items = this.store.getItems();
+      var items = this.store.items;
       var passedLabel = label || passedValue;
       var passedOptionId = parseInt(choiceId, 10) || -1;
 
@@ -4101,7 +4099,7 @@ var Choices = function () {
       }
 
       // Generate unique id
-      var choices = this.store.getChoices();
+      var choices = this.store.choices;
       var choiceLabel = label || value;
       var choiceId = choices ? choices.length + 1 : 1;
       var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
@@ -4207,14 +4205,12 @@ var Choices = function () {
     }
 
     /**
-     * Create DOM structure around passed select element
-     * @return
-     * @private
+     * Create DOM elements using templates
      */
 
   }, {
-    key: '_createStructure',
-    value: function _createStructure() {
+    key: '_createElements',
+    value: function _createElements() {
       var direction = this.passedElement.element.getAttribute('dir') || 'ltr';
       var containerOuter = this._getTemplate('containerOuter', direction, this.isSelectElement, this.isSelectOneElement, this.config.searchEnabled, this.passedElement.element.type);
       var containerInner = this._getTemplate('containerInner');
@@ -4229,18 +4225,28 @@ var Choices = function () {
       this.choiceList = new _list2.default(this, choiceList, this.config.classNames);
       this.itemList = new _list2.default(this, itemList, this.config.classNames);
       this.dropdown = new _dropdown2.default(this, dropdown, this.config.classNames);
+    }
 
+    /**
+     * Create DOM structure around passed select element
+     * @return
+     * @private
+     */
+
+  }, {
+    key: '_createStructure',
+    value: function _createStructure() {
+      // Hide original element
       this.passedElement.conceal();
-
       // Wrap input in container preserving DOM ordering
       this.containerInner.wrap(this.passedElement.element);
       // Wrapper inner container with outer container
       this.containerOuter.wrap(this.containerInner.element);
 
       if (this.isSelectOneElement) {
-        this.input.setPlaceholder(this.config.searchPlaceholderValue || '');
+        this.input.placeholder = this.config.searchPlaceholderValue || '';
       } else if (this.placeholder) {
-        this.input.setPlaceholder(this.placeholder);
+        this.input.placeholder = this.placeholder;
         this.input.setWidth(true);
       }
 
@@ -4250,16 +4256,16 @@ var Choices = function () {
 
       this.containerOuter.element.appendChild(this.containerInner.element);
       this.containerOuter.element.appendChild(this.dropdown.element);
-      this.containerInner.element.appendChild(itemList);
+      this.containerInner.element.appendChild(this.itemList.element);
 
       if (!this.isTextElement) {
-        dropdown.appendChild(choiceList);
+        this.dropdown.element.appendChild(this.choiceList.element);
       }
 
       if (!this.isSelectOneElement) {
         this.containerInner.element.appendChild(this.input.element);
       } else if (this.canSearch) {
-        dropdown.insertBefore(input, dropdown.firstChild);
+        this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
       }
 
       if (this.isSelectElement) {
@@ -4273,14 +4279,14 @@ var Choices = function () {
     value: function _addPredefinedChoices() {
       var _this21 = this;
 
-      var passedGroups = this.passedElement.getOptionGroups();
+      var passedGroups = this.passedElement.optionGroups;
 
       this.highlightPosition = 0;
       this.isSearching = false;
 
       if (passedGroups && passedGroups.length) {
         // If we have a placeholder option
-        var placeholderChoice = this.passedElement.getPlaceholderOption();
+        var placeholderChoice = this.passedElement.placeholderOption;
         if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
           this._addChoice(placeholderChoice.value, placeholderChoice.innerHTML, placeholderChoice.selected, placeholderChoice.disabled, undefined, undefined,
           /* placeholder */true);
@@ -4290,7 +4296,7 @@ var Choices = function () {
           _this21._addGroup(group, group.id || null);
         });
       } else {
-        var passedOptions = this.passedElement.getOptions();
+        var passedOptions = this.passedElement.options;
         var filter = this.config.sortFn;
         var allChoices = this.presetChoices;
 
@@ -4397,7 +4403,7 @@ var Choices = function () {
     value: function _findAndSelectChoiceByValue(val) {
       var _this24 = this;
 
-      var choices = this.store.getChoices();
+      var choices = this.store.choices;
       // Check 'value' property exists and the choice isn't already selected
       var foundChoice = choices.find(function (choice) {
         return _this24.config.itemComparer(choice.value, val);
@@ -5484,8 +5490,40 @@ var Store = function () {
      */
 
   }, {
-    key: 'getState',
-    value: function getState() {
+    key: 'getChoiceById',
+
+
+    /**
+     * Get single choice by it's ID
+     * @return {Object} Found choice
+     */
+    value: function getChoiceById(id) {
+      if (id) {
+        var choices = this.activeChoices;
+        var foundChoice = choices.find(function (choice) {
+          return choice.id === parseInt(id, 10);
+        });
+        return foundChoice;
+      }
+      return false;
+    }
+
+    /**
+     * Get group by group id
+     * @param  {Number} id Group ID
+     * @return {Object}    Group data
+     */
+
+  }, {
+    key: 'getGroupById',
+    value: function getGroupById(id) {
+      return this.groups.find(function (group) {
+        return group.id === parseInt(id, 10);
+      });
+    }
+  }, {
+    key: 'state',
+    get: function get() {
       return this.store.getState();
     }
 
@@ -5495,10 +5533,9 @@ var Store = function () {
      */
 
   }, {
-    key: 'getItems',
-    value: function getItems() {
-      var state = this.store.getState();
-      return state.items;
+    key: 'items',
+    get: function get() {
+      return this.state.items;
     }
 
     /**
@@ -5507,14 +5544,11 @@ var Store = function () {
      */
 
   }, {
-    key: 'getItemsFilteredByActive',
-    value: function getItemsFilteredByActive() {
-      var items = this.getItems();
-      var values = items.filter(function (item) {
+    key: 'activeItems',
+    get: function get() {
+      return this.items.filter(function (item) {
         return item.active === true;
       });
-
-      return values;
     }
 
     /**
@@ -5523,14 +5557,11 @@ var Store = function () {
     */
 
   }, {
-    key: 'getItemsFilteredByHighlighted',
-    value: function getItemsFilteredByHighlighted() {
-      var items = this.getItems();
-      var values = items.filter(function (item) {
+    key: 'highlightedActiveItems',
+    get: function get() {
+      return this.items.filter(function (item) {
         return item.active && item.highlighted;
       });
-
-      return values;
     }
 
     /**
@@ -5539,10 +5570,9 @@ var Store = function () {
      */
 
   }, {
-    key: 'getChoices',
-    value: function getChoices() {
-      var state = this.store.getState();
-      return state.choices;
+    key: 'choices',
+    get: function get() {
+      return this.state.choices;
     }
 
     /**
@@ -5551,9 +5581,9 @@ var Store = function () {
      */
 
   }, {
-    key: 'getChoicesFilteredByActive',
-    value: function getChoicesFilteredByActive() {
-      var choices = this.getChoices();
+    key: 'activeChoices',
+    get: function get() {
+      var choices = this.choices;
       var values = choices.filter(function (choice) {
         return choice.active === true;
       });
@@ -5567,14 +5597,11 @@ var Store = function () {
      */
 
   }, {
-    key: 'getChoicesFilteredBySelectable',
-    value: function getChoicesFilteredBySelectable() {
-      var choices = this.getChoices();
-      var values = choices.filter(function (choice) {
+    key: 'selectableChoices',
+    get: function get() {
+      return this.choices.filter(function (choice) {
         return choice.disabled !== true;
       });
-
-      return values;
     }
 
     /**
@@ -5583,30 +5610,11 @@ var Store = function () {
      */
 
   }, {
-    key: 'getSearchableChoices',
-    value: function getSearchableChoices() {
-      var filtered = this.getChoicesFilteredBySelectable();
-      return filtered.filter(function (choice) {
+    key: 'searchableChoices',
+    get: function get() {
+      return this.selectableChoices.filter(function (choice) {
         return choice.placeholder !== true;
       });
-    }
-
-    /**
-     * Get single choice by it's ID
-     * @return {Object} Found choice
-     */
-
-  }, {
-    key: 'getChoiceById',
-    value: function getChoiceById(id) {
-      if (id) {
-        var choices = this.getChoicesFilteredByActive();
-        var foundChoice = choices.find(function (choice) {
-          return choice.id === parseInt(id, 10);
-        });
-        return foundChoice;
-      }
-      return false;
     }
 
     /**
@@ -5615,14 +5623,11 @@ var Store = function () {
      */
 
   }, {
-    key: 'getPlaceholderChoice',
-    value: function getPlaceholderChoice() {
-      var choices = this.getChoices();
-      var placeholderChoice = [].concat(_toConsumableArray(choices)).reverse().find(function (choice) {
+    key: 'placeholderChoice',
+    get: function get() {
+      return [].concat(_toConsumableArray(this.choices)).reverse().find(function (choice) {
         return choice.placeholder === true;
       });
-
-      return placeholderChoice;
     }
 
     /**
@@ -5631,10 +5636,9 @@ var Store = function () {
      */
 
   }, {
-    key: 'getGroups',
-    value: function getGroups() {
-      var state = this.store.getState();
-      return state.groups;
+    key: 'groups',
+    get: function get() {
+      return this.state.groups;
     }
 
     /**
@@ -5643,37 +5647,18 @@ var Store = function () {
      */
 
   }, {
-    key: 'getGroupsFilteredByActive',
-    value: function getGroupsFilteredByActive() {
-      var groups = this.getGroups();
-      var choices = this.getChoices();
+    key: 'activeGroups',
+    get: function get() {
+      var groups = this.groups;
+      var choices = this.choices;
 
-      var values = groups.filter(function (group) {
+      return groups.filter(function (group) {
         var isActive = group.active === true && group.disabled === false;
         var hasActiveOptions = choices.some(function (choice) {
           return choice.active === true && choice.disabled === false;
         });
         return isActive && hasActiveOptions;
       }, []);
-
-      return values;
-    }
-
-    /**
-     * Get group by group id
-     * @param  {Number} id Group ID
-     * @return {Object}    Group data
-     */
-
-  }, {
-    key: 'getGroupById',
-    value: function getGroupById(id) {
-      var groups = this.getGroups();
-      var foundGroup = groups.find(function (group) {
-        return group.id === parseInt(id, 10);
-      });
-
-      return foundGroup;
     }
   }]);
 
@@ -6098,21 +6083,16 @@ var Dropdown = function () {
     this.isActive = false;
   }
 
+  /**
+   * Determine how far the top of our element is from
+   * the top of the window
+   * @return {Number} Vertical position
+   */
+
+
   _createClass(Dropdown, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Determine how far the top of our element is from
-     * the top of the window
-     * @return {Number} Vertical position
-     */
-
-  }, {
-    key: 'getVerticalPos',
-    value: function getVerticalPos() {
+    key: 'distanceFromTopWindow',
+    value: function distanceFromTopWindow() {
       this.dimensions = this.element.getBoundingClientRect();
       this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
       return this.position;
@@ -6199,17 +6179,12 @@ var Container = function () {
     this.onBlur = this.onBlur.bind(this);
   }
 
+  /**
+   * Add event listeners
+  */
+
+
   _createClass(Container, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Add event listeners
-    */
-
-  }, {
     key: 'addEventListeners',
     value: function addEventListeners() {
       this.element.addEventListener('focus', this.onFocus);
@@ -6448,11 +6423,6 @@ var Input = function () {
   }
 
   _createClass(Input, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-  }, {
     key: 'addEventListeners',
     value: function addEventListeners() {
       this.element.addEventListener('input', this.onInput);
@@ -6580,32 +6550,17 @@ var Input = function () {
         // If there is a placeholder, we only want to set the width of the input when it is a greater
         // length than 75% of the placeholder. This stops the input jumping around.
         if (this.element.value && this.element.value.length >= this.parentInstance.placeholder.length / 1.25 || enforceWidth) {
-          this.element.style.width = this.getWidth();
+          this.element.style.width = this.calcWidth();
         }
       } else {
         // If there is no placeholder, resize input to contents
-        this.element.style.width = this.getWidth();
+        this.element.style.width = this.calcWidth();
       }
     }
   }, {
-    key: 'getWidth',
-    value: function getWidth() {
-      return (0, _utils.getWidthOfInput)(this.element);
-    }
-  }, {
-    key: 'setPlaceholder',
-    value: function setPlaceholder(placeholder) {
-      this.element.placeholder = placeholder;
-    }
-  }, {
-    key: 'setValue',
-    value: function setValue(value) {
-      this.element.value = value;
-    }
-  }, {
-    key: 'getValue',
-    value: function getValue() {
-      return this.element.value;
+    key: 'calcWidth',
+    value: function calcWidth() {
+      return (0, _utils.calcWidthOfInput)(this.element);
     }
   }, {
     key: 'setActiveDescendant',
@@ -6616,6 +6571,19 @@ var Input = function () {
     key: 'removeActiveDescendant',
     value: function removeActiveDescendant() {
       this.element.removeAttribute('aria-activedescendant');
+    }
+  }, {
+    key: 'placeholder',
+    set: function set(placeholder) {
+      this.element.placeholder = placeholder;
+    }
+  }, {
+    key: 'value',
+    set: function set(value) {
+      this.element.value = value;
+    },
+    get: function get() {
+      return this.element.value;
     }
   }]);
 
@@ -6651,17 +6619,12 @@ var List = function () {
     this.hasChildren = !!this.element.children;
   }
 
+  /**
+   * Clear List contents
+   */
+
+
   _createClass(List, [{
-    key: 'getElement',
-    value: function getElement() {
-      return this.element;
-    }
-
-    /**
-     * Clear List contents
-     */
-
-  }, {
     key: 'clear',
     value: function clear() {
       this.element.innerHTML = '';
@@ -6749,38 +6712,19 @@ var WrappedInput = function (_WrappedElement) {
   }
 
   _createClass(WrappedInput, [{
-    key: 'getElement',
-    value: function getElement() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'getElement', this).call(this);
-    }
-  }, {
-    key: 'conceal',
-    value: function conceal() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'conceal', this).call(this);
-    }
-  }, {
-    key: 'reveal',
-    value: function reveal() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'reveal', this).call(this);
-    }
-  }, {
-    key: 'enable',
-    value: function enable() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'disable',
-    value: function disable() {
-      _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'disable', this).call(this);
-    }
-  }, {
-    key: 'setValue',
-    value: function setValue(items) {
+    key: 'value',
+    set: function set(items) {
       var itemsFiltered = (0, _utils.reduceToValues)(items);
       var itemsFilteredString = itemsFiltered.join(this.parentInstance.config.delimiter);
 
       this.element.setAttribute('value', itemsFilteredString);
       this.element.value = itemsFilteredString;
+    }
+
+    // @todo figure out why we need this? Perhaps a babel issue
+    ,
+    get: function get() {
+      return _get(WrappedInput.prototype.__proto__ || Object.getPrototypeOf(WrappedInput.prototype), 'value', this);
     }
   }]);
 
@@ -6801,8 +6745,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _wrappedElement = __webpack_require__(4);
 
@@ -6835,48 +6777,27 @@ var WrappedSelect = function (_WrappedElement) {
   }
 
   _createClass(WrappedSelect, [{
-    key: 'getElement',
-    value: function getElement() {
-      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'getElement', this).call(this);
+    key: 'appendDocFragment',
+    value: function appendDocFragment(fragment) {
+      this.element.innerHTML = '';
+      this.element.appendChild(fragment);
     }
   }, {
-    key: 'conceal',
-    value: function conceal() {
-      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'conceal', this).call(this);
-    }
-  }, {
-    key: 'reveal',
-    value: function reveal() {
-      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'reveal', this).call(this);
-    }
-  }, {
-    key: 'enable',
-    value: function enable() {
-      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'enable', this).call(this);
-    }
-  }, {
-    key: 'disable',
-    value: function disable() {
-      _get(WrappedSelect.prototype.__proto__ || Object.getPrototypeOf(WrappedSelect.prototype), 'disable', this).call(this);
-    }
-  }, {
-    key: 'getPlaceholderOption',
-    value: function getPlaceholderOption() {
+    key: 'placeholderOption',
+    get: function get() {
       return this.element.querySelector('option[placeholder]');
     }
   }, {
-    key: 'getOptions',
-    value: function getOptions() {
-      return Array.from(this.element.options);
-    }
-  }, {
-    key: 'getOptionGroups',
-    value: function getOptionGroups() {
+    key: 'optionGroups',
+    get: function get() {
       return Array.from(this.element.getElementsByTagName('OPTGROUP'));
     }
   }, {
-    key: 'setOptions',
-    value: function setOptions(options) {
+    key: 'options',
+    get: function get() {
+      return Array.from(this.element.options);
+    },
+    set: function set(options) {
       var fragment = document.createDocumentFragment();
       var addOptionToFragment = function addOptionToFragment(data) {
         // Create a standard select option
@@ -6891,12 +6812,6 @@ var WrappedSelect = function (_WrappedElement) {
       });
 
       this.appendDocFragment(fragment);
-    }
-  }, {
-    key: 'appendDocFragment',
-    value: function appendDocFragment(fragment) {
-      this.element.innerHTML = '';
-      this.element.appendChild(fragment);
     }
   }]);
 
