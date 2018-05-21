@@ -1,10 +1,7 @@
 export default class Dropdown {
-  constructor(instance, element, classNames) {
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.dimensions = null;
-    this.position = null;
+  constructor({ element, type, classNames }) {
+    Object.assign(this, { element, type, classNames });
+
     this.isActive = false;
   }
 
@@ -36,7 +33,7 @@ export default class Dropdown {
     this.element.classList.add(this.classNames.activeState);
     this.element.setAttribute('aria-expanded', 'true');
     this.isActive = true;
-    return this.parentInstance;
+    return this;
   }
 
   /**
@@ -48,6 +45,6 @@ export default class Dropdown {
     this.element.classList.remove(this.classNames.activeState);
     this.element.setAttribute('aria-expanded', 'false');
     this.isActive = false;
-    return this.parentInstance;
+    return this;
   }
 }

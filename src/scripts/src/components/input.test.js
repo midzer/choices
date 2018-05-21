@@ -1,21 +1,21 @@
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import Input from './input';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/input', () => {
   let instance;
-  let choicesInstance;
   let choicesElement;
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
     choicesElement = document.createElement('input');
-    instance = new Input(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
+    instance = new Input({
+      element: choicesElement,
+      type: 'text',
+      classNames: DEFAULT_CLASSNAMES,
+      placeholderValue: null,
+      preventPaste: false,
+    });
   });
 
   afterEach(() => {
@@ -24,10 +24,6 @@ describe('components/input', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to class', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(choicesElement);
     });
@@ -93,7 +89,7 @@ describe('components/input', () => {
 
     describe('when element is select one', () => {
       it('does not set input width', () => {
-        instance.parentInstance.isSelectOneElement = true;
+        instance.type = 'select-one';
         instance.onInput();
         expect(setWidthStub.callCount).to.equal(0);
       });
@@ -101,7 +97,7 @@ describe('components/input', () => {
 
     describe('when element is not a select one', () => {
       it('sets input width', () => {
-        instance.parentInstance.isSelectOneElement = false;
+        instance.type = 'text';
         instance.onInput();
         expect(setWidthStub.callCount).to.equal(1);
       });
@@ -120,7 +116,7 @@ describe('components/input', () => {
 
     describe('when pasting is disabled and target is the element', () => {
       it('prevents default pasting behaviour', () => {
-        instance.parentInstance.config.paste = false;
+        instance.preventPaste = true;
         instance.onPaste(eventMock);
         expect(eventMock.preventDefault.callCount).to.equal(1);
       });
@@ -128,7 +124,7 @@ describe('components/input', () => {
 
     describe('when pasting is enabled', () => {
       it('does not prevent default pasting behaviour', () => {
-        instance.parentInstance.config.paste = true;
+        instance.preventPaste = false;
         instance.onPaste(eventMock);
         expect(eventMock.preventDefault.callCount).to.equal(0);
       });
@@ -264,10 +260,9 @@ describe('components/input', () => {
       expect(setWidthStub.callCount).to.equal(1);
     });
 
-    it('returns parent instance', () => {
-      const actualResponse = instance.clear();
-      const expectedResponse = choicesInstance;
-      expect(actualResponse).to.eql(expectedResponse);
+    it('returns instance', () => {
+      const response = instance.clear();
+      expect(response).to.eql(instance);
     });
   });
 
@@ -286,7 +281,7 @@ describe('components/input', () => {
     describe('with a placeholder', () => {
       describe('when value length is greater or equal to 75% of the placeholder length', () => {
         it('sets the width of the element based on input value', () => {
-          instance.parentInstance.placeholder = 'This is a test';
+          instance.placeholderValue = 'This is a test';
           instance.element.value = 'This is a test';
           expect(instance.element.style.width).to.not.equal(inputWidth);
           instance.setWidth();
@@ -297,7 +292,7 @@ describe('components/input', () => {
 
       describe('when width is enforced', () => {
         it('sets the width of the element based on input value', () => {
-          instance.parentInstance.placeholder = 'This is a test';
+          instance.placeholderValue = 'This is a test';
           instance.element.value = '';
           expect(instance.element.style.width).to.not.equal(inputWidth);
           instance.setWidth(true);
@@ -308,7 +303,7 @@ describe('components/input', () => {
 
       describe('when value length is less than 75% of the placeholder length', () => {
         it('does not set the width of the element', () => {
-          instance.parentInstance.placeholder = 'This is a test';
+          instance.placeholderValue = 'This is a test';
           instance.element.value = 'Test';
           instance.setWidth();
           expect(calcWidthStub.callCount).to.equal(0);

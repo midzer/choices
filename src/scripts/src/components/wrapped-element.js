@@ -1,10 +1,9 @@
 import { dispatchEvent } from '../lib/utils';
 
 export default class WrappedElement {
-  constructor(instance, element, classNames) {
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
+  constructor({ element, classNames }) {
+    Object.assign(this, { element, classNames });
+
     this.isDisabled = false;
   }
 

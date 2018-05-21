@@ -2,11 +2,8 @@ import WrappedElement from './wrapped-element';
 import templates from './../templates';
 
 export default class WrappedSelect extends WrappedElement {
-  constructor(instance, element, classNames) {
-    super(instance, element, classNames);
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
+  constructor({ element, classNames }) {
+    super({ element, classNames });
   }
 
   get placeholderOption() {

@@ -1,23 +1,23 @@
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import Container from './container';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/container', () => {
   let instance;
-  let choicesInstance;
   let element;
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
     element = document.createElement('div');
     element.id = 'container';
+
     document.body.appendChild(element);
-    instance = new Container(choicesInstance, document.getElementById('container'), DEFAULT_CLASSNAMES);
+    instance = new Container({
+      element: document.getElementById('container'),
+      classNames: DEFAULT_CLASSNAMES,
+      position: 'auto',
+      type: 'text',
+    });
   });
 
   afterEach(() => {
@@ -27,10 +27,6 @@ describe('components/container', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to class', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(element);
     });
@@ -104,7 +100,7 @@ describe('components/container', () => {
     describe('passing dropdownPos', () => {
       describe('position config option set to "auto"', () => {
         beforeEach(() => {
-          instance.config.position = 'auto';
+          instance.position = 'auto';
         });
 
         describe('dropdownPos is greater than window height', () => {
@@ -122,7 +118,7 @@ describe('components/container', () => {
 
       describe('position config option set to "top"', () => {
         beforeEach(() => {
-          instance.config.position = 'top';
+          instance.position = 'top';
         });
 
         it('returns true', () => {
@@ -132,7 +128,7 @@ describe('components/container', () => {
 
       describe('position config option set to "bottom"', () => {
         beforeEach(() => {
-          instance.config.position = 'bottom';
+          instance.position = 'bottom';
         });
 
         it('returns false', () => {
@@ -310,7 +306,7 @@ describe('components/container', () => {
 
     describe('select one element', () => {
       beforeEach(() => {
-        instance.parentInstance.isSelectOneElement = true;
+        instance.type = 'select-one';
         instance.enable();
       });
 
@@ -344,7 +340,7 @@ describe('components/container', () => {
 
     describe('select one element', () => {
       beforeEach(() => {
-        instance.parentInstance.isSelectOneElement = true;
+        instance.type = 'select-one';
         instance.disable();
       });
 

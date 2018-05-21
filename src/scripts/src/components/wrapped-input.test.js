@@ -2,21 +2,20 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import WrappedElement from './wrapped-element';
 import WrappedInput from './wrapped-input';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/wrappedInput', () => {
   let instance;
-  let choicesInstance;
   let element;
+  const delimiter = '-';
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
     element = document.createElement('input');
-    instance = new WrappedInput(choicesInstance, element, DEFAULT_CLASSNAMES);
+    instance = new WrappedInput({
+      element,
+      classNames: DEFAULT_CLASSNAMES,
+      delimiter,
+    });
   });
 
   afterEach(() => {
@@ -25,10 +24,6 @@ describe('components/wrappedInput', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to class', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(element);
     });
@@ -77,7 +72,7 @@ describe('components/wrappedInput', () => {
     it('sets delimited value of element based on passed data', () => {
       expect(instance.element.value).to.equal('');
       instance.value = data;
-      expect(instance.value).to.equal('Value 1,Value 2,Value 3');
+      expect(instance.value).to.equal(`Value 1${delimiter}Value 2${delimiter}Value 3`);
     });
   });
 });

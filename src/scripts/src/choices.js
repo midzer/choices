@@ -80,9 +80,16 @@ class Choices {
     this.isValidElementType = this.isTextElement || this.isSelectElement;
 
     if (this.isTextElement) {
-      this.passedElement = new WrappedInput(this, passedElement, this.config.classNames);
+      this.passedElement = new WrappedInput({
+        element: passedElement,
+        classNames: this.config.classNames,
+        delimiter: this.config.delimiter,
+      });
     } else if (this.isSelectElement) {
-      this.passedElement = new WrappedSelect(this, passedElement, this.config.classNames);
+      this.passedElement = new WrappedSelect({
+        element: passedElement,
+        classNames: this.config.classNames,
+      });
     }
 
     if (!this.passedElement) {
@@ -106,9 +113,9 @@ class Choices {
     this.highlightPosition = 0;
     this.canSearch = this.config.searchEnabled;
 
-    this.placeholder = false;
+    this.placeholderValue = false;
     if (!this.isSelectOneElement) {
-      this.placeholder = this.config.placeholder ?
+      this.placeholderValue = this.config.placeholder ?
         (this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder')) :
         false;
     }
@@ -1085,9 +1092,9 @@ class Choices {
       this.containerOuter.removeLoadingState();
 
       if (this.isSelectOneElement) {
-        placeholderItem.innerHTML = (this.placeholder || '');
+        placeholderItem.innerHTML = (this.placeholderValue || '');
       } else {
-        this.input.placeholder = (this.placeholder || '');
+        this.input.placeholder = (this.placeholderValue || '');
       }
     }
   }
@@ -2166,12 +2173,39 @@ class Choices {
     const input = this._getTemplate('input');
     const dropdown = this._getTemplate('dropdown');
 
-    this.containerOuter = new Container(this, containerOuter, this.config.classNames);
-    this.containerInner = new Container(this, containerInner, this.config.classNames);
-    this.input = new Input(this, input, this.config.classNames);
-    this.choiceList = new List(this, choiceList, this.config.classNames);
-    this.itemList = new List(this, itemList, this.config.classNames);
-    this.dropdown = new Dropdown(this, dropdown, this.config.classNames);
+    this.containerOuter = new Container({
+      element: containerOuter,
+      classNames: this.config.classNames,
+      type: this.passedElement.element.type,
+      position: this.config.position,
+    });
+
+    this.containerInner = new Container({
+      element: containerInner,
+      classNames: this.config.classNames,
+      type: this.passedElement.element.type,
+      position: this.config.position,
+    });
+
+    this.input = new Input({
+      element: input,
+      classNames: this.config.classNames,
+      type: this.passedElement.element.type,
+    });
+
+    this.choiceList = new List({
+      element: choiceList,
+    });
+
+    this.itemList = new List({
+      element: itemList,
+    });
+
+    this.dropdown = new Dropdown({
+      element: dropdown,
+      classNames: this.config.classNames,
+      type: this.passedElement.element.type,
+    });
   }
 
   /**
@@ -2189,8 +2223,8 @@ class Choices {
 
     if (this.isSelectOneElement) {
       this.input.placeholder = (this.config.searchPlaceholderValue || '');
-    } else if (this.placeholder) {
-      this.input.placeholder = this.placeholder;
+    } else if (this.placeholderValue) {
+      this.input.placeholder = this.placeholderValue;
       this.input.setWidth(true);
     }
 

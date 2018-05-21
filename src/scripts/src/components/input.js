@@ -1,8 +1,9 @@
 import { calcWidthOfInput } from '../lib/utils';
 
 export default class Input {
-  constructor(instance, element, classNames) {
-    this.parentInstance = instance;
+  constructor({ element, type, classNames, placeholderValue }) {
+    Object.assign(this, { element, type, classNames, placeholderValue });
+
     this.element = element;
     this.classNames = classNames;
     this.isFocussed = this.element === document.activeElement;
@@ -47,7 +48,7 @@ export default class Input {
    * @private
    */
   onInput() {
-    if (!this.parentInstance.isSelectOneElement) {
+    if (this.type !== 'select-one') {
       this.setWidth();
     }
   }
@@ -60,21 +61,15 @@ export default class Input {
    */
   onPaste(e) {
     // Disable pasting into the input if option has been set
-    if (e.target === this.element && !this.parentInstance.config.paste) {
+    if (e.target === this.element && this.preventPaste) {
       e.preventDefault();
     }
   }
 
-  /**
-   * Set focussed state
-   */
   onFocus() {
     this.isFocussed = true;
   }
 
-  /**
-   * Remove focussed state
-   */
   onBlur() {
     this.isFocussed = false;
   }
@@ -115,7 +110,7 @@ export default class Input {
       this.setWidth();
     }
 
-    return this.parentInstance;
+    return this;
   }
 
   /**
@@ -124,12 +119,12 @@ export default class Input {
    * @return
    */
   setWidth(enforceWidth) {
-    if (this.parentInstance.placeholder) {
+    if (this.placeholderValue) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
       if (
         (this.element.value &&
-        this.element.value.length >= (this.parentInstance.placeholder.length / 1.25)) ||
+        this.element.value.length >= (this.placeholderValue.length / 1.25)) ||
         enforceWidth
       ) {
         this.element.style.width = this.calcWidth();

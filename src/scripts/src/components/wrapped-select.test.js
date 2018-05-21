@@ -2,20 +2,13 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import WrappedElement from './wrapped-element';
 import WrappedSelect from './wrapped-select';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/wrappedSelect', () => {
   let instance;
-  let choicesInstance;
   let element;
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
-
     element = document.createElement('select');
     element.id = 'target';
     for (let i = 1; i <= 4; i++) {
@@ -32,7 +25,10 @@ describe('components/wrappedSelect', () => {
     }
     document.body.appendChild(element);
 
-    instance = new WrappedSelect(choicesInstance, document.getElementById('target'), DEFAULT_CLASSNAMES);
+    instance = new WrappedSelect({
+      element: document.getElementById('target'),
+      classNames: DEFAULT_CLASSNAMES,
+    });
   });
 
   afterEach(() => {
@@ -41,10 +37,6 @@ describe('components/wrappedSelect', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to class', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(element);
     });

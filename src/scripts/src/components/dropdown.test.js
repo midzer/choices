@@ -1,23 +1,20 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import Dropdown from './dropdown';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/dropdown', () => {
   let instance;
-  let choicesInstance;
   let choicesElement;
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
-
     choicesElement = document.createElement('div');
     document.body.appendChild(choicesElement);
-    instance = new Dropdown(choicesInstance, choicesElement, DEFAULT_CLASSNAMES);
+    instance = new Dropdown({
+      element: choicesElement,
+      type: 'text',
+      classNames: DEFAULT_CLASSNAMES,
+    });
   });
 
   afterEach(() => {
@@ -26,10 +23,6 @@ describe('components/dropdown', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to instance', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to instance', () => {
       expect(instance.element).to.eql(choicesElement);
     });
@@ -125,8 +118,8 @@ describe('components/dropdown', () => {
       expect(instance.isActive).to.equal(true);
     });
 
-    it('returns parent instance', () => {
-      expect(actualResponse).to.eql(choicesInstance);
+    it('returns instance', () => {
+      expect(actualResponse).to.eql(instance);
     });
   });
 
@@ -153,8 +146,8 @@ describe('components/dropdown', () => {
       expect(instance.isActive).to.equal(false);
     });
 
-    it('returns parent instance', () => {
-      expect(actualResponse).to.eql(choicesInstance);
+    it('returns instance', () => {
+      expect(actualResponse).to.eql(instance);
     });
   });
 });

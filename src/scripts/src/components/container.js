@@ -1,16 +1,15 @@
 import { getWindowHeight, wrap } from '../lib/utils';
 
 export default class Container {
-  constructor(instance, element, classNames) {
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.config = instance.config;
+  constructor({ element, type, classNames, position }) {
+    Object.assign(this, { element, classNames, type, position });
+
     this.isOpen = false;
     this.isFlipped = false;
     this.isFocussed = false;
     this.isDisabled = false;
     this.isLoading = false;
+
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
@@ -57,15 +56,15 @@ export default class Container {
     if (dropdownPos === undefined) {
       return false;
     }
+
     // If flip is enabled and the dropdown bottom position is
     // greater than the window height flip the dropdown.
     let shouldFlip = false;
-    if (this.config.position === 'auto') {
+    if (this.position === 'auto') {
       shouldFlip = dropdownPos >= windowHeight;
-    } else if (this.config.position === 'top') {
+    } else if (this.position === 'top') {
       shouldFlip = true;
     }
-
 
     return shouldFlip;
   }
@@ -129,7 +128,7 @@ export default class Container {
   enable() {
     this.element.classList.remove(this.classNames.disabledState);
     this.element.removeAttribute('aria-disabled');
-    if (this.parentInstance.isSelectOneElement) {
+    if (this.type === 'select-one') {
       this.element.setAttribute('tabindex', '0');
     }
     this.isDisabled = false;
@@ -141,7 +140,7 @@ export default class Container {
   disable() {
     this.element.classList.add(this.classNames.disabledState);
     this.element.setAttribute('aria-disabled', 'true');
-    if (this.parentInstance.isSelectOneElement) {
+    if (this.type === 'select-one') {
       this.element.setAttribute('tabindex', '-1');
     }
     this.isDisabled = true;

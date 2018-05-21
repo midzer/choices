@@ -1,21 +1,17 @@
 import { expect } from 'chai';
 import WrappedElement from './wrapped-element';
-import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/wrappedElement', () => {
   let instance;
-  let choicesInstance;
   let element;
 
   beforeEach(() => {
-    choicesInstance = {
-      config: {
-        ...DEFAULT_CONFIG,
-      },
-    };
-
     element = document.createElement('select');
-    instance = new WrappedElement(choicesInstance, element, DEFAULT_CLASSNAMES);
+    instance = new WrappedElement({
+      element,
+      classNames: DEFAULT_CLASSNAMES,
+    });
   });
 
   afterEach(() => {
@@ -24,10 +20,6 @@ describe('components/wrappedElement', () => {
   });
 
   describe('constructor', () => {
-    it('assigns choices instance to class', () => {
-      expect(instance.parentInstance).to.eql(choicesInstance);
-    });
-
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(element);
     });
