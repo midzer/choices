@@ -127,16 +127,20 @@ export default class Input {
         this.element.value.length >= (this.placeholderValue.length / 1.25)) ||
         enforceWidth
       ) {
-        this.element.style.width = this.calcWidth();
+        this.calcWidth((width) => {
+          this.element.style.width = width;
+        });
       }
     } else {
       // If there is no placeholder, resize input to contents
-      this.element.style.width = this.calcWidth();
+      this.calcWidth((width) => {
+        this.element.style.width = width;
+      });
     }
   }
 
-  calcWidth() {
-    return calcWidthOfInput(this.element);
+  calcWidth(callback) {
+    return calcWidthOfInput(this.element, callback);
   }
 
   setActiveDescendant(activeDescendantID) {

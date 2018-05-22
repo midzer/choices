@@ -482,10 +482,10 @@ export const strToEl = (function() {
 }());
 
 /**
- * Sets the width of a passed input based on its value
- * @return {Number} Width of input
+ * Determines the width of a passed input based on its value and passes
+ * it to the supplied callback function.
  */
-export const calcWidthOfInput = (input) => {
+export const calcWidthOfInput = (input, callback) => {
   const value = input.value || input.placeholder;
   let width = input.offsetWidth;
 
@@ -514,14 +514,18 @@ export const calcWidthOfInput = (input) => {
 
     document.body.appendChild(testEl);
 
-    if (value && testEl.offsetWidth !== input.offsetWidth) {
-      width = testEl.offsetWidth + 4;
-    }
+    requestAnimationFrame(() => {
+      if (value && testEl.offsetWidth !== input.offsetWidth) {
+        width = testEl.offsetWidth + 4;
+      }
 
-    document.body.removeChild(testEl);
+      document.body.removeChild(testEl);
+
+      callback.call(this, `${width}px`);
+    });
+  } else {
+    callback.call(this, `${width}px`);
   }
-
-  return `${width}px`;
 };
 
 /**

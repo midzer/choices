@@ -271,7 +271,7 @@ describe('components/input', () => {
     const inputWidth = '200px';
 
     beforeEach(() => {
-      calcWidthStub = stub(instance, 'calcWidth').returns(inputWidth);
+      calcWidthStub = stub(instance, 'calcWidth').callsArgWith(0, inputWidth);
     });
 
     afterEach(() => {
