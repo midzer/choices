@@ -249,16 +249,18 @@ class Choices {
       this.currentState.groups !== this.prevState.groups ||
       this.currentState.items !== this.prevState.items
     );
+    const shouldRenderChoices = this.isSelectElement;
+    const shouldRenderItems = this.currentState.items !== this.prevState.items;
 
     if (!stateChanged) {
       return;
     }
 
-    if (this.isSelectElement) {
+    if (shouldRenderChoices) {
       this._renderChoices();
     }
 
-    if (this.currentState.items !== this.prevState.items) {
+    if (shouldRenderItems) {
       this._renderItems();
     }
 
