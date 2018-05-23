@@ -17,7 +17,6 @@ import {
   getAdjacentEl,
   getType,
   isType,
-  isElement,
   strToEl,
   extend,
   sortByAlpha,
@@ -25,6 +24,7 @@ import {
   generateId,
   findAncestorByAttrName,
   regexFilter,
+  isIE11,
 } from './lib/utils';
 import './lib/polyfills';
 
@@ -33,29 +33,17 @@ import './lib/polyfills';
  */
 class Choices {
   constructor(element = '[data-choice]', userConfig = {}) {
-    // If there are multiple elements, create a new instance
-    // for each element besides the first one (as that already has an instance)
     if (isType('String', element)) {
-      const elements = document.querySelectorAll(element);
+      const elements = Array.from(document.querySelectorAll(element));
+
+      // If there are multiple elements, create a new instance
+      // for each element besides the first one (as that already has an instance)
       if (elements.length > 1) {
-        for (let i = 1; i < elements.length; i += 1) {
-          const el = elements[i];
-          /* eslint-disable no-new */
-          new Choices(el, userConfig);
-        }
+        return this._generateInstances(elements, userConfig);
       }
     }
 
-    const defaultConfig = {
-      ...DEFAULT_CONFIG,
-      items: [],
-      choices: [],
-      classNames: DEFAULT_CLASSNAMES,
-      sortFn: sortByAlpha,
-    };
-
-    // Merge options with user options
-    this.config = extend(defaultConfig, Choices.userDefaults, userConfig);
+    this.config = Choices._generateConfig(userConfig);
 
     if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
@@ -69,6 +57,8 @@ class Choices {
     this.currentState = {};
     this.prevState = {};
     this.currentValue = '';
+    this.isScrollingOnIe = false;
+    this.wasTap = true;
 
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     const passedElement = isType('String', element) ? document.querySelector(element) : element;
@@ -77,7 +67,6 @@ class Choices {
     this.isSelectOneElement = passedElement.type === 'select-one';
     this.isSelectMultipleElement = passedElement.type === 'select-multiple';
     this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
-    this.isValidElementType = this.isTextElement || this.isSelectElement;
 
     if (this.isTextElement) {
       this.passedElement = new WrappedInput({
@@ -93,32 +82,15 @@ class Choices {
     }
 
     if (!this.passedElement) {
-      if (!this.config.silent) {
-        console.error('Passed element not found');
-      }
-      return false;
+      throw new Error('Could not wrap passed element');
     }
 
-    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
-    this.isScrollingOnIe = false;
-
-    if (this.config.shouldSortItems === true && this.isSelectOneElement) {
-      if (!this.config.silent) {
-        console.warn(
-          'shouldSortElements: Type of passed element is \'select-one\', falling back to false.',
-        );
-      }
+    if (this.config.shouldSortItems === true && this.isSelectOneElement && !this.config.silent) {
+      console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
     }
 
     this.highlightPosition = 0;
-    this.canSearch = this.config.searchEnabled;
-
-    this.placeholderValue = false;
-    if (!this.isSelectOneElement) {
-      this.placeholderValue = this.config.placeholder ?
-        (this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder')) :
-        false;
-    }
+    this.placeholderValue = this._generatePlaceholderValue();
 
     // Assign preset choices from passed object
     this.presetChoices = this.config.choices;
@@ -139,10 +111,7 @@ class Choices {
       itemChoice: 'item-choice',
     };
 
-    // Bind methods
     this.render = this.render.bind(this);
-
-    // Bind event handlers
     this._onFocus = this._onFocus.bind(this);
     this._onBlur = this._onBlur.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
@@ -153,28 +122,13 @@ class Choices {
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
 
-    // Monitor touch taps/scrolls
-    this.wasTap = true;
-
-    // Cutting the mustard
-    const cuttingTheMustard = 'classList' in document.documentElement;
-    if (!cuttingTheMustard && !this.config.silent) {
-      console.error('Choices: Your browser doesn\'t support Choices');
+    // If element has already been initialised with Choices, fail silently
+    if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+      return false;
     }
 
-    const canInit = isElement(this.passedElement.element) && this.isValidElementType;
-
-    if (canInit) {
-      // If element has already been initialised with Choices
-      if (this.passedElement.element.getAttribute('data-choice') === 'active') {
-        return false;
-      }
-
-      // Let's go
-      this.init();
-    } else if (!this.config.silent) {
-      console.error('Incompatible input passed');
-    }
+    // Let's go
+    this.init();
   }
 
   /* ========================================
@@ -284,142 +238,6 @@ class Choices {
   }
 
   /**
-   * Render group choices into a DOM fragment and append to choice list
-   * @param  {Array} groups    Groups to add to list
-   * @param  {Array} choices   Choices to add to groups
-   * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
-   * @return {DocumentFragment} Populated options fragment
-   * @private
-   */
-  createGroupsFragment(groups, choices, fragment) {
-    const groupFragment = fragment || document.createDocumentFragment();
-    const getGroupChoices = group => choices.filter((choice) => {
-      if (this.isSelectOneElement) {
-        return choice.groupId === group.id;
-      }
-      return choice.groupId === group.id && (this.config.renderSelectedChoices === 'always' || !choice.selected);
-    });
-
-
-    // If sorting is enabled, filter groups
-    if (this.config.shouldSort) {
-      groups.sort(this.config.sortFn);
-    }
-
-    groups.forEach((group) => {
-      const groupChoices = getGroupChoices(group);
-      if (groupChoices.length >= 1) {
-        const dropdownGroup = this._getTemplate('choiceGroup', group);
-        groupFragment.appendChild(dropdownGroup);
-        this.createChoicesFragment(groupChoices, groupFragment, true);
-      }
-    });
-
-    return groupFragment;
-  }
-
-  /**
-   * Render choices into a DOM fragment and append to choice list
-   * @param  {Array} choices    Choices to add to list
-   * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
-   * @return {DocumentFragment} Populated choices fragment
-   * @private
-   */
-  createChoicesFragment(choices, fragment, withinGroup = false) {
-    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-    const choicesFragment = fragment || document.createDocumentFragment();
-    const { renderSelectedChoices, searchResultLimit, renderChoiceLimit } = this.config;
-    const filter = this.isSearching ? sortByScore : this.config.sortFn;
-    const appendChoice = (choice) => {
-      const shouldRender = renderSelectedChoices === 'auto' ?
-        (this.isSelectOneElement || !choice.selected) :
-        true;
-      if (shouldRender) {
-        const dropdownItem = this._getTemplate('choice', choice, this.config.itemSelectText);
-        choicesFragment.appendChild(dropdownItem);
-      }
-    };
-
-    let rendererableChoices = choices;
-
-    if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
-      rendererableChoices = choices.filter(choice => !choice.selected);
-    }
-
-    // Split array into placeholders and "normal" choices
-    const { placeholderChoices, normalChoices } = rendererableChoices.reduce((acc, choice) => {
-      if (choice.placeholder) {
-        acc.placeholderChoices.push(choice);
-      } else {
-        acc.normalChoices.push(choice);
-      }
-      return acc;
-    }, { placeholderChoices: [], normalChoices: [] });
-
-    // If sorting is enabled or the user is searching, filter choices
-    if (this.config.shouldSort || this.isSearching) {
-      normalChoices.sort(filter);
-    }
-
-    let choiceLimit = rendererableChoices.length;
-
-    // Prepend placeholeder
-    const sortedChoices = [...placeholderChoices, ...normalChoices];
-
-    if (this.isSearching) {
-      choiceLimit = searchResultLimit;
-    } else if (renderChoiceLimit > 0 && !withinGroup) {
-      choiceLimit = renderChoiceLimit;
-    }
-
-    // Add each choice to dropdown within range
-    for (let i = 0; i < choiceLimit; i += 1) {
-      if (sortedChoices[i]) {
-        appendChoice(sortedChoices[i]);
-      }
-    }
-
-    return choicesFragment;
-  }
-
-  /**
-   * Render items into a DOM fragment and append to items list
-   * @param  {Array} items    Items to add to list
-   * @param  {DocumentFragment} [fragment] Fragment to add items to (optional)
-   * @return
-   * @private
-   */
-  createItemsFragment(items, fragment = null) {
-    // Create fragment to add elements to
-    const itemListFragment = fragment || document.createDocumentFragment();
-
-    // If sorting is enabled, filter items
-    if (this.config.shouldSortItems && !this.isSelectOneElement) {
-      items.sort(this.config.sortFn);
-    }
-
-    if (this.isTextElement) {
-      // Update the value of the hidden input
-      this.passedElement.value = items;
-    } else {
-      // Update the options of the hidden input
-      this.passedElement.options = items;
-    }
-
-    const addItemToFragment = (item) => {
-      // Create new list element
-      const listItem = this._getTemplate('item', item, this.config.removeItemButton);
-      // Append it to list
-      itemListFragment.appendChild(listItem);
-    };
-
-    // Add each list item to list
-    items.forEach(item => addItemToFragment(item));
-
-    return itemListFragment;
-  }
-
-  /**
    * Render DOM with values
    * @return
    * @private
@@ -436,95 +254,12 @@ class Choices {
       return;
     }
 
-    /* Choices */
-
     if (this.isSelectElement) {
-      // Get active groups/choices
-      const activeGroups = this.store.activeGroups;
-      const activeChoices = this.store.activeChoices;
-
-      let choiceListFragment = document.createDocumentFragment();
-
-      // Clear choices
-      this.choiceList.clear();
-
-      // Scroll back to top of choices list
-      if (this.config.resetScrollPosition) {
-        this.choiceList.scrollTo(0);
-      }
-
-      // If we have grouped options
-      if (activeGroups.length >= 1 && !this.isSearching) {
-        // If we have a placeholder choice along with groups
-        const activePlaceholders = activeChoices.filter(
-          activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
-        );
-        if (activePlaceholders.length >= 1) {
-          choiceListFragment = this.createChoicesFragment(activePlaceholders, choiceListFragment);
-        }
-        choiceListFragment = this.createGroupsFragment(
-            activeGroups,
-            activeChoices,
-            choiceListFragment,
-        );
-      } else if (activeChoices.length >= 1) {
-        choiceListFragment = this.createChoicesFragment(activeChoices, choiceListFragment);
-      }
-
-      // If we have choices to show
-      if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-        const activeItems = this.store.activeItems;
-        const canAddItem = this._canAddItem(activeItems, this.input.value);
-
-        // ...and we can select them
-        if (canAddItem.response) {
-          // ...append them and highlight the first choice
-          this.choiceList.append(choiceListFragment);
-          this._highlightChoice();
-        } else {
-          // ...otherwise show a notice
-          this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
-        }
-      } else {
-        // Otherwise show a notice
-        let dropdownItem;
-        let notice;
-
-        if (this.isSearching) {
-          notice = isType('Function', this.config.noResultsText) ?
-              this.config.noResultsText() :
-              this.config.noResultsText;
-
-          dropdownItem = this._getTemplate('notice', notice, 'no-results');
-        } else {
-          notice = isType('Function', this.config.noChoicesText) ?
-              this.config.noChoicesText() :
-              this.config.noChoicesText;
-
-          dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-        }
-
-        this.choiceList.append(dropdownItem);
-      }
+      this._renderChoices();
     }
 
-    /* Items */
     if (this.currentState.items !== this.prevState.items) {
-      // Get active items (items that can be selected)
-      const activeItems = this.store.activeItems || [];
-      // Clear list
-      this.itemList.clear();
-
-      if (activeItems.length) {
-        // Create a fragment to store our list items
-        // (so we don't have to update the DOM for each item)
-        const itemListFragment = this.createItemsFragment(activeItems);
-
-        // If we have items to add, append them
-        if (itemListFragment.childNodes) {
-          this.itemList.append(itemListFragment);
-        }
-      }
+      this._renderItems();
     }
 
     this.prevState = this.currentState;
@@ -590,8 +325,7 @@ class Choices {
    * @public
    */
   highlightAll() {
-    const items = this.store.items;
-    items.forEach(item => this.highlightItem(item));
+    this.store.items.forEach(item => this.highlightItem(item));
     return this;
   }
 
@@ -601,8 +335,7 @@ class Choices {
    * @public
    */
   unhighlightAll() {
-    const items = this.store.items;
-    items.forEach(item => this.unhighlightItem(item));
+    this.store.items.forEach(item => this.unhighlightItem(item));
     return this;
   }
 
@@ -610,6 +343,7 @@ class Choices {
    * Remove an item from the store by its value
    * @param  {String} value Value to search for
    * @return {Object} Class instance
+   * @todo Merge with removeActiveItems
    * @public
    */
   removeActiveItemsByValue(value) {
@@ -617,13 +351,9 @@ class Choices {
       return this;
     }
 
-    const items = this.store.activeItems;
-
-    items.forEach((item) => {
-      if (item.value === value) {
-        this._removeItem(item);
-      }
-    });
+    this.store.activeItems
+      .filter(item => item.value === value)
+      .forEach(item => this._removeItem(item));
 
     return this;
   }
@@ -636,13 +366,9 @@ class Choices {
    * @public
    */
   removeActiveItems(excludedId) {
-    const items = this.store.activeItems;
-
-    items.forEach((item) => {
-      if (excludedId !== item.id) {
-        this._removeItem(item);
-      }
-    });
+    this.store.activeItems
+      .filter(({ id }) => id !== excludedId)
+      .forEach(item => this._removeItem(item));
 
     return this;
   }
@@ -654,16 +380,15 @@ class Choices {
    * @public
    */
   removeHighlightedItems(runEvent = false) {
-    const items = this.store.highlightedActiveItems;
-
-    items.forEach((item) => {
-      this._removeItem(item);
-      // If this action was performed by the user
-      // trigger the event
-      if (runEvent) {
-        this._triggerChange(item.value);
-      }
-    });
+    this.store.highlightedActiveItems
+      .forEach((item) => {
+        this._removeItem(item);
+        // If this action was performed by the user
+        // trigger the event
+        if (runEvent) {
+          this._triggerChange(item.value);
+        }
+      });
 
     return this;
   }
@@ -678,14 +403,16 @@ class Choices {
       return this;
     }
 
-    this.dropdown.show();
-    this.containerOuter.open(this.dropdown.distanceFromTopWindow());
+    requestAnimationFrame(() => {
+      this.dropdown.show();
+      this.containerOuter.open(this.dropdown.distanceFromTopWindow());
 
-    if (focusInput && this.canSearch) {
-      this.input.focus();
-    }
+      if (focusInput && this.config.searchEnabled) {
+        this.input.focus();
+      }
 
-    this.passedElement.triggerEvent(EVENTS.showDropdown, {});
+      this.passedElement.triggerEvent(EVENTS.showDropdown, {});
+    });
 
     return this;
   }
@@ -700,15 +427,17 @@ class Choices {
       return this;
     }
 
-    this.dropdown.hide();
-    this.containerOuter.close();
+    requestAnimationFrame(() => {
+      this.dropdown.hide();
+      this.containerOuter.close();
 
-    if (blurInput && this.canSearch) {
-      this.input.removeActiveDescendant();
-      this.input.blur();
-    }
+      if (blurInput && this.config.searchEnabled) {
+        this.input.removeActiveDescendant();
+        this.input.blur();
+      }
 
-    this.passedElement.triggerEvent(EVENTS.hideDropdown, {});
+      this.passedElement.triggerEvent(EVENTS.hideDropdown, {});
+    });
 
     return this;
   }
@@ -886,6 +615,142 @@ class Choices {
   /* =============================================
   =                Private functions            =
   ============================================= */
+
+  /**
+   * Render group choices into a DOM fragment and append to choice list
+   * @param  {Array} groups    Groups to add to list
+   * @param  {Array} choices   Choices to add to groups
+   * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
+   * @return {DocumentFragment} Populated options fragment
+   * @private
+   */
+  _createGroupsFragment(groups, choices, fragment) {
+    const groupFragment = fragment || document.createDocumentFragment();
+    const getGroupChoices = group => choices.filter((choice) => {
+      if (this.isSelectOneElement) {
+        return choice.groupId === group.id;
+      }
+      return choice.groupId === group.id && (this.config.renderSelectedChoices === 'always' || !choice.selected);
+    });
+
+
+    // If sorting is enabled, filter groups
+    if (this.config.shouldSort) {
+      groups.sort(this.config.sortFn);
+    }
+
+    groups.forEach((group) => {
+      const groupChoices = getGroupChoices(group);
+      if (groupChoices.length >= 1) {
+        const dropdownGroup = this._getTemplate('choiceGroup', group);
+        groupFragment.appendChild(dropdownGroup);
+        this._createChoicesFragment(groupChoices, groupFragment, true);
+      }
+    });
+
+    return groupFragment;
+  }
+
+  /**
+   * Render choices into a DOM fragment and append to choice list
+   * @param  {Array} choices    Choices to add to list
+   * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
+   * @return {DocumentFragment} Populated choices fragment
+   * @private
+   */
+  _createChoicesFragment(choices, fragment, withinGroup = false) {
+    // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+    const choicesFragment = fragment || document.createDocumentFragment();
+    const { renderSelectedChoices, searchResultLimit, renderChoiceLimit } = this.config;
+    const filter = this.isSearching ? sortByScore : this.config.sortFn;
+    const appendChoice = (choice) => {
+      const shouldRender = renderSelectedChoices === 'auto' ?
+        (this.isSelectOneElement || !choice.selected) :
+        true;
+      if (shouldRender) {
+        const dropdownItem = this._getTemplate('choice', choice, this.config.itemSelectText);
+        choicesFragment.appendChild(dropdownItem);
+      }
+    };
+
+    let rendererableChoices = choices;
+
+    if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
+      rendererableChoices = choices.filter(choice => !choice.selected);
+    }
+
+    // Split array into placeholders and "normal" choices
+    const { placeholderChoices, normalChoices } = rendererableChoices.reduce((acc, choice) => {
+      if (choice.placeholder) {
+        acc.placeholderChoices.push(choice);
+      } else {
+        acc.normalChoices.push(choice);
+      }
+      return acc;
+    }, { placeholderChoices: [], normalChoices: [] });
+
+    // If sorting is enabled or the user is searching, filter choices
+    if (this.config.shouldSort || this.isSearching) {
+      normalChoices.sort(filter);
+    }
+
+    let choiceLimit = rendererableChoices.length;
+
+    // Prepend placeholeder
+    const sortedChoices = [...placeholderChoices, ...normalChoices];
+
+    if (this.isSearching) {
+      choiceLimit = searchResultLimit;
+    } else if (renderChoiceLimit > 0 && !withinGroup) {
+      choiceLimit = renderChoiceLimit;
+    }
+
+    // Add each choice to dropdown within range
+    for (let i = 0; i < choiceLimit; i += 1) {
+      if (sortedChoices[i]) {
+        appendChoice(sortedChoices[i]);
+      }
+    }
+
+    return choicesFragment;
+  }
+
+  /**
+   * Render items into a DOM fragment and append to items list
+   * @param  {Array} items    Items to add to list
+   * @param  {DocumentFragment} [fragment] Fragment to add items to (optional)
+   * @return
+   * @private
+   */
+  _createItemsFragment(items, fragment = null) {
+    // Create fragment to add elements to
+    const itemListFragment = fragment || document.createDocumentFragment();
+
+    // If sorting is enabled, filter items
+    if (this.config.shouldSortItems && !this.isSelectOneElement) {
+      items.sort(this.config.sortFn);
+    }
+
+    if (this.isTextElement) {
+      // Update the value of the hidden input
+      this.passedElement.value = items;
+    } else {
+      // Update the options of the hidden input
+      this.passedElement.options = items;
+    }
+
+    const addItemToFragment = (item) => {
+      // Create new list element
+      const listItem = this._getTemplate('item', item, this.config.removeItemButton);
+      // Append it to list
+      itemListFragment.appendChild(listItem);
+    };
+
+    // Add each list item to list
+    items.forEach(item => addItemToFragment(item));
+
+    return itemListFragment;
+  }
 
   /**
    * Call change callback
@@ -1352,12 +1217,12 @@ class Choices {
       this.showDropdown(true);
     }
 
-    this.canSearch = this.config.searchEnabled;
+    this.config.searchEnabled = this.config.searchEnabled;
 
     const onAKey = () => {
       // If CTRL + A or CMD + A have been pressed and there are items to select
       if (ctrlDownKey && hasItems) {
-        this.canSearch = false;
+        this.config.searchEnabled = false;
         if (
           this.config.removeItems &&
           !this.input.value &&
@@ -1421,7 +1286,7 @@ class Choices {
         // Show dropdown if focus
         this.showDropdown(true);
 
-        this.canSearch = false;
+        this.config.searchEnabled = false;
 
         const directionInt = e.keyCode === downKey || e.keyCode === pageDownKey ? 1 : -1;
         const skipKey = e.metaKey || e.keyCode === pageDownKey || e.keyCode === pageUpKey;
@@ -1531,12 +1396,12 @@ class Choices {
           this.isSearching = false;
           this.store.dispatch(activateChoices(true));
         }
-      } else if (this.canSearch && canAddItem.response) {
+      } else if (this.config.searchEnabled && canAddItem.response) {
         this._handleSearch(this.input.value);
       }
     }
     // Re-establish canSearch value from changes in _onKeyDown
-    this.canSearch = this.config.searchEnabled;
+    this.config.searchEnabled = this.config.searchEnabled;
   }
 
   /**
@@ -1591,7 +1456,7 @@ class Choices {
     const target = e.target;
 
     // If we have our mouse down on the scrollbar and are on IE11...
-    if (target === this.choiceList && this.isIe11) {
+    if (target === this.choiceList && isIE11()) {
       this.isScrollingOnIe = true;
     }
 
@@ -1651,7 +1516,7 @@ class Choices {
           if (document.activeElement !== this.input.element) {
             this.input.focus();
           }
-        } else if (this.canSearch) {
+        } else if (this.config.searchEnabled) {
           this.showDropdown(true);
         } else {
           this.showDropdown();
@@ -1746,7 +1611,7 @@ class Choices {
         'select-one': () => {
           this.containerOuter.removeFocusState();
           if (target === this.input.element ||
-            (target === this.containerOuter.element && !this.canSearch)) {
+            (target === this.containerOuter.element && !this.config.searchEnabled)) {
             this.hideDropdown();
           }
         },
@@ -2242,7 +2107,7 @@ class Choices {
 
     if (!this.isSelectOneElement) {
       this.containerInner.element.appendChild(this.input.element);
-    } else if (this.canSearch) {
+    } else if (this.config.searchEnabled) {
       this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
     }
 
@@ -2427,6 +2292,123 @@ class Choices {
         foundChoice.placeholder,
         foundChoice.keyCode,
       );
+    }
+  }
+
+  _generateInstances(elements, config) {
+    return elements.reduce((instances, element) => {
+      instances.push(new Choices(element, config));
+      return instances;
+    }, [this]);
+  }
+
+  static _generateConfig(userConfig) {
+    const defaultConfig = {
+      ...DEFAULT_CONFIG,
+      items: [],
+      choices: [],
+      classNames: DEFAULT_CLASSNAMES,
+      sortFn: sortByAlpha,
+    };
+
+    return extend(defaultConfig, Choices.userDefaults, userConfig);
+  }
+
+  _generatePlaceholderValue() {
+    if (!this.isSelectOneElement) {
+      return this.config.placeholder ?
+        (this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder')) :
+        false;
+    }
+
+    return false;
+  }
+
+  _renderChoices() {
+    // Get active groups/choices
+    const activeGroups = this.store.activeGroups;
+    const activeChoices = this.store.activeChoices;
+
+    let choiceListFragment = document.createDocumentFragment();
+
+    // Clear choices
+    this.choiceList.clear();
+
+    // Scroll back to top of choices list
+    if (this.config.resetScrollPosition) {
+      this.choiceList.scrollTo(0);
+    }
+
+    // If we have grouped options
+    if (activeGroups.length >= 1 && !this.isSearching) {
+      // If we have a placeholder choice along with groups
+      const activePlaceholders = activeChoices.filter(
+         activeChoice => activeChoice.placeholder === true && activeChoice.groupId === -1,
+       );
+      if (activePlaceholders.length >= 1) {
+        choiceListFragment = this._createChoicesFragment(activePlaceholders, choiceListFragment);
+      }
+      choiceListFragment = this._createGroupsFragment(
+           activeGroups,
+           activeChoices,
+           choiceListFragment,
+       );
+    } else if (activeChoices.length >= 1) {
+      choiceListFragment = this._createChoicesFragment(activeChoices, choiceListFragment);
+    }
+
+    // If we have choices to show
+    if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+      const activeItems = this.store.activeItems;
+      const canAddItem = this._canAddItem(activeItems, this.input.value);
+
+      // ...and we can select them
+      if (canAddItem.response) {
+        // ...append them and highlight the first choice
+        this.choiceList.append(choiceListFragment);
+        this._highlightChoice();
+      } else {
+        // ...otherwise show a notice
+        this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+      }
+    } else {
+      // Otherwise show a notice
+      let dropdownItem;
+      let notice;
+
+      if (this.isSearching) {
+        notice = isType('Function', this.config.noResultsText) ?
+             this.config.noResultsText() :
+             this.config.noResultsText;
+
+        dropdownItem = this._getTemplate('notice', notice, 'no-results');
+      } else {
+        notice = isType('Function', this.config.noChoicesText) ?
+             this.config.noChoicesText() :
+             this.config.noChoicesText;
+
+        dropdownItem = this._getTemplate('notice', notice, 'no-choices');
+      }
+
+      this.choiceList.append(dropdownItem);
+    }
+  }
+
+  _renderItems() {
+    // Get active items (items that can be selected)
+    const activeItems = this.store.activeItems || [];
+    // Clear list
+    this.itemList.clear();
+
+    if (activeItems.length) {
+      // Create a fragment to store our list items
+      // (so we don't have to update the DOM for each item)
+      const itemListFragment = this._createItemsFragment(activeItems);
+
+      // If we have items to add, append them
+      if (itemListFragment.childNodes) {
+        this.itemList.append(itemListFragment);
+      }
     }
   }
 

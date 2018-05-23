@@ -152,27 +152,33 @@ describe('choices', () => {
         });
 
         it('removes event listeners', () => {
+          requestAnimationFrame;
           expect(removeEventListenersSpy.called).to.equal(true);
         });
 
         it('reveals passed element', () => {
+          requestAnimationFrame;
           expect(passedElementRevealSpy.called).to.equal(true);
         });
 
         it('reverts outer container', () => {
+          requestAnimationFrame;
           expect(containerOuterUnwrapSpy.called).to.equal(true);
           expect(containerOuterUnwrapSpy.lastCall.args[0]).to.equal(instance.passedElement.element);
         });
 
         it('clears store', () => {
+          requestAnimationFrame;
           expect(clearStoreSpy.called).to.equal(true);
         });
 
         it('nullifys templates config', () => {
+          requestAnimationFrame;
           expect(instance.config.templates).to.equal(null);
         });
 
         it('resets initialise flag', () => {
+          requestAnimationFrame;
           expect(instance.initialised).to.equal(false);
         });
       });
@@ -374,18 +380,27 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('opens containerOuter', () => {
-          expect(containerOuterOpenSpy.called).to.equal(true);
+        it('opens containerOuter', (done) => {
+          requestAnimationFrame(() => {
+            expect(containerOuterOpenSpy.called).to.equal(true);
+            done();
+          });
         });
 
-        it('shows dropdown with blurInput flag', () => {
-          expect(dropdownShowSpy.called).to.equal(true);
+        it('shows dropdown with blurInput flag', (done) => {
+          requestAnimationFrame(() => {
+            expect(dropdownShowSpy.called).to.equal(true);
+            done();
+          });
         });
 
-        it('triggers event on passedElement', () => {
-          expect(passedElementTriggerEventStub.called).to.equal(true);
-          expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.showDropdown);
-          expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
+        it('triggers event on passedElement', (done) => {
+          requestAnimationFrame(() => {
+            expect(passedElementTriggerEventStub.called).to.equal(true);
+            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.showDropdown);
+            expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
+            done();
+          });
         });
 
         describe('passing true focusInput flag with canSearch set to true', () => {
@@ -395,8 +410,11 @@ describe('choices', () => {
             output = instance.showDropdown(true);
           });
 
-          it('focuses input', () => {
-            expect(inputFocusSpy.called).to.equal(true);
+          it('focuses input', (done) => {
+            requestAnimationFrame(() => {
+              expect(inputFocusSpy.called).to.equal(true);
+              done();
+            });
           });
         });
       });
@@ -453,18 +471,27 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('closes containerOuter', () => {
-          expect(containerOuterCloseSpy.called).to.equal(true);
+        it('closes containerOuter', (done) => {
+          requestAnimationFrame(() => {
+            expect(containerOuterCloseSpy.called).to.equal(true);
+            done();
+          });
         });
 
-        it('hides dropdown with blurInput flag', () => {
-          expect(dropdownHideSpy.called).to.equal(true);
+        it('hides dropdown with blurInput flag', (done) => {
+          requestAnimationFrame(() => {
+            expect(dropdownHideSpy.called).to.equal(true);
+            done();
+          });
         });
 
-        it('triggers event on passedElement', () => {
-          expect(passedElementTriggerEventStub.called).to.equal(true);
-          expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.hideDropdown);
-          expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
+        it('triggers event on passedElement', (done) => {
+          requestAnimationFrame(() => {
+            expect(passedElementTriggerEventStub.called).to.equal(true);
+            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.hideDropdown);
+            expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
+            done();
+          });
         });
 
         describe('passing true blurInput flag with canSearch set to true', () => {
@@ -474,12 +501,18 @@ describe('choices', () => {
             output = instance.hideDropdown(true);
           });
 
-          it('removes active descendants', () => {
-            expect(inputRemoveActiveDescendantSpy.called).to.equal(true);
+          it('removes active descendants', (done) => {
+            requestAnimationFrame(() => {
+              expect(inputRemoveActiveDescendantSpy.called).to.equal(true);
+              done();
+            });
           });
 
-          it('blurs input', () => {
-            expect(inputBlurSpy.called).to.equal(true);
+          it('blurs input', (done) => {
+            requestAnimationFrame(() => {
+              expect(inputBlurSpy.called).to.equal(true);
+              done();
+            });
           });
         });
       });
@@ -1477,8 +1510,8 @@ describe('choices', () => {
       });
     });
 
-    describe('createGroupsFragment', () => {
-      let createChoicesFragmentStub;
+    describe('_createGroupsFragment', () => {
+      let _createChoicesFragmentStub;
       const choices = [
         {
           id: 1,
@@ -1519,12 +1552,12 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        createChoicesFragmentStub = stub();
-        instance.createChoicesFragment = createChoicesFragmentStub;
+        _createChoicesFragmentStub = stub();
+        instance._createChoicesFragment = _createChoicesFragmentStub;
       });
 
       afterEach(() => {
-        instance.createChoicesFragment.reset();
+        instance._createChoicesFragment.reset();
       });
 
       describe('returning a fragment of groups', () => {
@@ -1534,7 +1567,7 @@ describe('choices', () => {
             const childElement = document.createElement('div');
             fragment.appendChild(childElement);
 
-            output = instance.createGroupsFragment(groups, choices, fragment);
+            output = instance._createGroupsFragment(groups, choices, fragment);
             const elementToWrapFragment = document.createElement('div');
             elementToWrapFragment.appendChild(output);
 
@@ -1546,7 +1579,7 @@ describe('choices', () => {
 
         describe('not passing fragment argument', () => {
           it('returns new groups fragment', () => {
-            output = instance.createGroupsFragment(groups, choices);
+            output = instance._createGroupsFragment(groups, choices);
             const elementToWrapFragment = document.createElement('div');
             elementToWrapFragment.appendChild(output);
 
@@ -1570,7 +1603,7 @@ describe('choices', () => {
 
           it('sorts groups by config.sortFn', () => {
             expect(sortFnStub.called).to.equal(false);
-            instance.createGroupsFragment(groups, choices);
+            instance._createGroupsFragment(groups, choices);
             expect(sortFnStub.called).to.equal(true);
           });
         });
@@ -1589,7 +1622,7 @@ describe('choices', () => {
           });
 
           it('does not sort groups', () => {
-            instance.createGroupsFragment(groups, choices);
+            instance._createGroupsFragment(groups, choices);
             expect(sortFnStub.called).to.equal(false);
           });
         });
@@ -1599,11 +1632,11 @@ describe('choices', () => {
             instance.isSelectOneElement = true;
           });
 
-          it('calls createChoicesFragment with choices that belong to each group', () => {
-            expect(createChoicesFragmentStub.called).to.equal(false);
-            instance.createGroupsFragment(groups, choices);
-            expect(createChoicesFragmentStub.called).to.equal(true);
-            expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+          it('calls _createChoicesFragment with choices that belong to each group', () => {
+            expect(_createChoicesFragmentStub.called).to.equal(false);
+            instance._createGroupsFragment(groups, choices);
+            expect(_createChoicesFragmentStub.called).to.equal(true);
+            expect(_createChoicesFragmentStub.firstCall.args[0]).to.eql([
               {
                 id: 1,
                 selected: true,
@@ -1619,7 +1652,7 @@ describe('choices', () => {
                 label: 'Choice 3',
               },
             ]);
-            expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+            expect(_createChoicesFragmentStub.secondCall.args[0]).to.eql([
               {
                 id: 2,
                 selected: false,
@@ -1638,11 +1671,11 @@ describe('choices', () => {
               instance.config.renderSelectedChoices = 'always';
             });
 
-            it('calls createChoicesFragment with choices that belong to each group', () => {
-              expect(createChoicesFragmentStub.called).to.equal(false);
-              instance.createGroupsFragment(groups, choices);
-              expect(createChoicesFragmentStub.called).to.equal(true);
-              expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+            it('calls _createChoicesFragment with choices that belong to each group', () => {
+              expect(_createChoicesFragmentStub.called).to.equal(false);
+              instance._createGroupsFragment(groups, choices);
+              expect(_createChoicesFragmentStub.called).to.equal(true);
+              expect(_createChoicesFragmentStub.firstCall.args[0]).to.eql([
                 {
                   id: 1,
                   selected: true,
@@ -1658,7 +1691,7 @@ describe('choices', () => {
                   label: 'Choice 3',
                 },
               ]);
-              expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+              expect(_createChoicesFragmentStub.secondCall.args[0]).to.eql([
                 {
                   id: 2,
                   selected: false,
@@ -1676,11 +1709,11 @@ describe('choices', () => {
               instance.config.renderSelectedChoices = false;
             });
 
-            it('calls createChoicesFragment with choices that belong to each group that are not already selected', () => {
-              expect(createChoicesFragmentStub.called).to.equal(false);
-              instance.createGroupsFragment(groups, choices);
-              expect(createChoicesFragmentStub.called).to.equal(true);
-              expect(createChoicesFragmentStub.firstCall.args[0]).to.eql([
+            it('calls _createChoicesFragment with choices that belong to each group that are not already selected', () => {
+              expect(_createChoicesFragmentStub.called).to.equal(false);
+              instance._createGroupsFragment(groups, choices);
+              expect(_createChoicesFragmentStub.called).to.equal(true);
+              expect(_createChoicesFragmentStub.firstCall.args[0]).to.eql([
                 {
                   id: 3,
                   selected: false,
@@ -1689,7 +1722,7 @@ describe('choices', () => {
                   label: 'Choice 3',
                 },
               ]);
-              expect(createChoicesFragmentStub.secondCall.args[0]).to.eql([
+              expect(_createChoicesFragmentStub.secondCall.args[0]).to.eql([
                 {
                   id: 2,
                   selected: false,
@@ -1702,16 +1735,6 @@ describe('choices', () => {
           });
         });
       });
-    });
-
-    describe('createChoicesFragment', () => {
-      beforeEach(() => {});
-      it('returns a fragment of choices', () => {});
-    });
-
-    describe('createItemsFragment', () => {
-      beforeEach(() => {});
-      it('returns a fragment of items', () => {});
     });
 
     describe('render', () => {

@@ -917,7 +917,7 @@ export default class Choices {
   private createChoicesFragment(choices: any[], fragment: DocumentFragment, withinGroup?: boolean): DocumentFragment;
 
   /** Render items into a DOM fragment and append to items list */
-  private createItemsFragment(items: any[], fragment?: DocumentFragment): void;
+  private _createItemsFragment(items: any[], fragment?: DocumentFragment): void;
 
   /** Render DOM with values */
   private render(): void;

@@ -603,3 +603,7 @@ export const reduceToValues = (items, key = 'value') => {
 
   return values;
 }
+
+export const isIE11 = () => {
+  return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+};
