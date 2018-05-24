@@ -3,7 +3,7 @@ import rootReducer from './../reducers/index';
 
 export default class Store {
   constructor() {
-    this.store = createStore(
+    this._store = createStore(
       rootReducer,
       window.devToolsExtension ?
         window.devToolsExtension() :
@@ -17,7 +17,7 @@ export default class Store {
    * @return
    */
   subscribe(onChange) {
-    this.store.subscribe(onChange);
+    this._store.subscribe(onChange);
   }
 
   /**
@@ -26,7 +26,7 @@ export default class Store {
    * @return
    */
   dispatch(action) {
-    this.store.dispatch(action);
+    this._store.dispatch(action);
   }
 
   /**
@@ -34,7 +34,7 @@ export default class Store {
    * @return {Object} State
    */
   get state() {
-    return this.store.getState();
+    return this._store.getState();
   }
 
   /**

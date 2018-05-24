@@ -281,7 +281,7 @@ describe('components/input', () => {
     describe('with a placeholder', () => {
       describe('when value length is greater or equal to 75% of the placeholder length', () => {
         it('sets the width of the element based on input value', () => {
-          instance.placeholderValue = 'This is a test';
+          instance._placeholderValue = 'This is a test';
           instance.element.value = 'This is a test';
           expect(instance.element.style.width).to.not.equal(inputWidth);
           instance.setWidth();
@@ -292,7 +292,7 @@ describe('components/input', () => {
 
       describe('when width is enforced', () => {
         it('sets the width of the element based on input value', () => {
-          instance.placeholderValue = 'This is a test';
+          instance._placeholderValue = 'This is a test';
           instance.element.value = '';
           expect(instance.element.style.width).to.not.equal(inputWidth);
           instance.setWidth(true);
@@ -303,7 +303,7 @@ describe('components/input', () => {
 
       describe('when value length is less than 75% of the placeholder length', () => {
         it('does not set the width of the element', () => {
-          instance.placeholderValue = 'This is a test';
+          instance._placeholderValue = 'This is a test';
           instance.element.value = 'Test';
           instance.setWidth();
           expect(calcWidthStub.callCount).to.equal(0);

@@ -60,7 +60,7 @@ describe('choices', () => {
         beforeEach(() => {
           createTemplatesSpy = spy(instance, '_createTemplates');
           createInputSpy = spy(instance, '_createStructure');
-          storeSubscribeSpy = spy(instance.store, 'subscribe');
+          storeSubscribeSpy = spy(instance._store, 'subscribe');
           renderSpy = spy(instance, 'render');
           addEventListenersSpy = spy(instance, '_addEventListeners');
 
@@ -152,33 +152,27 @@ describe('choices', () => {
         });
 
         it('removes event listeners', () => {
-          requestAnimationFrame;
           expect(removeEventListenersSpy.called).to.equal(true);
         });
 
         it('reveals passed element', () => {
-          requestAnimationFrame;
           expect(passedElementRevealSpy.called).to.equal(true);
         });
 
         it('reverts outer container', () => {
-          requestAnimationFrame;
           expect(containerOuterUnwrapSpy.called).to.equal(true);
           expect(containerOuterUnwrapSpy.lastCall.args[0]).to.equal(instance.passedElement.element);
         });
 
         it('clears store', () => {
-          requestAnimationFrame;
           expect(clearStoreSpy.called).to.equal(true);
         });
 
         it('nullifys templates config', () => {
-          requestAnimationFrame;
           expect(instance.config.templates).to.equal(null);
         });
 
         it('resets initialise flag', () => {
-          requestAnimationFrame;
           expect(instance.initialised).to.equal(false);
         });
       });
@@ -406,7 +400,7 @@ describe('choices', () => {
         describe('passing true focusInput flag with canSearch set to true', () => {
           beforeEach(() => {
             instance.dropdown.isActive = false;
-            instance.canSearch = true;
+            instance._canSearch = true;
             output = instance.showDropdown(true);
           });
 
@@ -497,7 +491,7 @@ describe('choices', () => {
         describe('passing true blurInput flag with canSearch set to true', () => {
           beforeEach(() => {
             instance.dropdown.isActive = true;
-            instance.canSearch = true;
+            instance._canSearch = true;
             output = instance.hideDropdown(true);
           });
 
@@ -573,15 +567,15 @@ describe('choices', () => {
         storeGetGroupByIdStub = stub().returns({
           value: groupIdValue,
         });
-        storeDispatchSpy = spy(instance.store, 'dispatch');
+        storeDispatchSpy = spy(instance._store, 'dispatch');
 
-        instance.store.getGroupById = storeGetGroupByIdStub;
+        instance._store.getGroupById = storeGetGroupByIdStub;
         instance.passedElement.triggerEvent = passedElementTriggerEventStub;
       });
 
       afterEach(() => {
         storeDispatchSpy.restore();
-        instance.store.getGroupById.reset();
+        instance._store.getGroupById.reset();
         instance.passedElement.triggerEvent.reset();
       });
 
@@ -684,15 +678,15 @@ describe('choices', () => {
         storeGetGroupByIdStub = stub().returns({
           value: groupIdValue,
         });
-        storeDispatchSpy = spy(instance.store, 'dispatch');
+        storeDispatchSpy = spy(instance._store, 'dispatch');
 
-        instance.store.getGroupById = storeGetGroupByIdStub;
+        instance._store.getGroupById = storeGetGroupByIdStub;
         instance.passedElement.triggerEvent = passedElementTriggerEventStub;
       });
 
       afterEach(() => {
         storeDispatchSpy.restore();
-        instance.store.getGroupById.reset();
+        instance._store.getGroupById.reset();
         instance.passedElement.triggerEvent.reset();
       });
 
@@ -800,7 +794,7 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        storeGetItemsStub = stub(instance.store, 'items').get(() => items);
+        storeGetItemsStub = stub(instance._store, 'items').get(() => items);
         highlightItemStub = stub();
 
         instance.highlightItem = highlightItemStub;
@@ -838,7 +832,7 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        storeGetItemsStub = stub(instance.store, 'items').get(() => items);
+        storeGetItemsStub = stub(instance._store, 'items').get(() => items);
         unhighlightItemStub = stub();
 
         instance.unhighlightItem = unhighlightItemStub;
@@ -865,13 +859,13 @@ describe('choices', () => {
 
       beforeEach(() => {
         storeDispatchStub = stub();
-        instance.store.dispatch = storeDispatchStub;
+        instance._store.dispatch = storeDispatchStub;
 
         output = instance.clearStore();
       });
 
       afterEach(() => {
-        instance.store.dispatch.reset();
+        instance._store.dispatch.reset();
       });
 
       returnsInstance(output);
@@ -890,21 +884,21 @@ describe('choices', () => {
       beforeEach(() => {
         inputClearSpy = spy(instance.input, 'clear');
         storeDispatchStub = stub();
-        instance.store.dispatch = storeDispatchStub;
+        instance._store.dispatch = storeDispatchStub;
         output = instance.clearInput();
       });
 
       afterEach(() => {
         inputClearSpy.restore();
-        instance.store.dispatch.reset();
+        instance._store.dispatch.reset();
       });
 
       returnsInstance(output);
 
       describe('text element', () => {
         beforeEach(() => {
-          instance.isSelectOneElement = false;
-          instance.isTextElement = false;
+          instance._isSelectOneElement = false;
+          instance._isTextElement = false;
 
           output = instance.clearInput();
         });
@@ -917,8 +911,8 @@ describe('choices', () => {
 
       describe('select element with search enabled', () => {
         beforeEach(() => {
-          instance.isSelectOneElement = true;
-          instance.isTextElement = false;
+          instance._isSelectOneElement = true;
+          instance._isTextElement = false;
           instance.config.searchEnabled = true;
 
           output = instance.clearInput();
@@ -930,7 +924,7 @@ describe('choices', () => {
         });
 
         it('resets search flag', () => {
-          expect(instance.isSearching).to.equal(false);
+          expect(instance._isSearching).to.equal(false);
         });
 
         it('dispatches activateChoices action', () => {
@@ -981,7 +975,7 @@ describe('choices', () => {
 
       describe('text element', () => {
         beforeEach(() => {
-          instance.isSelectElement = false;
+          instance._isSelectElement = false;
           output = instance.ajax(() => {});
         });
 
@@ -1003,7 +997,7 @@ describe('choices', () => {
 
         beforeEach(() => {
           instance.initialised = true;
-          instance.isSelectElement = true;
+          instance._isSelectElement = true;
           ajaxCallbackStub = stub();
           callback = stub();
           output = instance.ajax(callback);
@@ -1100,7 +1094,7 @@ describe('choices', () => {
       describe('when already initialised and not text element', () => {
         beforeEach(() => {
           instance.initialised = true;
-          instance.isTextElement = false;
+          instance._isTextElement = false;
         });
 
         describe('passing a string value', () => {
@@ -1153,7 +1147,7 @@ describe('choices', () => {
       ];
 
       beforeEach(() => {
-        activeItemsStub = stub(instance.store, 'activeItems').get(() => items);
+        activeItemsStub = stub(instance._store, 'activeItems').get(() => items);
       });
 
       afterEach(() => {
@@ -1163,7 +1157,7 @@ describe('choices', () => {
       describe('passing true valueOnly flag', () => {
         describe('select one input', () => {
           beforeEach(() => {
-            instance.isSelectOneElement = true;
+            instance._isSelectOneElement = true;
             output = instance.getValue(true);
           });
 
@@ -1174,7 +1168,7 @@ describe('choices', () => {
 
         describe('non select one input', () => {
           beforeEach(() => {
-            instance.isSelectOneElement = false;
+            instance._isSelectOneElement = false;
             output = instance.getValue(true);
           });
 
@@ -1187,7 +1181,7 @@ describe('choices', () => {
       describe('passing false valueOnly flag', () => {
         describe('select one input', () => {
           beforeEach(() => {
-            instance.isSelectOneElement = true;
+            instance._isSelectOneElement = true;
             output = instance.getValue(false);
           });
 
@@ -1198,7 +1192,7 @@ describe('choices', () => {
 
         describe('non select one input', () => {
           beforeEach(() => {
-            instance.isSelectOneElement = false;
+            instance._isSelectOneElement = false;
             output = instance.getValue(false);
           });
 
@@ -1239,7 +1233,7 @@ describe('choices', () => {
 
         beforeEach(() => {
           removeItemStub = stub();
-          activeItemsStub = stub(instance.store, 'activeItems').get(() => items);
+          activeItemsStub = stub(instance._store, 'activeItems').get(() => items);
           instance._removeItem = removeItemStub;
 
           output = instance.removeActiveItemsByValue(value);
@@ -1278,7 +1272,7 @@ describe('choices', () => {
 
       beforeEach(() => {
         removeItemStub = stub();
-        activeItemsStub = stub(instance.store, 'activeItems').get(() => items);
+        activeItemsStub = stub(instance._store, 'activeItems').get(() => items);
         instance._removeItem = removeItemStub;
       });
 
@@ -1333,7 +1327,7 @@ describe('choices', () => {
 
 
       beforeEach(() => {
-        highlightedActiveItemsStub = stub(instance.store, 'highlightedActiveItems').get(() => items);
+        highlightedActiveItemsStub = stub(instance._store, 'highlightedActiveItems').get(() => items);
         removeItemStub = stub();
         triggerChangeStub = stub();
 
@@ -1430,7 +1424,7 @@ describe('choices', () => {
 
       describe('when element is not select element', () => {
         beforeEach(() => {
-          instance.isSelectElement = false;
+          instance._isSelectElement = false;
           instance.setChoices(choices, value, label, false);
         });
 
@@ -1440,7 +1434,7 @@ describe('choices', () => {
       describe('passing invalid arguments', () => {
         describe('passing an empty array', () => {
           beforeEach(() => {
-            instance.isSelectElement = true;
+            instance._isSelectElement = true;
             instance.setChoices([], value, label, false);
           });
 
@@ -1449,7 +1443,7 @@ describe('choices', () => {
 
         describe('passing no value', () => {
           beforeEach(() => {
-            instance.isSelectElement = true;
+            instance._isSelectElement = true;
             instance.setChoices(choices, undefined, 'label', false);
           });
 
@@ -1459,7 +1453,7 @@ describe('choices', () => {
 
       describe('passing valid arguments', () => {
         beforeEach(() => {
-          instance.isSelectElement = true;
+          instance._isSelectElement = true;
         });
 
         it('removes loading state', () => {
@@ -1629,7 +1623,7 @@ describe('choices', () => {
 
         describe('select-one element', () => {
           beforeEach(() => {
-            instance.isSelectOneElement = true;
+            instance._isSelectOneElement = true;
           });
 
           it('calls _createChoicesFragment with choices that belong to each group', () => {
@@ -1667,7 +1661,7 @@ describe('choices', () => {
         describe('text/select-multiple element', () => {
           describe('renderSelectedChoices set to "always"', () => {
             beforeEach(() => {
-              instance.isSelectOneElement = false;
+              instance._isSelectOneElement = false;
               instance.config.renderSelectedChoices = 'always';
             });
 
@@ -1705,7 +1699,7 @@ describe('choices', () => {
 
           describe('renderSelectedChoices not set to "always"', () => {
             beforeEach(() => {
-              instance.isSelectOneElement = false;
+              instance._isSelectOneElement = false;
               instance.config.renderSelectedChoices = false;
             });
 
@@ -1737,31 +1731,31 @@ describe('choices', () => {
       });
     });
 
-    describe('render', () => {
-      beforeEach(() => {});
+    // describe('render', () => {
+    //   beforeEach(() => {});
 
-      describe('no change to state', () => {
-        it('returns early', () => {});
-      });
+    //   describe('no change to state', () => {
+    //     it('returns early', () => {});
+    //   });
 
-      describe('change to state', () => {
-        it('updates previous state to current state', () => {});
+    //   describe('change to state', () => {
+    //     it('updates previous state to current state', () => {});
 
-        describe('select element', () => {
-          it('clears choice list', () => {});
+    //     describe('select element', () => {
+    //       it('clears choice list', () => {});
 
-          describe('when resetScrollPosition config option is set to true', () => {
-            it('scrolls to top of choice list', () => {});
-          });
-        });
+    //       describe('when resetScrollPosition config option is set to true', () => {
+    //         it('scrolls to top of choice list', () => {});
+    //       });
+    //     });
 
-        describe('text element', () => {
-          describe('active items in store', () => {
-            it('clears item list', () => {});
-            it('renders active items inside item list', () => {});
-          });
-        });
-      });
-    });
+    //     describe('text element', () => {
+    //       describe('active items in store', () => {
+    //         it('clears item list', () => {});
+    //         it('renders active items inside item list', () => {});
+    //       });
+    //     });
+    //   });
+    // });
   });
 });

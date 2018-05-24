@@ -10,9 +10,9 @@ describe('reducers/store', () => {
 
   beforeEach(() => {
     instance = new Store();
-    subscribeStub = sinon.stub(instance.store, 'subscribe');
-    dispatchStub = sinon.stub(instance.store, 'dispatch');
-    getStateStub = sinon.stub(instance.store, 'getState');
+    subscribeStub = sinon.stub(instance._store, 'subscribe');
+    dispatchStub = sinon.stub(instance._store, 'dispatch');
+    getStateStub = sinon.stub(instance._store, 'getState');
   });
 
   afterEach(() => {
@@ -24,7 +24,7 @@ describe('reducers/store', () => {
 
   describe('constructor', () => {
     it('creates redux store', () => {
-      expect(instance.store).to.contain.keys([
+      expect(instance._store).to.contain.keys([
         'subscribe',
         'dispatch',
         'getState',
