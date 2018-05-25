@@ -1204,51 +1204,41 @@ describe('choices', () => {
     });
 
     describe('removeActiveItemsByValue', () => {
-      describe('passing invalid value', () => {
-        beforeEach(() => {
-          output = instance.removeActiveItemsByValue(null);
-        });
+      let activeItemsStub;
+      let removeItemStub;
+      const value = 'Removed';
+      const items = [
+        {
+          id: '1',
+          value: 'Not removed',
+        },
+        {
+          id: '2',
+          value: 'Removed',
+        },
+        {
+          id: '3',
+          value: 'Removed',
+        },
+      ];
 
-        returnsInstance(output);
+      beforeEach(() => {
+        removeItemStub = stub();
+        activeItemsStub = stub(instance._store, 'activeItems').get(() => items);
+        instance._removeItem = removeItemStub;
+
+        output = instance.removeActiveItemsByValue(value);
       });
 
-      describe('passing valid value', () => {
-        let activeItemsStub;
-        let removeItemStub;
-        const value = 'Removed';
-        const items = [
-          {
-            id: '1',
-            value: 'Not removed',
-          },
-          {
-            id: '2',
-            value: 'Removed',
-          },
-          {
-            id: '3',
-            value: 'Removed',
-          },
-        ];
+      afterEach(() => {
+        activeItemsStub.reset();
+        instance._removeItem.reset();
+      });
 
-        beforeEach(() => {
-          removeItemStub = stub();
-          activeItemsStub = stub(instance._store, 'activeItems').get(() => items);
-          instance._removeItem = removeItemStub;
-
-          output = instance.removeActiveItemsByValue(value);
-        });
-
-        afterEach(() => {
-          activeItemsStub.reset();
-          instance._removeItem.reset();
-        });
-
-        it('removes each active item in store with matching value', () => {
-          expect(removeItemStub.callCount).to.equal(2);
-          expect(removeItemStub.firstCall.args[0]).to.equal(items[1]);
-          expect(removeItemStub.secondCall.args[0]).to.equal(items[2]);
-        });
+      it('removes each active item in store with matching value', () => {
+        expect(removeItemStub.callCount).to.equal(2);
+        expect(removeItemStub.firstCall.args[0]).to.equal(items[1]);
+        expect(removeItemStub.secondCall.args[0]).to.equal(items[2]);
       });
     });
 

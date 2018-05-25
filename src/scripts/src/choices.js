@@ -344,10 +344,6 @@ class Choices {
    * @public
    */
   removeActiveItemsByValue(value) {
-    if (!value) {
-      return this;
-    }
-
     this._store.activeItems
       .filter(item => item.value === value)
       .forEach(item => this._removeItem(item));
@@ -448,7 +444,7 @@ class Choices {
     if (this.dropdown.isActive) {
       this.hideDropdown();
     } else {
-      this.showDropdown(true);
+      this.showDropdown(true); // code smell 🤢
     }
 
     return this;
@@ -462,13 +458,12 @@ class Choices {
    * @public
    */
   getValue(valueOnly = false) {
-    const items = this._store.activeItems;
-
-    const values = items.reduce((selectedItems, item) => {
-      const itemValue = valueOnly ? item.value : item;
-      selectedItems.push(itemValue);
-      return selectedItems;
-    }, []);
+    const values = this._store.activeItems
+      .reduce((selectedItems, item) => {
+        const itemValue = valueOnly ? item.value : item;
+        selectedItems.push(itemValue);
+        return selectedItems;
+      }, []);
 
     return this._isSelectOneElement ? values[0] : values;
   }

@@ -90,7 +90,7 @@ describe('components/input', () => {
     describe('when element is select one', () => {
       it('does not set input width', () => {
         instance.type = 'select-one';
-        instance.onInput();
+        instance._onInput();
         expect(setWidthStub.callCount).to.equal(0);
       });
     });
@@ -98,7 +98,7 @@ describe('components/input', () => {
     describe('when element is not a select one', () => {
       it('sets input width', () => {
         instance.type = 'text';
-        instance.onInput();
+        instance._onInput();
         expect(setWidthStub.callCount).to.equal(1);
       });
     });
@@ -117,7 +117,7 @@ describe('components/input', () => {
     describe('when pasting is disabled and target is the element', () => {
       it('prevents default pasting behaviour', () => {
         instance.preventPaste = true;
-        instance.onPaste(eventMock);
+        instance._onPaste(eventMock);
         expect(eventMock.preventDefault.callCount).to.equal(1);
       });
     });
@@ -125,7 +125,7 @@ describe('components/input', () => {
     describe('when pasting is enabled', () => {
       it('does not prevent default pasting behaviour', () => {
         instance.preventPaste = false;
-        instance.onPaste(eventMock);
+        instance._onPaste(eventMock);
         expect(eventMock.preventDefault.callCount).to.equal(0);
       });
     });
@@ -134,7 +134,7 @@ describe('components/input', () => {
   describe('onFocus', () => {
     it('sets isFocussed flag to true', () => {
       expect(instance.isFocussed).to.equal(false);
-      instance.onFocus();
+      instance._onFocus();
       expect(instance.isFocussed).to.equal(true);
     });
   });
@@ -142,7 +142,7 @@ describe('components/input', () => {
   describe('onBlur', () => {
     it('sets isFocussed flag to false', () => {
       instance.isFocussed = true;
-      instance.onBlur();
+      instance._onBlur();
       expect(instance.isFocussed).to.equal(false);
     });
   });

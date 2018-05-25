@@ -77,7 +77,7 @@ describe('components/container', () => {
   describe('onFocus', () => {
     it('sets isFocussed flag to true', () => {
       expect(instance.isFocussed).to.equal(false);
-      instance.onFocus();
+      instance._onFocus();
       expect(instance.isFocussed).to.equal(true);
     });
   });
@@ -85,7 +85,7 @@ describe('components/container', () => {
   describe('onBlur', () => {
     it('sets isFocussed flag to false', () => {
       instance.isFocussed = true;
-      instance.onBlur();
+      instance._onBlur();
       expect(instance.isFocussed).to.equal(false);
     });
   });

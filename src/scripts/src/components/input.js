@@ -10,10 +10,10 @@ export default class Input {
     this.isDisabled = false;
 
     // Bind event listeners
-    this.onPaste = this.onPaste.bind(this);
-    this.onInput = this.onInput.bind(this);
-    this.onFocus = this.onFocus.bind(this);
-    this.onBlur = this.onBlur.bind(this);
+    this._onPaste = this._onPaste.bind(this);
+    this._onInput = this._onInput.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
   }
 
   set placeholder(placeholder) {
@@ -29,49 +29,17 @@ export default class Input {
   }
 
   addEventListeners() {
-    this.element.addEventListener('input', this.onInput);
-    this.element.addEventListener('paste', this.onPaste);
-    this.element.addEventListener('focus', this.onFocus);
-    this.element.addEventListener('blur', this.onBlur);
+    this.element.addEventListener('input', this._onInput);
+    this.element.addEventListener('paste', this._onPaste);
+    this.element.addEventListener('focus', this._onFocus);
+    this.element.addEventListener('blur', this._onBlur);
   }
 
   removeEventListeners() {
-    this.element.removeEventListener('input', this.onInput);
-    this.element.removeEventListener('paste', this.onPaste);
-    this.element.removeEventListener('focus', this.onFocus);
-    this.element.removeEventListener('blur', this.onBlur);
-  }
-
-  /**
-   * Input event
-   * @return
-   * @private
-   */
-  onInput() {
-    if (this.type !== 'select-one') {
-      this.setWidth();
-    }
-  }
-
-  /**
-   * Paste event
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
-  onPaste(e) {
-    // Disable pasting into the input if option has been set
-    if (e.target === this.element && this.preventPaste) {
-      e.preventDefault();
-    }
-  }
-
-  onFocus() {
-    this.isFocussed = true;
-  }
-
-  onBlur() {
-    this.isFocussed = false;
+    this.element.removeEventListener('input', this._onInput);
+    this.element.removeEventListener('paste', this._onPaste);
+    this.element.removeEventListener('focus', this._onFocus);
+    this.element.removeEventListener('blur', this._onBlur);
   }
 
   enable() {
@@ -145,5 +113,37 @@ export default class Input {
 
   removeActiveDescendant() {
     this.element.removeAttribute('aria-activedescendant');
+  }
+
+  /**
+   * Input event
+   * @return
+   * @private
+   */
+  _onInput() {
+    if (this.type !== 'select-one') {
+      this.setWidth();
+    }
+  }
+
+  /**
+   * Paste event
+   * @param  {Object} e Event
+   * @return
+   * @private
+   */
+  _onPaste(e) {
+    // Disable pasting into the input if option has been set
+    if (e.target === this.element && this.preventPaste) {
+      e.preventDefault();
+    }
+  }
+
+  _onFocus() {
+    this.isFocussed = true;
+  }
+
+  _onBlur() {
+    this.isFocussed = false;
   }
 }

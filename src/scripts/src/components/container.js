@@ -10,16 +10,16 @@ export default class Container {
     this.isDisabled = false;
     this.isLoading = false;
 
-    this.onFocus = this.onFocus.bind(this);
-    this.onBlur = this.onBlur.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
   }
 
   /**
    * Add event listeners
   */
   addEventListeners() {
-    this.element.addEventListener('focus', this.onFocus);
-    this.element.addEventListener('blur', this.onBlur);
+    this.element.addEventListener('focus', this._onFocus);
+    this.element.addEventListener('blur', this._onBlur);
   }
 
   /**
@@ -28,22 +28,8 @@ export default class Container {
 
   /** */
   removeEventListeners() {
-    this.element.removeEventListener('focus', this.onFocus);
-    this.element.removeEventListener('blur', this.onBlur);
-  }
-
-  /**
-   * Set focussed state
-   */
-  onFocus() {
-    this.isFocussed = true;
-  }
-
-  /**
-   * Remove blurred state
-   */
-  onBlur() {
-    this.isFocussed = false;
+    this.element.removeEventListener('focus', this._onFocus);
+    this.element.removeEventListener('blur', this._onBlur);
   }
 
   /**
@@ -176,5 +162,19 @@ export default class Container {
     this.element.classList.remove(this.classNames.loadingState);
     this.element.removeAttribute('aria-busy');
     this.isLoading = false;
+  }
+
+  /**
+   * Set focussed state
+   */
+  _onFocus() {
+    this.isFocussed = true;
+  }
+
+  /**
+   * Remove blurred state
+   */
+  _onBlur() {
+    this.isFocussed = false;
   }
 }
