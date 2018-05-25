@@ -20,13 +20,16 @@
     "expect": true,
     "browser": true,
     "by": true,
-    "element": true
+    "element": true,
+    "cy": true
   },
   "parser": "babel-eslint",
   "rules": {
     "strict": 0,
     "no-underscore-dangle": 0,
-    "no-console": ["warn", { allow: ["warn", "error"] }],
+    "no-console": ["warn", {
+      "allow": ["warn", "error"]
+    }],
     "space-before-function-paren": 0
   }
 }

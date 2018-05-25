@@ -14,9 +14,9 @@ module.exports = (env) => {
       './src/scripts/src/choices',
     ],
     output: {
-      path: path.join(__dirname, '/src/scripts/dist'),
+      path: path.join(__dirname, '/public/assets/scripts'),
       filename: minimize ? 'choices.min.js' : 'choices.js',
-      publicPath: '/src/scripts/dist/',
+      publicPath: '/public/assets/scripts/',
       library: 'Choices',
       libraryTarget: 'umd',
       auxiliaryComment: {
