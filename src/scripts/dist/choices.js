@@ -75,11 +75,28 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "/src/scripts/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 35);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var store = __webpack_require__(32)('wks');
+var uid = __webpack_require__(15);
+var Symbol = __webpack_require__(2).Symbol;
+var USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function (name) {
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -698,8 +715,46 @@ var reduceToValues = exports.reduceToValues = function reduceToValues(items) {
   return values;
 };
 
+var isIE11 = exports.isIE11 = function isIE11() {
+  return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+};
+
 /***/ }),
-/* 1 */
+/* 2 */
+/***/ (function(module, exports) {
+
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self
+  // eslint-disable-next-line no-new-func
+  : Function('return this')();
+if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+var core = module.exports = { version: '2.5.6' };
+if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP = __webpack_require__(6);
+var createDesc = __webpack_require__(14);
+module.exports = __webpack_require__(9) ? function (object, key, value) {
+  return dP.f(object, key, createDesc(1, value));
+} : function (object, key, value) {
+  object[key] = value;
+  return object;
+};
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -710,7 +765,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.SCROLLING_SPEED = exports.KEY_CODES = exports.ACTION_TYPES = exports.EVENTS = exports.DEFAULT_CONFIG = exports.DEFAULT_CLASSNAMES = undefined;
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 var DEFAULT_CLASSNAMES = exports.DEFAULT_CLASSNAMES = {
   containerOuter: 'choices',
@@ -829,14 +884,251 @@ var KEY_CODES = exports.KEY_CODES = {
 var SCROLLING_SPEED = exports.SCROLLING_SPEED = 4;
 
 /***/ }),
-/* 2 */
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(7);
+var IE8_DOM_DEFINE = __webpack_require__(64);
+var toPrimitive = __webpack_require__(65);
+var dP = Object.defineProperty;
+
+exports.f = __webpack_require__(9) ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if (IE8_DOM_DEFINE) try {
+    return dP(O, P, Attributes);
+  } catch (e) { /* empty */ }
+  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
+  if ('value' in Attributes) O[P] = Attributes.value;
+  return O;
+};
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(8);
+module.exports = function (it) {
+  if (!isObject(it)) throw TypeError(it + ' is not an object!');
+  return it;
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+module.exports = function (it) {
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Thank's IE8 for his funny defineProperty
+module.exports = !__webpack_require__(27)(function () {
+  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function (it, key) {
+  return hasOwnProperty.call(it, key);
+};
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+// 7.1.4 ToInteger
+var ceil = Math.ceil;
+var floor = Math.floor;
+module.exports = function (it) {
+  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+};
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function (it) {
+  if (it == undefined) throw TypeError("Can't call method on  " + it);
+  return it;
+};
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(2);
+var core = __webpack_require__(3);
+var hide = __webpack_require__(4);
+var redefine = __webpack_require__(29);
+var ctx = __webpack_require__(16);
+var PROTOTYPE = 'prototype';
+
+var $export = function (type, name, source) {
+  var IS_FORCED = type & $export.F;
+  var IS_GLOBAL = type & $export.G;
+  var IS_STATIC = type & $export.S;
+  var IS_PROTO = type & $export.P;
+  var IS_BIND = type & $export.B;
+  var target = IS_GLOBAL ? global : IS_STATIC ? global[name] || (global[name] = {}) : (global[name] || {})[PROTOTYPE];
+  var exports = IS_GLOBAL ? core : core[name] || (core[name] = {});
+  var expProto = exports[PROTOTYPE] || (exports[PROTOTYPE] = {});
+  var key, own, out, exp;
+  if (IS_GLOBAL) source = name;
+  for (key in source) {
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    // export native or passed
+    out = (own ? target : source)[key];
+    // bind timers to global for call from export context
+    exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // extend global
+    if (target) redefine(target, key, out, type & $export.U);
+    // export
+    if (exports[key] != out) hide(exports, key, exp);
+    if (IS_PROTO && expProto[key] != out) expProto[key] = out;
+  }
+};
+global.core = core;
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library`
+module.exports = $export;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+module.exports = function (bitmap, value) {
+  return {
+    enumerable: !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable: !(bitmap & 4),
+    value: value
+  };
+};
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+var id = 0;
+var px = Math.random();
+module.exports = function (key) {
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// optional / simple context binding
+var aFunction = __webpack_require__(66);
+module.exports = function (fn, that, length) {
+  aFunction(fn);
+  if (that === undefined) return fn;
+  switch (length) {
+    case 1: return function (a) {
+      return fn.call(that, a);
+    };
+    case 2: return function (a, b) {
+      return fn.call(that, a, b);
+    };
+    case 3: return function (a, b, c) {
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function (/* ...args */) {
+    return fn.apply(that, arguments);
+  };
+};
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports) {
+
+module.exports = {};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+var toString = {}.toString;
+
+module.exports = function (it) {
+  return toString.call(it).slice(8, -1);
+};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.15 ToLength
+var toInteger = __webpack_require__(11);
+var min = Math.min;
+module.exports = function (it) {
+  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+};
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var shared = __webpack_require__(32)('keys');
+var uid = __webpack_require__(15);
+module.exports = function (key) {
+  return shared[key] || (shared[key] = uid(key));
+};
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__(12);
+module.exports = function (it) {
+  return Object(defined(it));
+};
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 // EXTERNAL MODULE: ./node_modules/lodash-es/_freeGlobal.js
-var _freeGlobal = __webpack_require__(10);
+var _freeGlobal = __webpack_require__(39);
 
 // CONCATENATED MODULE: ./node_modules/lodash-es/_root.js
 
@@ -1080,7 +1372,7 @@ function isPlainObject(value) {
 /* harmony default export */ var lodash_es_isPlainObject = (isPlainObject);
 
 // EXTERNAL MODULE: ./node_modules/symbol-observable/index.js
-var symbol_observable = __webpack_require__(11);
+var symbol_observable = __webpack_require__(40);
 var symbol_observable_default = /*#__PURE__*/__webpack_require__.n(symbol_observable);
 
 // CONCATENATED MODULE: ./node_modules/redux/es/createStore.js
@@ -1641,7 +1933,7 @@ if (false) {
 
 
 /***/ }),
-/* 3 */
+/* 23 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1668,7 +1960,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1680,17 +1972,23 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var WrappedElement = function () {
-  function WrappedElement(instance, element, classNames) {
+  function WrappedElement(_ref) {
+    var element = _ref.element,
+        classNames = _ref.classNames;
+
     _classCallCheck(this, WrappedElement);
 
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
+    Object.assign(this, { element: element, classNames: classNames });
+
+    if (!(0, _utils.isElement)(element)) {
+      throw new TypeError('Invalid element passed');
+    }
+
     this.isDisabled = false;
   }
 
@@ -1767,7 +2065,7 @@ var WrappedElement = function () {
 exports.default = WrappedElement;
 
 /***/ }),
-/* 5 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1778,11 +2076,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TEMPLATES = undefined;
 
-var _classnames = __webpack_require__(25);
+var _classnames = __webpack_require__(54);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1878,14 +2176,149 @@ var TEMPLATES = exports.TEMPLATES = {
 exports.default = TEMPLATES;
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 26 */
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(7);
+module.exports = false;
 
 
 /***/ }),
-/* 7 */
+/* 27 */
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return !!exec();
+  } catch (e) {
+    return true;
+  }
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(8);
+var document = __webpack_require__(2).document;
+// typeof document.createElement is 'object' in old IE
+var is = isObject(document) && isObject(document.createElement);
+module.exports = function (it) {
+  return is ? document.createElement(it) : {};
+};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(2);
+var hide = __webpack_require__(4);
+var has = __webpack_require__(10);
+var SRC = __webpack_require__(15)('src');
+var TO_STRING = 'toString';
+var $toString = Function[TO_STRING];
+var TPL = ('' + $toString).split(TO_STRING);
+
+__webpack_require__(3).inspectSource = function (it) {
+  return $toString.call(it);
+};
+
+(module.exports = function (O, key, val, safe) {
+  var isFunction = typeof val == 'function';
+  if (isFunction) has(val, 'name') || hide(val, 'name', key);
+  if (O[key] === val) return;
+  if (isFunction) has(val, SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
+  if (O === global) {
+    O[key] = val;
+  } else if (!safe) {
+    delete O[key];
+    hide(O, key, val);
+  } else if (O[key]) {
+    O[key] = val;
+  } else {
+    hide(O, key, val);
+  }
+// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
+})(Function.prototype, TO_STRING, function toString() {
+  return typeof this == 'function' && this[SRC] || $toString.call(this);
+});
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = __webpack_require__(31);
+var defined = __webpack_require__(12);
+module.exports = function (it) {
+  return IObject(defined(it));
+};
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = __webpack_require__(18);
+// eslint-disable-next-line no-prototype-builtins
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
+  return cof(it) == 'String' ? it.split('') : Object(it);
+};
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core = __webpack_require__(3);
+var global = __webpack_require__(2);
+var SHARED = '__core-js_shared__';
+var store = global[SHARED] || (global[SHARED] = {});
+
+(module.exports = function (key, value) {
+  return store[key] || (store[key] = value !== undefined ? value : {});
+})('versions', []).push({
+  version: core.version,
+  mode: __webpack_require__(26) ? 'pure' : 'global',
+  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+});
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports) {
+
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var def = __webpack_require__(6).f;
+var has = __webpack_require__(10);
+var TAG = __webpack_require__(0)('toStringTag');
+
+module.exports = function (it, tag, stat) {
+  if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
+};
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(36);
+
+
+/***/ }),
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1895,53 +2328,53 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _fuse = __webpack_require__(8);
+var _fuse = __webpack_require__(37);
 
 var _fuse2 = _interopRequireDefault(_fuse);
 
-var _store = __webpack_require__(9);
+var _store = __webpack_require__(38);
 
 var _store2 = _interopRequireDefault(_store);
 
-var _dropdown = __webpack_require__(19);
+var _dropdown = __webpack_require__(48);
 
 var _dropdown2 = _interopRequireDefault(_dropdown);
 
-var _container = __webpack_require__(20);
+var _container = __webpack_require__(49);
 
 var _container2 = _interopRequireDefault(_container);
 
-var _input = __webpack_require__(21);
+var _input = __webpack_require__(50);
 
 var _input2 = _interopRequireDefault(_input);
 
-var _list = __webpack_require__(22);
+var _list = __webpack_require__(51);
 
 var _list2 = _interopRequireDefault(_list);
 
-var _wrappedInput = __webpack_require__(23);
+var _wrappedInput = __webpack_require__(52);
 
 var _wrappedInput2 = _interopRequireDefault(_wrappedInput);
 
-var _wrappedSelect = __webpack_require__(24);
+var _wrappedSelect = __webpack_require__(53);
 
 var _wrappedSelect2 = _interopRequireDefault(_wrappedSelect);
 
-var _constants = __webpack_require__(1);
+var _constants = __webpack_require__(5);
 
-var _templates = __webpack_require__(5);
+var _templates = __webpack_require__(25);
 
-var _choices = __webpack_require__(26);
+var _choices = __webpack_require__(55);
 
-var _items = __webpack_require__(27);
+var _items = __webpack_require__(56);
 
-var _groups = __webpack_require__(28);
+var _groups = __webpack_require__(57);
 
-var _misc = __webpack_require__(29);
+var _misc = __webpack_require__(58);
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
-__webpack_require__(30);
+__webpack_require__(59);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1961,102 +2394,83 @@ var Choices = function () {
 
     _classCallCheck(this, Choices);
 
-    // If there are multiple elements, create a new instance
-    // for each element besides the first one (as that already has an instance)
     if ((0, _utils.isType)('String', element)) {
-      var elements = document.querySelectorAll(element);
+      var elements = Array.from(document.querySelectorAll(element));
+
+      // If there are multiple elements, create a new instance
+      // for each element besides the first one (as that already has an instance)
       if (elements.length > 1) {
-        for (var i = 1; i < elements.length; i += 1) {
-          var el = elements[i];
-          /* eslint-disable no-new */
-          new Choices(el, userConfig);
-        }
+        return this._generateInstances(elements, userConfig);
       }
     }
 
-    var defaultConfig = _extends({}, _constants.DEFAULT_CONFIG, {
-      items: [],
-      choices: [],
-      classNames: _constants.DEFAULT_CLASSNAMES,
-      sortFn: _utils.sortByAlpha
-    });
-
-    // Merge options with user options
-    this.config = (0, _utils.extend)(defaultConfig, Choices.userDefaults, userConfig);
+    this.config = Choices._generateConfig(userConfig);
 
     if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
     }
 
     // Create data store
-    this.store = new _store2.default(this.render);
+    this._store = new _store2.default(this.render);
 
     // State tracking
     this.initialised = false;
-    this.currentState = {};
-    this.prevState = {};
-    this.currentValue = '';
+    this._currentState = {};
+    this._prevState = {};
+    this._currentValue = '';
+    this._isScrollingOnIe = false;
+    this._wasTap = true;
 
     // Retrieve triggering element (i.e. element with 'data-choice' trigger)
     var passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
 
-    this.isTextElement = passedElement.type === 'text';
-    this.isSelectOneElement = passedElement.type === 'select-one';
-    this.isSelectMultipleElement = passedElement.type === 'select-multiple';
-    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
-    this.isValidElementType = this.isTextElement || this.isSelectElement;
+    this._isTextElement = passedElement.type === 'text';
+    this._isSelectOneElement = passedElement.type === 'select-one';
+    this._isSelectMultipleElement = passedElement.type === 'select-multiple';
+    this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
 
-    if (this.isTextElement) {
-      this.passedElement = new _wrappedInput2.default(this, passedElement, this.config.classNames);
-    } else if (this.isSelectElement) {
-      this.passedElement = new _wrappedSelect2.default(this, passedElement, this.config.classNames);
+    if (this._isTextElement) {
+      this.passedElement = new _wrappedInput2.default({
+        element: passedElement,
+        classNames: this.config.classNames,
+        delimiter: this.config.delimiter
+      });
+    } else if (this._isSelectElement) {
+      this.passedElement = new _wrappedSelect2.default({
+        element: passedElement,
+        classNames: this.config.classNames
+      });
     }
 
     if (!this.passedElement) {
-      if (!this.config.silent) {
-        console.error('Passed element not found');
-      }
-      return false;
+      throw new Error('Could not wrap passed element');
     }
 
-    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
-    this.isScrollingOnIe = false;
-
-    if (this.config.shouldSortItems === true && this.isSelectOneElement) {
-      if (!this.config.silent) {
-        console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
-      }
+    if (this.config.shouldSortItems === true && this._isSelectOneElement && !this.config.silent) {
+      console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
     }
 
-    this.highlightPosition = 0;
-    this.canSearch = this.config.searchEnabled;
-
-    this.placeholder = false;
-    if (!this.isSelectOneElement) {
-      this.placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder') : false;
-    }
+    this._highlightPosition = 0;
+    this._placeholderValue = this._generatePlaceholderValue();
 
     // Assign preset choices from passed object
-    this.presetChoices = this.config.choices;
+    this._presetChoices = this.config.choices;
     // Assign preset items from passed object first
-    this.presetItems = this.config.items;
+    this._presetItems = this.config.items;
 
     // Then add any values passed from attribute
     if (this.passedElement.value) {
-      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
+      this._presetItems = this._presetItems.concat(this.passedElement.value.split(this.config.delimiter));
     }
 
     // Set unique base Id
-    this.baseId = (0, _utils.generateId)(this.passedElement.element, 'choices-');
+    this._baseId = (0, _utils.generateId)(this.passedElement.element, 'choices-');
 
     this.idNames = {
       itemChoice: 'item-choice'
     };
 
-    // Bind methods
     this.render = this.render.bind(this);
-
-    // Bind event handlers
     this._onFocus = this._onFocus.bind(this);
     this._onBlur = this._onBlur.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
@@ -2067,28 +2481,13 @@ var Choices = function () {
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
 
-    // Monitor touch taps/scrolls
-    this.wasTap = true;
-
-    // Cutting the mustard
-    var cuttingTheMustard = 'classList' in document.documentElement;
-    if (!cuttingTheMustard && !this.config.silent) {
-      console.error('Choices: Your browser doesn\'t support Choices');
+    // If element has already been initialised with Choices, fail silently
+    if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+      return false;
     }
 
-    var canInit = (0, _utils.isElement)(this.passedElement.element) && this.isValidElementType;
-
-    if (canInit) {
-      // If element has already been initialised with Choices
-      if (this.passedElement.element.getAttribute('data-choice') === 'active') {
-        return false;
-      }
-
-      // Let's go
-      this.init();
-    } else if (!this.config.silent) {
-      console.error('Incompatible input passed');
-    }
+    // Let's go
+    this.init();
   }
 
   /* ========================================
@@ -2118,16 +2517,17 @@ var Choices = function () {
       // Generate input markup
       this._createStructure();
       // Subscribe store to render method
-      this.store.subscribe(this.render);
+      this._store.subscribe(this.render);
       // Render any items
       this.render();
       // Trigger event listeners
       this._addEventListeners();
 
-      var callback = this.config.callbackOnInit;
+      var callbackOnInit = this.config.callbackOnInit;
       // Run callback if it is a function
-      if (callback && (0, _utils.isType)('Function', callback)) {
-        callback.call(this);
+
+      if (callbackOnInit && (0, _utils.isType)('Function', callbackOnInit)) {
+        callbackOnInit.call(this);
       }
     }
 
@@ -2149,8 +2549,8 @@ var Choices = function () {
       this.passedElement.reveal();
       this.containerOuter.unwrap(this.passedElement.element);
 
-      if (this.isSelectElement) {
-        this.passedElement.options = this.presetChoices;
+      if (this._isSelectElement) {
+        this.passedElement.options = this._presetChoices;
       }
 
       // Clear data store
@@ -2211,173 +2611,6 @@ var Choices = function () {
     }
 
     /**
-     * Render group choices into a DOM fragment and append to choice list
-     * @param  {Array} groups    Groups to add to list
-     * @param  {Array} choices   Choices to add to groups
-     * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
-     * @return {DocumentFragment} Populated options fragment
-     * @private
-     */
-
-  }, {
-    key: 'createGroupsFragment',
-    value: function createGroupsFragment(groups, choices, fragment) {
-      var _this = this;
-
-      var groupFragment = fragment || document.createDocumentFragment();
-      var getGroupChoices = function getGroupChoices(group) {
-        return choices.filter(function (choice) {
-          if (_this.isSelectOneElement) {
-            return choice.groupId === group.id;
-          }
-          return choice.groupId === group.id && (_this.config.renderSelectedChoices === 'always' || !choice.selected);
-        });
-      };
-
-      // If sorting is enabled, filter groups
-      if (this.config.shouldSort) {
-        groups.sort(this.config.sortFn);
-      }
-
-      groups.forEach(function (group) {
-        var groupChoices = getGroupChoices(group);
-        if (groupChoices.length >= 1) {
-          var dropdownGroup = _this._getTemplate('choiceGroup', group);
-          groupFragment.appendChild(dropdownGroup);
-          _this.createChoicesFragment(groupChoices, groupFragment, true);
-        }
-      });
-
-      return groupFragment;
-    }
-
-    /**
-     * Render choices into a DOM fragment and append to choice list
-     * @param  {Array} choices    Choices to add to list
-     * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
-     * @return {DocumentFragment} Populated choices fragment
-     * @private
-     */
-
-  }, {
-    key: 'createChoicesFragment',
-    value: function createChoicesFragment(choices, fragment) {
-      var _this2 = this;
-
-      var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-      var choicesFragment = fragment || document.createDocumentFragment();
-      var _config = this.config,
-          renderSelectedChoices = _config.renderSelectedChoices,
-          searchResultLimit = _config.searchResultLimit,
-          renderChoiceLimit = _config.renderChoiceLimit;
-
-      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFn;
-      var appendChoice = function appendChoice(choice) {
-        var shouldRender = renderSelectedChoices === 'auto' ? _this2.isSelectOneElement || !choice.selected : true;
-        if (shouldRender) {
-          var dropdownItem = _this2._getTemplate('choice', choice, _this2.config.itemSelectText);
-          choicesFragment.appendChild(dropdownItem);
-        }
-      };
-
-      var rendererableChoices = choices;
-
-      if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
-        rendererableChoices = choices.filter(function (choice) {
-          return !choice.selected;
-        });
-      }
-
-      // Split array into placeholders and "normal" choices
-
-      var _rendererableChoices$ = rendererableChoices.reduce(function (acc, choice) {
-        if (choice.placeholder) {
-          acc.placeholderChoices.push(choice);
-        } else {
-          acc.normalChoices.push(choice);
-        }
-        return acc;
-      }, { placeholderChoices: [], normalChoices: [] }),
-          placeholderChoices = _rendererableChoices$.placeholderChoices,
-          normalChoices = _rendererableChoices$.normalChoices;
-
-      // If sorting is enabled or the user is searching, filter choices
-
-
-      if (this.config.shouldSort || this.isSearching) {
-        normalChoices.sort(filter);
-      }
-
-      var choiceLimit = rendererableChoices.length;
-
-      // Prepend placeholeder
-      var sortedChoices = [].concat(_toConsumableArray(placeholderChoices), _toConsumableArray(normalChoices));
-
-      if (this.isSearching) {
-        choiceLimit = searchResultLimit;
-      } else if (renderChoiceLimit > 0 && !withinGroup) {
-        choiceLimit = renderChoiceLimit;
-      }
-
-      // Add each choice to dropdown within range
-      for (var i = 0; i < choiceLimit; i += 1) {
-        if (sortedChoices[i]) {
-          appendChoice(sortedChoices[i]);
-        }
-      }
-
-      return choicesFragment;
-    }
-
-    /**
-     * Render items into a DOM fragment and append to items list
-     * @param  {Array} items    Items to add to list
-     * @param  {DocumentFragment} [fragment] Fragment to add items to (optional)
-     * @return
-     * @private
-     */
-
-  }, {
-    key: 'createItemsFragment',
-    value: function createItemsFragment(items) {
-      var _this3 = this;
-
-      var fragment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      // Create fragment to add elements to
-      var itemListFragment = fragment || document.createDocumentFragment();
-
-      // If sorting is enabled, filter items
-      if (this.config.shouldSortItems && !this.isSelectOneElement) {
-        items.sort(this.config.sortFn);
-      }
-
-      if (this.isTextElement) {
-        // Update the value of the hidden input
-        this.passedElement.value = items;
-      } else {
-        // Update the options of the hidden input
-        this.passedElement.options = items;
-      }
-
-      var addItemToFragment = function addItemToFragment(item) {
-        // Create new list element
-        var listItem = _this3._getTemplate('item', item, _this3.config.removeItemButton);
-        // Append it to list
-        itemListFragment.appendChild(listItem);
-      };
-
-      // Add each list item to list
-      items.forEach(function (item) {
-        return addItemToFragment(item);
-      });
-
-      return itemListFragment;
-    }
-
-    /**
      * Render DOM with values
      * @return
      * @private
@@ -2386,97 +2619,25 @@ var Choices = function () {
   }, {
     key: 'render',
     value: function render() {
-      this.currentState = this.store.state;
-      var stateChanged = this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups || this.currentState.items !== this.prevState.items;
+      this._currentState = this._store.state;
+
+      var stateChanged = this._currentState.choices !== this._prevState.choices || this._currentState.groups !== this._prevState.groups || this._currentState.items !== this._prevState.items;
+      var shouldRenderChoices = this._isSelectElement;
+      var shouldRenderItems = this._currentState.items !== this._prevState.items;
 
       if (!stateChanged) {
         return;
       }
 
-      /* Choices */
-
-      if (this.isSelectElement) {
-        // Get active groups/choices
-        var activeGroups = this.store.activeGroups;
-        var activeChoices = this.store.activeChoices;
-
-        var choiceListFragment = document.createDocumentFragment();
-
-        // Clear choices
-        this.choiceList.clear();
-
-        // Scroll back to top of choices list
-        if (this.config.resetScrollPosition) {
-          this.choiceList.scrollTo(0);
-        }
-
-        // If we have grouped options
-        if (activeGroups.length >= 1 && !this.isSearching) {
-          // If we have a placeholder choice along with groups
-          var activePlaceholders = activeChoices.filter(function (activeChoice) {
-            return activeChoice.placeholder === true && activeChoice.groupId === -1;
-          });
-          if (activePlaceholders.length >= 1) {
-            choiceListFragment = this.createChoicesFragment(activePlaceholders, choiceListFragment);
-          }
-          choiceListFragment = this.createGroupsFragment(activeGroups, activeChoices, choiceListFragment);
-        } else if (activeChoices.length >= 1) {
-          choiceListFragment = this.createChoicesFragment(activeChoices, choiceListFragment);
-        }
-
-        // If we have choices to show
-        if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-          var activeItems = this.store.activeItems;
-          var canAddItem = this._canAddItem(activeItems, this.input.value);
-
-          // ...and we can select them
-          if (canAddItem.response) {
-            // ...append them and highlight the first choice
-            this.choiceList.append(choiceListFragment);
-            this._highlightChoice();
-          } else {
-            // ...otherwise show a notice
-            this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
-          }
-        } else {
-          // Otherwise show a notice
-          var dropdownItem = void 0;
-          var notice = void 0;
-
-          if (this.isSearching) {
-            notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
-
-            dropdownItem = this._getTemplate('notice', notice, 'no-results');
-          } else {
-            notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
-
-            dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-          }
-
-          this.choiceList.append(dropdownItem);
-        }
+      if (shouldRenderChoices) {
+        this._renderChoices();
       }
 
-      /* Items */
-      if (this.currentState.items !== this.prevState.items) {
-        // Get active items (items that can be selected)
-        var _activeItems = this.store.activeItems || [];
-        // Clear list
-        this.itemList.clear();
-
-        if (_activeItems.length) {
-          // Create a fragment to store our list items
-          // (so we don't have to update the DOM for each item)
-          var itemListFragment = this.createItemsFragment(_activeItems);
-
-          // If we have items to add, append them
-          if (itemListFragment.childNodes) {
-            this.itemList.append(itemListFragment);
-          }
-        }
+      if (shouldRenderItems) {
+        this._renderItems();
       }
 
-      this.prevState = this.currentState;
+      this._prevState = this._currentState;
     }
 
     /**
@@ -2504,9 +2665,9 @@ var Choices = function () {
           _item$label = item.label,
           label = _item$label === undefined ? '' : _item$label;
 
-      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
 
-      this.store.dispatch((0, _items.highlightItem)(id, true));
+      this._store.dispatch((0, _items.highlightItem)(id, true));
 
       if (runEvent) {
         this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
@@ -2542,9 +2703,9 @@ var Choices = function () {
           _item$label2 = item.label,
           label = _item$label2 === undefined ? '' : _item$label2;
 
-      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
 
-      this.store.dispatch((0, _items.highlightItem)(id, false));
+      this._store.dispatch((0, _items.highlightItem)(id, false));
       this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
         id: id,
         value: value,
@@ -2564,11 +2725,10 @@ var Choices = function () {
   }, {
     key: 'highlightAll',
     value: function highlightAll() {
-      var _this4 = this;
+      var _this = this;
 
-      var items = this.store.items;
-      items.forEach(function (item) {
-        return _this4.highlightItem(item);
+      this._store.items.forEach(function (item) {
+        return _this.highlightItem(item);
       });
       return this;
     }
@@ -2582,11 +2742,10 @@ var Choices = function () {
   }, {
     key: 'unhighlightAll',
     value: function unhighlightAll() {
-      var _this5 = this;
+      var _this2 = this;
 
-      var items = this.store.items;
-      items.forEach(function (item) {
-        return _this5.unhighlightItem(item);
+      this._store.items.forEach(function (item) {
+        return _this2.unhighlightItem(item);
       });
       return this;
     }
@@ -2595,24 +2754,23 @@ var Choices = function () {
      * Remove an item from the store by its value
      * @param  {String} value Value to search for
      * @return {Object} Class instance
+     * @todo Merge with removeActiveItems
      * @public
      */
 
   }, {
     key: 'removeActiveItemsByValue',
     value: function removeActiveItemsByValue(value) {
-      var _this6 = this;
+      var _this3 = this;
 
       if (!value) {
         return this;
       }
 
-      var items = this.store.activeItems;
-
-      items.forEach(function (item) {
-        if (item.value === value) {
-          _this6._removeItem(item);
-        }
+      this._store.activeItems.filter(function (item) {
+        return item.value === value;
+      }).forEach(function (item) {
+        return _this3._removeItem(item);
       });
 
       return this;
@@ -2629,14 +2787,13 @@ var Choices = function () {
   }, {
     key: 'removeActiveItems',
     value: function removeActiveItems(excludedId) {
-      var _this7 = this;
+      var _this4 = this;
 
-      var items = this.store.activeItems;
-
-      items.forEach(function (item) {
-        if (excludedId !== item.id) {
-          _this7._removeItem(item);
-        }
+      this._store.activeItems.filter(function (_ref) {
+        var id = _ref.id;
+        return id !== excludedId;
+      }).forEach(function (item) {
+        return _this4._removeItem(item);
       });
 
       return this;
@@ -2652,18 +2809,16 @@ var Choices = function () {
   }, {
     key: 'removeHighlightedItems',
     value: function removeHighlightedItems() {
-      var _this8 = this;
+      var _this5 = this;
 
       var runEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      var items = this.store.highlightedActiveItems;
-
-      items.forEach(function (item) {
-        _this8._removeItem(item);
+      this._store.highlightedActiveItems.forEach(function (item) {
+        _this5._removeItem(item);
         // If this action was performed by the user
         // trigger the event
         if (runEvent) {
-          _this8._triggerChange(item.value);
+          _this5._triggerChange(item.value);
         }
       });
 
@@ -2679,18 +2834,22 @@ var Choices = function () {
   }, {
     key: 'showDropdown',
     value: function showDropdown(focusInput) {
+      var _this6 = this;
+
       if (this.dropdown.isActive) {
         return this;
       }
 
-      this.dropdown.show();
-      this.containerOuter.open(this.dropdown.distanceFromTopWindow());
+      requestAnimationFrame(function () {
+        _this6.dropdown.show();
+        _this6.containerOuter.open(_this6.dropdown.distanceFromTopWindow());
 
-      if (focusInput && this.canSearch) {
-        this.input.focus();
-      }
+        if (focusInput && _this6.config.searchEnabled) {
+          _this6.input.focus();
+        }
 
-      this.passedElement.triggerEvent(_constants.EVENTS.showDropdown, {});
+        _this6.passedElement.triggerEvent(_constants.EVENTS.showDropdown, {});
+      });
 
       return this;
     }
@@ -2704,19 +2863,23 @@ var Choices = function () {
   }, {
     key: 'hideDropdown',
     value: function hideDropdown(blurInput) {
+      var _this7 = this;
+
       if (!this.dropdown.isActive) {
         return this;
       }
 
-      this.dropdown.hide();
-      this.containerOuter.close();
+      requestAnimationFrame(function () {
+        _this7.dropdown.hide();
+        _this7.containerOuter.close();
 
-      if (blurInput && this.canSearch) {
-        this.input.removeActiveDescendant();
-        this.input.blur();
-      }
+        if (blurInput && _this7.config.searchEnabled) {
+          _this7.input.removeActiveDescendant();
+          _this7.input.blur();
+        }
 
-      this.passedElement.triggerEvent(_constants.EVENTS.hideDropdown, {});
+        _this7.passedElement.triggerEvent(_constants.EVENTS.hideDropdown, {});
+      });
 
       return this;
     }
@@ -2752,7 +2915,7 @@ var Choices = function () {
     value: function getValue() {
       var valueOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      var items = this.store.activeItems;
+      var items = this._store.activeItems;
 
       var values = items.reduce(function (selectedItems, item) {
         var itemValue = valueOnly ? item.value : item;
@@ -2760,7 +2923,7 @@ var Choices = function () {
         return selectedItems;
       }, []);
 
-      return this.isSelectOneElement ? values[0] : values;
+      return this._isSelectOneElement ? values[0] : values;
     }
 
     /**
@@ -2774,7 +2937,7 @@ var Choices = function () {
   }, {
     key: 'setValue',
     value: function setValue(args) {
-      var _this9 = this;
+      var _this8 = this;
 
       if (!this.initialised) {
         return this;
@@ -2783,7 +2946,7 @@ var Choices = function () {
       // Convert args to an iterable array
       var values = [].concat(_toConsumableArray(args));
       values.forEach(function (value) {
-        return _this9._setChoiceOrItem(value);
+        return _this8._setChoiceOrItem(value);
       });
 
       return this;
@@ -2799,9 +2962,9 @@ var Choices = function () {
   }, {
     key: 'setChoiceByValue',
     value: function setChoiceByValue(value) {
-      var _this10 = this;
+      var _this9 = this;
 
-      if (!this.initialised || this.isTextElement) {
+      if (!this.initialised || this._isTextElement) {
         return this;
       }
 
@@ -2810,7 +2973,7 @@ var Choices = function () {
 
       // Loop through each value and
       choiceValue.forEach(function (val) {
-        return _this10._findAndSelectChoiceByValue(val);
+        return _this9._findAndSelectChoiceByValue(val);
       });
 
       return this;
@@ -2832,12 +2995,12 @@ var Choices = function () {
       var choices = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
       var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
-      var _this11 = this;
+      var _this10 = this;
 
       var label = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-      if (!this.isSelectElement || !choices.length || !value) {
+      if (!this._isSelectElement || !choices.length || !value) {
         return this;
       }
 
@@ -2849,9 +3012,9 @@ var Choices = function () {
       this.containerOuter.removeLoadingState();
       var addGroupsAndChoices = function addGroupsAndChoices(groupOrChoice) {
         if (groupOrChoice.choices) {
-          _this11._addGroup(groupOrChoice, groupOrChoice.id || null, value, label);
+          _this10._addGroup(groupOrChoice, groupOrChoice.id || null, value, label);
         } else {
-          _this11._addChoice(groupOrChoice[value], groupOrChoice[label], groupOrChoice.selected, groupOrChoice.disabled, undefined, groupOrChoice.customProperties, groupOrChoice.placeholder);
+          _this10._addChoice(groupOrChoice[value], groupOrChoice[label], groupOrChoice.selected, groupOrChoice.disabled, undefined, groupOrChoice.customProperties, groupOrChoice.placeholder);
         }
       };
 
@@ -2870,7 +3033,7 @@ var Choices = function () {
   }, {
     key: 'clearStore',
     value: function clearStore() {
-      this.store.dispatch((0, _misc.clearAll)());
+      this._store.dispatch((0, _misc.clearAll)());
       return this;
     }
 
@@ -2883,12 +3046,12 @@ var Choices = function () {
   }, {
     key: 'clearInput',
     value: function clearInput() {
-      var shouldSetInputWidth = !this.isSelectOneElement;
+      var shouldSetInputWidth = !this._isSelectOneElement;
       this.input.clear(shouldSetInputWidth);
 
-      if (!this.isTextElement && this.config.searchEnabled) {
-        this.isSearching = false;
-        this.store.dispatch((0, _choices.activateChoices)(true));
+      if (!this._isTextElement && this.config.searchEnabled) {
+        this._isSearching = false;
+        this._store.dispatch((0, _choices.activateChoices)(true));
       }
 
       return this;
@@ -2904,14 +3067,14 @@ var Choices = function () {
   }, {
     key: 'ajax',
     value: function ajax(fn) {
-      var _this12 = this;
+      var _this11 = this;
 
-      if (!this.initialised || !this.isSelectElement || !fn) {
+      if (!this.initialised || !this._isSelectElement || !fn) {
         return this;
       }
 
       requestAnimationFrame(function () {
-        return _this12._handleLoadingState(true);
+        return _this11._handleLoadingState(true);
       });
       fn(this._ajaxCallback());
 
@@ -2923,6 +3086,178 @@ var Choices = function () {
     /* =============================================
     =                Private functions            =
     ============================================= */
+
+    /**
+     * Render group choices into a DOM fragment and append to choice list
+     * @param  {Array} groups    Groups to add to list
+     * @param  {Array} choices   Choices to add to groups
+     * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
+     * @return {DocumentFragment} Populated options fragment
+     * @private
+     */
+
+  }, {
+    key: '_createGroupsFragment',
+    value: function _createGroupsFragment(groups, choices, fragment) {
+      var _this12 = this;
+
+      var groupFragment = fragment || document.createDocumentFragment();
+      var getGroupChoices = function getGroupChoices(group) {
+        return choices.filter(function (choice) {
+          if (_this12._isSelectOneElement) {
+            return choice.groupId === group.id;
+          }
+          return choice.groupId === group.id && (_this12.config.renderSelectedChoices === 'always' || !choice.selected);
+        });
+      };
+
+      // If sorting is enabled, filter groups
+      if (this.config.shouldSort) {
+        groups.sort(this.config.sortFn);
+      }
+
+      groups.forEach(function (group) {
+        var groupChoices = getGroupChoices(group);
+        if (groupChoices.length >= 1) {
+          var dropdownGroup = _this12._getTemplate('choiceGroup', group);
+          groupFragment.appendChild(dropdownGroup);
+          _this12._createChoicesFragment(groupChoices, groupFragment, true);
+        }
+      });
+
+      return groupFragment;
+    }
+
+    /**
+     * Render choices into a DOM fragment and append to choice list
+     * @param  {Array} choices    Choices to add to list
+     * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
+     * @return {DocumentFragment} Populated choices fragment
+     * @private
+     */
+
+  }, {
+    key: '_createChoicesFragment',
+    value: function _createChoicesFragment(choices, fragment) {
+      var _this13 = this;
+
+      var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+      var choicesFragment = fragment || document.createDocumentFragment();
+      var _config = this.config,
+          renderSelectedChoices = _config.renderSelectedChoices,
+          searchResultLimit = _config.searchResultLimit,
+          renderChoiceLimit = _config.renderChoiceLimit;
+
+      var filter = this._isSearching ? _utils.sortByScore : this.config.sortFn;
+      var appendChoice = function appendChoice(choice) {
+        var shouldRender = renderSelectedChoices === 'auto' ? _this13._isSelectOneElement || !choice.selected : true;
+        if (shouldRender) {
+          var dropdownItem = _this13._getTemplate('choice', choice, _this13.config.itemSelectText);
+          choicesFragment.appendChild(dropdownItem);
+        }
+      };
+
+      var rendererableChoices = choices;
+
+      if (renderSelectedChoices === 'auto' && !this._isSelectOneElement) {
+        rendererableChoices = choices.filter(function (choice) {
+          return !choice.selected;
+        });
+      }
+
+      // Split array into placeholders and "normal" choices
+
+      var _rendererableChoices$ = rendererableChoices.reduce(function (acc, choice) {
+        if (choice.placeholder) {
+          acc.placeholderChoices.push(choice);
+        } else {
+          acc.normalChoices.push(choice);
+        }
+        return acc;
+      }, { placeholderChoices: [], normalChoices: [] }),
+          placeholderChoices = _rendererableChoices$.placeholderChoices,
+          normalChoices = _rendererableChoices$.normalChoices;
+
+      // If sorting is enabled or the user is searching, filter choices
+
+
+      if (this.config.shouldSort || this._isSearching) {
+        normalChoices.sort(filter);
+      }
+
+      var choiceLimit = rendererableChoices.length;
+
+      // Prepend placeholeder
+      var sortedChoices = [].concat(_toConsumableArray(placeholderChoices), _toConsumableArray(normalChoices));
+
+      if (this._isSearching) {
+        choiceLimit = searchResultLimit;
+      } else if (renderChoiceLimit > 0 && !withinGroup) {
+        choiceLimit = renderChoiceLimit;
+      }
+
+      // Add each choice to dropdown within range
+      for (var i = 0; i < choiceLimit; i += 1) {
+        if (sortedChoices[i]) {
+          appendChoice(sortedChoices[i]);
+        }
+      }
+
+      return choicesFragment;
+    }
+
+    /**
+     * Render items into a DOM fragment and append to items list
+     * @param  {Array} items    Items to add to list
+     * @param  {DocumentFragment} [fragment] Fragment to add items to (optional)
+     * @return
+     * @private
+     */
+
+  }, {
+    key: '_createItemsFragment',
+    value: function _createItemsFragment(items) {
+      var _this14 = this;
+
+      var fragment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      // Create fragment to add elements to
+      var _config2 = this.config,
+          shouldSortItems = _config2.shouldSortItems,
+          sortFn = _config2.sortFn,
+          removeItemButton = _config2.removeItemButton;
+
+      var itemListFragment = fragment || document.createDocumentFragment();
+
+      // If sorting is enabled, filter items
+      if (shouldSortItems && !this._isSelectOneElement) {
+        items.sort(sortFn);
+      }
+
+      if (this._isTextElement) {
+        // Update the value of the hidden input
+        this.passedElement.value = items;
+      } else {
+        // Update the options of the hidden input
+        this.passedElement.options = items;
+      }
+
+      var addItemToFragment = function addItemToFragment(item) {
+        // Create new list element
+        var listItem = _this14._getTemplate('item', item, removeItemButton);
+        // Append it to list
+        itemListFragment.appendChild(listItem);
+      };
+
+      // Add each list item to list
+      items.forEach(function (item) {
+        return addItemToFragment(item);
+      });
+
+      return itemListFragment;
+    }
 
     /**
      * Call change callback
@@ -2950,7 +3285,7 @@ var Choices = function () {
   }, {
     key: '_selectPlaceholderChoice',
     value: function _selectPlaceholderChoice() {
-      var placeholderChoice = this.store.placeholderChoice;
+      var placeholderChoice = this._store.placeholderChoice;
 
       if (placeholderChoice) {
         this._addItem(placeholderChoice.value, placeholderChoice.label, placeholderChoice.id, placeholderChoice.groupId, null, placeholderChoice.placeholder);
@@ -2982,7 +3317,7 @@ var Choices = function () {
       this._removeItem(itemToRemove);
       this._triggerChange(itemToRemove.value);
 
-      if (this.isSelectOneElement) {
+      if (this._isSelectOneElement) {
         this._selectPlaceholderChoice();
       }
     }
@@ -2999,11 +3334,11 @@ var Choices = function () {
   }, {
     key: '_handleItemAction',
     value: function _handleItemAction(activeItems, element) {
-      var _this13 = this;
+      var _this15 = this;
 
       var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-      if (!activeItems || !element || !this.config.removeItems || this.isSelectOneElement) {
+      if (!activeItems || !element || !this.config.removeItems || this._isSelectOneElement) {
         return;
       }
 
@@ -3014,9 +3349,9 @@ var Choices = function () {
       // unless shift is being pressed
       activeItems.forEach(function (item) {
         if (item.id === parseInt(passedId, 10) && !item.highlighted) {
-          _this13.highlightItem(item);
+          _this15.highlightItem(item);
         } else if (!hasShiftKey && item.highlighted) {
-          _this13.unhighlightItem(item);
+          _this15.unhighlightItem(item);
         }
       });
 
@@ -3041,7 +3376,7 @@ var Choices = function () {
 
       // If we are clicking on an option
       var id = element.getAttribute('data-id');
-      var choice = this.store.getChoiceById(id);
+      var choice = this._store.getChoiceById(id);
       var passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
       var hasActiveDropdown = this.dropdown.isActive;
 
@@ -3064,7 +3399,7 @@ var Choices = function () {
       this.clearInput();
 
       // We wont to close the dropdown if we are dealing with a single select box
-      if (hasActiveDropdown && this.isSelectOneElement) {
+      if (hasActiveDropdown && this._isSelectOneElement) {
         this.hideDropdown();
         this.containerOuter.focus();
       }
@@ -3120,7 +3455,7 @@ var Choices = function () {
       var placeholderItem = this.itemList.getChild('.' + this.config.classNames.placeholder);
       if (isLoading) {
         this.containerOuter.addLoadingState();
-        if (this.isSelectOneElement) {
+        if (this._isSelectOneElement) {
           if (!placeholderItem) {
             placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
             this.itemList.append(placeholderItem);
@@ -3133,10 +3468,10 @@ var Choices = function () {
       } else {
         this.containerOuter.removeLoadingState();
 
-        if (this.isSelectOneElement) {
-          placeholderItem.innerHTML = this.placeholder || '';
+        if (this._isSelectOneElement) {
+          placeholderItem.innerHTML = this._placeholderValue || '';
         } else {
-          this.input.placeholder = this.placeholder || '';
+          this.input.placeholder = this._placeholderValue || '';
         }
       }
     }
@@ -3155,7 +3490,7 @@ var Choices = function () {
       var canAddItem = true;
       var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
-      if (this.isSelectMultipleElement || this.isTextElement) {
+      if (this._isSelectMultipleElement || this._isTextElement) {
         if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
           // If there is a max entry limit and we have reached that limit
           // don't update
@@ -3164,7 +3499,7 @@ var Choices = function () {
         }
       }
 
-      if (this.config.regexFilter && this.isTextElement && this.config.addItems && canAddItem) {
+      if (this.config.regexFilter && this._isTextElement && this.config.addItems && canAddItem) {
         // If a user has supplied a regular expression filter
         // determine whether we can update based on whether
         // our regular expression passes
@@ -3181,7 +3516,7 @@ var Choices = function () {
         return item.value === value;
       });
 
-      if (!isUnique && !this.config.duplicateItems && !this.isSelectOneElement && canAddItem) {
+      if (!isUnique && !this.config.duplicateItems && !this._isSelectOneElement && canAddItem) {
         canAddItem = false;
         notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
       }
@@ -3201,7 +3536,7 @@ var Choices = function () {
   }, {
     key: '_ajaxCallback',
     value: function _ajaxCallback() {
-      var _this14 = this;
+      var _this16 = this;
 
       return function (results, value, label) {
         if (!results || !value) {
@@ -3212,23 +3547,23 @@ var Choices = function () {
 
         if (parsedResults && (0, _utils.isType)('Array', parsedResults) && parsedResults.length) {
           // Remove loading states/text
-          _this14._handleLoadingState(false);
+          _this16._handleLoadingState(false);
           // Add each result as a choice
           parsedResults.forEach(function (result) {
             if (result.choices) {
               var groupId = result.id || null;
-              _this14._addGroup(result, groupId, value, label);
+              _this16._addGroup(result, groupId, value, label);
             } else {
-              _this14._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
+              _this16._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
             }
           });
 
-          if (_this14.isSelectOneElement) {
-            _this14._selectPlaceholderChoice();
+          if (_this16._isSelectOneElement) {
+            _this16._selectPlaceholderChoice();
           }
         } else {
           // No results, remove loading state
-          _this14._handleLoadingState(false);
+          _this16._handleLoadingState(false);
         }
       };
     }
@@ -3244,24 +3579,24 @@ var Choices = function () {
     key: '_searchChoices',
     value: function _searchChoices(value) {
       var newValue = (0, _utils.isType)('String', value) ? value.trim() : value;
-      var currentValue = (0, _utils.isType)('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
+      var currentValue = (0, _utils.isType)('String', this._currentValue) ? this._currentValue.trim() : this._currentValue;
 
       if (newValue.length < 1 && newValue === currentValue + ' ') {
         return 0;
       }
 
       // If new value matches the desired length and is not the same as the current value with a space
-      var haystack = this.store.searchableChoices;
+      var haystack = this._store.searchableChoices;
       var needle = newValue;
       var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
       var options = Object.assign(this.config.fuseOptions, { keys: keys });
       var fuse = new _fuse2.default(haystack, options);
       var results = fuse.search(needle);
 
-      this.currentValue = newValue;
-      this.highlightPosition = 0;
-      this.isSearching = true;
-      this.store.dispatch((0, _choices.filterChoices)(results));
+      this._currentValue = newValue;
+      this._highlightPosition = 0;
+      this._isSearching = true;
+      this._store.dispatch((0, _choices.filterChoices)(results));
 
       return results.length;
     }
@@ -3280,14 +3615,18 @@ var Choices = function () {
         return;
       }
 
-      var choices = this.store.choices;
+      var choices = this._store.choices;
+      var _config3 = this.config,
+          searchFloor = _config3.searchFloor,
+          searchChoices = _config3.searchChoices;
+
       var hasUnactiveChoices = choices.some(function (option) {
         return !option.active;
       });
 
       // Check that we have a value to search and the input was an alphanumeric character
-      if (value && value.length >= this.config.searchFloor) {
-        var resultCount = this.config.searchChoices ? this._searchChoices(value) : 0;
+      if (value && value.length >= searchFloor) {
+        var resultCount = searchChoices ? this._searchChoices(value) : 0;
         // Trigger search event
         this.passedElement.triggerEvent(_constants.EVENTS.search, {
           value: value,
@@ -3295,8 +3634,8 @@ var Choices = function () {
         });
       } else if (hasUnactiveChoices) {
         // Otherwise reset choices to active
-        this.isSearching = false;
-        this.store.dispatch((0, _choices.activateChoices)(true));
+        this._isSearching = false;
+        this._store.dispatch((0, _choices.activateChoices)(true));
       }
     }
 
@@ -3317,7 +3656,7 @@ var Choices = function () {
       document.addEventListener('mousedown', this._onMouseDown);
       document.addEventListener('mouseover', this._onMouseOver);
 
-      if (this.isSelectOneElement) {
+      if (this._isSelectOneElement) {
         this.containerOuter.element.addEventListener('focus', this._onFocus);
         this.containerOuter.element.addEventListener('blur', this._onBlur);
       }
@@ -3345,14 +3684,13 @@ var Choices = function () {
       document.removeEventListener('mousedown', this._onMouseDown);
       document.removeEventListener('mouseover', this._onMouseOver);
 
-      if (this.isSelectOneElement) {
+      if (this._isSelectOneElement) {
         this.containerOuter.element.removeEventListener('focus', this._onFocus);
         this.containerOuter.element.removeEventListener('blur', this._onBlur);
       }
 
       this.input.element.removeEventListener('focus', this._onFocus);
       this.input.element.removeEventListener('blur', this._onBlur);
-
       this.input.removeEventListeners();
     }
 
@@ -3365,7 +3703,7 @@ var Choices = function () {
   }, {
     key: '_onKeyDown',
     value: function _onKeyDown(e) {
-      var _this15 = this,
+      var _this17 = this,
           _keyDownActions;
 
       if (e.target !== this.input.element && !this.containerOuter.element.contains(e.target)) {
@@ -3373,7 +3711,7 @@ var Choices = function () {
       }
 
       var target = e.target;
-      var activeItems = this.store.activeItems;
+      var activeItems = this._store.activeItems;
       var hasFocusedInput = this.input.isFocussed;
       var hasActiveDropdown = this.dropdown.isActive;
       var hasItems = this.itemList.hasChildren;
@@ -3390,46 +3728,46 @@ var Choices = function () {
       var ctrlDownKey = e.ctrlKey || e.metaKey;
 
       // If a user is typing and the dropdown is not active
-      if (!this.isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
+      if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
         this.showDropdown(true);
       }
 
-      this.canSearch = this.config.searchEnabled;
+      this.config.searchEnabled = this.config.searchEnabled;
 
       var onAKey = function onAKey() {
         // If CTRL + A or CMD + A have been pressed and there are items to select
         if (ctrlDownKey && hasItems) {
-          _this15.canSearch = false;
-          if (_this15.config.removeItems && !_this15.input.value && _this15.input.element === document.activeElement) {
+          _this17.config.searchEnabled = false;
+          if (_this17.config.removeItems && !_this17.input.value && _this17.input.element === document.activeElement) {
             // Highlight items
-            _this15.highlightAll();
+            _this17.highlightAll();
           }
         }
       };
 
       var onEnterKey = function onEnterKey() {
         // If enter key is pressed and the input has a value
-        if (_this15.isTextElement && target.value) {
-          var value = _this15.input.value;
-          var canAddItem = _this15._canAddItem(activeItems, value);
+        if (_this17._isTextElement && target.value) {
+          var value = _this17.input.value;
+          var canAddItem = _this17._canAddItem(activeItems, value);
 
           // All is good, add
           if (canAddItem.response) {
-            _this15.hideDropdown();
-            _this15._addItem(value);
-            _this15._triggerChange(value);
-            _this15.clearInput();
+            _this17.hideDropdown();
+            _this17._addItem(value);
+            _this17._triggerChange(value);
+            _this17.clearInput();
           }
         }
 
         if (target.hasAttribute('data-button')) {
-          _this15._handleButtonAction(activeItems, target);
+          _this17._handleButtonAction(activeItems, target);
           e.preventDefault();
         }
 
         if (hasActiveDropdown) {
           e.preventDefault();
-          var highlighted = _this15.dropdown.getChild('.' + _this15.config.classNames.highlightedState);
+          var highlighted = _this17.dropdown.getChild('.' + _this17.config.classNames.highlightedState);
 
           // If we have a highlighted choice
           if (highlighted) {
@@ -3437,56 +3775,57 @@ var Choices = function () {
             if (activeItems[0]) {
               activeItems[0].keyCode = enterKey;
             }
-            _this15._handleChoiceAction(activeItems, highlighted);
+            _this17._handleChoiceAction(activeItems, highlighted);
           }
-        } else if (_this15.isSelectOneElement) {
+        } else if (_this17._isSelectOneElement) {
           // Open single select dropdown if it's not active
-          _this15.showDropdown(true);
+          _this17.showDropdown(true);
           e.preventDefault();
         }
       };
 
       var onEscapeKey = function onEscapeKey() {
         if (hasActiveDropdown) {
-          _this15.hideDropdown();
-          _this15.containerOuter.focus();
+          _this17.hideDropdown();
+          _this17.containerOuter.focus();
         }
       };
 
       var onDirectionKey = function onDirectionKey() {
         // If up or down key is pressed, traverse through options
-        if (hasActiveDropdown || _this15.isSelectOneElement) {
+        if (hasActiveDropdown || _this17._isSelectOneElement) {
           // Show dropdown if focus
-          _this15.showDropdown(true);
+          _this17.showDropdown(true);
 
-          _this15.canSearch = false;
+          _this17.config.searchEnabled = false;
 
           var directionInt = e.keyCode === downKey || e.keyCode === pageDownKey ? 1 : -1;
           var skipKey = e.metaKey || e.keyCode === pageDownKey || e.keyCode === pageUpKey;
+          var selectableChoiceIdentifier = '[data-choice-selectable]';
 
           var nextEl = void 0;
           if (skipKey) {
             if (directionInt > 0) {
-              nextEl = Array.from(_this15.dropdown.element.querySelectorAll('[data-choice-selectable]')).pop();
+              nextEl = Array.from(_this17.dropdown.element.querySelectorAll(selectableChoiceIdentifier)).pop();
             } else {
-              nextEl = _this15.dropdown.element.querySelector('[data-choice-selectable]');
+              nextEl = _this17.dropdown.element.querySelector(selectableChoiceIdentifier);
             }
           } else {
-            var currentEl = _this15.dropdown.element.querySelector('.' + _this15.config.classNames.highlightedState);
+            var currentEl = _this17.dropdown.element.querySelector('.' + _this17.config.classNames.highlightedState);
             if (currentEl) {
-              nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
+              nextEl = (0, _utils.getAdjacentEl)(currentEl, selectableChoiceIdentifier, directionInt);
             } else {
-              nextEl = _this15.dropdown.element.querySelector('[data-choice-selectable]');
+              nextEl = _this17.dropdown.element.querySelector(selectableChoiceIdentifier);
             }
           }
 
           if (nextEl) {
             // We prevent default to stop the cursor moving
             // when pressing the arrow
-            if (!(0, _utils.isScrolledIntoView)(nextEl, _this15.choiceList.element, directionInt)) {
-              _this15._scrollToChoice(nextEl, directionInt);
+            if (!(0, _utils.isScrolledIntoView)(nextEl, _this17.choiceList.element, directionInt)) {
+              _this17._scrollToChoice(nextEl, directionInt);
             }
-            _this15._highlightChoice(nextEl);
+            _this17._highlightChoice(nextEl);
           }
 
           // Prevent default to maintain cursor position whilst
@@ -3497,8 +3836,8 @@ var Choices = function () {
 
       var onDeleteKey = function onDeleteKey() {
         // If backspace or delete key is pressed and the input has no value
-        if (hasFocusedInput && !e.target.value && !_this15.isSelectOneElement) {
-          _this15._handleBackspace(activeItems);
+        if (hasFocusedInput && !e.target.value && !_this17._isSelectOneElement) {
+          _this17._handleBackspace(activeItems);
           e.preventDefault();
         }
       };
@@ -3527,12 +3866,12 @@ var Choices = function () {
       }
 
       var value = this.input.value;
-      var activeItems = this.store.activeItems;
+      var activeItems = this._store.activeItems;
       var canAddItem = this._canAddItem(activeItems, value);
 
       // We are typing into a text input and have a value, we want to show a dropdown
       // notice. Otherwise hide the dropdown
-      if (this.isTextElement) {
+      if (this._isTextElement) {
         if (value) {
           if (canAddItem.notice) {
             var dropdownItem = this._getTemplate('notice', canAddItem.notice);
@@ -3554,16 +3893,16 @@ var Choices = function () {
         // If user has removed value...
         if ((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
           // ...and it is a multiple select input, activate choices (if searching)
-          if (!this.isTextElement && this.isSearching) {
-            this.isSearching = false;
-            this.store.dispatch((0, _choices.activateChoices)(true));
+          if (!this._isTextElement && this._isSearching) {
+            this._isSearching = false;
+            this._store.dispatch((0, _choices.activateChoices)(true));
           }
-        } else if (this.canSearch && canAddItem.response) {
+        } else if (this.config.searchEnabled && canAddItem.response) {
           this._handleSearch(this.input.value);
         }
       }
       // Re-establish canSearch value from changes in _onKeyDown
-      this.canSearch = this.config.searchEnabled;
+      this.config.searchEnabled = this.config.searchEnabled;
     }
 
     /**
@@ -3575,8 +3914,8 @@ var Choices = function () {
   }, {
     key: '_onTouchMove',
     value: function _onTouchMove() {
-      if (this.wasTap === true) {
-        this.wasTap = false;
+      if (this._wasTap === true) {
+        this._wasTap = false;
       }
     }
 
@@ -3593,10 +3932,10 @@ var Choices = function () {
       var target = e.target || e.touches[0].target;
 
       // If a user tapped within our container...
-      if (this.wasTap === true && this.containerOuter.element.contains(target)) {
+      if (this._wasTap === true && this.containerOuter.element.contains(target)) {
         // ...and we aren't dealing with a single select box, show dropdown/focus input
-        if ((target === this.containerOuter.element || target === this.containerInner.element) && !this.isSelectOneElement) {
-          if (this.isTextElement) {
+        if ((target === this.containerOuter.element || target === this.containerInner.element) && !this._isSelectOneElement) {
+          if (this._isTextElement) {
             // If text element, we only want to focus the input
             this.input.focus();
           } else {
@@ -3608,7 +3947,7 @@ var Choices = function () {
         e.stopPropagation();
       }
 
-      this.wasTap = true;
+      this._wasTap = true;
     }
 
     /**
@@ -3624,12 +3963,12 @@ var Choices = function () {
       var target = e.target;
 
       // If we have our mouse down on the scrollbar and are on IE11...
-      if (target === this.choiceList && this.isIe11) {
-        this.isScrollingOnIe = true;
+      if (target === this.choiceList && (0, _utils.isIE11)()) {
+        this._isScrollingOnIe = true;
       }
 
       if (this.containerOuter.element.contains(target) && target !== this.input.element) {
-        var activeItems = this.store.activeItems;
+        var activeItems = this._store.activeItems;
         var hasShiftKey = e.shiftKey;
 
         var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
@@ -3679,23 +4018,23 @@ var Choices = function () {
     value: function _onClick(e) {
       var target = e.target;
       var hasActiveDropdown = this.dropdown.isActive;
-      var activeItems = this.store.activeItems;
+      var activeItems = this._store.activeItems;
 
       // If target is something that concerns us
       if (this.containerOuter.element.contains(target)) {
         if (!hasActiveDropdown) {
-          if (this.isTextElement) {
+          if (this._isTextElement) {
             if (document.activeElement !== this.input.element) {
               this.input.focus();
             }
-          } else if (this.canSearch) {
+          } else if (this.config.searchEnabled) {
             this.showDropdown(true);
           } else {
             this.showDropdown();
             // code smell
             this.containerOuter.focus();
           }
-        } else if (this.isSelectOneElement && target !== this.input.element && !this.dropdown.element.contains(target)) {
+        } else if (this._isSelectOneElement && target !== this.input.element && !this.dropdown.element.contains(target)) {
           this.hideDropdown(true);
         }
       } else {
@@ -3726,7 +4065,7 @@ var Choices = function () {
   }, {
     key: '_onFocus',
     value: function _onFocus(e) {
-      var _this16 = this;
+      var _this18 = this;
 
       var target = e.target;
       if (!this.containerOuter.element.contains(target)) {
@@ -3735,23 +4074,23 @@ var Choices = function () {
 
       var focusActions = {
         text: function text() {
-          if (target === _this16.input.element) {
-            _this16.containerOuter.addFocusState();
+          if (target === _this18.input.element) {
+            _this18.containerOuter.addFocusState();
           }
         },
         'select-one': function selectOne() {
-          _this16.containerOuter.addFocusState();
-          if (target === _this16.input.element) {
+          _this18.containerOuter.addFocusState();
+          if (target === _this18.input.element) {
             // Show dropdown if it isn't already showing
-            _this16.showDropdown();
+            _this18.showDropdown();
           }
         },
         'select-multiple': function selectMultiple() {
-          if (target === _this16.input.element) {
+          if (target === _this18.input.element) {
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
-            _this16.containerOuter.addFocusState();
-            _this16.showDropdown(true);
+            _this18.containerOuter.addFocusState();
+            _this18.showDropdown(true);
           }
         }
       };
@@ -3769,41 +4108,41 @@ var Choices = function () {
   }, {
     key: '_onBlur',
     value: function _onBlur(e) {
-      var _this17 = this;
+      var _this19 = this;
 
       var target = e.target;
       // If target is something that concerns us
-      if (this.containerOuter.element.contains(target) && !this.isScrollingOnIe) {
-        var activeItems = this.store.activeItems;
+      if (this.containerOuter.element.contains(target) && !this._isScrollingOnIe) {
+        var activeItems = this._store.activeItems;
         var hasHighlightedItems = activeItems.some(function (item) {
           return item.highlighted;
         });
         var blurActions = {
           text: function text() {
-            if (target === _this17.input.element) {
+            if (target === _this19.input.element) {
               // Remove the focus state
-              _this17.containerOuter.removeFocusState();
+              _this19.containerOuter.removeFocusState();
               // De-select any highlighted items
               if (hasHighlightedItems) {
-                _this17.unhighlightAll();
+                _this19.unhighlightAll();
               }
-              _this17.hideDropdown();
+              _this19.hideDropdown();
             }
           },
           'select-one': function selectOne() {
-            _this17.containerOuter.removeFocusState();
-            if (target === _this17.input.element || target === _this17.containerOuter.element && !_this17.canSearch) {
-              _this17.hideDropdown();
+            _this19.containerOuter.removeFocusState();
+            if (target === _this19.input.element || target === _this19.containerOuter.element && !_this19.config.searchEnabled) {
+              _this19.hideDropdown();
             }
           },
           'select-multiple': function selectMultiple() {
-            if (target === _this17.input.element) {
+            if (target === _this19.input.element) {
               // Remove the focus state
-              _this17.containerOuter.removeFocusState();
-              _this17.hideDropdown();
+              _this19.containerOuter.removeFocusState();
+              _this19.hideDropdown();
               // De-select any highlighted items
               if (hasHighlightedItems) {
-                _this17.unhighlightAll();
+                _this19.unhighlightAll();
               }
             }
           }
@@ -3814,7 +4153,7 @@ var Choices = function () {
         // On IE11, clicking the scollbar blurs our input and thus
         // closes the dropdown. To stop this, we refocus our input
         // if we know we are on IE *and* are scrolling.
-        this.isScrollingOnIe = false;
+        this._isScrollingOnIe = false;
         this.input.element.focus();
       }
     }
@@ -3830,7 +4169,7 @@ var Choices = function () {
   }, {
     key: '_scrollToChoice',
     value: function _scrollToChoice(choice, direction) {
-      var _this18 = this;
+      var _this20 = this;
 
       if (!choice) {
         return;
@@ -3847,7 +4186,7 @@ var Choices = function () {
 
       var animateScroll = function animateScroll() {
         var strength = _constants.SCROLLING_SPEED;
-        var choiceListScrollTop = _this18.choiceList.element.scrollTop;
+        var choiceListScrollTop = _this20.choiceList.element.scrollTop;
         var continueAnimation = false;
         var easing = void 0;
         var distance = void 0;
@@ -3856,7 +4195,7 @@ var Choices = function () {
           easing = (endPoint - choiceListScrollTop) / strength;
           distance = easing > 1 ? easing : 1;
 
-          _this18.choiceList.scrollTo(choiceListScrollTop + distance);
+          _this20.choiceList.scrollTo(choiceListScrollTop + distance);
           if (choiceListScrollTop < endPoint) {
             continueAnimation = true;
           }
@@ -3864,7 +4203,7 @@ var Choices = function () {
           easing = (choiceListScrollTop - endPoint) / strength;
           distance = easing > 1 ? easing : 1;
 
-          _this18.choiceList.scrollTo(choiceListScrollTop - distance);
+          _this20.choiceList.scrollTo(choiceListScrollTop - distance);
           if (choiceListScrollTop > endPoint) {
             continueAnimation = true;
           }
@@ -3892,7 +4231,7 @@ var Choices = function () {
   }, {
     key: '_highlightChoice',
     value: function _highlightChoice() {
-      var _this19 = this;
+      var _this21 = this;
 
       var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
@@ -3909,17 +4248,17 @@ var Choices = function () {
 
       // Remove any highlighted choices
       highlightedChoices.forEach(function (choice) {
-        choice.classList.remove(_this19.config.classNames.highlightedState);
+        choice.classList.remove(_this21.config.classNames.highlightedState);
         choice.setAttribute('aria-selected', 'false');
       });
 
       if (passedEl) {
-        this.highlightPosition = choices.indexOf(passedEl);
+        this._highlightPosition = choices.indexOf(passedEl);
       } else {
         // Highlight choice based on last known highlight location
-        if (choices.length > this.highlightPosition) {
+        if (choices.length > this._highlightPosition) {
           // If we have an option to highlight
-          passedEl = choices[this.highlightPosition];
+          passedEl = choices[this._highlightPosition];
         } else {
           // Otherwise highlight the option before
           passedEl = choices[choices.length - 1];
@@ -3964,16 +4303,13 @@ var Choices = function () {
       var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
       var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
+
       var passedKeyCode = keyCode;
       var passedCustomProperties = customProperties;
-      var items = this.store.items;
+      var items = this._store.items;
       var passedLabel = label || passedValue;
       var passedOptionId = parseInt(choiceId, 10) || -1;
-
-      // Get group if group ID passed
-      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-
-      // Generate unique id
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
       var id = items ? items.length + 1 : 1;
 
       // If a prepended value has been passed, prepend it
@@ -3986,9 +4322,9 @@ var Choices = function () {
         passedValue += this.config.appendValue.toString();
       }
 
-      this.store.dispatch((0, _items.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
+      this._store.dispatch((0, _items.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
 
-      if (this.isSelectOneElement) {
+      if (this._isSelectOneElement) {
         this.removeActiveItems(id);
       }
 
@@ -4035,9 +4371,9 @@ var Choices = function () {
           choiceId = item.choiceId,
           groupId = item.groupId;
 
-      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
 
-      this.store.dispatch((0, _items.removeItem)(id, choiceId));
+      this._store.dispatch((0, _items.removeItem)(id, choiceId));
 
       if (group && group.value) {
         this.passedElement.triggerEvent(_constants.EVENTS.removeItem, {
@@ -4085,12 +4421,12 @@ var Choices = function () {
       }
 
       // Generate unique id
-      var choices = this.store.choices;
+      var choices = this._store.choices;
       var choiceLabel = label || value;
       var choiceId = choices ? choices.length + 1 : 1;
-      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
+      var choiceElementId = this._baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
-      this.store.dispatch((0, _choices.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
+      this._store.dispatch((0, _choices.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
 
       if (isSelected) {
         this._addItem(value, choiceLabel, choiceId, undefined, customProperties, placeholder, keyCode);
@@ -4106,7 +4442,7 @@ var Choices = function () {
   }, {
     key: '_clearChoices',
     value: function _clearChoices() {
-      this.store.dispatch((0, _choices.clearChoices)());
+      this._store.dispatch((0, _choices.clearChoices)());
     }
 
     /**
@@ -4122,7 +4458,7 @@ var Choices = function () {
   }, {
     key: '_addGroup',
     value: function _addGroup(group, id) {
-      var _this20 = this;
+      var _this22 = this;
 
       var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
       var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
@@ -4132,16 +4468,16 @@ var Choices = function () {
       var isDisabled = group.disabled ? group.disabled : false;
 
       if (groupChoices) {
-        this.store.dispatch((0, _groups.addGroup)(group.label, groupId, true, isDisabled));
+        this._store.dispatch((0, _groups.addGroup)(group.label, groupId, true, isDisabled));
 
         var addGroupChoices = function addGroupChoices(choice) {
           var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
-          _this20._addChoice(choice[valueKey], (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
+          _this22._addChoice(choice[valueKey], (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
         };
 
         groupChoices.forEach(addGroupChoices);
       } else {
-        this.store.dispatch((0, _groups.addGroup)(group.label, group.id, false, group.disabled));
+        this._store.dispatch((0, _groups.addGroup)(group.label, group.id, false, group.disabled));
       }
     }
 
@@ -4198,19 +4534,46 @@ var Choices = function () {
     key: '_createElements',
     value: function _createElements() {
       var direction = this.passedElement.element.getAttribute('dir') || 'ltr';
-      var containerOuter = this._getTemplate('containerOuter', direction, this.isSelectElement, this.isSelectOneElement, this.config.searchEnabled, this.passedElement.element.type);
+      var containerOuter = this._getTemplate('containerOuter', direction, this._isSelectElement, this._isSelectOneElement, this.config.searchEnabled, this.passedElement.element.type);
       var containerInner = this._getTemplate('containerInner');
-      var itemList = this._getTemplate('itemList', this.isSelectOneElement);
-      var choiceList = this._getTemplate('choiceList', this.isSelectOneElement);
+      var itemList = this._getTemplate('itemList', this._isSelectOneElement);
+      var choiceList = this._getTemplate('choiceList', this._isSelectOneElement);
       var input = this._getTemplate('input');
       var dropdown = this._getTemplate('dropdown');
 
-      this.containerOuter = new _container2.default(this, containerOuter, this.config.classNames);
-      this.containerInner = new _container2.default(this, containerInner, this.config.classNames);
-      this.input = new _input2.default(this, input, this.config.classNames);
-      this.choiceList = new _list2.default(this, choiceList, this.config.classNames);
-      this.itemList = new _list2.default(this, itemList, this.config.classNames);
-      this.dropdown = new _dropdown2.default(this, dropdown, this.config.classNames);
+      this.containerOuter = new _container2.default({
+        element: containerOuter,
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type,
+        position: this.config.position
+      });
+
+      this.containerInner = new _container2.default({
+        element: containerInner,
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type,
+        position: this.config.position
+      });
+
+      this.input = new _input2.default({
+        element: input,
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type
+      });
+
+      this.choiceList = new _list2.default({
+        element: choiceList
+      });
+
+      this.itemList = new _list2.default({
+        element: itemList
+      });
+
+      this.dropdown = new _dropdown2.default({
+        element: dropdown,
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type
+      });
     }
 
     /**
@@ -4229,10 +4592,10 @@ var Choices = function () {
       // Wrapper inner container with outer container
       this.containerOuter.wrap(this.containerInner.element);
 
-      if (this.isSelectOneElement) {
+      if (this._isSelectOneElement) {
         this.input.placeholder = this.config.searchPlaceholderValue || '';
-      } else if (this.placeholder) {
-        this.input.placeholder = this.placeholder;
+      } else if (this._placeholderValue) {
+        this.input.placeholder = this._placeholderValue;
         this.input.setWidth(true);
       }
 
@@ -4244,31 +4607,31 @@ var Choices = function () {
       this.containerOuter.element.appendChild(this.dropdown.element);
       this.containerInner.element.appendChild(this.itemList.element);
 
-      if (!this.isTextElement) {
+      if (!this._isTextElement) {
         this.dropdown.element.appendChild(this.choiceList.element);
       }
 
-      if (!this.isSelectOneElement) {
+      if (!this._isSelectOneElement) {
         this.containerInner.element.appendChild(this.input.element);
-      } else if (this.canSearch) {
+      } else if (this.config.searchEnabled) {
         this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
       }
 
-      if (this.isSelectElement) {
+      if (this._isSelectElement) {
         this._addPredefinedChoices();
-      } else if (this.isTextElement) {
+      } else if (this._isTextElement) {
         this._addPredefinedItems();
       }
     }
   }, {
     key: '_addPredefinedChoices',
     value: function _addPredefinedChoices() {
-      var _this21 = this;
+      var _this23 = this;
 
       var passedGroups = this.passedElement.optionGroups;
 
-      this.highlightPosition = 0;
-      this.isSearching = false;
+      this._highlightPosition = 0;
+      this._isSearching = false;
 
       if (passedGroups && passedGroups.length) {
         // If we have a placeholder option
@@ -4279,12 +4642,12 @@ var Choices = function () {
         }
 
         passedGroups.forEach(function (group) {
-          _this21._addGroup(group, group.id || null);
+          _this23._addGroup(group, group.id || null);
         });
       } else {
         var passedOptions = this.passedElement.options;
         var filter = this.config.sortFn;
-        var allChoices = this.presetChoices;
+        var allChoices = this._presetChoices;
 
         // Create array of options from option elements
         passedOptions.forEach(function (o) {
@@ -4307,22 +4670,22 @@ var Choices = function () {
           return choice.selected;
         });
         var handleChoice = function handleChoice(choice, index) {
-          if (_this21.isSelectElement) {
+          if (_this23._isSelectElement) {
             // If the choice is actually a group
             if (choice.choices) {
-              _this21._addGroup(choice, choice.id || null);
+              _this23._addGroup(choice, choice.id || null);
             } else {
               // If there is a selected choice already or the choice is not
               // the first in the array, add each choice normally
               // Otherwise pre-select the first choice in the array if it's a single select
-              var shouldPreselect = _this21.isSelectOneElement && !hasSelectedChoice && index === 0;
+              var shouldPreselect = _this23._isSelectOneElement && !hasSelectedChoice && index === 0;
               var isSelected = shouldPreselect ? true : choice.selected;
               var isDisabled = shouldPreselect ? false : choice.disabled;
 
-              _this21._addChoice(choice.value, choice.label, isSelected, isDisabled, undefined, choice.customProperties, choice.placeholder);
+              _this23._addChoice(choice.value, choice.label, isSelected, isDisabled, undefined, choice.customProperties, choice.placeholder);
             }
           } else {
-            _this21._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
+            _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
           }
         };
 
@@ -4335,7 +4698,7 @@ var Choices = function () {
   }, {
     key: '_addPredefinedItems',
     value: function _addPredefinedItems() {
-      var _this22 = this;
+      var _this24 = this;
 
       var handlePresetItem = function handlePresetItem(item) {
         var itemType = (0, _utils.getType)(item);
@@ -4343,20 +4706,20 @@ var Choices = function () {
           if (!item.value) {
             return;
           }
-          _this22._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
+          _this24._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
         } else if (itemType === 'String') {
-          _this22._addItem(item);
+          _this24._addItem(item);
         }
       };
 
-      this.presetItems.forEach(function (item) {
+      this._presetItems.forEach(function (item) {
         return handlePresetItem(item);
       });
     }
   }, {
     key: '_setChoiceOrItem',
     value: function _setChoiceOrItem(item) {
-      var _this23 = this;
+      var _this25 = this;
 
       var itemType = (0, _utils.getType)(item).toLowerCase();
       var handleType = {
@@ -4367,17 +4730,17 @@ var Choices = function () {
 
           // If we are dealing with a select input, we need to create an option first
           // that is then selected. For text inputs we can just add items normally.
-          if (!_this23.isTextElement) {
-            _this23._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
+          if (!_this25._isTextElement) {
+            _this25._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
           } else {
-            _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
+            _this25._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
           }
         },
         string: function string() {
-          if (!_this23.isTextElement) {
-            _this23._addChoice(item, item, true, false, -1, null);
+          if (!_this25._isTextElement) {
+            _this25._addChoice(item, item, true, false, -1, null);
           } else {
-            _this23._addItem(item);
+            _this25._addItem(item);
           }
         }
       };
@@ -4387,21 +4750,132 @@ var Choices = function () {
   }, {
     key: '_findAndSelectChoiceByValue',
     value: function _findAndSelectChoiceByValue(val) {
-      var _this24 = this;
+      var _this26 = this;
 
-      var choices = this.store.choices;
+      var choices = this._store.choices;
       // Check 'value' property exists and the choice isn't already selected
       var foundChoice = choices.find(function (choice) {
-        return _this24.config.itemComparer(choice.value, val);
+        return _this26.config.itemComparer(choice.value, val);
       });
 
       if (foundChoice && !foundChoice.selected) {
         this._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties, foundChoice.placeholder, foundChoice.keyCode);
       }
     }
+  }, {
+    key: '_generateInstances',
+    value: function _generateInstances(elements, config) {
+      return elements.reduce(function (instances, element) {
+        instances.push(new Choices(element, config));
+        return instances;
+      }, [this]);
+    }
+  }, {
+    key: '_generatePlaceholderValue',
+    value: function _generatePlaceholderValue() {
+      if (!this._isSelectOneElement) {
+        return this.config.placeholder ? this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder') : false;
+      }
+
+      return false;
+    }
+  }, {
+    key: '_renderChoices',
+    value: function _renderChoices() {
+      // Get active groups/choices
+      var activeGroups = this._store.activeGroups;
+      var activeChoices = this._store.activeChoices;
+
+      var choiceListFragment = document.createDocumentFragment();
+
+      // Clear choices
+      this.choiceList.clear();
+
+      // Scroll back to top of choices list
+      if (this.config.resetScrollPosition) {
+        this.choiceList.scrollTo(0);
+      }
+
+      // If we have grouped options
+      if (activeGroups.length >= 1 && !this._isSearching) {
+        // If we have a placeholder choice along with groups
+        var activePlaceholders = activeChoices.filter(function (activeChoice) {
+          return activeChoice.placeholder === true && activeChoice.groupId === -1;
+        });
+        if (activePlaceholders.length >= 1) {
+          choiceListFragment = this._createChoicesFragment(activePlaceholders, choiceListFragment);
+        }
+        choiceListFragment = this._createGroupsFragment(activeGroups, activeChoices, choiceListFragment);
+      } else if (activeChoices.length >= 1) {
+        choiceListFragment = this._createChoicesFragment(activeChoices, choiceListFragment);
+      }
+
+      // If we have choices to show
+      if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+        var activeItems = this._store.activeItems;
+        var canAddItem = this._canAddItem(activeItems, this.input.value);
+
+        // ...and we can select them
+        if (canAddItem.response) {
+          // ...append them and highlight the first choice
+          this.choiceList.append(choiceListFragment);
+          this._highlightChoice();
+        } else {
+          // ...otherwise show a notice
+          this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+        }
+      } else {
+        // Otherwise show a notice
+        var dropdownItem = void 0;
+        var notice = void 0;
+
+        if (this._isSearching) {
+          notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+
+          dropdownItem = this._getTemplate('notice', notice, 'no-results');
+        } else {
+          notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+
+          dropdownItem = this._getTemplate('notice', notice, 'no-choices');
+        }
+
+        this.choiceList.append(dropdownItem);
+      }
+    }
+  }, {
+    key: '_renderItems',
+    value: function _renderItems() {
+      // Get active items (items that can be selected)
+      var activeItems = this._store.activeItems || [];
+      // Clear list
+      this.itemList.clear();
+
+      if (activeItems.length) {
+        // Create a fragment to store our list items
+        // (so we don't have to update the DOM for each item)
+        var itemListFragment = this._createItemsFragment(activeItems);
+
+        // If we have items to add, append them
+        if (itemListFragment.childNodes) {
+          this.itemList.append(itemListFragment);
+        }
+      }
+    }
 
     /* =====  End of Private functions  ====== */
 
+  }], [{
+    key: '_generateConfig',
+    value: function _generateConfig(userConfig) {
+      var defaultConfig = _extends({}, _constants.DEFAULT_CONFIG, {
+        items: [],
+        choices: [],
+        classNames: _constants.DEFAULT_CLASSNAMES,
+        sortFn: _utils.sortByAlpha
+      });
+
+      return (0, _utils.extend)(defaultConfig, Choices.userDefaults, userConfig);
+    }
   }]);
 
   return Choices;
@@ -4413,7 +4887,7 @@ Choices.userDefaults = {};
 module.exports = Choices;
 
 /***/ }),
-/* 8 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -5414,7 +5888,7 @@ module.exports = Fuse;
 //# sourceMappingURL=fuse.js.map
 
 /***/ }),
-/* 9 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5426,9 +5900,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _redux = __webpack_require__(2);
+var _redux = __webpack_require__(22);
 
-var _index = __webpack_require__(15);
+var _index = __webpack_require__(44);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -5442,7 +5916,7 @@ var Store = function () {
   function Store() {
     _classCallCheck(this, Store);
 
-    this.store = (0, _redux.createStore)(_index2.default, window.devToolsExtension ? window.devToolsExtension() : undefined);
+    this._store = (0, _redux.createStore)(_index2.default, window.devToolsExtension ? window.devToolsExtension() : undefined);
   }
 
   /**
@@ -5455,7 +5929,7 @@ var Store = function () {
   _createClass(Store, [{
     key: 'subscribe',
     value: function subscribe(onChange) {
-      this.store.subscribe(onChange);
+      this._store.subscribe(onChange);
     }
 
     /**
@@ -5467,7 +5941,7 @@ var Store = function () {
   }, {
     key: 'dispatch',
     value: function dispatch(action) {
-      this.store.dispatch(action);
+      this._store.dispatch(action);
     }
 
     /**
@@ -5510,7 +5984,7 @@ var Store = function () {
   }, {
     key: 'state',
     get: function get() {
-      return this.store.getState();
+      return this._store.getState();
     }
 
     /**
@@ -5654,7 +6128,7 @@ var Store = function () {
 exports.default = Store;
 
 /***/ }),
-/* 10 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5663,17 +6137,17 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 /* harmony default export */ __webpack_exports__["a"] = (freeGlobal);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(23)))
 
 /***/ }),
-/* 11 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(12);
+module.exports = __webpack_require__(41);
 
 
 /***/ }),
-/* 12 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5683,7 +6157,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _ponyfill = __webpack_require__(14);
+var _ponyfill = __webpack_require__(43);
 
 var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -5706,10 +6180,10 @@ if (typeof self !== 'undefined') {
 
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(13)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23), __webpack_require__(42)(module)))
 
 /***/ }),
-/* 13 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -5737,7 +6211,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 14 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5766,7 +6240,7 @@ function symbolObservablePonyfill(root) {
 };
 
 /***/ }),
-/* 15 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5776,17 +6250,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _redux = __webpack_require__(2);
+var _redux = __webpack_require__(22);
 
-var _items = __webpack_require__(16);
+var _items = __webpack_require__(45);
 
 var _items2 = _interopRequireDefault(_items);
 
-var _groups = __webpack_require__(17);
+var _groups = __webpack_require__(46);
 
 var _groups2 = _interopRequireDefault(_groups);
 
-var _choices = __webpack_require__(18);
+var _choices = __webpack_require__(47);
 
 var _choices2 = _interopRequireDefault(_choices);
 
@@ -5814,7 +6288,7 @@ var rootReducer = function rootReducer(passedState, action) {
 exports.default = rootReducer;
 
 /***/ }),
-/* 16 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5888,7 +6362,7 @@ function items() {
 }
 
 /***/ }),
-/* 17 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5931,7 +6405,7 @@ function groups() {
 }
 
 /***/ }),
-/* 18 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6060,7 +6534,7 @@ function choices() {
 }
 
 /***/ }),
-/* 19 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6075,14 +6549,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Dropdown = function () {
-  function Dropdown(instance, element, classNames) {
+  function Dropdown(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames;
+
     _classCallCheck(this, Dropdown);
 
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.dimensions = null;
-    this.position = null;
+    Object.assign(this, { element: element, type: type, classNames: classNames });
+
     this.isActive = false;
   }
 
@@ -6124,7 +6599,7 @@ var Dropdown = function () {
       this.element.classList.add(this.classNames.activeState);
       this.element.setAttribute('aria-expanded', 'true');
       this.isActive = true;
-      return this.parentInstance;
+      return this;
     }
 
     /**
@@ -6139,7 +6614,7 @@ var Dropdown = function () {
       this.element.classList.remove(this.classNames.activeState);
       this.element.setAttribute('aria-expanded', 'false');
       this.isActive = false;
-      return this.parentInstance;
+      return this;
     }
   }]);
 
@@ -6149,7 +6624,7 @@ var Dropdown = function () {
 exports.default = Dropdown;
 
 /***/ }),
-/* 20 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6161,23 +6636,27 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Container = function () {
-  function Container(instance, element, classNames) {
+  function Container(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames,
+        position = _ref.position;
+
     _classCallCheck(this, Container);
 
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
-    this.config = instance.config;
+    Object.assign(this, { element: element, classNames: classNames, type: type, position: position });
+
     this.isOpen = false;
     this.isFlipped = false;
     this.isFocussed = false;
     this.isDisabled = false;
     this.isLoading = false;
+
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
@@ -6242,12 +6721,13 @@ var Container = function () {
       if (dropdownPos === undefined) {
         return false;
       }
+
       // If flip is enabled and the dropdown bottom position is
       // greater than the window height flip the dropdown.
       var shouldFlip = false;
-      if (this.config.position === 'auto') {
+      if (this.position === 'auto') {
         shouldFlip = dropdownPos >= windowHeight;
-      } else if (this.config.position === 'top') {
+      } else if (this.position === 'top') {
         shouldFlip = true;
       }
 
@@ -6327,7 +6807,7 @@ var Container = function () {
     value: function enable() {
       this.element.classList.remove(this.classNames.disabledState);
       this.element.removeAttribute('aria-disabled');
-      if (this.parentInstance.isSelectOneElement) {
+      if (this.type === 'select-one') {
         this.element.setAttribute('tabindex', '0');
       }
       this.isDisabled = false;
@@ -6342,7 +6822,7 @@ var Container = function () {
     value: function disable() {
       this.element.classList.add(this.classNames.disabledState);
       this.element.setAttribute('aria-disabled', 'true');
-      if (this.parentInstance.isSelectOneElement) {
+      if (this.type === 'select-one') {
         this.element.setAttribute('tabindex', '-1');
       }
       this.isDisabled = true;
@@ -6392,7 +6872,7 @@ var Container = function () {
 exports.default = Container;
 
 /***/ }),
-/* 21 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6404,15 +6884,21 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Input = function () {
-  function Input(instance, element, classNames) {
+  function Input(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames,
+        placeholderValue = _ref.placeholderValue;
+
     _classCallCheck(this, Input);
 
-    this.parentInstance = instance;
+    Object.assign(this, { element: element, type: type, classNames: classNames, placeholderValue: placeholderValue });
+
     this.element = element;
     this.classNames = classNames;
     this.isFocussed = this.element === document.activeElement;
@@ -6451,7 +6937,7 @@ var Input = function () {
   }, {
     key: 'onInput',
     value: function onInput() {
-      if (!this.parentInstance.isSelectOneElement) {
+      if (this.type !== 'select-one') {
         this.setWidth();
       }
     }
@@ -6467,25 +6953,15 @@ var Input = function () {
     key: 'onPaste',
     value: function onPaste(e) {
       // Disable pasting into the input if option has been set
-      if (e.target === this.element && !this.parentInstance.config.paste) {
+      if (e.target === this.element && this.preventPaste) {
         e.preventDefault();
       }
     }
-
-    /**
-     * Set focussed state
-     */
-
   }, {
     key: 'onFocus',
     value: function onFocus() {
       this.isFocussed = true;
     }
-
-    /**
-     * Remove focussed state
-     */
-
   }, {
     key: 'onBlur',
     value: function onBlur() {
@@ -6537,7 +7013,7 @@ var Input = function () {
         this.setWidth();
       }
 
-      return this.parentInstance;
+      return this;
     }
 
     /**
@@ -6549,10 +7025,10 @@ var Input = function () {
   }, {
     key: 'setWidth',
     value: function setWidth(enforceWidth) {
-      if (this.parentInstance.placeholder) {
+      if (this._placeholderValue) {
         // If there is a placeholder, we only want to set the width of the input when it is a greater
         // length than 75% of the placeholder. This stops the input jumping around.
-        if (this.element.value && this.element.value.length >= this.parentInstance.placeholder.length / 1.25 || enforceWidth) {
+        if (this.element.value && this.element.value.length >= this._placeholderValue.length / 1.25 || enforceWidth) {
           this.element.style.width = this.calcWidth();
         }
       } else {
@@ -6596,7 +7072,7 @@ var Input = function () {
 exports.default = Input;
 
 /***/ }),
-/* 22 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6611,12 +7087,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var List = function () {
-  function List(instance, element, classNames) {
+  function List(_ref) {
+    var element = _ref.element;
+
     _classCallCheck(this, List);
 
-    this.parentInstance = instance;
-    this.element = element;
-    this.classNames = classNames;
+    Object.assign(this, { element: element });
+
     this.scrollPos = this.element.scrollTop;
     this.height = this.element.offsetHeight;
     this.hasChildren = !!this.element.children;
@@ -6672,7 +7149,7 @@ var List = function () {
 exports.default = List;
 
 /***/ }),
-/* 23 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6686,11 +7163,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _wrappedElement = __webpack_require__(4);
+var _wrappedElement = __webpack_require__(24);
 
 var _wrappedElement2 = _interopRequireDefault(_wrappedElement);
 
-var _utils = __webpack_require__(0);
+var _utils = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6703,14 +7180,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var WrappedInput = function (_WrappedElement) {
   _inherits(WrappedInput, _WrappedElement);
 
-  function WrappedInput(instance, element, classNames) {
+  function WrappedInput(_ref) {
+    var element = _ref.element,
+        classNames = _ref.classNames,
+        delimiter = _ref.delimiter;
+
     _classCallCheck(this, WrappedInput);
 
-    var _this = _possibleConstructorReturn(this, (WrappedInput.__proto__ || Object.getPrototypeOf(WrappedInput)).call(this, instance, element, classNames));
+    var _this = _possibleConstructorReturn(this, (WrappedInput.__proto__ || Object.getPrototypeOf(WrappedInput)).call(this, { element: element, classNames: classNames }));
 
-    _this.parentInstance = instance;
-    _this.element = element;
-    _this.classNames = classNames;
+    _this.delimiter = delimiter;
     return _this;
   }
 
@@ -6718,7 +7197,7 @@ var WrappedInput = function (_WrappedElement) {
     key: 'value',
     set: function set(items) {
       var itemsFiltered = (0, _utils.reduceToValues)(items);
-      var itemsFilteredString = itemsFiltered.join(this.parentInstance.config.delimiter);
+      var itemsFilteredString = itemsFiltered.join(this.delimiter);
 
       this.element.setAttribute('value', itemsFilteredString);
       this.element.value = itemsFilteredString;
@@ -6737,7 +7216,7 @@ var WrappedInput = function (_WrappedElement) {
 exports.default = WrappedInput;
 
 /***/ }),
-/* 24 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6749,11 +7228,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _wrappedElement = __webpack_require__(4);
+var _wrappedElement = __webpack_require__(24);
 
 var _wrappedElement2 = _interopRequireDefault(_wrappedElement);
 
-var _templates = __webpack_require__(5);
+var _templates = __webpack_require__(25);
 
 var _templates2 = _interopRequireDefault(_templates);
 
@@ -6768,15 +7247,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var WrappedSelect = function (_WrappedElement) {
   _inherits(WrappedSelect, _WrappedElement);
 
-  function WrappedSelect(instance, element, classNames) {
+  function WrappedSelect(_ref) {
+    var element = _ref.element,
+        classNames = _ref.classNames;
+
     _classCallCheck(this, WrappedSelect);
 
-    var _this = _possibleConstructorReturn(this, (WrappedSelect.__proto__ || Object.getPrototypeOf(WrappedSelect)).call(this, instance, element, classNames));
-
-    _this.parentInstance = instance;
-    _this.element = element;
-    _this.classNames = classNames;
-    return _this;
+    return _possibleConstructorReturn(this, (WrappedSelect.__proto__ || Object.getPrototypeOf(WrappedSelect)).call(this, { element: element, classNames: classNames }));
   }
 
   _createClass(WrappedSelect, [{
@@ -6824,7 +7301,7 @@ var WrappedSelect = function (_WrappedElement) {
 exports.default = WrappedSelect;
 
 /***/ }),
-/* 25 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -6879,7 +7356,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 
 /***/ }),
-/* 26 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6890,7 +7367,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.addChoice = undefined;
 
-var _constants = __webpack_require__(1);
+var _constants = __webpack_require__(5);
 
 var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
   return {
@@ -6929,7 +7406,7 @@ var clearChoices = exports.clearChoices = function clearChoices() {
 };
 
 /***/ }),
-/* 27 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6940,7 +7417,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.highlightItem = exports.removeItem = exports.addItem = undefined;
 
-var _constants = __webpack_require__(1);
+var _constants = __webpack_require__(5);
 
 var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
   return {
@@ -6973,7 +7450,7 @@ var highlightItem = exports.highlightItem = function highlightItem(id, highlight
 };
 
 /***/ }),
-/* 28 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6984,7 +7461,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.addGroup = undefined;
 
-var _constants = __webpack_require__(1);
+var _constants = __webpack_require__(5);
 
 /* eslint-disable import/prefer-default-export */
 var addGroup = exports.addGroup = function addGroup(value, id, active, disabled) {
@@ -6998,7 +7475,7 @@ var addGroup = exports.addGroup = function addGroup(value, id, active, disabled)
 };
 
 /***/ }),
-/* 29 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7015,133 +7492,24 @@ var clearAll = exports.clearAll = function clearAll() {
 };
 
 /***/ }),
-/* 30 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/* eslint-disable */
-(function () {
-  // Production steps of ECMA-262, Edition 6, 22.1.2.1
-  // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
-  if (!Array.from) {
-    Array.from = function () {
-      var toStr = Object.prototype.toString;
+__webpack_require__(60);
 
-      var isCallable = function isCallable(fn) {
-        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
-      };
+__webpack_require__(83);
 
-      var toInteger = function toInteger(value) {
-        var number = Number(value);
-        if (isNaN(number)) {
-          return 0;
-        }
-        if (number === 0 || !isFinite(number)) {
-          return number;
-        }
-        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
-      };
-
-      var maxSafeInteger = Math.pow(2, 53) - 1;
-
-      var toLength = function toLength(value) {
-        var len = toInteger(value);
-        return Math.min(Math.max(len, 0), maxSafeInteger);
-      };
-
-      // The length property of the from method is 1.
-      return function from(arrayLike /* , mapFn, thisArg */) {
-        // 1. Let C be the this value.
-        var C = this;
-
-        // 2. Let items be ToObject(arrayLike).
-        var items = Object(arrayLike);
-
-        // 3. ReturnIfAbrupt(items).
-        if (arrayLike == null) {
-          throw new TypeError('Array.from requires an array-like object - not null or undefined');
-        }
-
-        // 4. If mapfn is undefined, then let mapping be false.
-        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-        var T = void 0;
-        if (typeof mapFn !== 'undefined') {
-          // 5. else
-          // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-          if (!isCallable(mapFn)) {
-            throw new TypeError('Array.from: when provided, the second argument must be a function');
-          }
-
-          // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-          if (arguments.length > 2) {
-            T = arguments[2];
-          }
-        }
-
-        // 10. Let lenValue be Get(items, "length").
-        // 11. Let len be ToLength(lenValue).
-        var len = toLength(items.length);
-
-        // 13. If IsConstructor(C) is true, then
-        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
-        // 14. a. Else, Let A be ArrayCreate(len).
-        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
-
-        // 16. Let k be 0.
-        var k = 0;
-        // 17. Repeat, while k < len… (also steps a - h)
-        var kValue = void 0;
-        while (k < len) {
-          kValue = items[k];
-          if (mapFn) {
-            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-          } else {
-            A[k] = kValue;
-          }
-          k += 1;
-        }
-        // 18. Let putStatus be Put(A, "length", len, true).
-        A.length = len;
-        // 20. Return A.
-        return A;
-      };
-    }();
+(function CustomEventPolyfill() {
+  if (typeof window.CustomEvent === 'function') {
+    return false;
   }
 
-  // Reference: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-  if (!Array.prototype.find) {
-    Array.prototype.find = function (predicate) {
-      'use strict';
+  function CustomEvent(event) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { bubbles: false, cancelable: false, detail: undefined };
 
-      if (this == null) {
-        throw new TypeError('Array.prototype.find called on null or undefined');
-      }
-      if (typeof predicate !== 'function') {
-        throw new TypeError('predicate must be a function');
-      }
-      var list = Object(this);
-      var length = list.length >>> 0;
-      var thisArg = arguments[1];
-      var value = void 0;
-
-      for (var i = 0; i < length; i++) {
-        value = list[i];
-        if (predicate.call(thisArg, value, i, list)) {
-          return value;
-        }
-      }
-      return undefined;
-    };
-  }
-
-  function CustomEvent(event, params) {
-    params = params || {
-      bubbles: false,
-      cancelable: false,
-      detail: undefined
-    };
     var evt = document.createEvent('CustomEvent');
     evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
     return evt;
@@ -7151,6 +7519,665 @@ var clearAll = exports.clearAll = function clearAll() {
 
   window.CustomEvent = CustomEvent;
 })();
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(61);
+__webpack_require__(76);
+module.exports = __webpack_require__(3).Array.from;
+
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $at = __webpack_require__(62)(true);
+
+// 21.1.3.27 String.prototype[@@iterator]()
+__webpack_require__(63)(String, 'String', function (iterated) {
+  this._t = String(iterated); // target
+  this._i = 0;                // next index
+// 21.1.5.2.1 %StringIteratorPrototype%.next()
+}, function () {
+  var O = this._t;
+  var index = this._i;
+  var point;
+  if (index >= O.length) return { value: undefined, done: true };
+  point = $at(O, index);
+  this._i += point.length;
+  return { value: point, done: false };
+});
+
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toInteger = __webpack_require__(11);
+var defined = __webpack_require__(12);
+// true  -> String#at
+// false -> String#codePointAt
+module.exports = function (TO_STRING) {
+  return function (that, pos) {
+    var s = String(defined(that));
+    var i = toInteger(pos);
+    var l = s.length;
+    var a, b;
+    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+    a = s.charCodeAt(i);
+    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+      ? TO_STRING ? s.charAt(i) : a
+      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+  };
+};
+
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var LIBRARY = __webpack_require__(26);
+var $export = __webpack_require__(13);
+var redefine = __webpack_require__(29);
+var hide = __webpack_require__(4);
+var Iterators = __webpack_require__(17);
+var $iterCreate = __webpack_require__(67);
+var setToStringTag = __webpack_require__(34);
+var getPrototypeOf = __webpack_require__(75);
+var ITERATOR = __webpack_require__(0)('iterator');
+var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
+var FF_ITERATOR = '@@iterator';
+var KEYS = 'keys';
+var VALUES = 'values';
+
+var returnThis = function () { return this; };
+
+module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+  $iterCreate(Constructor, NAME, next);
+  var getMethod = function (kind) {
+    if (!BUGGY && kind in proto) return proto[kind];
+    switch (kind) {
+      case KEYS: return function keys() { return new Constructor(this, kind); };
+      case VALUES: return function values() { return new Constructor(this, kind); };
+    } return function entries() { return new Constructor(this, kind); };
+  };
+  var TAG = NAME + ' Iterator';
+  var DEF_VALUES = DEFAULT == VALUES;
+  var VALUES_BUG = false;
+  var proto = Base.prototype;
+  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
+  var $default = $native || getMethod(DEFAULT);
+  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
+  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
+  var methods, key, IteratorPrototype;
+  // Fix native
+  if ($anyNative) {
+    IteratorPrototype = getPrototypeOf($anyNative.call(new Base()));
+    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
+      // Set @@toStringTag to native iterators
+      setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if (!LIBRARY && typeof IteratorPrototype[ITERATOR] != 'function') hide(IteratorPrototype, ITERATOR, returnThis);
+    }
+  }
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if (DEF_VALUES && $native && $native.name !== VALUES) {
+    VALUES_BUG = true;
+    $default = function values() { return $native.call(this); };
+  }
+  // Define iterator
+  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    hide(proto, ITERATOR, $default);
+  }
+  // Plug for library
+  Iterators[NAME] = $default;
+  Iterators[TAG] = returnThis;
+  if (DEFAULT) {
+    methods = {
+      values: DEF_VALUES ? $default : getMethod(VALUES),
+      keys: IS_SET ? $default : getMethod(KEYS),
+      entries: $entries
+    };
+    if (FORCED) for (key in methods) {
+      if (!(key in proto)) redefine(proto, key, methods[key]);
+    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+  }
+  return methods;
+};
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = !__webpack_require__(9) && !__webpack_require__(27)(function () {
+  return Object.defineProperty(__webpack_require__(28)('div'), 'a', { get: function () { return 7; } }).a != 7;
+});
+
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.1 ToPrimitive(input [, PreferredType])
+var isObject = __webpack_require__(8);
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+module.exports = function (it, S) {
+  if (!isObject(it)) return it;
+  var fn, val;
+  if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+
+
+/***/ }),
+/* 66 */
+/***/ (function(module, exports) {
+
+module.exports = function (it) {
+  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+  return it;
+};
+
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var create = __webpack_require__(68);
+var descriptor = __webpack_require__(14);
+var setToStringTag = __webpack_require__(34);
+var IteratorPrototype = {};
+
+// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+__webpack_require__(4)(IteratorPrototype, __webpack_require__(0)('iterator'), function () { return this; });
+
+module.exports = function (Constructor, NAME, next) {
+  Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
+  setToStringTag(Constructor, NAME + ' Iterator');
+};
+
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+var anObject = __webpack_require__(7);
+var dPs = __webpack_require__(69);
+var enumBugKeys = __webpack_require__(33);
+var IE_PROTO = __webpack_require__(20)('IE_PROTO');
+var Empty = function () { /* empty */ };
+var PROTOTYPE = 'prototype';
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function () {
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = __webpack_require__(28)('iframe');
+  var i = enumBugKeys.length;
+  var lt = '<';
+  var gt = '>';
+  var iframeDocument;
+  iframe.style.display = 'none';
+  __webpack_require__(74).appendChild(iframe);
+  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
+  // createDict = iframe.contentWindow.Object;
+  // html.removeChild(iframe);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while (i--) delete createDict[PROTOTYPE][enumBugKeys[i]];
+  return createDict();
+};
+
+module.exports = Object.create || function create(O, Properties) {
+  var result;
+  if (O !== null) {
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty();
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : dPs(result, Properties);
+};
+
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP = __webpack_require__(6);
+var anObject = __webpack_require__(7);
+var getKeys = __webpack_require__(70);
+
+module.exports = __webpack_require__(9) ? Object.defineProperties : function defineProperties(O, Properties) {
+  anObject(O);
+  var keys = getKeys(Properties);
+  var length = keys.length;
+  var i = 0;
+  var P;
+  while (length > i) dP.f(O, P = keys[i++], Properties[P]);
+  return O;
+};
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys = __webpack_require__(71);
+var enumBugKeys = __webpack_require__(33);
+
+module.exports = Object.keys || function keys(O) {
+  return $keys(O, enumBugKeys);
+};
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var has = __webpack_require__(10);
+var toIObject = __webpack_require__(30);
+var arrayIndexOf = __webpack_require__(72)(false);
+var IE_PROTO = __webpack_require__(20)('IE_PROTO');
+
+module.exports = function (object, names) {
+  var O = toIObject(object);
+  var i = 0;
+  var result = [];
+  var key;
+  for (key in O) if (key != IE_PROTO) has(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while (names.length > i) if (has(O, key = names[i++])) {
+    ~arrayIndexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// false -> Array#indexOf
+// true  -> Array#includes
+var toIObject = __webpack_require__(30);
+var toLength = __webpack_require__(19);
+var toAbsoluteIndex = __webpack_require__(73);
+module.exports = function (IS_INCLUDES) {
+  return function ($this, el, fromIndex) {
+    var O = toIObject($this);
+    var length = toLength(O.length);
+    var index = toAbsoluteIndex(fromIndex, length);
+    var value;
+    // Array#includes uses SameValueZero equality algorithm
+    // eslint-disable-next-line no-self-compare
+    if (IS_INCLUDES && el != el) while (length > index) {
+      value = O[index++];
+      // eslint-disable-next-line no-self-compare
+      if (value != value) return true;
+    // Array#indexOf ignores holes, Array#includes - not
+    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
+      if (O[index] === el) return IS_INCLUDES || index || 0;
+    } return !IS_INCLUDES && -1;
+  };
+};
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toInteger = __webpack_require__(11);
+var max = Math.max;
+var min = Math.min;
+module.exports = function (index, length) {
+  index = toInteger(index);
+  return index < 0 ? max(index + length, 0) : min(index, length);
+};
+
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var document = __webpack_require__(2).document;
+module.exports = document && document.documentElement;
+
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
+var has = __webpack_require__(10);
+var toObject = __webpack_require__(21);
+var IE_PROTO = __webpack_require__(20)('IE_PROTO');
+var ObjectProto = Object.prototype;
+
+module.exports = Object.getPrototypeOf || function (O) {
+  O = toObject(O);
+  if (has(O, IE_PROTO)) return O[IE_PROTO];
+  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
+    return O.constructor.prototype;
+  } return O instanceof Object ? ObjectProto : null;
+};
+
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var ctx = __webpack_require__(16);
+var $export = __webpack_require__(13);
+var toObject = __webpack_require__(21);
+var call = __webpack_require__(77);
+var isArrayIter = __webpack_require__(78);
+var toLength = __webpack_require__(19);
+var createProperty = __webpack_require__(79);
+var getIterFn = __webpack_require__(80);
+
+$export($export.S + $export.F * !__webpack_require__(82)(function (iter) { Array.from(iter); }), 'Array', {
+  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+  from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
+    var O = toObject(arrayLike);
+    var C = typeof this == 'function' ? this : Array;
+    var aLen = arguments.length;
+    var mapfn = aLen > 1 ? arguments[1] : undefined;
+    var mapping = mapfn !== undefined;
+    var index = 0;
+    var iterFn = getIterFn(O);
+    var length, result, step, iterator;
+    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
+    // if object isn't iterable or it's array with default iterator - use simple case
+    if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
+      for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+        createProperty(result, index, mapping ? call(iterator, mapfn, [step.value, index], true) : step.value);
+      }
+    } else {
+      length = toLength(O.length);
+      for (result = new C(length); length > index; index++) {
+        createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
+      }
+    }
+    result.length = index;
+    return result;
+  }
+});
+
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// call something on iterator step with safe closing on error
+var anObject = __webpack_require__(7);
+module.exports = function (iterator, fn, value, entries) {
+  try {
+    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+  // 7.4.6 IteratorClose(iterator, completion)
+  } catch (e) {
+    var ret = iterator['return'];
+    if (ret !== undefined) anObject(ret.call(iterator));
+    throw e;
+  }
+};
+
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// check on default Array iterator
+var Iterators = __webpack_require__(17);
+var ITERATOR = __webpack_require__(0)('iterator');
+var ArrayProto = Array.prototype;
+
+module.exports = function (it) {
+  return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+};
+
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $defineProperty = __webpack_require__(6);
+var createDesc = __webpack_require__(14);
+
+module.exports = function (object, index, value) {
+  if (index in object) $defineProperty.f(object, index, createDesc(0, value));
+  else object[index] = value;
+};
+
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var classof = __webpack_require__(81);
+var ITERATOR = __webpack_require__(0)('iterator');
+var Iterators = __webpack_require__(17);
+module.exports = __webpack_require__(3).getIteratorMethod = function (it) {
+  if (it != undefined) return it[ITERATOR]
+    || it['@@iterator']
+    || Iterators[classof(it)];
+};
+
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// getting tag from 19.1.3.6 Object.prototype.toString()
+var cof = __webpack_require__(18);
+var TAG = __webpack_require__(0)('toStringTag');
+// ES3 wrong here
+var ARG = cof(function () { return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function (it, key) {
+  try {
+    return it[key];
+  } catch (e) { /* empty */ }
+};
+
+module.exports = function (it) {
+  var O, T, B;
+  return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+    // builtinTag case
+    : ARG ? cof(O)
+    // ES3 arguments fallback
+    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+};
+
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ITERATOR = __webpack_require__(0)('iterator');
+var SAFE_CLOSING = false;
+
+try {
+  var riter = [7][ITERATOR]();
+  riter['return'] = function () { SAFE_CLOSING = true; };
+  // eslint-disable-next-line no-throw-literal
+  Array.from(riter, function () { throw 2; });
+} catch (e) { /* empty */ }
+
+module.exports = function (exec, skipClosing) {
+  if (!skipClosing && !SAFE_CLOSING) return false;
+  var safe = false;
+  try {
+    var arr = [7];
+    var iter = arr[ITERATOR]();
+    iter.next = function () { return { done: safe = true }; };
+    arr[ITERATOR] = function () { return iter; };
+    exec(arr);
+  } catch (e) { /* empty */ }
+  return safe;
+};
+
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(84);
+module.exports = __webpack_require__(3).Array.find;
+
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
+var $export = __webpack_require__(13);
+var $find = __webpack_require__(85)(5);
+var KEY = 'find';
+var forced = true;
+// Shouldn't skip holes
+if (KEY in []) Array(1)[KEY](function () { forced = false; });
+$export($export.P + $export.F * forced, 'Array', {
+  find: function find(callbackfn /* , that = undefined */) {
+    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+__webpack_require__(89)(KEY);
+
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 0 -> Array#forEach
+// 1 -> Array#map
+// 2 -> Array#filter
+// 3 -> Array#some
+// 4 -> Array#every
+// 5 -> Array#find
+// 6 -> Array#findIndex
+var ctx = __webpack_require__(16);
+var IObject = __webpack_require__(31);
+var toObject = __webpack_require__(21);
+var toLength = __webpack_require__(19);
+var asc = __webpack_require__(86);
+module.exports = function (TYPE, $create) {
+  var IS_MAP = TYPE == 1;
+  var IS_FILTER = TYPE == 2;
+  var IS_SOME = TYPE == 3;
+  var IS_EVERY = TYPE == 4;
+  var IS_FIND_INDEX = TYPE == 6;
+  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+  var create = $create || asc;
+  return function ($this, callbackfn, that) {
+    var O = toObject($this);
+    var self = IObject(O);
+    var f = ctx(callbackfn, that, 3);
+    var length = toLength(self.length);
+    var index = 0;
+    var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+    var val, res;
+    for (;length > index; index++) if (NO_HOLES || index in self) {
+      val = self[index];
+      res = f(val, index, O);
+      if (TYPE) {
+        if (IS_MAP) result[index] = res;   // map
+        else if (res) switch (TYPE) {
+          case 3: return true;             // some
+          case 5: return val;              // find
+          case 6: return index;            // findIndex
+          case 2: result.push(val);        // filter
+        } else if (IS_EVERY) return false; // every
+      }
+    }
+    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+  };
+};
+
+
+/***/ }),
+/* 86 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+var speciesConstructor = __webpack_require__(87);
+
+module.exports = function (original, length) {
+  return new (speciesConstructor(original))(length);
+};
+
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(8);
+var isArray = __webpack_require__(88);
+var SPECIES = __webpack_require__(0)('species');
+
+module.exports = function (original) {
+  var C;
+  if (isArray(original)) {
+    C = original.constructor;
+    // cross-realm fallback
+    if (typeof C == 'function' && (C === Array || isArray(C.prototype))) C = undefined;
+    if (isObject(C)) {
+      C = C[SPECIES];
+      if (C === null) C = undefined;
+    }
+  } return C === undefined ? Array : C;
+};
+
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.2.2 IsArray(argument)
+var cof = __webpack_require__(18);
+module.exports = Array.isArray || function isArray(arg) {
+  return cof(arg) == 'Array';
+};
+
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 22.1.3.31 Array.prototype[@@unscopables]
+var UNSCOPABLES = __webpack_require__(0)('unscopables');
+var ArrayProto = Array.prototype;
+if (ArrayProto[UNSCOPABLES] == undefined) __webpack_require__(4)(ArrayProto, UNSCOPABLES, {});
+module.exports = function (key) {
+  ArrayProto[UNSCOPABLES][key] = true;
+};
+
 
 /***/ })
 /******/ ]);
