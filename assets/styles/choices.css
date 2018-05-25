@@ -18,7 +18,10 @@
 .choices.is-disabled .choices__inner, .choices.is-disabled .choices__input {
   background-color: #EAEAEA;
   cursor: not-allowed;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .choices.is-disabled .choices__item {
@@ -265,7 +268,8 @@
     position: absolute;
     right: 10px;
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
   }
   [dir="rtl"] .choices__list--dropdown .choices__item--selectable {
     text-align: right;
@@ -296,7 +300,10 @@
 
 .choices__item--disabled {
   cursor: not-allowed;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   opacity: .5;
 }
 
@@ -311,7 +318,8 @@
 .choices__button {
   text-indent: -9999px;
   -webkit-appearance: none;
-  appearance: none;
+  -moz-appearance: none;
+       appearance: none;
   border: 0;
   background-color: transparent;
   background-repeat: no-repeat;
