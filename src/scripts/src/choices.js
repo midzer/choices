@@ -1,11 +1,8 @@
 import Fuse from 'fuse.js';
+
+import './lib/polyfills';
 import Store from './store/store';
-import Dropdown from './components/dropdown';
-import Container from './components/container';
-import Input from './components/input';
-import List from './components/list';
-import WrappedInput from './components/wrapped-input';
-import WrappedSelect from './components/wrapped-select';
+import { Dropdown, Container, Input, List, WrappedInput, WrappedSelect } from './components';
 import { DEFAULT_CONFIG, DEFAULT_CLASSNAMES, EVENTS, KEY_CODES, SCROLLING_SPEED } from './constants';
 import { TEMPLATES } from './templates';
 import { addChoice, filterChoices, activateChoices, clearChoices } from './actions/choices';
@@ -26,7 +23,6 @@ import {
   regexFilter,
   isIE11,
 } from './lib/utils';
-import './lib/polyfills';
 
 /**
  * Choices
