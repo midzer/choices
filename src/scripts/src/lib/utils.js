@@ -1,15 +1,6 @@
 /* eslint-disable */
 
 /**
- * Capitalises the first letter of each word in a string
- * @param  {String} str String to capitalise
- * @return {String}     Capitalised string
- */
-export const capitalise = function(str) {
-  return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-};
-
-/**
  * Generates a string of random chars
  * @param  {Number} length Length of the string to generate
  * @return {String} String of random chars
@@ -39,7 +30,6 @@ export const generateId = function(element, prefix) {
   return id;
 };
 
-
 /**
  * Tests the type of an object
  * @param  {String}  type Type to test object against
@@ -62,24 +52,14 @@ export const isType = function(type, obj) {
 };
 
 /**
- * Tests to see if a passed object is a node
- * @param  {Object}  obj  Object to be tested
- * @return {Boolean}
- */
-export const isNode = o => (
-    typeof Node === 'object' ? o instanceof Node :
-    o && typeof o === 'object' && typeof o.nodeType === 'number' && typeof o.nodeName === 'string'
-  );
-
-/**
  * Tests to see if a passed object is an element
  * @param  {Object}  obj  Object to be tested
  * @return {Boolean}
  */
 export const isElement = o => (
-    typeof HTMLElement === 'object' ? o instanceof HTMLElement : // DOM2
-    o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
-  );
+  typeof HTMLElement === 'object' ? o instanceof HTMLElement : // DOM2
+  o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
+);
 
 /**
  * Merges unspecified amount of objects into new object
@@ -121,132 +101,6 @@ export const extend = function() {
   return extended;
 };
 
-/**
- * CSS transition end event listener
- * @return
- */
-export const whichTransitionEvent = function() {
-  let t,
-    el = document.createElement('fakeelement');
-
-  const transitions = {
-    transition: 'transitionend',
-    OTransition: 'oTransitionEnd',
-    MozTransition: 'transitionend',
-    WebkitTransition: 'webkitTransitionEnd',
-  };
-
-  for (t in transitions) {
-    if (el.style[t] !== undefined) {
-      return transitions[t];
-    }
-  }
-};
-
-/**
- * CSS animation end event listener
- * @return
- */
-export const whichAnimationEvent = function() {
-  let t,
-    el = document.createElement('fakeelement');
-
-  const animations = {
-    animation: 'animationend',
-    OAnimation: 'oAnimationEnd',
-    MozAnimation: 'animationend',
-    WebkitAnimation: 'webkitAnimationEnd',
-  };
-
-  for (t in animations) {
-    if (el.style[t] !== undefined) {
-      return animations[t];
-    }
-  }
-};
-
-/**
- *  Get the ancestors of each element in the current set of matched elements,
- *  up to but not including the element matched by the selector
- * @param  {NodeElement} elem     Element to begin search from
- * @param  {NodeElement} parent   Parent to find
- * @param  {String} selector Class to find
- * @return {Array}          Array of parent elements
- */
-export const getParentsUntil = function(elem, parent, selector) {
-  const parents = [];
-  // Get matches
-  for (; elem && elem !== document; elem = elem.parentNode) {
-    // Check if parent has been reached
-    if (parent) {
-      const parentType = parent.charAt(0);
-
-      // If parent is a class
-      if (parentType === '.') {
-        if (elem.classList.contains(parent.substr(1))) {
-          break;
-        }
-      }
-
-      // If parent is an ID
-      if (parentType === '#') {
-        if (elem.id === parent.substr(1)) {
-          break;
-        }
-      }
-
-      // If parent is a data attribute
-      if (parentType === '[') {
-        if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
-          break;
-        }
-      }
-
-      // If parent is a tag
-      if (elem.tagName.toLowerCase() === parent) {
-        break;
-      }
-    }
-    if (selector) {
-      const selectorType = selector.charAt(0);
-
-      // If selector is a class
-      if (selectorType === '.') {
-        if (elem.classList.contains(selector.substr(1))) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is an ID
-      if (selectorType === '#') {
-        if (elem.id === selector.substr(1)) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is a data attribute
-      if (selectorType === '[') {
-        if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
-          parents.push(elem);
-        }
-      }
-
-      // If selector is a tag
-      if (elem.tagName.toLowerCase() === selector) {
-        parents.push(elem);
-      }
-    } else {
-      parents.push(elem);
-    }
-  }
-
-  // Return parents if any exist
-  if (parents.length === 0) {
-    return null;
-  }
-  return parents;
-};
-
 export const wrap = function(element, wrapper) {
   wrapper = wrapper || document.createElement('div');
   if (element.nextSibling) {
@@ -255,17 +109,6 @@ export const wrap = function(element, wrapper) {
     element.parentNode.appendChild(wrapper);
   }
   return wrapper.appendChild(element);
-};
-
-export const getSiblings = function(elem) {
-  const siblings = [];
-  let sibling = elem.parentNode.firstChild;
-  for (; sibling; sibling = sibling.nextSibling) {
-    if (sibling.nodeType === 1 && sibling !== elem) {
-      siblings.push(sibling);
-    }
-  }
-  return siblings;
 };
 
 /**
@@ -300,60 +143,6 @@ export const findAncestorByAttrName = function(el, attr) {
 };
 
 /**
- * Debounce an event handler.
- * @param  {Function} func      Function to run after wait
- * @param  {Number} wait      The delay before the function is executed
- * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing.
- * @return {Function}           A function will be called after it stops being called for a given delay
- */
-export const debounce = function(func, wait, immediate) {
-  let timeout;
-  return function() {
-    let context = this,
-      args = arguments;
-    const later = function() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    const callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-};
-
-/**
- * Get an element's distance from the top of the page
- * @private
- * @param  {NodeElement} el Element to test for
- * @return {Number} Elements Distance from top of page
- */
-export const getElemDistance = function(el) {
-  let location = 0;
-  if (el.offsetParent) {
-    do {
-      location += el.offsetTop;
-      el = el.offsetParent;
-    } while (el);
-  }
-  return location >= 0 ? location : 0;
-};
-
-/**
- * Determine element height multiplied by any offsets
- * @private
- * @param  {HTMLElement} el Element to test for
- * @return {Number}    Height of element
- */
-export const getElementOffset = function(el, offset) {
-  let elOffset = offset;
-  if (elOffset > 1) elOffset = 1;
-  if (elOffset > 0) elOffset = 0;
-
-  return Math.max(el.offsetHeight * elOffset);
-};
-
-/**
  * Get the next or previous element from a given start point
  * @param  {HTMLElement} startEl    Element to start position from
  * @param  {String}      className  The class we will look through
@@ -370,31 +159,6 @@ export const getAdjacentEl = (startEl, className, direction = 1) => {
   const operatorDirection = direction > 0 ? 1 : -1;
 
   return children[startPos + operatorDirection];
-};
-
-/**
- * Get scroll position based on top/bottom position
- * @private
- * @return {String} Position of scroll
- */
-export const getScrollPosition = function(position) {
-  if (position === 'bottom') {
-    // Scroll position from the bottom of the viewport
-    return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
-  }
-    // Scroll position from the top of the viewport
-  return (window.scrollY || window.pageYOffset);
-};
-
-/**
- * Determine whether an element is within the viewport
- * @param  {HTMLElement}  el Element to test
- * @return {String} Position of scroll
- * @return {Boolean}
- */
-export const isInView = function(el, position, offset) {
-  // If the user has scrolled further than the distance from the element to the top of its parent
-  return this.getScrollPosition(position) > (this.getElemDistance(el) + this.getElementOffset(el, offset));
 };
 
 /**
@@ -430,25 +194,6 @@ export const stripHTML = html =>
     .replace(/>/g, '&rt;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
-
-/**
- * Adds animation to an element and removes it upon animation completion
- * @param  {Element} el        Element to add animation to
- * @param  {String} animation Animation class to add to element
- * @return
- */
-export const addAnimation = (el, animation) => {
-  const animationEvent = whichAnimationEvent();
-
-  const removeAnimation = () => {
-    el.classList.remove(animation);
-    el.removeEventListener(animationEvent, removeAnimation, false);
-  };
-
-  el.classList.add(animation);
-  el.addEventListener(animationEvent, removeAnimation, false);
-};
-
 
 /**
  * Get a random number between a range
