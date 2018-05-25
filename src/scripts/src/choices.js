@@ -104,10 +104,8 @@ class Choices {
       );
     }
 
-    // Set unique base Id
     this._baseId = generateId(this.passedElement.element, 'choices-');
-
-    this.idNames = {
+    this._idNames = {
       itemChoice: 'item-choice',
     };
 
@@ -1900,7 +1898,7 @@ class Choices {
     const choices = this._store.choices;
     const choiceLabel = label || value;
     const choiceId = choices ? choices.length + 1 : 1;
-    const choiceElementId = `${this._baseId}-${this.idNames.itemChoice}-${choiceId}`;
+    const choiceElementId = `${this._baseId}-${this._idNames.itemChoice}-${choiceId}`;
 
     this._store.dispatch(
       addChoice(
@@ -2001,8 +1999,10 @@ class Choices {
     if (!template) {
       return null;
     }
+
     const templates = this.config.templates;
     const globalClasses = this.config.classNames;
+
     return templates[template].call(this, globalClasses, ...args);
   }
 
@@ -2012,11 +2012,11 @@ class Choices {
    * @private
    */
   _createTemplates() {
-    // User's custom templates
-    const callbackTemplate = this.config.callbackOnCreateTemplates;
+    const { callbackOnCreateTemplates } = this.config;
     let userTemplates = {};
-    if (callbackTemplate && isType('Function', callbackTemplate)) {
-      userTemplates = callbackTemplate.call(this, strToEl);
+
+    if (callbackOnCreateTemplates && isType('Function', callbackOnCreateTemplates)) {
+      userTemplates = callbackOnCreateTemplates.call(this, strToEl);
     }
 
     this.config.templates = extend(TEMPLATES, userTemplates);
