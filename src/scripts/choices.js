@@ -1340,26 +1340,34 @@ class Choices {
       (this.choiceList.element.scrollTop + choicePos) - containerScrollPos
     ) : choice.offsetTop;
 
+    const scrollDown = (scrollPos, strength) => {
+      const easing = (endPoint - scrollPos) / strength;
+      const distance = easing > 1 ? easing : 1;
+
+      this.choiceList.scrollTo(scrollPos + distance);
+    };
+
+    const scrollUp = (scrollPos, strength) => {
+      const easing = (scrollPos - endPoint) / strength;
+      const distance = easing > 1 ? easing : 1;
+
+      this.choiceList.scrollTo(scrollPos - distance);
+    };
+
     const animateScroll = () => {
       const strength = SCROLLING_SPEED;
       const choiceListScrollTop = this.choiceList.element.scrollTop;
       let continueAnimation = false;
-      let easing;
-      let distance;
 
       if (direction > 0) {
-        easing = (endPoint - choiceListScrollTop) / strength;
-        distance = easing > 1 ? easing : 1;
+        scrollDown(choiceListScrollTop, strength);
 
-        this.choiceList.scrollTo(choiceListScrollTop + distance);
         if (choiceListScrollTop < endPoint) {
           continueAnimation = true;
         }
       } else {
-        easing = (choiceListScrollTop - endPoint) / strength;
-        distance = easing > 1 ? easing : 1;
+        scrollUp(choiceListScrollTop, strength);
 
-        this.choiceList.scrollTo(choiceListScrollTop - distance);
         if (choiceListScrollTop > endPoint) {
           continueAnimation = true;
         }
@@ -1378,7 +1386,6 @@ class Choices {
   }
 
   _highlightChoice(el = null) {
-    // Highlight first element in dropdown
     const choices = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]'));
 
     if (!choices.length) {
@@ -1414,7 +1421,6 @@ class Choices {
       }
     }
 
-    // Highlight given option, and set accessiblity attributes
     passedEl.classList.add(this.config.classNames.highlightedState);
     passedEl.setAttribute('aria-selected', 'true');
 
@@ -1622,10 +1628,8 @@ class Choices {
       return null;
     }
 
-    const templates = this.config.templates;
-    const globalClasses = this.config.classNames;
-
-    return templates[template].call(this, globalClasses, ...args);
+    const { templates, classNames } = this.config;
+    return templates[template].call(this, classNames, ...args);
   }
 
   _createTemplates() {
@@ -1936,10 +1940,7 @@ class Choices {
   }
 
   _renderChoices() {
-    // Get active groups/choices
-    const activeGroups = this._store.activeGroups;
-    const activeChoices = this._store.activeChoices;
-
+    const { activeGroups, activeChoices } = this._store;
     let choiceListFragment = document.createDocumentFragment();
 
     // Clear choices
