@@ -5,8 +5,8 @@
   "main": "./public/assets/scripts/choices.min.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "start": "npm run clear && NODE_ENV=development node server.js",
-    "build": "npm run clear && npm run js:build && npm run css:build",
+    "start": "NODE_ENV=development node server.js",
+    "build": "npm run js:build && npm run css:build",
     "lint": "eslint assets/**/*.js",
     "coverage": "nyc npm run test",
     "test": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\"",
@@ -18,7 +18,6 @@
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' public/assets/styles/*.css -d public/assets/styles",
     "css:min": "csso public/assets/styles/base.css public/assets/styles/base.min.css && csso public/assets/styles/choices.css public/assets/styles/choices.min.css",
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --env.minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",
-    "clear": "rm -rf public/assets/scripts",
     "version": "node version.js --current $npm_package_version --new $npm_config_newVersion",
     "postversion": "npm run js:build",
     "prepush": "npm run lint && npm run test"

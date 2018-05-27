@@ -2,12 +2,12 @@
 const express = require('express');
 const path = require('path');
 
+const PORT = 3001;
+const DIST_DIR = path.join(__dirname, 'public');
+
 const app = express();
-const port = 3001;
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
   const webpack = require('webpack');
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -17,21 +17,20 @@ if (process.env.NODE_ENV === 'development') {
   const compiler = webpack(config);
 
   app.use(webpackDevMiddleware(compiler, {
-    publicPath: config.output.publicPath,
+    publicPath: '/assets/scripts/',
     stats: {
       colors: true,
     },
   }));
 
-  app.use(webpackHotMiddleware(compiler, {
-    log: console.log,
-  }));
+  app.use(webpackHotMiddleware(compiler));
 }
 
-app.listen(port, (err) => {
+app.use(express.static(DIST_DIR));
+app.listen(PORT, (err) => {
   if (err) {
     console.log(err);
   }
 
-  console.log(`Listening at ${port} 👂`);
+  console.log(`Listening at ${PORT} 👂`);
 });
