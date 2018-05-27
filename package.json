@@ -1,27 +1,27 @@
 {
   "name": "choices.js",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "A vanilla JS customisable text input/select box plugin",
-  "main": "./src/scripts/dist/choices.min.js",
+  "main": "./public/assets/scripts/choices.min.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "start": "node devServer.js",
+    "start": "npm run clear && NODE_ENV=development node server.js",
+    "build": "npm run clear && npm run js:build && npm run css:build",
     "lint": "eslint assets/**/*.js",
+    "coverage": "nyc npm run test",
     "test": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\"",
     "test:watch": "npm run test -- --watch --inspect=5556",
-    "test:cypress": "node server.js && cypress open",
-    "coverage": "nyc npm run test",
+    "test:cypress": "npm run build && concurrently \"NODE_ENV=production node server.js\" \"cypress open\"",
     "css:watch": "nodemon -e scss -x \"npm run css:build\"",
     "css:build": "npm run css:sass -s && npm run css:prefix -s && npm run css:min -s",
-    "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/scss/base.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/scss/choices.scss public/assets/styles/choices.css",
+    "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/scss/*.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/scss/choices.scss public/assets/styles/choices.css",
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' public/assets/styles/*.css -d public/assets/styles",
     "css:min": "csso public/assets/styles/base.css public/assets/styles/base.min.css && csso public/assets/styles/choices.css public/assets/styles/choices.min.css",
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --env.minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",
-    "build": "rm -rf public/assets/scripts && npm run js:build && npm run css:build",
+    "clear": "rm -rf public/assets/scripts",
     "version": "node version.js --current $npm_package_version --new $npm_config_newVersion",
     "postversion": "npm run js:build",
-    "prepush": "npm run lint && npm run test",
-    "dev": "dev"
+    "prepush": "npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -65,8 +65,8 @@
     "postcss-cli": "^2.5.1",
     "sinon": "^2.4.0",
     "webpack": "^3.8.1",
-    "webpack-dashboard": "^0.1.8",
-    "webpack-dev-server": "^1.14.1",
+    "webpack-dev-middleware": "^2.0.0",
+    "webpack-hot-middleware": "^2.22.2",
     "whatwg-fetch": "^1.0.0",
     "wrapper-webpack-plugin": "^0.1.7"
   },
@@ -83,9 +83,9 @@
     {
       "basePath": "src",
       "files": [
-        "scripts/dist/*",
-        "styles/css/*",
-        "icons/*"
+        "public/scripts/*",
+        "public/styles/*",
+        "src/icons/*"
       ]
     }
   ],
