@@ -1,16 +1,28 @@
 /*=============================================
 =            Generic styling                  =
 =============================================*/
+
+$global-guttering : 24px;
+$global-font-size-h1 : 32px;
+$global-font-size-h2 : 24px;
+$global-font-size-h3 : 20px;
+$global-font-size-h4 : 18px;
+$global-font-size-h5 : 16px;
+$global-font-size-h6 : 14px;
+
 * {
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale
 }
 
-*, *:before, *:after {
-  box-sizing: border-box;
+*,
+*:before,
+*:after {
+  box-sizing: border-box
 }
 
-html, body {
+html,
+body {
   position: relative;
   margin: 0;
   width: 100%;
@@ -40,20 +52,27 @@ p {
 
 hr {
   display: block;
-  margin: 30px 0;
+  margin: $global-guttering*1.25 0;
   border: 0;
   border-bottom: 1px solid #eaeaea;
   height: 1px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 0;
-  margin-bottom: 12px;
+  margin-bottom: $global-guttering/2;
   font-weight: 400;
   line-height: 1.2;
 }
 
-a, a:visited, a:focus {
+a,
+a:visited,
+a:focus {
   color: #FFFFFF;
   text-decoration: none;
   font-weight: 600;
@@ -69,59 +88,63 @@ a, a:visited, a:focus {
   font-size: 14px;
   -webkit-appearance: none;
   appearance: none;
-  margin-bottom: 24px;
+  margin-bottom: $global-guttering;
 }
 
-h1, .h1 {
-  font-size: 32px;
+h1,
+.h1 {
+  font-size: $global-font-size-h1;
 }
 
-h2, .h2 {
-  font-size: 24px;
+h2,
+.h2 {
+  font-size: $global-font-size-h2;
 }
 
-h3, .h3 {
-  font-size: 20px;
+h3,
+.h3 {
+  font-size: $global-font-size-h3;
 }
 
-h4, .h4 {
-  font-size: 18px;
+h4,
+.h4 {
+  font-size: $global-font-size-h4;
 }
 
-h5, .h5 {
-  font-size: 16px;
+h5,
+.h5 {
+  font-size: $global-font-size-h5;
 }
 
-h6, .h6 {
-  font-size: 14px;
+h6,
+.h6 {
+  font-size: $global-font-size-h6;
 }
 
 .container {
   display: block;
   margin: auto;
   max-width: 40em;
-  padding: 48px;
-}
-
-@media (max-width: 620px) {
-  .container {
+  padding: $global-guttering*2;
+  @media (max-width: 620px) {
     padding: 0;
   }
 }
 
 .section {
   background-color: #FFFFFF;
-  padding: 24px;
+  padding: $global-guttering;
   color: #333;
-}
-
-.section a, .section a:visited, .section a:focus {
-  color: #00bcd4;
+  a,
+  a:visited,
+  a:focus {
+    color: #00bcd4;
+  }
 }
 
 .logo {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: $global-guttering/2;
 }
 
 .logo__img {
@@ -130,7 +153,7 @@ h6, .h6 {
   display: inline-block;
   max-width: 100%;
   vertical-align: top;
-  padding: 6px 0;
+  padding: $global-guttering/4 0;
 }
 
 .visible-ie {

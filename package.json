@@ -14,7 +14,7 @@
     "test:cypress": "npm run build && concurrently \"NODE_ENV=production node server.js\" \"cypress open\"",
     "css:watch": "nodemon -e scss -x \"npm run css:build\"",
     "css:build": "npm run css:sass -s && npm run css:prefix -s && npm run css:min -s",
-    "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/scss/*.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/scss/choices.scss public/assets/styles/choices.css",
+    "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/base.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/choices.scss public/assets/styles/choices.css",
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' public/assets/styles/*.css -d public/assets/styles",
     "css:min": "csso public/assets/styles/base.css public/assets/styles/base.min.css && csso public/assets/styles/choices.css public/assets/styles/choices.min.css",
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --env.minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",

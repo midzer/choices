@@ -6,11 +6,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   position: relative;
   margin: 0;
   width: 100%;
@@ -46,14 +49,21 @@ hr {
   height: 1px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 0;
   margin-bottom: 12px;
   font-weight: 400;
   line-height: 1.2;
 }
 
-a, a:visited, a:focus {
+a,
+a:visited,
+a:focus {
   color: #FFFFFF;
   text-decoration: none;
   font-weight: 600;
@@ -73,27 +83,33 @@ a, a:visited, a:focus {
   margin-bottom: 24px;
 }
 
-h1, .h1 {
+h1,
+.h1 {
   font-size: 32px;
 }
 
-h2, .h2 {
+h2,
+.h2 {
   font-size: 24px;
 }
 
-h3, .h3 {
+h3,
+.h3 {
   font-size: 20px;
 }
 
-h4, .h4 {
+h4,
+.h4 {
   font-size: 18px;
 }
 
-h5, .h5 {
+h5,
+.h5 {
   font-size: 16px;
 }
 
-h6, .h6 {
+h6,
+.h6 {
   font-size: 14px;
 }
 
@@ -116,7 +132,9 @@ h6, .h6 {
   color: #333;
 }
 
-.section a, .section a:visited, .section a:focus {
+.section a,
+.section a:visited,
+.section a:focus {
   color: #00bcd4;
 }
 
