@@ -22,6 +22,7 @@ import {
   findAncestorByAttrName,
   regexFilter,
   isIE11,
+  existsInArray,
 } from './lib/utils';
 
 /**
@@ -758,7 +759,9 @@ class Choices {
       this.config.addItemText(value) :
       this.config.addItemText;
 
-    if (this._isSelectMultipleElement || this._isTextElement) {
+    if (!this._isSelectOneElement) {
+      const valueAlreadyExists = !existsInArray(activeItems, value);
+
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
         // If there is a max entry limit and we have reached that limit
         // don't update
@@ -767,34 +770,24 @@ class Choices {
           this.config.maxItemText(this.config.maxItemCount) :
           this.config.maxItemText;
       }
-    }
 
-    if (this.config.regexFilter && this._isTextElement && this.config.addItems && canAddItem) {
-      // If a user has supplied a regular expression filter
-      // determine whether we can update based on whether
-      // our regular expression passes
-      canAddItem = regexFilter(value, this.config.regexFilter);
-    }
-
-    // If no duplicates are allowed, and the value already exists
-    // in the array
-    const isUnique = !activeItems.some((item) => {
-      if (isType('String', value)) {
-        return item.value === value.trim();
+      if (this.config.regexFilter && this._isTextElement && this.config.addItems && canAddItem) {
+        // If a user has supplied a regular expression filter
+        // determine whether we can update based on whether
+        // our regular expression passes
+        canAddItem = regexFilter(value, this.config.regexFilter);
       }
 
-      return item.value === value;
-    });
-
-    if (!isUnique &&
-      !this.config.duplicateItems &&
-      !this._isSelectOneElement &&
-      canAddItem
-    ) {
-      canAddItem = false;
-      notice = isType('Function', this.config.uniqueItemText) ?
-        this.config.uniqueItemText(value) :
-        this.config.uniqueItemText;
+      if (
+        !this.config.duplicateItems &&
+        !valueAlreadyExists &&
+        canAddItem
+      ) {
+        canAddItem = false;
+        notice = isType('Function', this.config.uniqueItemText) ?
+          this.config.uniqueItemText(value) :
+          this.config.uniqueItemText;
+      }
     }
 
     return {

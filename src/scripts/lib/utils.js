@@ -352,3 +352,13 @@ export const reduceToValues = (items, key = 'value') => {
 export const isIE11 = () => {
   return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
 };
+
+export const existsInArray = (array, value) => {
+  return array.some((item) => {
+    if (isType('String', value)) {
+      return item.value === value.trim();
+    }
+
+    return item.value === value;
+  })
+};
