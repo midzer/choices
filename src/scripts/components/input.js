@@ -1,4 +1,4 @@
-import { calcWidthOfInput } from '../lib/utils';
+import { calcWidthOfInput, stripHTML } from '../lib/utils';
 
 export default class Input {
   constructor({ element, type, classNames, placeholderValue }) {
@@ -21,11 +21,11 @@ export default class Input {
   }
 
   set value(value) {
-    this.element.value = value;
+    this.element.value = `${value}`;
   }
 
   get value() {
-    return this.element.value;
+    return stripHTML(this.element.value);
   }
 
   addEventListeners() {
@@ -119,23 +119,11 @@ export default class Input {
     this.element.removeAttribute('aria-activedescendant');
   }
 
-  /**
-   * Input event
-   * @return
-   * @private
-   */
   _onInput() {
     if (this.type !== 'select-one') {
       this.setWidth();
     }
   }
-
-  /**
-   * Paste event
-   * @param  {Object} e Event
-   * @return
-   * @private
-   */
   _onPaste(e) {
     // Disable pasting into the input if option has been set
     if (e.target === this.element && this.preventPaste) {

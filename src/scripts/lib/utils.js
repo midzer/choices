@@ -185,7 +185,7 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
 };
 
 /**
- * Escape html in the string
+ * Escapes html in the string
  * @param  {String} html Initial string/html
  * @return {String}  Sanitised string
  */
