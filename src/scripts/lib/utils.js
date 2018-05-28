@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /**
  * Generates a string of random chars
  * @param  {Number} length Length of the string to generate
@@ -23,7 +21,10 @@ export const generateChars = function(length) {
  * @return {String} Unique Id
  */
 export const generateId = function(element, prefix) {
-  let id = element.id || (element.name && (`${element.name}-${generateChars(2)}`)) || generateChars(4);
+  let id =
+    element.id ||
+    (element.name && `${element.name}-${generateChars(2)}`) ||
+    generateChars(4);
   id = id.replace(/(:|\.|\[|\]|,)/g, '');
   id = prefix + id;
 
@@ -56,10 +57,14 @@ export const isType = function(type, obj) {
  * @param  {Object}  obj  Object to be tested
  * @return {Boolean}
  */
-export const isElement = o => (
-  typeof HTMLElement === 'object' ? o instanceof HTMLElement : // DOM2
-  o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
-);
+export const isElement = o =>
+  typeof HTMLElement === 'object'
+    ? o instanceof HTMLElement // DOM2
+    : o &&
+      typeof o === 'object' &&
+      o !== null &&
+      o.nodeType === 1 &&
+      typeof o.nodeName === 'string';
 
 /**
  * Merges unspecified amount of objects into new object
@@ -78,12 +83,12 @@ export const extend = function() {
     for (const prop in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         // If deep merge and property is an object, merge properties
-         if (isType('Object', obj[prop])) {
+        if (isType('Object', obj[prop])) {
           extended[prop] = extend(true, extended[prop], obj[prop]);
         } else {
           extended[prop] = obj[prop];
         }
-       }
+      }
     }
   };
 
@@ -175,7 +180,8 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
 
   if (direction > 0) {
     // In view from bottom
-    isVisible = (parent.scrollTop + parent.offsetHeight) >= (el.offsetTop + el.offsetHeight);
+    isVisible =
+      parent.scrollTop + parent.offsetHeight >= el.offsetTop + el.offsetHeight;
   } else {
     // In view from top
     isVisible = el.offsetTop >= parent.scrollTop;
@@ -190,7 +196,8 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
  * @return {String}  Sanitised string
  */
 export const stripHTML = html =>
-  html.replace(/&/g, '&amp;')
+  html
+    .replace(/&/g, '&amp;')
     .replace(/>/g, '&rt;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
@@ -224,7 +231,7 @@ export const strToEl = (function() {
 
     return r;
   };
-}());
+})();
 
 /**
  * Determines the width of a passed input based on its value and passes
@@ -351,33 +358,39 @@ export const reduceToValues = (items, key = 'value') => {
   }, []);
 
   return values;
-}
+};
 
 /**
  * Fetch properties from object
  * @param {Object} object     Related object
  * @param {String} properties Properties from object
  */
-export const fetchFromObject = function (object, properties){
+export const fetchFromObject = (object, properties) => {
   const index = properties.indexOf('.');
 
-  if (index > -1){
-    return fetchFromObject(object[properties.substring(0, index)], properties.substr(index + 1));
+  if (index > -1) {
+    return fetchFromObject(
+      object[properties.substring(0, index)],
+      properties.substr(index + 1),
+    );
   }
 
   return object[properties];
 };
 
 export const isIE11 = () => {
-  return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+  return !!(
+    navigator.userAgent.match(/Trident/) &&
+    navigator.userAgent.match(/rv[ :]11/)
+  );
 };
 
 export const existsInArray = (array, value) => {
-  return array.some((item) => {
+  return array.some(item => {
     if (isType('String', value)) {
       return item.value === value.trim();
     }
 
     return item.value === value;
-  })
+  });
 };
