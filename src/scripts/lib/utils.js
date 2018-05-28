@@ -38,15 +38,15 @@ export const generateId = function(element, prefix) {
     (element.name && `${element.name}-${generateChars(2)}`) ||
     generateChars(4);
   id = id.replace(/(:|\.|\[|\]|,)/g, '');
-  id = prefix + id;
+  id = `${prefix}-${id}`;
 
   return id;
 };
 
 /**
- * Tests the type of an object
- * @param  {String}  type Type to test object against
- * @param  {Object}  obj  Object to be tested
+ * Gets the type of an object
+ * Why not use typeof? See here: http: //bonsaiden.github.io/JavaScript-Garden/#types.typeof
+ * @param  {Object}  obj  Object to check
  * @return {Boolean}
  */
 export const getType = function(obj) {
@@ -69,14 +69,9 @@ export const isType = function(type, obj) {
  * @param  {Object}  obj  Object to be tested
  * @return {Boolean}
  */
-export const isElement = o =>
-  typeof HTMLElement === 'object'
-    ? o instanceof HTMLElement // DOM2
-    : o &&
-      typeof o === 'object' &&
-      o !== null &&
-      o.nodeType === 1 &&
-      typeof o.nodeName === 'string';
+export const isElement = (element) => {
+  return element instanceof Element;
+};
 
 /**
  * Merges unspecified amount of objects into new object
@@ -294,8 +289,14 @@ export const sortByAlpha = (a, b) => {
   const labelA = (a.label || a.value).toLowerCase();
   const labelB = (b.label || b.value).toLowerCase();
 
-  if (labelA < labelB) return -1;
-  if (labelA > labelB) return 1;
+  if (labelA < labelB) {
+    return -1;
+  }
+
+  if (labelA > labelB) {
+    return 1;
+  }
+
   return 0;
 };
 
@@ -364,20 +365,20 @@ export const reduceToValues = (items, key = 'value') => {
 
 /**
  * Fetch properties from object
- * @param {Object} object     Related object
- * @param {String} properties Properties from object
+ * @param {Object} object Related object
+ * @param {String} path   Path to value
  */
-export const fetchFromObject = (object, properties) => {
-  const index = properties.indexOf('.');
+export const fetchFromObject = (object, path) => {
+  const index = path.indexOf('.');
 
   if (index > -1) {
     return fetchFromObject(
-      object[properties.substring(0, index)],
-      properties.substr(index + 1),
+      object[path.substring(0, index)],
+      path.substr(index + 1),
     );
   }
 
-  return object[properties];
+  return object[path];
 };
 
 export const isIE11 = () =>
@@ -386,13 +387,13 @@ export const isIE11 = () =>
     navigator.userAgent.match(/rv[ :]11/)
   );
 
-export const existsInArray = (array, value) =>
+export const existsInArray = (array, value, key = 'value') =>
   array.some(item => {
     if (isType('String', value)) {
-      return item.value === value.trim();
+      return item[key] === value.trim();
     }
 
-    return item.value === value;
+    return item[key] === value;
   });
 
 /**

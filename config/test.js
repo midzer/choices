@@ -15,7 +15,7 @@ function ignoreExtensions(extensions = [], returnValue = {}) {
     return returnValue;
   }
 
-  extensions.forEach((ext) => {
+  extensions.forEach(ext => {
     require.extensions[ext] = noop;
   });
 }
@@ -35,7 +35,7 @@ function mockRAF(global) {
 
   global.requestAnimationFrame = callback => callbacksQueue.push(callback) - 1;
 
-  global.cancelAnimationFrame = (id) => {
+  global.cancelAnimationFrame = id => {
     callbacksQueue[id] = false;
   };
 }
@@ -46,6 +46,7 @@ global.navigator = {
   userAgent: 'node.js',
 };
 global.CustomEvent = window.CustomEvent;
+global.Element = window.Element;
 global.HTMLElement = window.HTMLElement;
 global.HTMLOptionElement = window.HTMLOptionElement;
 global.HTMLOptGroupElement = window.HTMLOptGroupElement;

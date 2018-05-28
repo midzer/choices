@@ -26,6 +26,7 @@
       "devDependencies": true
     }],
     "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-plusplus": "off",
     "no-unused-expressions": "off",
     "no-underscore-dangle": "off",
     "prettier/prettier": ["error", {

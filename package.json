@@ -86,11 +86,10 @@
   ],
   "nyc": {
     "include": [
-      "src/**/**/**/**/**/*.js"
+      "src/scripts/**/**/*.js"
     ],
     "exclude": [
-      "src/**/**/**/**/**/*.test.js",
-      "src/scripts/src/lib/polyfills.js"
+      "src/scripts/**/**/*.test.js"
     ]
   }
 }
