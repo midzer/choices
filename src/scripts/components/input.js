@@ -1,4 +1,4 @@
-import { calcWidthOfInput, escape } from '../lib/utils';
+import { calcWidthOfInput, stripHTML } from '../lib/utils';
 
 export default class Input {
   constructor({ element, type, classNames, placeholderValue }) {
@@ -25,7 +25,7 @@ export default class Input {
   }
 
   get value() {
-    return escape(this.element.value);
+    return stripHTML(this.element.value);
   }
 
   addEventListeners() {
