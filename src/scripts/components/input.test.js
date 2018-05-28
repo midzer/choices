@@ -75,7 +75,7 @@ describe('components/input', () => {
     });
   });
 
-  describe('onInput', () => {
+  describe('_onInput', () => {
     let setWidthStub;
 
     beforeEach(() => {
@@ -103,7 +103,7 @@ describe('components/input', () => {
     });
   });
 
-  describe('onPaste', () => {
+  describe('_onPaste', () => {
     let eventMock;
 
     beforeEach(() => {
@@ -130,7 +130,7 @@ describe('components/input', () => {
     });
   });
 
-  describe('onFocus', () => {
+  describe('_onFocus', () => {
     it('sets isFocussed flag to true', () => {
       expect(instance.isFocussed).to.equal(false);
       instance._onFocus();
@@ -138,7 +138,7 @@ describe('components/input', () => {
     });
   });
 
-  describe('onBlur', () => {
+  describe('_onBlur', () => {
     it('sets isFocussed flag to false', () => {
       instance.isFocussed = true;
       instance._onBlur();
@@ -342,8 +342,15 @@ describe('components/input', () => {
     it('sets value of element to passed value', () => {
       const value = 'test';
       instance.element.value = value;
-      const actualResponse = instance.value;
-      expect(actualResponse).to.equal(value);
+      expect(instance.value).to.equal(value);
+    });
+
+    it('strips HTML from value', () => {
+      const value = '<script>somethingMalicious();</script>';
+      instance.element.value = value;
+      expect(instance.value).to.equal(
+        '&lt;script&rt;somethingMalicious();&lt;/script&rt;',
+      );
     });
   });
 
