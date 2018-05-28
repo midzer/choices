@@ -336,6 +336,12 @@ describe('components/input', () => {
       instance.value = value;
       expect(instance.element.value).to.equal(value);
     });
+
+    it('casts value to string', () => {
+      const value = 1234;
+      instance.value = value;
+      expect(instance.element.value).to.equal(`${value}`);
+    });
   });
 
   describe('value getter', () => {

@@ -185,11 +185,11 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
 };
 
 /**
- * Escape html in the string
+ * Escapes html in the string
  * @param  {String} html Initial string/html
  * @return {String}  Sanitised string
  */
-export const stripHTML = html =>
+export const escape = html =>
   html.replace(/&/g, '&amp;')
     .replace(/>/g, '&rt;')
     .replace(/</g, '&lt;')
@@ -235,7 +235,7 @@ export const calcWidthOfInput = (input, callback) => {
   let width = input.offsetWidth;
 
   if (value) {
-    const testEl = strToEl(`<span>${stripHTML(value)}</span>`);
+    const testEl = strToEl(`<span>${escape(value)}</span>`);
     testEl.style.position = 'absolute';
     testEl.style.padding = '0';
     testEl.style.top = '-9999px';
