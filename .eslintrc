@@ -1,7 +1,14 @@
 {
-  "extends": ["prettier"],
-  "plugins": ["prettier"],
+  "parser": "babel-eslint",
+  "extends": [
+    "airbnb",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
   "env": {
+    "es6": true,
     "browser": true,
     "node": true,
     "mocha": true
@@ -14,8 +21,13 @@
     "beforeEach": true,
     "afterEach": true
   },
-  "parser": "babel-eslint",
   "rules": {
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": true
+    }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-expressions": "off",
+    "no-underscore-dangle": "off",
     "prettier/prettier": ["error", {
       "singleQuote": true,
       "trailingComma": "all"
