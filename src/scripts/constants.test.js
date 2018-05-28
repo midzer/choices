@@ -140,7 +140,7 @@ describe('constants', () => {
       });
 
       it('exports each value as a number', () => {
-        Object.keys(KEY_CODES).forEach((key) => {
+        Object.keys(KEY_CODES).forEach(key => {
           expect(KEY_CODES[key]).to.be.a('number');
         });
       });

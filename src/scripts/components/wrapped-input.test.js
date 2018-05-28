@@ -34,7 +34,7 @@ describe('components/wrappedInput', () => {
   });
 
   describe('inherited methods', () => {
-    ['conceal', 'reveal', 'enable', 'disable'].forEach((method) => {
+    ['conceal', 'reveal', 'enable', 'disable'].forEach(method => {
       describe(method, () => {
         beforeEach(() => {
           stub(WrappedElement.prototype, method);
@@ -72,7 +72,9 @@ describe('components/wrappedInput', () => {
     it('sets delimited value of element based on passed data', () => {
       expect(instance.element.value).to.equal('');
       instance.value = data;
-      expect(instance.value).to.equal(`Value 1${delimiter}Value 2${delimiter}Value 3`);
+      expect(instance.value).to.equal(
+        `Value 1${delimiter}Value 2${delimiter}Value 3`,
+      );
     });
   });
 });

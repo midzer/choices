@@ -27,17 +27,19 @@ describe('actions/choices', () => {
         keyCode,
       };
 
-      expect(actions.addChoice(
-        value,
-        label,
-        id,
-        groupId,
-        disabled,
-        elementId,
-        customProperties,
-        placeholder,
-        keyCode,
-      )).to.eql(expectedAction);
+      expect(
+        actions.addChoice(
+          value,
+          label,
+          id,
+          groupId,
+          disabled,
+          elementId,
+          customProperties,
+          placeholder,
+          keyCode,
+        ),
+      ).to.eql(expectedAction);
     });
   });
 
@@ -88,4 +90,3 @@ describe('actions/choices', () => {
     });
   });
 });
-

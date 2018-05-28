@@ -16,12 +16,9 @@ describe('actions/groups', () => {
         disabled,
       };
 
-      expect(actions.addGroup(
-        value,
-        id,
-        active,
-        disabled,
-      )).to.eql(expectedAction);
+      expect(actions.addGroup(value, id, active, disabled)).to.eql(
+        expectedAction,
+      );
     });
   });
 });

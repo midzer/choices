@@ -39,13 +39,10 @@ export const TEMPLATES = {
     `);
   },
   itemList(globalClasses, isSelectOneElement) {
-    const localClasses = classNames(
-      globalClasses.list,
-      {
-        [globalClasses.listSingle]: (isSelectOneElement),
-        [globalClasses.listItems]: (!isSelectOneElement),
-      },
-    );
+    const localClasses = classNames(globalClasses.list, {
+      [globalClasses.listSingle]: isSelectOneElement,
+      [globalClasses.listItems]: !isSelectOneElement,
+    });
 
     return strToEl(`
       <div class="${localClasses}"></div>
@@ -62,22 +59,18 @@ export const TEMPLATES = {
     const ariaSelected = data.active ? 'aria-selected="true"' : '';
     const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
 
-    let localClasses = classNames(
-      globalClasses.item, {
-        [globalClasses.highlightedState]: data.highlighted,
-        [globalClasses.itemSelectable]: !data.highlighted,
-        [globalClasses.placeholder]: data.placeholder,
-      },
-    );
+    let localClasses = classNames(globalClasses.item, {
+      [globalClasses.highlightedState]: data.highlighted,
+      [globalClasses.itemSelectable]: !data.highlighted,
+      [globalClasses.placeholder]: data.placeholder,
+    });
 
     if (removeItemButton) {
-      localClasses = classNames(
-        globalClasses.item, {
-          [globalClasses.highlightedState]: data.highlighted,
-          [globalClasses.itemSelectable]: !data.disabled,
-          [globalClasses.placeholder]: data.placeholder,
-        },
-      );
+      localClasses = classNames(globalClasses.item, {
+        [globalClasses.highlightedState]: data.highlighted,
+        [globalClasses.itemSelectable]: !data.disabled,
+        [globalClasses.placeholder]: data.placeholder,
+      });
 
       return strToEl(`
         <div
@@ -116,9 +109,9 @@ export const TEMPLATES = {
     `);
   },
   choiceList(globalClasses, isSelectOneElement) {
-    const ariaMultiSelectable = !isSelectOneElement ?
-      'aria-multiselectable="true"' :
-      '';
+    const ariaMultiSelectable = !isSelectOneElement
+      ? 'aria-multiselectable="true"'
+      : '';
 
     return strToEl(`
       <div
@@ -132,11 +125,9 @@ export const TEMPLATES = {
   },
   choiceGroup(globalClasses, data) {
     const ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
-    const localClasses = classNames(
-      globalClasses.group, {
-        [globalClasses.itemDisabled]: data.disabled,
-      },
-    );
+    const localClasses = classNames(globalClasses.group, {
+      [globalClasses.itemDisabled]: data.disabled,
+    });
 
     return strToEl(`
       <div
@@ -155,7 +146,8 @@ export const TEMPLATES = {
     const role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
     const localClasses = classNames(
       globalClasses.item,
-      globalClasses.itemChoice, {
+      globalClasses.itemChoice,
+      {
         [globalClasses.itemDisabled]: data.disabled,
         [globalClasses.itemSelectable]: !data.disabled,
         [globalClasses.placeholder]: data.placeholder,
@@ -169,9 +161,10 @@ export const TEMPLATES = {
         data-choice
         data-id="${data.id}"
         data-value="${data.value}"
-        ${data.disabled ?
-          'data-choice-disabled aria-disabled="true"' :
-          'data-choice-selectable'
+        ${
+          data.disabled
+            ? 'data-choice-disabled aria-disabled="true"'
+            : 'data-choice-selectable'
         }
         id="${data.elementId}"
         ${role}
@@ -217,8 +210,8 @@ export const TEMPLATES = {
       globalClasses.item,
       globalClasses.itemChoice,
       {
-        [globalClasses.noResults]: (type === 'no-results'),
-        [globalClasses.noChoices]: (type === 'no-choices'),
+        [globalClasses.noResults]: type === 'no-results',
+        [globalClasses.noChoices]: type === 'no-choices',
       },
     );
 
@@ -230,7 +223,9 @@ export const TEMPLATES = {
   },
   option(data) {
     return strToEl(`
-      <option value="${data.value}" ${data.selected ? 'selected' : ''} ${data.disabled ? 'disabled' : ''}>${data.label}</option>
+      <option value="${data.value}" ${data.selected ? 'selected' : ''} ${
+      data.disabled ? 'disabled' : ''
+    }>${data.label}</option>
     `);
   },
 };

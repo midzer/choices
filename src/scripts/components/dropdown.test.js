@@ -50,7 +50,9 @@ describe('components/dropdown', () => {
         width: 0,
       };
 
-      getBoundingClientRectStub = sinon.stub(instance.element, 'getBoundingClientRect').returns(dimensions);
+      getBoundingClientRectStub = sinon
+        .stub(instance.element, 'getBoundingClientRect')
+        .returns(dimensions);
 
       window.pageYOffset = 50;
     });
@@ -107,7 +109,9 @@ describe('components/dropdown', () => {
     });
 
     it('adds active class', () => {
-      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.activeState)).to.equal(true);
+      expect(
+        instance.element.classList.contains(DEFAULT_CLASSNAMES.activeState),
+      ).to.equal(true);
     });
 
     it('sets expanded attribute', () => {
@@ -135,7 +139,9 @@ describe('components/dropdown', () => {
     });
 
     it('adds active class', () => {
-      expect(instance.element.classList.contains(DEFAULT_CLASSNAMES.activeState)).to.equal(false);
+      expect(
+        instance.element.classList.contains(DEFAULT_CLASSNAMES.activeState),
+      ).to.equal(false);
     });
 
     it('sets expanded attribute', () => {

@@ -12,7 +12,9 @@ export default class Dropdown {
    */
   distanceFromTopWindow() {
     this.dimensions = this.element.getBoundingClientRect();
-    this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
+    this.position = Math.ceil(
+      this.dimensions.top + window.pageYOffset + this.element.offsetHeight,
+    );
     return this.position;
   }
 

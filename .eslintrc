@@ -1,34 +1,24 @@
 {
-  "extends": "airbnb",
-  "ecmaFeatures": {
-    "modules": true
-  },
+  "extends": ["prettier"],
+  "plugins": ["prettier"],
   "env": {
     "browser": true,
     "node": true,
     "mocha": true
   },
   "globals": {
-    "__DEV__": true,
     "describe": true,
     "it": true,
     "before": true,
     "after": true,
     "beforeEach": true,
-    "afterEach": true,
-    "expect": true,
-    "browser": true,
-    "by": true,
-    "element": true,
-    "cy": true
+    "afterEach": true
   },
   "parser": "babel-eslint",
   "rules": {
-    "strict": 0,
-    "no-underscore-dangle": 0,
-    "no-console": ["warn", {
-      "allow": ["warn", "error"]
-    }],
-    "space-before-function-paren": 0
+    "prettier/prettier": ["error", {
+      "singleQuote": true,
+      "trailingComma": "all"
+    }]
   }
 }

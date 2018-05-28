@@ -30,7 +30,7 @@ export default class List {
   /**
    * Find element that matches passed selector
    * @return {HTMLElement}
-  */
+   */
   getChild(selector) {
     return this.element.querySelector(selector);
   }

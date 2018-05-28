@@ -24,7 +24,7 @@ describe('components/list', () => {
   });
 
   describe('clear', () => {
-    it('clears element\'s inner HTML', () => {
+    it("clears element's inner HTML", () => {
       const innerHTML = 'test';
       instance.element.innerHTML = innerHTML;
       expect(instance.element.innerHTML).to.equal(innerHTML);
@@ -59,10 +59,11 @@ describe('components/list', () => {
       elementToAppend.classList.add(childClass);
       expect(instance.element.querySelector(`.${childClass}`)).to.equal(null);
       instance.append(elementToAppend);
-      expect(instance.element.querySelector(`.${childClass}`)).to.equal(elementToAppend);
+      expect(instance.element.querySelector(`.${childClass}`)).to.equal(
+        elementToAppend,
+      );
     });
   });
-
 
   describe('getChild', () => {
     let childElement;

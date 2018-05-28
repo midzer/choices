@@ -92,7 +92,7 @@ export default class Input {
       // length than 75% of the placeholder. This stops the input jumping around.
       if (
         (this.element.value &&
-        this.element.value.length >= (this._placeholderValue.length / 1.25)) ||
+          this.element.value.length >= this._placeholderValue.length / 1.25) ||
         enforceWidth
       ) {
         this.element.style.width = this.calcWidth();

@@ -47,7 +47,7 @@ describe('components/wrappedSelect', () => {
   });
 
   describe('inherited methods', () => {
-    ['conceal', 'reveal', 'enable', 'disable'].forEach((method) => {
+    ['conceal', 'reveal', 'enable', 'disable'].forEach(method => {
       beforeEach(() => {
         stub(WrappedElement.prototype, method);
       });
@@ -76,7 +76,7 @@ describe('components/wrappedSelect', () => {
     it('returns all option elements', () => {
       const { options } = instance;
       expect(options).to.be.an('array');
-      options.forEach((option) => {
+      options.forEach(option => {
         expect(option).to.be.instanceOf(HTMLOptionElement);
       });
     });
@@ -91,7 +91,7 @@ describe('components/wrappedSelect', () => {
 
       const { optionGroups } = instance;
       expect(optionGroups.length).to.equal(3);
-      optionGroups.forEach((option) => {
+      optionGroups.forEach(option => {
         expect(option).to.be.instanceOf(HTMLOptGroupElement);
       });
     });
@@ -141,9 +141,13 @@ describe('components/wrappedSelect', () => {
 
   describe('appendDocFragment', () => {
     it('empties contents of element', () => {
-      expect(instance.element.getElementsByTagName('option').length).to.equal(4);
+      expect(instance.element.getElementsByTagName('option').length).to.equal(
+        4,
+      );
       instance.appendDocFragment(document.createDocumentFragment());
-      expect(instance.element.getElementsByTagName('option').length).to.equal(0);
+      expect(instance.element.getElementsByTagName('option').length).to.equal(
+        0,
+      );
     });
 
     it('appends passed fragment to element', () => {
@@ -153,7 +157,9 @@ describe('components/wrappedSelect', () => {
       fragment.appendChild(elementToAppend);
       expect(instance.element.querySelector('#fragment-target')).to.equal(null);
       instance.appendDocFragment(fragment);
-      expect(instance.element.querySelector('#fragment-target')).to.eql(elementToAppend);
+      expect(instance.element.querySelector('#fragment-target')).to.eql(
+        elementToAppend,
+      );
     });
   });
 });

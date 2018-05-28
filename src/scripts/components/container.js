@@ -16,7 +16,7 @@ export default class Container {
 
   /**
    * Add event listeners
-  */
+   */
   addEventListeners() {
     this.element.addEventListener('focus', this._onFocus);
     this.element.addEventListener('blur', this._onBlur);
@@ -24,7 +24,7 @@ export default class Container {
 
   /**
    * Remove event listeners
-  */
+   */
 
   /** */
   removeEventListeners() {
@@ -138,10 +138,7 @@ export default class Container {
 
   unwrap(element) {
     // Move passed element outside this element
-    this.element.parentNode.insertBefore(
-      element,
-      this.element,
-    );
+    this.element.parentNode.insertBefore(element, this.element);
     // Remove this element
     this.element.parentNode.removeChild(this.element);
   }

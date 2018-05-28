@@ -174,15 +174,16 @@ describe('reducers/choices', () => {
           score,
         };
 
-
         const actualResponse = choices(state, {
           type: 'FILTER_CHOICES',
-          results: [{
-            item: {
-              id,
+          results: [
+            {
+              item: {
+                id,
+              },
+              score,
             },
-            score,
-          }],
+          ],
         }).find(choice => choice.id === id);
 
         expect(actualResponse).to.eql(expectedResponse);

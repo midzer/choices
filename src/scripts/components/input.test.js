@@ -86,7 +86,6 @@ describe('components/input', () => {
       setWidthStub.restore();
     });
 
-
     describe('when element is select one', () => {
       it('does not set input width', () => {
         instance.type = 'select-one';
@@ -207,7 +206,6 @@ describe('components/input', () => {
     });
   });
 
-
   describe('blur', () => {
     let blurStub;
 
@@ -220,7 +218,7 @@ describe('components/input', () => {
     });
 
     describe('when element is not focussed', () => {
-      it('doesn\'t blur element', () => {
+      it("doesn't blur element", () => {
         instance.isFocussed = false;
         instance.blur();
         expect(blurStub.callCount).to.equal(0);
@@ -247,14 +245,14 @@ describe('components/input', () => {
       setWidthStub.restore();
     });
 
-    it('removes the element\'s value if it has one', () => {
+    it("removes the element's value if it has one", () => {
       instance.element.value = 'test';
       expect(instance.element.value).to.equal('test');
       instance.clear();
       expect(instance.element.value).to.equal('');
     });
 
-    it('sets the element\'s width if flag passed', () => {
+    it("sets the element's width if flag passed", () => {
       expect(setWidthStub.callCount).to.equal(0);
       instance.clear(true);
       expect(setWidthStub.callCount).to.equal(1);
@@ -350,21 +348,32 @@ describe('components/input', () => {
   });
 
   describe('setActiveDescendant', () => {
-    it('sets element\'s aria-activedescendant attribute with passed descendant ID', () => {
+    it("sets element's aria-activedescendant attribute with passed descendant ID", () => {
       const activeDescendantID = '1234';
-      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(null);
+      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(
+        null,
+      );
       instance.setActiveDescendant(activeDescendantID);
-      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(activeDescendantID);
+      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(
+        activeDescendantID,
+      );
     });
   });
 
   describe('removeActiveDescendant', () => {
-    it('remove elememnt\'s aria-activedescendant attribute', () => {
+    it("remove elememnt's aria-activedescendant attribute", () => {
       const activeDescendantID = '1234';
-      instance.element.setAttribute('aria-activedescendant', activeDescendantID);
-      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(activeDescendantID);
+      instance.element.setAttribute(
+        'aria-activedescendant',
+        activeDescendantID,
+      );
+      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(
+        activeDescendantID,
+      );
       instance.removeActiveDescendant();
-      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(null);
+      expect(instance.element.getAttribute('aria-activedescendant')).to.equal(
+        null,
+      );
     });
   });
 });

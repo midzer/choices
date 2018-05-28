@@ -45,7 +45,7 @@ describe('choices', () => {
           instance.init();
         });
 
-        it('doesn\'t set initialise flag', () => {
+        it("doesn't set initialise flag", () => {
           expect(instance.initialised).to.not.equal(false);
         });
       });
@@ -123,7 +123,7 @@ describe('choices', () => {
           instance.destroy();
         });
 
-        it('doesn\'t set initialise flag', () => {
+        it("doesn't set initialise flag", () => {
           expect(instance.initialised).to.not.equal(true);
         });
       });
@@ -161,7 +161,9 @@ describe('choices', () => {
 
         it('reverts outer container', () => {
           expect(containerOuterUnwrapSpy.called).to.equal(true);
-          expect(containerOuterUnwrapSpy.lastCall.args[0]).to.equal(instance.passedElement.element);
+          expect(containerOuterUnwrapSpy.lastCall.args[0]).to.equal(
+            instance.passedElement.element,
+          );
         });
 
         it('clears store', () => {
@@ -262,7 +264,6 @@ describe('choices', () => {
         containerOuterDisableSpy = spy(instance.containerOuter, 'disable');
         inputDisableSpy = spy(instance.input, 'disable');
       });
-
 
       afterEach(() => {
         removeEventListenersSpy.restore();
@@ -374,24 +375,26 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('opens containerOuter', (done) => {
+        it('opens containerOuter', done => {
           requestAnimationFrame(() => {
             expect(containerOuterOpenSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('shows dropdown with blurInput flag', (done) => {
+        it('shows dropdown with blurInput flag', done => {
           requestAnimationFrame(() => {
             expect(dropdownShowSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('triggers event on passedElement', (done) => {
+        it('triggers event on passedElement', done => {
           requestAnimationFrame(() => {
             expect(passedElementTriggerEventStub.called).to.equal(true);
-            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.showDropdown);
+            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(
+              EVENTS.showDropdown,
+            );
             expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
             done();
           });
@@ -404,7 +407,7 @@ describe('choices', () => {
             output = instance.showDropdown(true);
           });
 
-          it('focuses input', (done) => {
+          it('focuses input', done => {
             requestAnimationFrame(() => {
               expect(inputFocusSpy.called).to.equal(true);
               done();
@@ -425,7 +428,10 @@ describe('choices', () => {
         containerOuterCloseSpy = spy(instance.containerOuter, 'close');
         dropdownHideSpy = spy(instance.dropdown, 'hide');
         inputBlurSpy = spy(instance.input, 'blur');
-        inputRemoveActiveDescendantSpy = spy(instance.input, 'removeActiveDescendant');
+        inputRemoveActiveDescendantSpy = spy(
+          instance.input,
+          'removeActiveDescendant',
+        );
         passedElementTriggerEventStub = stub();
 
         instance.passedElement.triggerEvent = passedElementTriggerEventStub;
@@ -465,24 +471,26 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('closes containerOuter', (done) => {
+        it('closes containerOuter', done => {
           requestAnimationFrame(() => {
             expect(containerOuterCloseSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('hides dropdown with blurInput flag', (done) => {
+        it('hides dropdown with blurInput flag', done => {
           requestAnimationFrame(() => {
             expect(dropdownHideSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('triggers event on passedElement', (done) => {
+        it('triggers event on passedElement', done => {
           requestAnimationFrame(() => {
             expect(passedElementTriggerEventStub.called).to.equal(true);
-            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(EVENTS.hideDropdown);
+            expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(
+              EVENTS.hideDropdown,
+            );
             expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({});
             done();
           });
@@ -495,14 +503,14 @@ describe('choices', () => {
             output = instance.hideDropdown(true);
           });
 
-          it('removes active descendants', (done) => {
+          it('removes active descendants', done => {
             requestAnimationFrame(() => {
               expect(inputRemoveActiveDescendantSpy.called).to.equal(true);
               done();
             });
           });
 
-          it('blurs input', (done) => {
+          it('blurs input', done => {
             requestAnimationFrame(() => {
               expect(inputBlurSpy.called).to.equal(true);
               done();
@@ -624,7 +632,9 @@ describe('choices', () => {
 
             it('triggers event with null groupValue', () => {
               expect(passedElementTriggerEventStub.called).to.equal(true);
-              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(EVENTS.highlightItem);
+              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(
+                EVENTS.highlightItem,
+              );
               expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({
                 id: item.id,
                 value: item.value,
@@ -642,7 +652,9 @@ describe('choices', () => {
 
             it('triggers event with groupValue', () => {
               expect(passedElementTriggerEventStub.called).to.equal(true);
-              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(EVENTS.highlightItem);
+              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(
+                EVENTS.highlightItem,
+              );
               expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({
                 id: item.id,
                 value: item.value,
@@ -658,7 +670,7 @@ describe('choices', () => {
             output = instance.highlightItem(item, false);
           });
 
-          it('doesn\'t trigger event', () => {
+          it("doesn't trigger event", () => {
             expect(passedElementTriggerEventStub.called).to.equal(false);
           });
 
@@ -735,7 +747,9 @@ describe('choices', () => {
 
             it('triggers event with null groupValue', () => {
               expect(passedElementTriggerEventStub.called).to.equal(true);
-              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(EVENTS.highlightItem);
+              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(
+                EVENTS.highlightItem,
+              );
               expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({
                 id: item.id,
                 value: item.value,
@@ -753,7 +767,9 @@ describe('choices', () => {
 
             it('triggers event with groupValue', () => {
               expect(passedElementTriggerEventStub.called).to.equal(true);
-              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(EVENTS.highlightItem);
+              expect(passedElementTriggerEventStub.lastCall.args[0]).to.equal(
+                EVENTS.highlightItem,
+              );
               expect(passedElementTriggerEventStub.lastCall.args[1]).to.eql({
                 id: item.id,
                 value: item.value,
@@ -769,7 +785,7 @@ describe('choices', () => {
             output = instance.highlightItem(item, false);
           });
 
-          it('doesn\'t trigger event', () => {
+          it("doesn't trigger event", () => {
             expect(passedElementTriggerEventStub.called).to.equal(false);
           });
 
@@ -1005,7 +1021,7 @@ describe('choices', () => {
 
         returnsInstance(output);
 
-        it('sets loading state', (done) => {
+        it('sets loading state', done => {
           requestAnimationFrame(() => {
             expect(handleLoadingStateStub.called).to.equal(true);
             done();
@@ -1108,15 +1124,14 @@ describe('choices', () => {
 
           it('sets each choice with same value', () => {
             expect(findAndSelectChoiceByValueStub.called).to.equal(true);
-            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(value);
+            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(
+              value,
+            );
           });
         });
 
         describe('passing an array of values', () => {
-          const values = [
-            'Value 1',
-            'Value 2',
-          ];
+          const values = ['Value 1', 'Value 2'];
 
           beforeEach(() => {
             output = instance.setChoiceByValue(values);
@@ -1126,8 +1141,12 @@ describe('choices', () => {
 
           it('sets each choice with same value', () => {
             expect(findAndSelectChoiceByValueStub.callCount).to.equal(2);
-            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(values[0]);
-            expect(findAndSelectChoiceByValueStub.secondCall.args[0]).to.equal(values[1]);
+            expect(findAndSelectChoiceByValueStub.firstCall.args[0]).to.equal(
+              values[0],
+            );
+            expect(findAndSelectChoiceByValueStub.secondCall.args[0]).to.equal(
+              values[1],
+            );
           });
         });
       });
@@ -1173,7 +1192,7 @@ describe('choices', () => {
           });
 
           it('returns all active item values', () => {
-            expect(output).to.eql(items.map((item => item.value)));
+            expect(output).to.eql(items.map(item => item.value));
           });
         });
       });
@@ -1315,9 +1334,11 @@ describe('choices', () => {
         },
       ];
 
-
       beforeEach(() => {
-        highlightedActiveItemsStub = stub(instance._store, 'highlightedActiveItems').get(() => items);
+        highlightedActiveItemsStub = stub(
+          instance._store,
+          'highlightedActiveItems',
+        ).get(() => items);
         removeItemStub = stub();
         triggerChangeStub = stub();
 
@@ -1557,7 +1578,9 @@ describe('choices', () => {
 
             expect(output).to.be.instanceOf(DocumentFragment);
             expect(elementToWrapFragment.children[0]).to.eql(childElement);
-            expect(elementToWrapFragment.querySelectorAll('[data-group]').length).to.equal(2);
+            expect(
+              elementToWrapFragment.querySelectorAll('[data-group]').length,
+            ).to.equal(2);
           });
         });
 
@@ -1568,7 +1591,9 @@ describe('choices', () => {
             elementToWrapFragment.appendChild(output);
 
             expect(output).to.be.instanceOf(DocumentFragment);
-            expect(elementToWrapFragment.querySelectorAll('[data-group]').length).to.equal(2);
+            expect(
+              elementToWrapFragment.querySelectorAll('[data-group]').length,
+            ).to.equal(2);
           });
         });
 

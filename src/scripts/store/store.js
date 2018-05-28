@@ -5,9 +5,7 @@ export default class Store {
   constructor() {
     this._store = createStore(
       rootReducer,
-      window.devToolsExtension ?
-        window.devToolsExtension() :
-        undefined,
+      window.devToolsExtension ? window.devToolsExtension() : undefined,
     );
   }
 
@@ -54,9 +52,9 @@ export default class Store {
   }
 
   /**
-  * Get highlighted items from store
-  * @return {Array} Item objects
-  */
+   * Get highlighted items from store
+   * @return {Array} Item objects
+   */
   get highlightedActiveItems() {
     return this.items.filter(item => item.active && item.highlighted);
   }
@@ -122,10 +120,10 @@ export default class Store {
     const groups = this.groups;
     const choices = this.choices;
 
-    return groups.filter((group) => {
+    return groups.filter(group => {
       const isActive = group.active === true && group.disabled === false;
-      const hasActiveOptions = choices.some(choice =>
-        choice.active === true && choice.disabled === false,
+      const hasActiveOptions = choices.some(
+        choice => choice.active === true && choice.disabled === false,
       );
       return isActive && hasActiveOptions;
     }, []);
@@ -138,7 +136,9 @@ export default class Store {
   getChoiceById(id) {
     if (id) {
       const choices = this.activeChoices;
-      const foundChoice = choices.find(choice => choice.id === parseInt(id, 10));
+      const foundChoice = choices.find(
+        choice => choice.id === parseInt(id, 10),
+      );
       return foundChoice;
     }
     return false;

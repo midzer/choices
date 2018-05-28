@@ -25,16 +25,18 @@ describe('actions/items', () => {
         keyCode,
       };
 
-      expect(actions.addItem(
-        value,
-        label,
-        id,
-        choiceId,
-        groupId,
-        customProperties,
-        placeholder,
-        keyCode,
-      )).to.eql(expectedAction);
+      expect(
+        actions.addItem(
+          value,
+          label,
+          id,
+          choiceId,
+          groupId,
+          customProperties,
+          placeholder,
+          keyCode,
+        ),
+      ).to.eql(expectedAction);
     });
   });
 

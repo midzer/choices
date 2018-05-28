@@ -43,11 +43,7 @@ describe('utils', () => {
     ];
 
     it('returns an array of item values', () => {
-      const expectedResponse = [
-        items[0].value,
-        items[1].value,
-        items[2].value,
-      ];
+      const expectedResponse = [items[0].value, items[1].value, items[2].value];
 
       const actualResponse = reduceToValues(items);
       expect(actualResponse).to.eql(expectedResponse);

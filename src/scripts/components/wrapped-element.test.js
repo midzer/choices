@@ -10,7 +10,7 @@ describe('components/wrappedElement', () => {
     element = document.createElement('select');
     instance = new WrappedElement({
       element,
-      classNames: DEFAULT_CLASSNAMES,
+      classNames: DEFAULT_CLASSNAMES
     });
   });
 
@@ -50,11 +50,17 @@ describe('components/wrappedElement', () => {
     it('hides element', () => {
       instance.conceal();
       expect(instance.element.tabIndex).to.equal(-1);
-      expect(instance.element.classList.contains(instance.classNames.input)).to.equal(true);
-      expect(instance.element.classList.contains(instance.classNames.hiddenState)).to.equal(true);
+      expect(
+        instance.element.classList.contains(instance.classNames.input)
+      ).to.equal(true);
+      expect(
+        instance.element.classList.contains(instance.classNames.hiddenState)
+      ).to.equal(true);
       expect(instance.element.getAttribute('aria-hidden')).to.equal('true');
       expect(instance.element.getAttribute('data-choice')).to.equal('active');
-      expect(instance.element.getAttribute('data-choice-orig-style')).to.equal(originalStyling);
+      expect(instance.element.getAttribute('data-choice-orig-style')).to.equal(
+        originalStyling
+      );
     });
   });
 
@@ -69,12 +75,18 @@ describe('components/wrappedElement', () => {
     it('shows element', () => {
       instance.reveal();
       expect(instance.element.tabIndex).to.equal(0);
-      expect(instance.element.classList.contains(instance.classNames.input)).to.equal(false);
-      expect(instance.element.classList.contains(instance.classNames.hiddenState)).to.equal(false);
+      expect(
+        instance.element.classList.contains(instance.classNames.input)
+      ).to.equal(false);
+      expect(
+        instance.element.classList.contains(instance.classNames.hiddenState)
+      ).to.equal(false);
       expect(instance.element.getAttribute('style')).to.equal(originalStyling);
       expect(instance.element.getAttribute('aria-hidden')).to.equal(null);
       expect(instance.element.getAttribute('data-choice')).to.equal(null);
-      expect(instance.element.getAttribute('data-choice-orig-style')).to.equal(null);
+      expect(instance.element.getAttribute('data-choice-orig-style')).to.equal(
+        null
+      );
     });
   });
 
@@ -127,9 +139,9 @@ describe('components/wrappedElement', () => {
   });
 
   describe('triggerEvent', () => {
-    it('fires event on element using passed eventType and data', (done) => {
+    it('fires event on element using passed eventType and data', done => {
       const data = {
-        test: true,
+        test: true
       };
 
       instance.element.addEventListener('testEvent', ({ detail }) => {
