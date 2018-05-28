@@ -1954,7 +1954,7 @@ class Choices {
     this.choiceList.clear();
 
     if (this.config.resetScrollPosition) {
-      this.choiceList.scrollToTop();
+      requestAnimationFrame(() => this.choiceList.scrollToTop());
     }
 
     // If we have grouped options
