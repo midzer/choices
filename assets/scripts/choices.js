@@ -461,8 +461,33 @@ var reduceToValues = exports.reduceToValues = function reduceToValues(items) {
   return values;
 };
 
+/**
+ * Fetch properties from object
+ * @param {Object} object     Related object
+ * @param {String} properties Properties from object
+ */
+var fetchFromObject = exports.fetchFromObject = function fetchFromObject(object, properties) {
+  var index = properties.indexOf('.');
+
+  if (index > -1) {
+    return fetchFromObject(object[properties.substring(0, index)], properties.substr(index + 1));
+  }
+
+  return object[properties];
+};
+
 var isIE11 = exports.isIE11 = function isIE11() {
   return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+};
+
+var existsInArray = exports.existsInArray = function existsInArray(array, value) {
+  return array.some(function (item) {
+    if (isType('String', value)) {
+      return item.value === value.trim();
+    }
+
+    return item.value === value;
+  });
 };
 
 /***/ }),
@@ -487,73 +512,6 @@ if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var dP = __webpack_require__(5);
-var createDesc = __webpack_require__(13);
-module.exports = __webpack_require__(7) ? function (object, key, value) {
-  return dP.f(object, key, createDesc(1, value));
-} : function (object, key, value) {
-  object[key] = value;
-  return object;
-};
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var anObject = __webpack_require__(6);
-var IE8_DOM_DEFINE = __webpack_require__(42);
-var toPrimitive = __webpack_require__(43);
-var dP = Object.defineProperty;
-
-exports.f = __webpack_require__(7) ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if (IE8_DOM_DEFINE) try {
-    return dP(O, P, Attributes);
-  } catch (e) { /* empty */ }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
-  if ('value' in Attributes) O[P] = Attributes.value;
-  return O;
-};
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isObject = __webpack_require__(12);
-module.exports = function (it) {
-  if (!isObject(it)) throw TypeError(it + ' is not an object!');
-  return it;
-};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Thank's IE8 for his funny defineProperty
-module.exports = !__webpack_require__(19)(function () {
-  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-});
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-var hasOwnProperty = {}.hasOwnProperty;
-module.exports = function (it, key) {
-  return hasOwnProperty.call(it, key);
-};
-
-
-/***/ }),
-/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -683,6 +641,73 @@ var KEY_CODES = exports.KEY_CODES = {
 var SCROLLING_SPEED = exports.SCROLLING_SPEED = 4;
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP = __webpack_require__(6);
+var createDesc = __webpack_require__(13);
+module.exports = __webpack_require__(8) ? function (object, key, value) {
+  return dP.f(object, key, createDesc(1, value));
+} : function (object, key, value) {
+  object[key] = value;
+  return object;
+};
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(7);
+var IE8_DOM_DEFINE = __webpack_require__(42);
+var toPrimitive = __webpack_require__(43);
+var dP = Object.defineProperty;
+
+exports.f = __webpack_require__(8) ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if (IE8_DOM_DEFINE) try {
+    return dP(O, P, Attributes);
+  } catch (e) { /* empty */ }
+  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
+  if ('value' in Attributes) O[P] = Attributes.value;
+  return O;
+};
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(12);
+module.exports = function (it) {
+  if (!isObject(it)) throw TypeError(it + ' is not an object!');
+  return it;
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Thank's IE8 for his funny defineProperty
+module.exports = !__webpack_require__(19)(function () {
+  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function (it, key) {
+  return hasOwnProperty.call(it, key);
+};
+
+
+/***/ }),
 /* 10 */
 /***/ (function(module, exports) {
 
@@ -770,7 +795,7 @@ module.exports = false;
 
 var global = __webpack_require__(2);
 var core = __webpack_require__(3);
-var hide = __webpack_require__(4);
+var hide = __webpack_require__(5);
 var redefine = __webpack_require__(21);
 var ctx = __webpack_require__(22);
 var PROTOTYPE = 'prototype';
@@ -844,8 +869,8 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(2);
-var hide = __webpack_require__(4);
-var has = __webpack_require__(8);
+var hide = __webpack_require__(5);
+var has = __webpack_require__(9);
 var SRC = __webpack_require__(14)('src');
 var TO_STRING = 'toString';
 var $toString = Function[TO_STRING];
@@ -969,8 +994,8 @@ module.exports = (
 /* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var def = __webpack_require__(5).f;
-var has = __webpack_require__(8);
+var def = __webpack_require__(6).f;
+var has = __webpack_require__(9);
 var TAG = __webpack_require__(0)('toStringTag');
 
 module.exports = function (it, tag, stat) {
@@ -2067,13 +2092,13 @@ var _fuse2 = _interopRequireDefault(_fuse);
 
 __webpack_require__(37);
 
-var _store = __webpack_require__(63);
+var _store2 = __webpack_require__(63);
 
-var _store2 = _interopRequireDefault(_store);
+var _store3 = _interopRequireDefault(_store2);
 
 var _components = __webpack_require__(72);
 
-var _constants = __webpack_require__(9);
+var _constants = __webpack_require__(4);
 
 var _templates = __webpack_require__(33);
 
@@ -2148,10 +2173,10 @@ var Choices = function () {
     }
 
     if (this.config.shouldSortItems === true && this._isSelectOneElement && !this.config.silent) {
-      console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
+      console.warn("shouldSortElements: Type of passed element is 'select-one', falling back to false.");
     }
 
-    this._store = new _store2.default(this.render);
+    this._store = new _store3.default(this.render);
     this.initialised = false;
     this._currentState = {};
     this._prevState = {};
@@ -2504,12 +2529,9 @@ var Choices = function () {
         return this;
       }
 
-      // Convert args to an iterable array
-      var values = [].concat(_toConsumableArray(args));
-      values.forEach(function (value) {
+      [].concat(_toConsumableArray(args)).forEach(function (value) {
         return _this8._setChoiceOrItem(value);
       });
-
       return this;
     }
   }, {
@@ -2917,35 +2939,27 @@ var Choices = function () {
       var canAddItem = true;
       var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
 
-      if (this._isSelectMultipleElement || this._isTextElement) {
+      if (!this._isSelectOneElement) {
+        var valueAlreadyExists = !(0, _utils.existsInArray)(activeItems, value);
+
         if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
           // If there is a max entry limit and we have reached that limit
           // don't update
           canAddItem = false;
           notice = (0, _utils.isType)('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
         }
-      }
 
-      if (this.config.regexFilter && this._isTextElement && this.config.addItems && canAddItem) {
-        // If a user has supplied a regular expression filter
-        // determine whether we can update based on whether
-        // our regular expression passes
-        canAddItem = (0, _utils.regexFilter)(value, this.config.regexFilter);
-      }
-
-      // If no duplicates are allowed, and the value already exists
-      // in the array
-      var isUnique = !activeItems.some(function (item) {
-        if ((0, _utils.isType)('String', value)) {
-          return item.value === value.trim();
+        if (this.config.regexFilter && this._isTextElement && this.config.addItems && canAddItem) {
+          // If a user has supplied a regular expression filter
+          // determine whether we can update based on whether
+          // our regular expression passes
+          canAddItem = (0, _utils.regexFilter)(value, this.config.regexFilter);
         }
 
-        return item.value === value;
-      });
-
-      if (!isUnique && !this.config.duplicateItems && !this._isSelectOneElement && canAddItem) {
-        canAddItem = false;
-        notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+        if (!this.config.duplicateItems && !valueAlreadyExists && canAddItem) {
+          canAddItem = false;
+          notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+        }
       }
 
       return {
@@ -2974,7 +2988,7 @@ var Choices = function () {
               var groupId = result.id || null;
               _this16._addGroup(result, groupId, value, label);
             } else {
-              _this16._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
+              _this16._addChoice((0, _utils.fetchFromObject)(result, value), (0, _utils.fetchFromObject)(result, label), result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
             }
           });
 
@@ -3211,7 +3225,7 @@ var Choices = function () {
             // We prevent default to stop the cursor moving
             // when pressing the arrow
             if (!(0, _utils.isScrolledIntoView)(nextEl, _this17.choiceList.element, directionInt)) {
-              _this17._scrollToChoice(nextEl, directionInt);
+              _this17.choiceList.scrollToChoice(nextEl, directionInt);
             }
             _this17._highlightChoice(nextEl);
           }
@@ -3486,67 +3500,12 @@ var Choices = function () {
       }
     }
   }, {
-    key: '_scrollToChoice',
-    value: function _scrollToChoice(choice, direction) {
-      var _this20 = this;
-
-      if (!choice) {
-        return;
-      }
-
-      var dropdownHeight = this.choiceList.element.offsetHeight;
-      var choiceHeight = choice.offsetHeight;
-      // Distance from bottom of element to top of parent
-      var choicePos = choice.offsetTop + choiceHeight;
-      // Scroll position of dropdown
-      var containerScrollPos = this.choiceList.element.scrollTop + dropdownHeight;
-      // Difference between the choice and scroll position
-      var endPoint = direction > 0 ? this.choiceList.element.scrollTop + choicePos - containerScrollPos : choice.offsetTop;
-
-      var animateScroll = function animateScroll() {
-        var strength = _constants.SCROLLING_SPEED;
-        var choiceListScrollTop = _this20.choiceList.element.scrollTop;
-        var continueAnimation = false;
-        var easing = void 0;
-        var distance = void 0;
-
-        if (direction > 0) {
-          easing = (endPoint - choiceListScrollTop) / strength;
-          distance = easing > 1 ? easing : 1;
-
-          _this20.choiceList.scrollTo(choiceListScrollTop + distance);
-          if (choiceListScrollTop < endPoint) {
-            continueAnimation = true;
-          }
-        } else {
-          easing = (choiceListScrollTop - endPoint) / strength;
-          distance = easing > 1 ? easing : 1;
-
-          _this20.choiceList.scrollTo(choiceListScrollTop - distance);
-          if (choiceListScrollTop > endPoint) {
-            continueAnimation = true;
-          }
-        }
-
-        if (continueAnimation) {
-          requestAnimationFrame(function (time) {
-            animateScroll(time, endPoint, direction);
-          });
-        }
-      };
-
-      requestAnimationFrame(function (time) {
-        animateScroll(time, endPoint, direction);
-      });
-    }
-  }, {
     key: '_highlightChoice',
     value: function _highlightChoice() {
-      var _this21 = this;
+      var _this20 = this;
 
       var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-      // Highlight first element in dropdown
       var choices = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]'));
 
       if (!choices.length) {
@@ -3559,7 +3518,7 @@ var Choices = function () {
 
       // Remove any highlighted choices
       highlightedChoices.forEach(function (choice) {
-        choice.classList.remove(_this21.config.classNames.highlightedState);
+        choice.classList.remove(_this20.config.classNames.highlightedState);
         choice.setAttribute('aria-selected', 'false');
       });
 
@@ -3580,7 +3539,6 @@ var Choices = function () {
         }
       }
 
-      // Highlight given option, and set accessiblity attributes
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
 
@@ -3718,7 +3676,7 @@ var Choices = function () {
   }, {
     key: '_addGroup',
     value: function _addGroup(group, id) {
-      var _this22 = this;
+      var _this21 = this;
 
       var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
       var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
@@ -3732,7 +3690,7 @@ var Choices = function () {
 
         var addGroupChoices = function addGroupChoices(choice) {
           var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
-          _this22._addChoice(choice[valueKey], (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
+          _this21._addChoice(choice[valueKey], (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML, choice.selected, isOptDisabled, groupId, choice.customProperties, choice.placeholder);
         };
 
         groupChoices.forEach(addGroupChoices);
@@ -3749,14 +3707,15 @@ var Choices = function () {
         return null;
       }
 
-      var templates = this.config.templates;
-      var globalClasses = this.config.classNames;
+      var _config4 = this.config,
+          templates = _config4.templates,
+          classNames = _config4.classNames;
 
       for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
         args[_key - 1] = arguments[_key];
       }
 
-      return (_templates$template = templates[template]).call.apply(_templates$template, [this, globalClasses].concat(args));
+      return (_templates$template = templates[template]).call.apply(_templates$template, [this, classNames].concat(args));
     }
   }, {
     key: '_createTemplates',
@@ -3860,7 +3819,7 @@ var Choices = function () {
   }, {
     key: '_addPredefinedChoices',
     value: function _addPredefinedChoices() {
-      var _this23 = this;
+      var _this22 = this;
 
       var passedGroups = this.passedElement.optionGroups;
 
@@ -3876,7 +3835,7 @@ var Choices = function () {
         }
 
         passedGroups.forEach(function (group) {
-          _this23._addGroup(group, group.id || null);
+          _this22._addGroup(group, group.id || null);
         });
       } else {
         var passedOptions = this.passedElement.options;
@@ -3904,22 +3863,22 @@ var Choices = function () {
           return choice.selected;
         });
         var handleChoice = function handleChoice(choice, index) {
-          if (_this23._isSelectElement) {
+          if (_this22._isSelectElement) {
             // If the choice is actually a group
             if (choice.choices) {
-              _this23._addGroup(choice, choice.id || null);
+              _this22._addGroup(choice, choice.id || null);
             } else {
               // If there is a selected choice already or the choice is not
               // the first in the array, add each choice normally
               // Otherwise pre-select the first choice in the array if it's a single select
-              var shouldPreselect = _this23._isSelectOneElement && !hasSelectedChoice && index === 0;
+              var shouldPreselect = _this22._isSelectOneElement && !hasSelectedChoice && index === 0;
               var isSelected = shouldPreselect ? true : choice.selected;
               var isDisabled = shouldPreselect ? false : choice.disabled;
 
-              _this23._addChoice(choice.value, choice.label, isSelected, isDisabled, undefined, choice.customProperties, choice.placeholder);
+              _this22._addChoice(choice.value, choice.label, isSelected, isDisabled, undefined, choice.customProperties, choice.placeholder);
             }
           } else {
-            _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
+            _this22._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
           }
         };
 
@@ -3932,7 +3891,7 @@ var Choices = function () {
   }, {
     key: '_addPredefinedItems',
     value: function _addPredefinedItems() {
-      var _this24 = this;
+      var _this23 = this;
 
       var handlePresetItem = function handlePresetItem(item) {
         var itemType = (0, _utils.getType)(item);
@@ -3940,9 +3899,9 @@ var Choices = function () {
           if (!item.value) {
             return;
           }
-          _this24._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
+          _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
         } else if (itemType === 'String') {
-          _this24._addItem(item);
+          _this23._addItem(item);
         }
       };
 
@@ -3953,7 +3912,7 @@ var Choices = function () {
   }, {
     key: '_setChoiceOrItem',
     value: function _setChoiceOrItem(item) {
-      var _this25 = this;
+      var _this24 = this;
 
       var itemType = (0, _utils.getType)(item).toLowerCase();
       var handleType = {
@@ -3964,17 +3923,17 @@ var Choices = function () {
 
           // If we are dealing with a select input, we need to create an option first
           // that is then selected. For text inputs we can just add items normally.
-          if (!_this25._isTextElement) {
-            _this25._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
+          if (!_this24._isTextElement) {
+            _this24._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
           } else {
-            _this25._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
+            _this24._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
           }
         },
         string: function string() {
-          if (!_this25._isTextElement) {
-            _this25._addChoice(item, item, true, false, -1, null);
+          if (!_this24._isTextElement) {
+            _this24._addChoice(item, item, true, false, -1, null);
           } else {
-            _this25._addItem(item);
+            _this24._addItem(item);
           }
         }
       };
@@ -3984,12 +3943,12 @@ var Choices = function () {
   }, {
     key: '_findAndSelectChoiceByValue',
     value: function _findAndSelectChoiceByValue(val) {
-      var _this26 = this;
+      var _this25 = this;
 
       var choices = this._store.choices;
       // Check 'value' property exists and the choice isn't already selected
       var foundChoice = choices.find(function (choice) {
-        return _this26.config.itemComparer(choice.value, val);
+        return _this25.config.itemComparer(choice.value, val);
       });
 
       if (foundChoice && !foundChoice.selected) {
@@ -4016,9 +3975,9 @@ var Choices = function () {
   }, {
     key: '_renderChoices',
     value: function _renderChoices() {
-      // Get active groups/choices
-      var activeGroups = this._store.activeGroups;
-      var activeChoices = this._store.activeChoices;
+      var _store = this._store,
+          activeGroups = _store.activeGroups,
+          activeChoices = _store.activeChoices;
 
       var choiceListFragment = document.createDocumentFragment();
 
@@ -4027,7 +3986,7 @@ var Choices = function () {
 
       // Scroll back to top of choices list
       if (this.config.resetScrollPosition) {
-        this.choiceList.scrollTo(0);
+        this.choiceList.scrollToTop();
       }
 
       // If we have grouped options
@@ -5197,7 +5156,7 @@ module.exports = function (TO_STRING) {
 var LIBRARY = __webpack_require__(17);
 var $export = __webpack_require__(18);
 var redefine = __webpack_require__(21);
-var hide = __webpack_require__(4);
+var hide = __webpack_require__(5);
 var Iterators = __webpack_require__(15);
 var $iterCreate = __webpack_require__(45);
 var setToStringTag = __webpack_require__(28);
@@ -5268,7 +5227,7 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
 /* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = !__webpack_require__(7) && !__webpack_require__(19)(function () {
+module.exports = !__webpack_require__(8) && !__webpack_require__(19)(function () {
   return Object.defineProperty(__webpack_require__(20)('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -5313,7 +5272,7 @@ var setToStringTag = __webpack_require__(28);
 var IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-__webpack_require__(4)(IteratorPrototype, __webpack_require__(0)('iterator'), function () { return this; });
+__webpack_require__(5)(IteratorPrototype, __webpack_require__(0)('iterator'), function () { return this; });
 
 module.exports = function (Constructor, NAME, next) {
   Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
@@ -5326,7 +5285,7 @@ module.exports = function (Constructor, NAME, next) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var anObject = __webpack_require__(6);
+var anObject = __webpack_require__(7);
 var dPs = __webpack_require__(47);
 var enumBugKeys = __webpack_require__(27);
 var IE_PROTO = __webpack_require__(16)('IE_PROTO');
@@ -5372,11 +5331,11 @@ module.exports = Object.create || function create(O, Properties) {
 /* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dP = __webpack_require__(5);
-var anObject = __webpack_require__(6);
+var dP = __webpack_require__(6);
+var anObject = __webpack_require__(7);
 var getKeys = __webpack_require__(48);
 
-module.exports = __webpack_require__(7) ? Object.defineProperties : function defineProperties(O, Properties) {
+module.exports = __webpack_require__(8) ? Object.defineProperties : function defineProperties(O, Properties) {
   anObject(O);
   var keys = getKeys(Properties);
   var length = keys.length;
@@ -5404,7 +5363,7 @@ module.exports = Object.keys || function keys(O) {
 /* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var has = __webpack_require__(8);
+var has = __webpack_require__(9);
 var toIObject = __webpack_require__(23);
 var arrayIndexOf = __webpack_require__(51)(false);
 var IE_PROTO = __webpack_require__(16)('IE_PROTO');
@@ -5490,7 +5449,7 @@ module.exports = document && document.documentElement;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-var has = __webpack_require__(8);
+var has = __webpack_require__(9);
 var toObject = __webpack_require__(29);
 var IE_PROTO = __webpack_require__(16)('IE_PROTO');
 var ObjectProto = Object.prototype;
@@ -5553,7 +5512,7 @@ $export($export.S + $export.F * !__webpack_require__(61)(function (iter) { Array
 /***/ (function(module, exports, __webpack_require__) {
 
 // call something on iterator step with safe closing on error
-var anObject = __webpack_require__(6);
+var anObject = __webpack_require__(7);
 module.exports = function (iterator, fn, value, entries) {
   try {
     return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -5586,7 +5545,7 @@ module.exports = function (it) {
 
 "use strict";
 
-var $defineProperty = __webpack_require__(5);
+var $defineProperty = __webpack_require__(6);
 var createDesc = __webpack_require__(13);
 
 module.exports = function (object, index, value) {
@@ -5841,9 +5800,9 @@ var Store = function () {
     }
 
     /**
-    * Get highlighted items from store
-    * @return {Array} Item objects
-    */
+     * Get highlighted items from store
+     * @return {Array} Item objects
+     */
 
   }, {
     key: 'highlightedActiveItems',
@@ -6520,7 +6479,7 @@ var Container = function () {
 
   /**
    * Add event listeners
-  */
+   */
 
 
   _createClass(Container, [{
@@ -6532,7 +6491,7 @@ var Container = function () {
 
     /**
      * Remove event listeners
-    */
+     */
 
     /** */
 
@@ -6941,6 +6900,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _constants = __webpack_require__(4);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var List = function () {
@@ -6956,47 +6917,92 @@ var List = function () {
     this.hasChildren = !!this.element.children;
   }
 
-  /**
-   * Clear List contents
-   */
-
-
   _createClass(List, [{
     key: 'clear',
     value: function clear() {
       this.element.innerHTML = '';
     }
-
-    /**
-     * Scroll to passed position on Y axis
-     */
-
-  }, {
-    key: 'scrollTo',
-    value: function scrollTo() {
-      var scrollPos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-
-      this.element.scrollTop = scrollPos;
-    }
-    /**
-     * Append node to element
-     */
-
   }, {
     key: 'append',
     value: function append(node) {
       this.element.appendChild(node);
     }
-
-    /**
-     * Find element that matches passed selector
-     * @return {HTMLElement}
-    */
-
   }, {
     key: 'getChild',
     value: function getChild(selector) {
       return this.element.querySelector(selector);
+    }
+  }, {
+    key: 'scrollToTop',
+    value: function scrollToTop() {
+      this.element.scrollTop = 0;
+    }
+  }, {
+    key: 'scrollToChoice',
+    value: function scrollToChoice(choice, direction) {
+      var _this = this;
+
+      if (!choice) {
+        return;
+      }
+
+      var dropdownHeight = this.element.offsetHeight;
+      var choiceHeight = choice.offsetHeight;
+      // Distance from bottom of element to top of parent
+      var choicePos = choice.offsetTop + choiceHeight;
+      // Scroll position of dropdown
+      var containerScrollPos = this.element.scrollTop + dropdownHeight;
+      // Difference between the choice and scroll position
+      var endpoint = direction > 0 ? this.element.scrollTop + choicePos - containerScrollPos : choice.offsetTop;
+
+      requestAnimationFrame(function (time) {
+        _this._animateScroll(time, endpoint, direction);
+      });
+    }
+  }, {
+    key: '_scrollDown',
+    value: function _scrollDown(scrollPos, strength, endpoint) {
+      var easing = (endpoint - scrollPos) / strength;
+      var distance = easing > 1 ? easing : 1;
+
+      this.element.scrollTop = scrollPos + distance;
+    }
+  }, {
+    key: '_scrollUp',
+    value: function _scrollUp(scrollPos, strength, endpoint) {
+      var easing = (scrollPos - endpoint) / strength;
+      var distance = easing > 1 ? easing : 1;
+
+      this.element.scrollTop = scrollPos - distance;
+    }
+  }, {
+    key: '_animateScroll',
+    value: function _animateScroll(time, endpoint, direction) {
+      var _this2 = this;
+
+      var strength = _constants.SCROLLING_SPEED;
+      var choiceListScrollTop = this.element.scrollTop;
+      var continueAnimation = false;
+
+      if (direction > 0) {
+        this._scrollDown(choiceListScrollTop, strength, endpoint);
+
+        if (choiceListScrollTop < endpoint) {
+          continueAnimation = true;
+        }
+      } else {
+        this._scrollUp(choiceListScrollTop, strength, endpoint);
+
+        if (choiceListScrollTop > endpoint) {
+          continueAnimation = true;
+        }
+      }
+
+      if (continueAnimation) {
+        requestAnimationFrame(function (time) {
+          _this2._animateScroll(time, endpoint, direction);
+        });
+      }
     }
   }]);
 
@@ -7224,7 +7230,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.addChoice = undefined;
 
-var _constants = __webpack_require__(9);
+var _constants = __webpack_require__(4);
 
 var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
   return {
@@ -7274,7 +7280,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.highlightItem = exports.removeItem = exports.addItem = undefined;
 
-var _constants = __webpack_require__(9);
+var _constants = __webpack_require__(4);
 
 var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
   return {
@@ -7318,7 +7324,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.addGroup = undefined;
 
-var _constants = __webpack_require__(9);
+var _constants = __webpack_require__(4);
 
 /* eslint-disable import/prefer-default-export */
 var addGroup = exports.addGroup = function addGroup(value, id, active, disabled) {
