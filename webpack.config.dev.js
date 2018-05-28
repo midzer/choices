@@ -1,25 +1,21 @@
 const path = require('path');
 const webpack = require('webpack');
-const Dashboard = require('webpack-dashboard');
-const DashboardPlugin = require('webpack-dashboard/plugin');
-
-const dashboard = new Dashboard();
 
 module.exports = {
   devtool: 'eval',
   entry: [
-    'webpack-dev-server/client?http://localhost:3000',
-    './src/scripts/src/choices',
+    'webpack/hot/dev-server',
+    'webpack-hot-middleware/client',
+    './src/scripts/choices',
   ],
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.resolve('public'),
     filename: 'choices.min.js',
-    publicPath: '/src/scripts/dist/',
+    publicPath: 'http://localhost:3001/assets/scripts/',
     library: 'Choices',
     libraryTarget: 'umd',
   },
   plugins: [
-    new DashboardPlugin(dashboard.setData),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
@@ -32,7 +28,7 @@ module.exports = {
       {
         enforce: 'pre',
         test: /\.js?$/,
-        include: path.join(__dirname, 'src/scripts/src'),
+        include: path.join(__dirname, 'src/scripts'),
         exclude: /(node_modules|bower_components)/,
         loader: 'eslint-loader',
         query: {
@@ -41,7 +37,7 @@ module.exports = {
       },
       {
         test: /\.js?$/,
-        include: path.join(__dirname, 'src/scripts/src'),
+        include: path.join(__dirname, 'src/scripts'),
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
       },

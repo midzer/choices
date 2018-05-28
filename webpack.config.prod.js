@@ -11,12 +11,12 @@ module.exports = (env) => {
   const config = {
     devtool: minimize ? false : 'cheap-module-source-map',
     entry: [
-      './src/scripts/src/choices',
+      './src/scripts/choices',
     ],
     output: {
-      path: path.join(__dirname, '/src/scripts/dist'),
+      path: path.join(__dirname, '/public/assets/scripts'),
       filename: minimize ? 'choices.min.js' : 'choices.js',
-      publicPath: '/src/scripts/dist/',
+      publicPath: '/public/assets/scripts/',
       library: 'Choices',
       libraryTarget: 'umd',
       auxiliaryComment: {
@@ -43,7 +43,7 @@ module.exports = (env) => {
         {
           enforce: 'pre',
           test: /\.js?$/,
-          include: path.join(__dirname, 'src/scripts/src'),
+          include: path.join(__dirname, 'src/scripts'),
           exclude: /(node_modules|bower_components)/,
           loader: 'eslint-loader',
           query: {
@@ -52,7 +52,7 @@ module.exports = (env) => {
         },
         {
           test: /\.js?$/,
-          include: path.join(__dirname, 'src/scripts/src'),
+          include: path.join(__dirname, 'src/scripts'),
           exclude: /(node_modules|bower_components)/,
           loader: 'babel-loader',
         },

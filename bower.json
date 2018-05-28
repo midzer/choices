@@ -3,8 +3,8 @@
   "version": "3.0.2",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": [
-    "./assets/scripts/dist/choices.js",
-    "./assets/styles/css/choices.css"
+    "./public/assets/scripts/choices.min.js",
+    "./public/assets/styles/choices.min.css"
   ],
   "authors": [
     "Josh Johnson"
@@ -16,6 +16,7 @@
     "node_modules",
     "bower_components",
     "test",
+    "cypress",
     "tests"
   ],
   "keywords": [
