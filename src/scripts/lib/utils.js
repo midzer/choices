@@ -1,3 +1,15 @@
+/* eslint-disable */
+
+/**
+ * Get a random number between a range
+ * @param  {Number} min Minimum range
+ * @param  {Number} max Maximum range
+ * @return {Number}     Random number
+ */
+export const getRandomNumber = function(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+};
+
 /**
  * Generates a string of random chars
  * @param  {Number} length Length of the string to generate
@@ -203,16 +215,6 @@ export const stripHTML = html =>
     .replace(/"/g, '&quot;');
 
 /**
- * Get a random number between a range
- * @param  {Number} min Minimum range
- * @param  {Number} max Maximum range
- * @return {Number}     Random number
- */
-export const getRandomNumber = function(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-};
-
-/**
  * Turn a string into a node
  * @param  {String} String to convert
  * @return {HTMLElement}   Converted node element
@@ -378,19 +380,25 @@ export const fetchFromObject = (object, properties) => {
   return object[properties];
 };
 
-export const isIE11 = () => {
-  return !!(
+export const isIE11 = () =>
+  !!(
     navigator.userAgent.match(/Trident/) &&
     navigator.userAgent.match(/rv[ :]11/)
   );
-};
 
-export const existsInArray = (array, value) => {
-  return array.some(item => {
+export const existsInArray = (array, value) =>
+  array.some(item => {
     if (isType('String', value)) {
       return item.value === value.trim();
     }
 
     return item.value === value;
   });
-};
+
+/**
+ * Deep clone an object
+ * @param  {Object} obj Object to clone
+ * @return {Object}     Clone of the object
+ * @private
+ */
+export const cloneObject = obj => JSON.parse(JSON.stringify(obj));

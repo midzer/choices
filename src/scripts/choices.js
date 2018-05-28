@@ -25,7 +25,7 @@ import {
 } from './actions/choices';
 import { addItem, removeItem, highlightItem } from './actions/items';
 import { addGroup } from './actions/groups';
-import { clearAll } from './actions/misc';
+import { clearAll, resetTo } from './actions/misc';
 import {
   isScrolledIntoView,
   getAdjacentEl,
@@ -41,6 +41,7 @@ import {
   fetchFromObject,
   isIE11,
   existsInArray,
+  cloneObject,
 } from './lib/utils';
 
 /**
@@ -105,6 +106,7 @@ class Choices {
 
     this._store = new Store(this.render);
     this.initialised = false;
+    this._initialState = {};
     this._currentState = {};
     this._prevState = {};
     this._currentValue = '';
@@ -136,6 +138,7 @@ class Choices {
     this._onTouchEnd = this._onTouchEnd.bind(this);
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
+    this._onFormReset = this._onFormReset.bind(this);
 
     // If element has already been initialised with Choices, fail silently
     if (this.passedElement.element.getAttribute('data-choice') === 'active') {
@@ -163,6 +166,9 @@ class Choices {
     this._createElements();
     // Generate input markup
     this._createStructure();
+    // Set initial state (We need to clone the state because some reducers
+    // modify the inner objects properties in the state) 🤢
+    this._initialState = cloneObject(this._store.state);
     // Subscribe store to render method
     this._store.subscribe(this.render);
     // Render any items
@@ -948,6 +954,10 @@ class Choices {
     this.input.element.addEventListener('focus', this._onFocus);
     this.input.element.addEventListener('blur', this._onBlur);
 
+    if (this.input.element.form) {
+      this.input.element.form.addEventListener('reset', this._onFormReset);
+    }
+
     this.input.addEventListeners();
   }
 
@@ -967,6 +977,11 @@ class Choices {
 
     this.input.element.removeEventListener('focus', this._onFocus);
     this.input.element.removeEventListener('blur', this._onBlur);
+
+    if (this.input.element.form) {
+      this.input.element.form.removeEventListener('reset', this._onFormReset);
+    }
+
     this.input.removeEventListeners();
   }
 
@@ -1382,6 +1397,10 @@ class Choices {
       this._isScrollingOnIe = false;
       this.input.element.focus();
     }
+  }
+
+  _onFormReset() {
+    this._store.dispatch(resetTo(this._initialState));
   }
 
   _highlightChoice(el = null) {

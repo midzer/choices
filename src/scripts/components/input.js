@@ -33,6 +33,10 @@ export default class Input {
     this.element.addEventListener('paste', this._onPaste);
     this.element.addEventListener('focus', this._onFocus);
     this.element.addEventListener('blur', this._onBlur);
+
+    if (this.element.form) {
+      this.element.form.addEventListener('reset', this._onFormReset);
+    }
   }
 
   removeEventListeners() {
@@ -40,6 +44,10 @@ export default class Input {
     this.element.removeEventListener('paste', this._onPaste);
     this.element.removeEventListener('focus', this._onFocus);
     this.element.removeEventListener('blur', this._onBlur);
+
+    if (this.element.form) {
+      this.element.form.removeEventListener('reset', this._onFormReset);
+    }
   }
 
   enable() {
@@ -124,10 +132,12 @@ export default class Input {
       this.setWidth();
     }
   }
-  _onPaste(e) {
+
+  _onPaste(event) {
+    const { target } = event;
     // Disable pasting into the input if option has been set
-    if (e.target === this.element && this.preventPaste) {
-      e.preventDefault();
+    if (target === this.element && this.preventPaste) {
+      event.preventDefault();
     }
   }
 

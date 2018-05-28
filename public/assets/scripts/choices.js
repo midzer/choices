@@ -82,23 +82,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var store = __webpack_require__(26)('wks');
-var uid = __webpack_require__(14);
-var Symbol = __webpack_require__(2).Symbol;
-var USE_SYMBOL = typeof Symbol == 'function';
-
-var $exports = module.exports = function (name) {
-  return store[name] || (store[name] =
-    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
-};
-
-$exports.store = store;
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -109,6 +92,16 @@ Object.defineProperty(exports, "__esModule", {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /* eslint-disable */
+
+/**
+ * Get a random number between a range
+ * @param  {Number} min Minimum range
+ * @param  {Number} max Maximum range
+ * @return {Number}     Random number
+ */
+var getRandomNumber = exports.getRandomNumber = function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+};
 
 /**
  * Generates a string of random chars
@@ -167,8 +160,8 @@ var isType = exports.isType = function isType(type, obj) {
  * @return {Boolean}
  */
 var isElement = exports.isElement = function isElement(o) {
-  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object' ? o instanceof HTMLElement : // DOM2
-  o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
+  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object' ? o instanceof HTMLElement // DOM2
+  : o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
 };
 
 /**
@@ -299,22 +292,12 @@ var isScrolledIntoView = exports.isScrolledIntoView = function isScrolledIntoVie
 };
 
 /**
- * Escape html in the string
+ * Escapes html in the string
  * @param  {String} html Initial string/html
  * @return {String}  Sanitised string
  */
 var stripHTML = exports.stripHTML = function stripHTML(html) {
   return html.replace(/&/g, '&amp;').replace(/>/g, '&rt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-};
-
-/**
- * Get a random number between a range
- * @param  {Number} min Minimum range
- * @param  {Number} max Maximum range
- * @return {Number}     Random number
- */
-var getRandomNumber = exports.getRandomNumber = function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
 };
 
 /**
@@ -339,10 +322,10 @@ var strToEl = exports.strToEl = function () {
 }();
 
 /**
- * Sets the width of a passed input based on its value
- * @return {Number} Width of input
+ * Determines the width of a passed input based on its value and passes
+ * it to the supplied callback function.
  */
-var calcWidthOfInput = exports.calcWidthOfInput = function calcWidthOfInput(input) {
+var calcWidthOfInput = exports.calcWidthOfInput = function calcWidthOfInput(input, callback) {
   var value = input.value || input.placeholder;
   var width = input.offsetWidth;
 
@@ -371,14 +354,18 @@ var calcWidthOfInput = exports.calcWidthOfInput = function calcWidthOfInput(inpu
 
     document.body.appendChild(testEl);
 
-    if (value && testEl.offsetWidth !== input.offsetWidth) {
-      width = testEl.offsetWidth + 4;
-    }
+    requestAnimationFrame(function () {
+      if (value && testEl.offsetWidth !== input.offsetWidth) {
+        width = testEl.offsetWidth + 4;
+      }
 
-    document.body.removeChild(testEl);
+      document.body.removeChild(testEl);
+
+      callback.call(undefined, width + 'px');
+    });
+  } else {
+    callback.call(undefined, width + 'px');
   }
-
-  return width + 'px';
 };
 
 /**
@@ -490,6 +477,33 @@ var existsInArray = exports.existsInArray = function existsInArray(array, value)
   });
 };
 
+/**
+ * Deep clone an object
+ * @param  {Object} obj Object to clone
+ * @return {Object}     Clone of the object
+ * @private
+ */
+var cloneObject = exports.cloneObject = function cloneObject(obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var store = __webpack_require__(26)('wks');
+var uid = __webpack_require__(14);
+var Symbol = __webpack_require__(2).Symbol;
+var USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function (name) {
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+
+
 /***/ }),
 /* 2 */
 /***/ (function(module, exports) {
@@ -522,7 +536,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.SCROLLING_SPEED = exports.KEY_CODES = exports.ACTION_TYPES = exports.EVENTS = exports.DEFAULT_CONFIG = exports.DEFAULT_CLASSNAMES = undefined;
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 var DEFAULT_CLASSNAMES = exports.DEFAULT_CLASSNAMES = {
   containerOuter: 'choices',
@@ -996,7 +1010,7 @@ module.exports = (
 
 var def = __webpack_require__(6).f;
 var has = __webpack_require__(9);
-var TAG = __webpack_require__(0)('toStringTag');
+var TAG = __webpack_require__(1)('toStringTag');
 
 module.exports = function (it, tag, stat) {
   if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
@@ -1865,7 +1879,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1973,7 +1987,7 @@ var _classnames = __webpack_require__(79);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2110,7 +2124,7 @@ var _groups = __webpack_require__(82);
 
 var _misc = __webpack_require__(83);
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2178,6 +2192,7 @@ var Choices = function () {
 
     this._store = new _store3.default(this.render);
     this.initialised = false;
+    this._initialState = {};
     this._currentState = {};
     this._prevState = {};
     this._currentValue = '';
@@ -2207,6 +2222,7 @@ var Choices = function () {
     this._onTouchEnd = this._onTouchEnd.bind(this);
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
+    this._onFormReset = this._onFormReset.bind(this);
 
     // If element has already been initialised with Choices, fail silently
     if (this.passedElement.element.getAttribute('data-choice') === 'active') {
@@ -2236,6 +2252,9 @@ var Choices = function () {
       this._createElements();
       // Generate input markup
       this._createStructure();
+      // Set initial state (We need to clone the state because some reducers
+      // modify the inner objects properties in the state) 🤢
+      this._initialState = (0, _utils.cloneObject)(this._store.state);
       // Subscribe store to render method
       this._store.subscribe(this.render);
       // Render any items
@@ -3075,6 +3094,10 @@ var Choices = function () {
       this.input.element.addEventListener('focus', this._onFocus);
       this.input.element.addEventListener('blur', this._onBlur);
 
+      if (this.input.element.form) {
+        this.input.element.form.addEventListener('reset', this._onFormReset);
+      }
+
       this.input.addEventListeners();
     }
   }, {
@@ -3095,6 +3118,11 @@ var Choices = function () {
 
       this.input.element.removeEventListener('focus', this._onFocus);
       this.input.element.removeEventListener('blur', this._onBlur);
+
+      if (this.input.element.form) {
+        this.input.element.form.removeEventListener('reset', this._onFormReset);
+      }
+
       this.input.removeEventListeners();
     }
   }, {
@@ -3133,8 +3161,6 @@ var Choices = function () {
       if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
         this.showDropdown(true);
       }
-
-      this.config.searchEnabled = this.config.searchEnabled;
 
       var onAKey = function onAKey() {
         // If CTRL + A or CMD + A have been pressed and there are items to select
@@ -3289,7 +3315,6 @@ var Choices = function () {
 
         // If user has removed value...
         if ((keyCode === backKey || keyCode === deleteKey) && !target.value) {
-          // ...and it is a multiple select input, activate choices (if searching)
           if (!this._isTextElement && this._isSearching) {
             this._isSearching = false;
             this._store.dispatch((0, _choices.activateChoices)(true));
@@ -3316,7 +3341,10 @@ var Choices = function () {
       // If a user tapped within our container...
       if (this._wasTap === true && this.containerOuter.element.contains(target)) {
         // ...and we aren't dealing with a single select box, show dropdown/focus input
-        if ((target === this.containerOuter.element || target === this.containerInner.element) && !this._isSelectOneElement) {
+
+        var containerWasTarget = target === this.containerOuter.element || target === this.containerInner.element;
+
+        if (containerWasTarget && !this._isSelectOneElement) {
           if (this._isTextElement) {
             // If text element, we only want to focus the input
             this.input.focus();
@@ -3391,8 +3419,7 @@ var Choices = function () {
             this.showDropdown(true);
           } else {
             this.showDropdown();
-            // code smell
-            this.containerOuter.focus();
+            this.containerOuter.focus(); // code smell 🤢
           }
         } else if (this._isSelectOneElement && target !== this.input.element && !this.dropdown.element.contains(target)) {
           this.hideDropdown(true);
@@ -3430,7 +3457,6 @@ var Choices = function () {
         'select-one': function selectOne() {
           _this18.containerOuter.addFocusState();
           if (target === _this18.input.element) {
-            // Show dropdown if it isn't already showing
             _this18.showDropdown();
           }
         },
@@ -3462,9 +3488,7 @@ var Choices = function () {
         var blurActions = {
           text: function text() {
             if (target === _this19.input.element) {
-              // Remove the focus state
               _this19.containerOuter.removeFocusState();
-              // De-select any highlighted items
               if (hasHighlightedItems) {
                 _this19.unhighlightAll();
               }
@@ -3479,10 +3503,8 @@ var Choices = function () {
           },
           'select-multiple': function selectMultiple() {
             if (target === _this19.input.element) {
-              // Remove the focus state
               _this19.containerOuter.removeFocusState();
               _this19.hideDropdown();
-              // De-select any highlighted items
               if (hasHighlightedItems) {
                 _this19.unhighlightAll();
               }
@@ -3498,6 +3520,11 @@ var Choices = function () {
         this._isScrollingOnIe = false;
         this.input.element.focus();
       }
+    }
+  }, {
+    key: '_onFormReset',
+    value: function _onFormReset() {
+      this._store.dispatch((0, _misc.resetTo)(this._initialState));
     }
   }, {
     key: '_highlightChoice',
@@ -3975,18 +4002,20 @@ var Choices = function () {
   }, {
     key: '_renderChoices',
     value: function _renderChoices() {
+      var _this26 = this;
+
       var _store = this._store,
           activeGroups = _store.activeGroups,
           activeChoices = _store.activeChoices;
 
       var choiceListFragment = document.createDocumentFragment();
 
-      // Clear choices
       this.choiceList.clear();
 
-      // Scroll back to top of choices list
       if (this.config.resetScrollPosition) {
-        this.choiceList.scrollToTop();
+        requestAnimationFrame(function () {
+          return _this26.choiceList.scrollToTop();
+        });
       }
 
       // If we have grouped options
@@ -4075,7 +4104,6 @@ var Choices = function () {
 }();
 
 Choices.userDefaults = {};
-
 // We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
 module.exports = Choices;
 
@@ -5161,7 +5189,7 @@ var Iterators = __webpack_require__(15);
 var $iterCreate = __webpack_require__(45);
 var setToStringTag = __webpack_require__(28);
 var getPrototypeOf = __webpack_require__(54);
-var ITERATOR = __webpack_require__(0)('iterator');
+var ITERATOR = __webpack_require__(1)('iterator');
 var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
 var FF_ITERATOR = '@@iterator';
 var KEYS = 'keys';
@@ -5272,7 +5300,7 @@ var setToStringTag = __webpack_require__(28);
 var IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-__webpack_require__(5)(IteratorPrototype, __webpack_require__(0)('iterator'), function () { return this; });
+__webpack_require__(5)(IteratorPrototype, __webpack_require__(1)('iterator'), function () { return this; });
 
 module.exports = function (Constructor, NAME, next) {
   Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
@@ -5531,7 +5559,7 @@ module.exports = function (iterator, fn, value, entries) {
 
 // check on default Array iterator
 var Iterators = __webpack_require__(15);
-var ITERATOR = __webpack_require__(0)('iterator');
+var ITERATOR = __webpack_require__(1)('iterator');
 var ArrayProto = Array.prototype;
 
 module.exports = function (it) {
@@ -5559,7 +5587,7 @@ module.exports = function (object, index, value) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof = __webpack_require__(60);
-var ITERATOR = __webpack_require__(0)('iterator');
+var ITERATOR = __webpack_require__(1)('iterator');
 var Iterators = __webpack_require__(15);
 module.exports = __webpack_require__(3).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
@@ -5574,7 +5602,7 @@ module.exports = __webpack_require__(3).getIteratorMethod = function (it) {
 
 // getting tag from 19.1.3.6 Object.prototype.toString()
 var cof = __webpack_require__(24);
-var TAG = __webpack_require__(0)('toStringTag');
+var TAG = __webpack_require__(1)('toStringTag');
 // ES3 wrong here
 var ARG = cof(function () { return arguments; }()) == 'Arguments';
 
@@ -5601,7 +5629,7 @@ module.exports = function (it) {
 /* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ITERATOR = __webpack_require__(0)('iterator');
+var ITERATOR = __webpack_require__(1)('iterator');
 var SAFE_CLOSING = false;
 
 try {
@@ -6035,6 +6063,8 @@ var _choices = __webpack_require__(71);
 
 var _choices2 = _interopRequireDefault(_choices);
 
+var _utils = __webpack_require__(0);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var appReducer = (0, _redux.combineReducers)({
@@ -6051,6 +6081,8 @@ var rootReducer = function rootReducer(passedState, action) {
   // See: http://stackoverflow.com/a/35641992
   if (action.type === 'CLEAR_ALL') {
     state = undefined;
+  } else if (action.type === 'RESET_TO') {
+    return (0, _utils.cloneObject)(action.state);
   }
 
   return appReducer(state, action);
@@ -6452,7 +6484,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6700,7 +6732,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6734,6 +6766,10 @@ var Input = function () {
       this.element.addEventListener('paste', this._onPaste);
       this.element.addEventListener('focus', this._onFocus);
       this.element.addEventListener('blur', this._onBlur);
+
+      if (this.element.form) {
+        this.element.form.addEventListener('reset', this._onFormReset);
+      }
     }
   }, {
     key: 'removeEventListeners',
@@ -6742,6 +6778,10 @@ var Input = function () {
       this.element.removeEventListener('paste', this._onPaste);
       this.element.removeEventListener('focus', this._onFocus);
       this.element.removeEventListener('blur', this._onBlur);
+
+      if (this.element.form) {
+        this.element.form.removeEventListener('reset', this._onFormReset);
+      }
     }
   }, {
     key: 'enable',
@@ -6801,21 +6841,27 @@ var Input = function () {
   }, {
     key: 'setWidth',
     value: function setWidth(enforceWidth) {
+      var _this = this;
+
       if (this._placeholderValue) {
         // If there is a placeholder, we only want to set the width of the input when it is a greater
         // length than 75% of the placeholder. This stops the input jumping around.
         if (this.element.value && this.element.value.length >= this._placeholderValue.length / 1.25 || enforceWidth) {
-          this.element.style.width = this.calcWidth();
+          this.calcWidth(function (width) {
+            _this.element.style.width = width;
+          });
         }
       } else {
         // If there is no placeholder, resize input to contents
-        this.element.style.width = this.calcWidth();
+        this.calcWidth(function (width) {
+          _this.element.style.width = width;
+        });
       }
     }
   }, {
     key: 'calcWidth',
-    value: function calcWidth() {
-      return (0, _utils.calcWidthOfInput)(this.element);
+    value: function calcWidth(callback) {
+      return (0, _utils.calcWidthOfInput)(this.element, callback);
     }
   }, {
     key: 'setActiveDescendant',
@@ -6827,13 +6873,6 @@ var Input = function () {
     value: function removeActiveDescendant() {
       this.element.removeAttribute('aria-activedescendant');
     }
-
-    /**
-     * Input event
-     * @return
-     * @private
-     */
-
   }, {
     key: '_onInput',
     value: function _onInput() {
@@ -6841,20 +6880,14 @@ var Input = function () {
         this.setWidth();
       }
     }
-
-    /**
-     * Paste event
-     * @param  {Object} e Event
-     * @return
-     * @private
-     */
-
   }, {
     key: '_onPaste',
-    value: function _onPaste(e) {
+    value: function _onPaste(event) {
+      var target = event.target;
       // Disable pasting into the input if option has been set
-      if (e.target === this.element && this.preventPaste) {
-        e.preventDefault();
+
+      if (target === this.element && this.preventPaste) {
+        event.preventDefault();
       }
     }
   }, {
@@ -6875,10 +6908,10 @@ var Input = function () {
   }, {
     key: 'value',
     set: function set(value) {
-      this.element.value = value;
+      this.element.value = '' + value;
     },
     get: function get() {
-      return this.element.value;
+      return (0, _utils.stripHTML)(this.element.value);
     }
   }]);
 
@@ -6999,7 +7032,7 @@ var List = function () {
       }
 
       if (continueAnimation) {
-        requestAnimationFrame(function (time) {
+        requestAnimationFrame(function () {
           _this2._animateScroll(time, endpoint, direction);
         });
       }
@@ -7030,7 +7063,7 @@ var _wrappedElement = __webpack_require__(32);
 
 var _wrappedElement2 = _interopRequireDefault(_wrappedElement);
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7347,10 +7380,16 @@ var addGroup = exports.addGroup = function addGroup(value, id, active, disabled)
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-/* eslint-disable import/prefer-default-export */
 var clearAll = exports.clearAll = function clearAll() {
   return {
     type: 'CLEAR_ALL'
+  };
+};
+
+var resetTo = exports.resetTo = function resetTo(state) {
+  return {
+    type: 'RESET_TO',
+    state: state
   };
 };
 

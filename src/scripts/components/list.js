@@ -81,7 +81,7 @@ export default class List {
     }
 
     if (continueAnimation) {
-      requestAnimationFrame(time => {
+      requestAnimationFrame(() => {
         this._animateScroll(time, endpoint, direction);
       });
     }
