@@ -1000,8 +1000,6 @@ class Choices {
       this.showDropdown(true);
     }
 
-    this.config.searchEnabled = this.config.searchEnabled;
-
     const onAKey = () => {
       // If CTRL + A or CMD + A have been pressed and there are items to select
       if (ctrlDownKey && hasItems) {
@@ -1185,7 +1183,6 @@ class Choices {
 
       // If user has removed value...
       if ((keyCode === backKey || keyCode === deleteKey) && !target.value) {
-        // ...and it is a multiple select input, activate choices (if searching)
         if (!this._isTextElement && this._isSearching) {
           this._isSearching = false;
           this._store.dispatch(activateChoices(true));
@@ -1210,11 +1207,12 @@ class Choices {
     // If a user tapped within our container...
     if (this._wasTap === true && this.containerOuter.element.contains(target)) {
       // ...and we aren't dealing with a single select box, show dropdown/focus input
-      if (
-        (target === this.containerOuter.element ||
-          target === this.containerInner.element) &&
-        !this._isSelectOneElement
-      ) {
+
+      const containerWasTarget =
+        target === this.containerOuter.element ||
+        target === this.containerInner.element;
+
+      if (containerWasTarget && !this._isSelectOneElement) {
         if (this._isTextElement) {
           // If text element, we only want to focus the input
           this.input.focus();
@@ -1285,8 +1283,7 @@ class Choices {
           this.showDropdown(true);
         } else {
           this.showDropdown();
-          // code smell
-          this.containerOuter.focus();
+          this.containerOuter.focus(); // code smell 🤢
         }
       } else if (
         this._isSelectOneElement &&
@@ -1321,7 +1318,6 @@ class Choices {
       'select-one': () => {
         this.containerOuter.addFocusState();
         if (target === this.input.element) {
-          // Show dropdown if it isn't already showing
           this.showDropdown();
         }
       },
@@ -1349,9 +1345,7 @@ class Choices {
       const blurActions = {
         text: () => {
           if (target === this.input.element) {
-            // Remove the focus state
             this.containerOuter.removeFocusState();
-            // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
@@ -1370,10 +1364,8 @@ class Choices {
         },
         'select-multiple': () => {
           if (target === this.input.element) {
-            // Remove the focus state
             this.containerOuter.removeFocusState();
             this.hideDropdown();
-            // De-select any highlighted items
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
@@ -1959,10 +1951,8 @@ class Choices {
     const { activeGroups, activeChoices } = this._store;
     let choiceListFragment = document.createDocumentFragment();
 
-    // Clear choices
     this.choiceList.clear();
 
-    // Scroll back to top of choices list
     if (this.config.resetScrollPosition) {
       this.choiceList.scrollToTop();
     }
@@ -2054,6 +2044,5 @@ class Choices {
 }
 
 Choices.userDefaults = {};
-
 // We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
 module.exports = Choices;
