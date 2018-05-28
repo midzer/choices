@@ -15,7 +15,6 @@ import {
   DEFAULT_CLASSNAMES,
   EVENTS,
   KEY_CODES,
-  SCROLLING_SPEED,
 } from './constants';
 import { TEMPLATES } from './templates';
 import {
@@ -1116,7 +1115,7 @@ class Choices {
           if (
             !isScrolledIntoView(nextEl, this.choiceList.element, directionInt)
           ) {
-            this._scrollToChoice(nextEl, directionInt);
+            this.choiceList.scrollToChoice(nextEl, directionInt);
           }
           this._highlightChoice(nextEl);
         }
@@ -1390,69 +1389,6 @@ class Choices {
       this._isScrollingOnIe = false;
       this.input.element.focus();
     }
-  }
-
-  _scrollToChoice(choice, direction) {
-    if (!choice) {
-      return;
-    }
-
-    const dropdownHeight = this.choiceList.element.offsetHeight;
-    const choiceHeight = choice.offsetHeight;
-    // Distance from bottom of element to top of parent
-    const choicePos = choice.offsetTop + choiceHeight;
-    // Scroll position of dropdown
-    const containerScrollPos =
-      this.choiceList.element.scrollTop + dropdownHeight;
-    // Difference between the choice and scroll position
-    const endPoint =
-      direction > 0
-        ? this.choiceList.element.scrollTop + choicePos - containerScrollPos
-        : choice.offsetTop;
-
-    const scrollDown = (scrollPos, strength) => {
-      const easing = (endPoint - scrollPos) / strength;
-      const distance = easing > 1 ? easing : 1;
-
-      this.choiceList.scrollTo(scrollPos + distance);
-    };
-
-    const scrollUp = (scrollPos, strength) => {
-      const easing = (scrollPos - endPoint) / strength;
-      const distance = easing > 1 ? easing : 1;
-
-      this.choiceList.scrollTo(scrollPos - distance);
-    };
-
-    const animateScroll = () => {
-      const strength = SCROLLING_SPEED;
-      const choiceListScrollTop = this.choiceList.element.scrollTop;
-      let continueAnimation = false;
-
-      if (direction > 0) {
-        scrollDown(choiceListScrollTop, strength);
-
-        if (choiceListScrollTop < endPoint) {
-          continueAnimation = true;
-        }
-      } else {
-        scrollUp(choiceListScrollTop, strength);
-
-        if (choiceListScrollTop > endPoint) {
-          continueAnimation = true;
-        }
-      }
-
-      if (continueAnimation) {
-        requestAnimationFrame(time => {
-          animateScroll(time, endPoint, direction);
-        });
-      }
-    };
-
-    requestAnimationFrame(time => {
-      animateScroll(time, endPoint, direction);
-    });
   }
 
   _highlightChoice(el = null) {
@@ -2028,7 +1964,7 @@ class Choices {
 
     // Scroll back to top of choices list
     if (this.config.resetScrollPosition) {
-      this.choiceList.scrollTo(0);
+      this.choiceList.scrollToTop();
     }
 
     // If we have grouped options

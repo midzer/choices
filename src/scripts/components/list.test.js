@@ -33,25 +33,6 @@ describe('components/list', () => {
     });
   });
 
-  describe('scrollTo', () => {
-    describe('passing position', () => {
-      it('scrolls element to passed position', () => {
-        const scrollPosition = 20;
-        expect(instance.element.scrollTop).to.equal(0);
-        instance.scrollTo(scrollPosition);
-        expect(instance.element.scrollTop).to.equal(scrollPosition);
-      });
-    });
-
-    describe('not passing position', () => {
-      it('scrolls element to default position', () => {
-        expect(instance.element.scrollTop).to.equal(0);
-        instance.scrollTo();
-        expect(instance.element.scrollTop).to.equal(0);
-      });
-    });
-  });
-
   describe('append', () => {
     it('appends passed node to element', () => {
       const elementToAppend = document.createElement('span');
