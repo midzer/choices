@@ -117,6 +117,7 @@ class Choices {
     this._wasTap = true;
     this._placeholderValue = this._generatePlaceholderValue();
     this._baseId = generateId(this.passedElement.element, 'choices-');
+    this._direction = this.passedElement.element.getAttribute('dir') || 'ltr';
     this._idNames = {
       itemChoice: 'item-choice',
     };
@@ -1658,54 +1659,43 @@ class Choices {
   }
 
   _createElements() {
-    const direction = this.passedElement.element.getAttribute('dir') || 'ltr';
-    const containerOuter = this._getTemplate(
-      'containerOuter',
-      direction,
-      this._isSelectElement,
-      this._isSelectOneElement,
-      this.config.searchEnabled,
-      this.passedElement.element.type,
-    );
-    const containerInner = this._getTemplate('containerInner');
-    const itemList = this._getTemplate('itemList', this._isSelectOneElement);
-    const choiceList = this._getTemplate(
-      'choiceList',
-      this._isSelectOneElement,
-    );
-    const input = this._getTemplate('input');
-    const dropdown = this._getTemplate('dropdown');
-
     this.containerOuter = new Container({
-      element: containerOuter,
+      element: this._getTemplate(
+        'containerOuter',
+        this._direction,
+        this._isSelectElement,
+        this._isSelectOneElement,
+        this.config.searchEnabled,
+        this.passedElement.element.type,
+      ),
       classNames: this.config.classNames,
       type: this.passedElement.element.type,
       position: this.config.position,
     });
 
     this.containerInner = new Container({
-      element: containerInner,
+      element: this._getTemplate('containerInner'),
       classNames: this.config.classNames,
       type: this.passedElement.element.type,
       position: this.config.position,
     });
 
     this.input = new Input({
-      element: input,
+      element: this._getTemplate('input'),
       classNames: this.config.classNames,
       type: this.passedElement.element.type,
     });
 
     this.choiceList = new List({
-      element: choiceList,
+      element: this._getTemplate('choiceList', this._isSelectOneElement),
     });
 
     this.itemList = new List({
-      element: itemList,
+      element: this._getTemplate('itemList', this._isSelectOneElement),
     });
 
     this.dropdown = new Dropdown({
-      element: dropdown,
+      element: this._getTemplate('dropdown'),
       classNames: this.config.classNames,
       type: this.passedElement.element.type,
     });
@@ -1853,10 +1843,7 @@ class Choices {
   _addPredefinedItems() {
     const handlePresetItem = item => {
       const itemType = getType(item);
-      if (itemType === 'Object') {
-        if (!item.value) {
-          return;
-        }
+      if (itemType === 'Object' && item.value) {
         this._addItem({
           value: item.value,
           label: item.label,
