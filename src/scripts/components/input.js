@@ -95,23 +95,22 @@ export default class Input {
    * @return
    */
   setWidth(enforceWidth) {
+    const callback = width => {
+      this.element.style.width = width;
+    };
+
     if (this._placeholderValue) {
       // If there is a placeholder, we only want to set the width of the input when it is a greater
       // length than 75% of the placeholder. This stops the input jumping around.
-      if (
-        (this.element.value &&
-          this.element.value.length >= this._placeholderValue.length / 1.25) ||
-        enforceWidth
-      ) {
-        this.calcWidth(width => {
-          this.element.style.width = width;
-        });
+      const valueHasDesiredLength =
+        this.element.value.length >= this._placeholderValue.length / 1.25;
+
+      if ((this.element.value && valueHasDesiredLength) || enforceWidth) {
+        this.calcWidth(callback);
       }
     } else {
       // If there is no placeholder, resize input to contents
-      this.calcWidth(width => {
-        this.element.style.width = width;
-      });
+      this.calcWidth(callback);
     }
   }
 
