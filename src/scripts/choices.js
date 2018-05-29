@@ -104,12 +104,14 @@ class Choices {
       );
     }
 
-    this._store = new Store(this.render);
     this.initialised = false;
+
+    this._store = new Store(this.render);
     this._initialState = {};
     this._currentState = {};
     this._prevState = {};
     this._currentValue = '';
+    this._canSearch = this.config.searchEnabled;
     this._isScrollingOnIe = false;
     this._highlightPosition = 0;
     this._wasTap = true;
@@ -142,7 +144,9 @@ class Choices {
 
     // If element has already been initialised with Choices, fail silently
     if (this.passedElement.element.getAttribute('data-choice') === 'active') {
-      return false;
+      console.warn(
+        'Trying to initialise Choices on element already initialised',
+      );
     }
 
     // Let's go
@@ -158,23 +162,16 @@ class Choices {
       return;
     }
 
-    // Set initialise flag
-    this.initialised = true;
-    // Create required templates
     this._createTemplates();
-    // Create required elements
     this._createElements();
-    // Generate input markup
     this._createStructure();
     // Set initial state (We need to clone the state because some reducers
     // modify the inner objects properties in the state) 🤢
     this._initialState = cloneObject(this._store.state);
-    // Subscribe store to render method
     this._store.subscribe(this.render);
-    // Render any items
     this.render();
-    // Trigger event listeners
     this._addEventListeners();
+    this.initialised = true;
 
     const { callbackOnInit } = this.config;
     // Run callback if it is a function
@@ -349,7 +346,7 @@ class Choices {
       this.dropdown.show();
       this.containerOuter.open(this.dropdown.distanceFromTopWindow());
 
-      if (!preventInputFocus && this.config.searchEnabled) {
+      if (!preventInputFocus && this._canSearch) {
         this.input.focus();
       }
 
@@ -368,7 +365,7 @@ class Choices {
       this.dropdown.hide();
       this.containerOuter.close();
 
-      if (!preventInputBlur && this.config.searchEnabled) {
+      if (!preventInputBlur && this._canSearch) {
         this.input.removeActiveDescendant();
         this.input.blur();
       }
@@ -380,12 +377,7 @@ class Choices {
   }
 
   toggleDropdown() {
-    if (this.dropdown.isActive) {
-      this.hideDropdown();
-    } else {
-      this.showDropdown();
-    }
-
+    this.dropdown.isActive ? this.hideDropdown() : this.showDropdown();
     return this;
   }
 
@@ -463,7 +455,7 @@ class Choices {
     const shouldSetInputWidth = !this._isSelectOneElement;
     this.input.clear(shouldSetInputWidth);
 
-    if (!this._isTextElement && this.config.searchEnabled) {
+    if (!this._isTextElement && this._canSearch) {
       this._isSearching = false;
       this._store.dispatch(activateChoices(true));
     }
@@ -1023,7 +1015,7 @@ class Choices {
     const onAKey = () => {
       // If CTRL + A or CMD + A have been pressed and there are items to select
       if (ctrlDownKey && hasItems) {
-        this.config.searchEnabled = false;
+        this._canSearch = false;
         if (
           this.config.removeItems &&
           !this.input.value &&
@@ -1086,10 +1078,8 @@ class Choices {
     const onDirectionKey = () => {
       // If up or down key is pressed, traverse through options
       if (hasActiveDropdown || this._isSelectOneElement) {
-        // Show dropdown if focus
         this.showDropdown();
-
-        this.config.searchEnabled = false;
+        this._canSearch = false;
 
         const directionInt =
           keyCode === downKey || keyCode === pageDownKey ? 1 : -1;
@@ -1207,12 +1197,12 @@ class Choices {
           this._isSearching = false;
           this._store.dispatch(activateChoices(true));
         }
-      } else if (this.config.searchEnabled && canAddItem.response) {
+      } else if (this._canSearch && canAddItem.response) {
         this._handleSearch(this.input.value);
       }
     }
-    // Re-establish canSearch value from changes in _onKeyDown
-    this.config.searchEnabled = this.config.searchEnabled;
+
+    this._canSearch = this.config.searchEnabled;
   }
 
   _onTouchMove() {
@@ -1373,8 +1363,7 @@ class Choices {
           this.containerOuter.removeFocusState();
           if (
             target === this.input.element ||
-            (target === this.containerOuter.element &&
-              !this.config.searchEnabled)
+            (target === this.containerOuter.element && !this._canSearch)
           ) {
             this.hideDropdown(true);
           }
@@ -1780,9 +1769,7 @@ class Choices {
         );
       }
 
-      passedGroups.forEach(group => {
-        this._addGroup(group, group.id || null);
-      });
+      passedGroups.forEach(group => this._addGroup(group, group.id || null));
     } else {
       const passedOptions = this.passedElement.options;
       const filter = this.config.sortFn;
