@@ -2194,12 +2194,14 @@ var Choices = function () {
       console.warn("shouldSortElements: Type of passed element is 'select-one', falling back to false.");
     }
 
-    this._store = new _store3.default(this.render);
     this.initialised = false;
+
+    this._store = new _store3.default(this.render);
     this._initialState = {};
     this._currentState = {};
     this._prevState = {};
     this._currentValue = '';
+    this._canSearch = this.config.searchEnabled;
     this._isScrollingOnIe = false;
     this._highlightPosition = 0;
     this._wasTap = true;
@@ -2230,7 +2232,7 @@ var Choices = function () {
 
     // If element has already been initialised with Choices, fail silently
     if (this.passedElement.element.getAttribute('data-choice') === 'active') {
-      return false;
+      console.warn('Trying to initialise Choices on element already initialised');
     }
 
     // Let's go
@@ -2248,23 +2250,16 @@ var Choices = function () {
         return;
       }
 
-      // Set initialise flag
-      this.initialised = true;
-      // Create required templates
       this._createTemplates();
-      // Create required elements
       this._createElements();
-      // Generate input markup
       this._createStructure();
       // Set initial state (We need to clone the state because some reducers
       // modify the inner objects properties in the state) 🤢
       this._initialState = (0, _utils.cloneObject)(this._store.state);
-      // Subscribe store to render method
       this._store.subscribe(this.render);
-      // Render any items
       this.render();
-      // Trigger event listeners
       this._addEventListeners();
+      this.initialised = true;
 
       var callbackOnInit = this.config.callbackOnInit;
       // Run callback if it is a function
@@ -2487,7 +2482,7 @@ var Choices = function () {
         _this6.dropdown.show();
         _this6.containerOuter.open(_this6.dropdown.distanceFromTopWindow());
 
-        if (!preventInputFocus && _this6.config.searchEnabled) {
+        if (!preventInputFocus && _this6._canSearch) {
           _this6.input.focus();
         }
 
@@ -2509,7 +2504,7 @@ var Choices = function () {
         _this7.dropdown.hide();
         _this7.containerOuter.close();
 
-        if (!preventInputBlur && _this7.config.searchEnabled) {
+        if (!preventInputBlur && _this7._canSearch) {
           _this7.input.removeActiveDescendant();
           _this7.input.blur();
         }
@@ -2522,12 +2517,7 @@ var Choices = function () {
   }, {
     key: 'toggleDropdown',
     value: function toggleDropdown() {
-      if (this.dropdown.isActive) {
-        this.hideDropdown();
-      } else {
-        this.showDropdown();
-      }
-
+      this.dropdown.isActive ? this.hideDropdown() : this.showDropdown();
       return this;
     }
   }, {
@@ -2621,7 +2611,7 @@ var Choices = function () {
       var shouldSetInputWidth = !this._isSelectOneElement;
       this.input.clear(shouldSetInputWidth);
 
-      if (!this._isTextElement && this.config.searchEnabled) {
+      if (!this._isTextElement && this._canSearch) {
         this._isSearching = false;
         this._store.dispatch((0, _choices.activateChoices)(true));
       }
@@ -3169,7 +3159,7 @@ var Choices = function () {
       var onAKey = function onAKey() {
         // If CTRL + A or CMD + A have been pressed and there are items to select
         if (ctrlDownKey && hasItems) {
-          _this17.config.searchEnabled = false;
+          _this17._canSearch = false;
           if (_this17.config.removeItems && !_this17.input.value && _this17.input.element === document.activeElement) {
             // Highlight items
             _this17.highlightAll();
@@ -3226,10 +3216,8 @@ var Choices = function () {
       var onDirectionKey = function onDirectionKey() {
         // If up or down key is pressed, traverse through options
         if (hasActiveDropdown || _this17._isSelectOneElement) {
-          // Show dropdown if focus
           _this17.showDropdown();
-
-          _this17.config.searchEnabled = false;
+          _this17._canSearch = false;
 
           var directionInt = keyCode === downKey || keyCode === pageDownKey ? 1 : -1;
           var skipKey = metaKey || keyCode === pageDownKey || keyCode === pageUpKey;
@@ -3323,12 +3311,12 @@ var Choices = function () {
             this._isSearching = false;
             this._store.dispatch((0, _choices.activateChoices)(true));
           }
-        } else if (this.config.searchEnabled && canAddItem.response) {
+        } else if (this._canSearch && canAddItem.response) {
           this._handleSearch(this.input.value);
         }
       }
-      // Re-establish canSearch value from changes in _onKeyDown
-      this.config.searchEnabled = this.config.searchEnabled;
+
+      this._canSearch = this.config.searchEnabled;
     }
   }, {
     key: '_onTouchMove',
@@ -3374,24 +3362,26 @@ var Choices = function () {
         this._isScrollingOnIe = true;
       }
 
-      if (this.containerOuter.element.contains(target) && target !== this.input.element) {
-        var activeItems = this._store.activeItems;
-        var hasShiftKey = shiftKey;
-
-        var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
-        var itemTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item');
-        var choiceTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice');
-
-        if (buttonTarget) {
-          this._handleButtonAction(activeItems, buttonTarget);
-        } else if (itemTarget) {
-          this._handleItemAction(activeItems, itemTarget, hasShiftKey);
-        } else if (choiceTarget) {
-          this._handleChoiceAction(activeItems, choiceTarget);
-        }
-
-        event.preventDefault();
+      if (!this.containerOuter.element.contains(target) || target === this.input.element) {
+        return;
       }
+
+      var activeItems = this._store.activeItems;
+      var hasShiftKey = shiftKey;
+
+      var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
+      var itemTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item');
+      var choiceTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice');
+
+      if (buttonTarget) {
+        this._handleButtonAction(activeItems, buttonTarget);
+      } else if (itemTarget) {
+        this._handleItemAction(activeItems, itemTarget, hasShiftKey);
+      } else if (choiceTarget) {
+        this._handleChoiceAction(activeItems, choiceTarget);
+      }
+
+      event.preventDefault();
     }
   }, {
     key: '_onMouseOver',
@@ -3459,10 +3449,10 @@ var Choices = function () {
         },
         'select-multiple': function selectMultiple() {
           if (target === _this18.input.element) {
+            _this18.showDropdown(true);
             // If element is a select box, the focused element is the container and the dropdown
             // isn't already open, focus and show dropdown
             _this18.containerOuter.addFocusState();
-            _this18.showDropdown();
           }
         }
       };
@@ -3494,7 +3484,7 @@ var Choices = function () {
           },
           'select-one': function selectOne() {
             _this19.containerOuter.removeFocusState();
-            if (target === _this19.input.element || target === _this19.containerOuter.element && !_this19.config.searchEnabled) {
+            if (target === _this19.input.element || target === _this19.containerOuter.element && !_this19._canSearch) {
               _this19.hideDropdown(true);
             }
           },
@@ -3538,7 +3528,6 @@ var Choices = function () {
 
       var passedEl = el;
       var highlightedChoices = Array.from(this.dropdown.element.querySelectorAll('.' + this.config.classNames.highlightedState));
-      var hasActiveDropdown = this.dropdown.isActive;
 
       // Remove any highlighted choices
       highlightedChoices.forEach(function (choice) {
@@ -3566,7 +3555,7 @@ var Choices = function () {
       passedEl.classList.add(this.config.classNames.highlightedState);
       passedEl.setAttribute('aria-selected', 'true');
 
-      if (hasActiveDropdown) {
+      if (this.dropdown.isActive) {
         // IE11 ignores aria-label and blocks virtual keyboard
         // if aria-activedescendant is set without a dropdown
         this.input.setActiveDescendant(passedEl.id);
@@ -3859,7 +3848,7 @@ var Choices = function () {
         }
 
         passedGroups.forEach(function (group) {
-          _this22._addGroup(group, group.id || null);
+          return _this22._addGroup(group, group.id || null);
         });
       } else {
         var passedOptions = this.passedElement.options;
@@ -4064,9 +4053,7 @@ var Choices = function () {
   }, {
     key: '_renderItems',
     value: function _renderItems() {
-      // Get active items (items that can be selected)
       var activeItems = this._store.activeItems || [];
-      // Clear list
       this.itemList.clear();
 
       if (activeItems.length) {

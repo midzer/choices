@@ -2030,9 +2030,7 @@ class Choices {
   }
 
   _renderItems() {
-    // Get active items (items that can be selected)
     const activeItems = this._store.activeItems || [];
-    // Clear list
     this.itemList.clear();
 
     if (activeItems.length) {
