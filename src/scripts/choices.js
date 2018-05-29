@@ -862,10 +862,9 @@ class Choices {
         // Add each result as a choice
         parsedResults.forEach(result => {
           if (result.choices) {
-            const groupId = result.id || null;
             this._addGroup({
               group: result,
-              id: groupId,
+              id: result.id || null,
               valueKey: value,
               labelKey: label,
             });
@@ -904,9 +903,7 @@ class Choices {
     // If new value matches the desired length and is not the same as the current value with a space
     const haystack = this._store.searchableChoices;
     const needle = newValue;
-    const keys = isType('Array', this.config.searchFields)
-      ? this.config.searchFields
-      : [this.config.searchFields];
+    const keys = [...this.config.searchFields];
     const options = Object.assign(this.config.fuseOptions, { keys });
     const fuse = new Fuse(haystack, options);
     const results = fuse.search(needle);
