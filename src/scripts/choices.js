@@ -340,7 +340,7 @@ class Choices {
     return this;
   }
 
-  showDropdown(focusInput) {
+  showDropdown(preventInputFocus) {
     if (this.dropdown.isActive) {
       return this;
     }
@@ -349,7 +349,7 @@ class Choices {
       this.dropdown.show();
       this.containerOuter.open(this.dropdown.distanceFromTopWindow());
 
-      if (focusInput && this.config.searchEnabled) {
+      if (!preventInputFocus && this.config.searchEnabled) {
         this.input.focus();
       }
 
@@ -359,7 +359,7 @@ class Choices {
     return this;
   }
 
-  hideDropdown(blurInput) {
+  hideDropdown(preventInputBlur) {
     if (!this.dropdown.isActive) {
       return this;
     }
@@ -368,7 +368,7 @@ class Choices {
       this.dropdown.hide();
       this.containerOuter.close();
 
-      if (blurInput && this.config.searchEnabled) {
+      if (!preventInputBlur && this.config.searchEnabled) {
         this.input.removeActiveDescendant();
         this.input.blur();
       }
@@ -383,7 +383,7 @@ class Choices {
     if (this.dropdown.isActive) {
       this.hideDropdown();
     } else {
-      this.showDropdown(true); // code smell 🤢
+      this.showDropdown();
     }
 
     return this;
@@ -736,7 +736,7 @@ class Choices {
 
     // We wont to close the dropdown if we are dealing with a single select box
     if (hasActiveDropdown && this._isSelectOneElement) {
-      this.hideDropdown();
+      this.hideDropdown(true);
       this.containerOuter.focus();
     }
   }
@@ -1017,7 +1017,7 @@ class Choices {
 
     // If a user is typing and the dropdown is not active
     if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
-      this.showDropdown(true);
+      this.showDropdown();
     }
 
     const onAKey = () => {
@@ -1043,7 +1043,7 @@ class Choices {
 
         // All is good, add
         if (canAddItem.response) {
-          this.hideDropdown();
+          this.hideDropdown(true);
           this._addItem(value);
           this._triggerChange(value);
           this.clearInput();
@@ -1071,14 +1071,14 @@ class Choices {
         }
       } else if (this._isSelectOneElement) {
         // Open single select dropdown if it's not active
-        this.showDropdown(true);
+        this.showDropdown();
         event.preventDefault();
       }
     };
 
     const onEscapeKey = () => {
       if (hasActiveDropdown) {
-        this.hideDropdown();
+        this.hideDropdown(true);
         this.containerOuter.focus();
       }
     };
@@ -1087,7 +1087,7 @@ class Choices {
       // If up or down key is pressed, traverse through options
       if (hasActiveDropdown || this._isSelectOneElement) {
         // Show dropdown if focus
-        this.showDropdown(true);
+        this.showDropdown();
 
         this.config.searchEnabled = false;
 
@@ -1190,12 +1190,12 @@ class Choices {
         }
 
         if (canAddItem.response === true) {
-          this.showDropdown();
+          this.showDropdown(true);
         } else if (!canAddItem.notice) {
-          this.hideDropdown();
+          this.hideDropdown(true);
         }
       } else {
-        this.hideDropdown();
+        this.hideDropdown(true);
       }
     } else {
       const backKey = KEY_CODES.BACK_KEY;
@@ -1238,7 +1238,7 @@ class Choices {
           this.input.focus();
         } else {
           // If a select box, we want to show the dropdown
-          this.showDropdown(true);
+          this.showDropdown();
         }
       }
       // Prevents focus event firing
@@ -1256,26 +1256,28 @@ class Choices {
     }
 
     if (
-      this.containerOuter.element.contains(target) &&
-      target !== this.input.element
+      !this.containerOuter.element.contains(target) ||
+      target === this.input.element
     ) {
-      const activeItems = this._store.activeItems;
-      const hasShiftKey = shiftKey;
-
-      const buttonTarget = findAncestorByAttrName(target, 'data-button');
-      const itemTarget = findAncestorByAttrName(target, 'data-item');
-      const choiceTarget = findAncestorByAttrName(target, 'data-choice');
-
-      if (buttonTarget) {
-        this._handleButtonAction(activeItems, buttonTarget);
-      } else if (itemTarget) {
-        this._handleItemAction(activeItems, itemTarget, hasShiftKey);
-      } else if (choiceTarget) {
-        this._handleChoiceAction(activeItems, choiceTarget);
-      }
-
-      event.preventDefault();
+      return;
     }
+
+    const activeItems = this._store.activeItems;
+    const hasShiftKey = shiftKey;
+
+    const buttonTarget = findAncestorByAttrName(target, 'data-button');
+    const itemTarget = findAncestorByAttrName(target, 'data-item');
+    const choiceTarget = findAncestorByAttrName(target, 'data-choice');
+
+    if (buttonTarget) {
+      this._handleButtonAction(activeItems, buttonTarget);
+    } else if (itemTarget) {
+      this._handleItemAction(activeItems, itemTarget, hasShiftKey);
+    } else if (choiceTarget) {
+      this._handleChoiceAction(activeItems, choiceTarget);
+    }
+
+    event.preventDefault();
   }
 
   _onMouseOver({ target }) {
@@ -1290,37 +1292,32 @@ class Choices {
   }
 
   _onClick({ target }) {
-    const hasActiveDropdown = this.dropdown.isActive;
-    const activeItems = this._store.activeItems;
-
     if (this.containerOuter.element.contains(target)) {
-      if (!hasActiveDropdown) {
+      if (!this.dropdown.isActive) {
         if (this._isTextElement) {
           if (document.activeElement !== this.input.element) {
             this.input.focus();
           }
-        } else if (this.config.searchEnabled) {
-          this.showDropdown(true);
         } else {
           this.showDropdown();
-          this.containerOuter.focus(); // code smell 🤢
+          this.containerOuter.focus();
         }
       } else if (
         this._isSelectOneElement &&
         target !== this.input.element &&
         !this.dropdown.element.contains(target)
       ) {
-        this.hideDropdown(true);
+        this.hideDropdown();
       }
     } else {
-      const hasHighlightedItems = activeItems.some(item => item.highlighted);
+      const hasHighlightedItems = this._store.highlightedActiveItems;
 
       if (hasHighlightedItems) {
         this.unhighlightAll();
       }
 
       this.containerOuter.removeFocusState();
-      this.hideDropdown();
+      this.hideDropdown(true);
     }
   }
 
@@ -1338,15 +1335,15 @@ class Choices {
       'select-one': () => {
         this.containerOuter.addFocusState();
         if (target === this.input.element) {
-          this.showDropdown();
+          this.showDropdown(true);
         }
       },
       'select-multiple': () => {
         if (target === this.input.element) {
+          this.showDropdown(true);
           // If element is a select box, the focused element is the container and the dropdown
           // isn't already open, focus and show dropdown
           this.containerOuter.addFocusState();
-          this.showDropdown(true);
         }
       },
     };
@@ -1369,7 +1366,7 @@ class Choices {
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
-            this.hideDropdown();
+            this.hideDropdown(true);
           }
         },
         'select-one': () => {
@@ -1379,13 +1376,13 @@ class Choices {
             (target === this.containerOuter.element &&
               !this.config.searchEnabled)
           ) {
-            this.hideDropdown();
+            this.hideDropdown(true);
           }
         },
         'select-multiple': () => {
           if (target === this.input.element) {
             this.containerOuter.removeFocusState();
-            this.hideDropdown();
+            this.hideDropdown(true);
             if (hasHighlightedItems) {
               this.unhighlightAll();
             }
@@ -1422,7 +1419,6 @@ class Choices {
         `.${this.config.classNames.highlightedState}`,
       ),
     );
-    const hasActiveDropdown = this.dropdown.isActive;
 
     // Remove any highlighted choices
     highlightedChoices.forEach(choice => {
@@ -1450,7 +1446,7 @@ class Choices {
     passedEl.classList.add(this.config.classNames.highlightedState);
     passedEl.setAttribute('aria-selected', 'true');
 
-    if (hasActiveDropdown) {
+    if (this.dropdown.isActive) {
       // IE11 ignores aria-label and blocks virtual keyboard
       // if aria-activedescendant is set without a dropdown
       this.input.setActiveDescendant(passedEl.id);
