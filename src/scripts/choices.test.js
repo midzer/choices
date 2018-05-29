@@ -1476,10 +1476,12 @@ describe('choices', () => {
           it('adds groups', () => {
             instance.setChoices(groups, value, label, false);
             expect(addGroupStub.callCount).to.equal(1);
-            expect(addGroupStub.firstCall.args[0]).to.equal(groups[0]);
-            expect(addGroupStub.firstCall.args[1]).to.equal(groups[0].id);
-            expect(addGroupStub.firstCall.args[2]).to.equal(value);
-            expect(addGroupStub.firstCall.args[3]).to.equal(label);
+            expect(addGroupStub.firstCall.args[0]).to.eql({
+              group: groups[0],
+              id: groups[0].id,
+              valueKey: value,
+              labelKey: label,
+            });
           });
         });
 
@@ -1488,13 +1490,14 @@ describe('choices', () => {
             instance.setChoices(choices, value, label, false);
             expect(addChoiceStub.callCount).to.equal(2);
             addChoiceStub.getCalls().forEach((call, index) => {
-              expect(call.args[0]).to.equal(choices[index][value]);
-              expect(call.args[1]).to.equal(choices[index][label]);
-              expect(call.args[2]).to.equal(choices[index].selected);
-              expect(call.args[3]).to.equal(choices[index].disabled);
-              expect(call.args[4]).to.equal(undefined);
-              expect(call.args[5]).to.equal(choices[index].customProperties);
-              expect(call.args[6]).to.equal(choices[index].placeholder);
+              expect(call.args[0]).to.eql({
+                value: choices[index][value],
+                label: choices[index][label],
+                isSelected: choices[index].selected,
+                isDisabled: choices[index].disabled,
+                customProperties: choices[index].customProperties,
+                placeholder: choices[index].placeholder,
+              });
             });
           });
         });

@@ -1,6 +1,6 @@
 import { ACTION_TYPES } from './../constants';
 
-export const addChoice = (
+export const addChoice = ({
   value,
   label,
   id,
@@ -10,7 +10,7 @@ export const addChoice = (
   customProperties,
   placeholder,
   keyCode,
-) => ({
+}) => ({
   type: ACTION_TYPES.ADD_CHOICE,
   value,
   label,

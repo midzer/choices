@@ -26,7 +26,7 @@ describe('actions/items', () => {
       };
 
       expect(
-        actions.addItem(
+        actions.addItem({
           value,
           label,
           id,
@@ -35,7 +35,7 @@ describe('actions/items', () => {
           customProperties,
           placeholder,
           keyCode,
-        ),
+        }),
       ).to.eql(expectedAction);
     });
   });

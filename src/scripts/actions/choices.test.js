@@ -28,7 +28,7 @@ describe('actions/choices', () => {
       };
 
       expect(
-        actions.addChoice(
+        actions.addChoice({
           value,
           label,
           id,
@@ -38,7 +38,7 @@ describe('actions/choices', () => {
           customProperties,
           placeholder,
           keyCode,
-        ),
+        }),
       ).to.eql(expectedAction);
     });
   });
