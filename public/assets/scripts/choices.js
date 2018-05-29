@@ -1,4 +1,4 @@
-/*! choices.js v4.0.0 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.0 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -577,7 +577,7 @@ var DEFAULT_CONFIG = exports.DEFAULT_CONFIG = {
   removeItems: true,
   removeItemButton: false,
   editItems: false,
-  duplicateItems: true,
+  duplicateItemsAllowed: true,
   delimiter: ',',
   paste: true,
   searchEnabled: true,
@@ -2975,7 +2975,7 @@ var Choices = function () {
           canAddItem = (0, _utils.regexFilter)(value, this.config.regexFilter);
         }
 
-        if (!this.config.duplicateItems && !valueAlreadyExists && canAddItem) {
+        if (!this.config.duplicateItemsAllowed && !valueAlreadyExists && canAddItem) {
           canAddItem = false;
           notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
         }
@@ -4113,10 +4113,10 @@ module.exports = Choices;
 
 /*!
  * Fuse.js v3.2.0 - Lightweight fuzzy-search (http://fusejs.io)
- * 
+ *
  * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
  * All Rights Reserved. Apache Software License 2.0
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {

@@ -320,7 +320,7 @@ declare namespace Choices {
      *
      * @default true
      */
-    duplicateItems?: boolean;
+    duplicateItemsAllowed?: boolean;
 
     /**
      * What divides each value. The default delimiter seperates each value with a comma: `"Value 1, Value 2, Value 3"`.

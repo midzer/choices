@@ -802,7 +802,7 @@ class Choices {
       : this.config.addItemText;
 
     if (!this._isSelectOneElement) {
-      const valueAlreadyExists = !existsInArray(activeItems, value);
+      const isDuplicateValue = existsInArray(activeItems, value);
 
       if (
         this.config.maxItemCount > 0 &&
@@ -828,7 +828,11 @@ class Choices {
         canAddItem = regexFilter(value, this.config.regexFilter);
       }
 
-      if (!this.config.duplicateItems && !valueAlreadyExists && canAddItem) {
+      if (
+        !this.config.duplicateItemsAllowed &&
+        isDuplicateValue &&
+        canAddItem
+      ) {
         canAddItem = false;
         notice = isType('Function', this.config.uniqueItemText)
           ? this.config.uniqueItemText(value)

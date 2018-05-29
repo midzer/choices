@@ -69,7 +69,7 @@ Or include Choices directly:
     removeItems: true,
     removeItemButton: false,
     editItems: false,
-    duplicateItems: true,
+    duplicateItemsAllowed: true,
     delimiter: ',',
     paste: true,
     searchEnabled: true,
@@ -256,12 +256,12 @@ Pass an array of objects:
 
 **Usage:** Whether a user can edit items. An item's value can be edited by pressing the backspace.
 
-### duplicateItems
+### duplicateItemsAllowed
 **Type:** `Boolean` **Default:** `true`
 
 **Input types affected:** `text`, `select-multiple`
 
-**Usage:** Whether each inputted/chosen item should be unique.
+**Usage:** Whether duplicate inputted/chosen items are allowed
 
 ### delimiter
 **Type:** `String` **Default:** `,`

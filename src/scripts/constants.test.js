@@ -59,7 +59,7 @@ describe('constants', () => {
         expect(DEFAULT_CONFIG.removeItems).to.be.a('boolean');
         expect(DEFAULT_CONFIG.removeItemButton).to.be.a('boolean');
         expect(DEFAULT_CONFIG.editItems).to.be.a('boolean');
-        expect(DEFAULT_CONFIG.duplicateItems).to.be.a('boolean');
+        expect(DEFAULT_CONFIG.duplicateItemsAllowed).to.be.a('boolean');
         expect(DEFAULT_CONFIG.delimiter).to.be.a('string');
         expect(DEFAULT_CONFIG.paste).to.be.a('boolean');
         expect(DEFAULT_CONFIG.searchEnabled).to.be.a('boolean');
