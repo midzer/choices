@@ -131,7 +131,8 @@ class Choices {
         this.passedElement.value.split(this.config.delimiter),
       );
     }
-    this.render = this.render.bind(this);
+
+    this._render = this._render.bind(this);
     this._onFocus = this._onFocus.bind(this);
     this._onBlur = this._onBlur.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
@@ -169,8 +170,8 @@ class Choices {
     // Set initial state (We need to clone the state because some reducers
     // modify the inner objects properties in the state) 🤢
     this._initialState = cloneObject(this._store.state);
-    this._store.subscribe(this.render);
-    this.render();
+    this._store.subscribe(this._render);
+    this._render();
     this._addEventListeners();
     this.initialised = true;
 
@@ -230,32 +231,6 @@ class Choices {
     }
 
     return this;
-  }
-
-  render() {
-    this._currentState = this._store.state;
-
-    const stateChanged =
-      this._currentState.choices !== this._prevState.choices ||
-      this._currentState.groups !== this._prevState.groups ||
-      this._currentState.items !== this._prevState.items;
-    const shouldRenderChoices = this._isSelectElement;
-    const shouldRenderItems =
-      this._currentState.items !== this._prevState.items;
-
-    if (!stateChanged) {
-      return;
-    }
-
-    if (shouldRenderChoices) {
-      this._renderChoices();
-    }
-
-    if (shouldRenderItems) {
-      this._renderItems();
-    }
-
-    this._prevState = this._currentState;
   }
 
   highlightItem(item, runEvent = true) {
@@ -484,6 +459,123 @@ class Choices {
   /* =============================================
   =                Private functions            =
   ============================================= */
+
+  _render() {
+    this._currentState = this._store.state;
+
+    const stateChanged =
+      this._currentState.choices !== this._prevState.choices ||
+      this._currentState.groups !== this._prevState.groups ||
+      this._currentState.items !== this._prevState.items;
+    const shouldRenderChoices = this._isSelectElement;
+    const shouldRenderItems =
+      this._currentState.items !== this._prevState.items;
+
+    if (!stateChanged) {
+      return;
+    }
+
+    if (shouldRenderChoices) {
+      this._renderChoices();
+    }
+
+    if (shouldRenderItems) {
+      this._renderItems();
+    }
+
+    this._prevState = this._currentState;
+  }
+
+  _renderChoices() {
+    const { activeGroups, activeChoices } = this._store;
+    let choiceListFragment = document.createDocumentFragment();
+
+    this.choiceList.clear();
+
+    if (this.config.resetScrollPosition) {
+      requestAnimationFrame(() => this.choiceList.scrollToTop());
+    }
+
+    // If we have grouped options
+    if (activeGroups.length >= 1 && !this._isSearching) {
+      // If we have a placeholder choice along with groups
+      const activePlaceholders = activeChoices.filter(
+        activeChoice =>
+          activeChoice.placeholder === true && activeChoice.groupId === -1,
+      );
+      if (activePlaceholders.length >= 1) {
+        choiceListFragment = this._createChoicesFragment(
+          activePlaceholders,
+          choiceListFragment,
+        );
+      }
+      choiceListFragment = this._createGroupsFragment(
+        activeGroups,
+        activeChoices,
+        choiceListFragment,
+      );
+    } else if (activeChoices.length >= 1) {
+      choiceListFragment = this._createChoicesFragment(
+        activeChoices,
+        choiceListFragment,
+      );
+    }
+
+    // If we have choices to show
+    if (
+      choiceListFragment.childNodes &&
+      choiceListFragment.childNodes.length > 0
+    ) {
+      const activeItems = this._store.activeItems;
+      const canAddItem = this._canAddItem(activeItems, this.input.value);
+
+      // ...and we can select them
+      if (canAddItem.response) {
+        // ...append them and highlight the first choice
+        this.choiceList.append(choiceListFragment);
+        this._highlightChoice();
+      } else {
+        // ...otherwise show a notice
+        this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+      }
+    } else {
+      // Otherwise show a notice
+      let dropdownItem;
+      let notice;
+
+      if (this._isSearching) {
+        notice = isType('Function', this.config.noResultsText)
+          ? this.config.noResultsText()
+          : this.config.noResultsText;
+
+        dropdownItem = this._getTemplate('notice', notice, 'no-results');
+      } else {
+        notice = isType('Function', this.config.noChoicesText)
+          ? this.config.noChoicesText()
+          : this.config.noChoicesText;
+
+        dropdownItem = this._getTemplate('notice', notice, 'no-choices');
+      }
+
+      this.choiceList.append(dropdownItem);
+    }
+  }
+
+  _renderItems() {
+    const activeItems = this._store.activeItems || [];
+    this.itemList.clear();
+
+    if (activeItems.length) {
+      // Create a fragment to store our list items
+      // (so we don't have to update the DOM for each item)
+      const itemListFragment = this._createItemsFragment(activeItems);
+
+      // If we have items to add, append them
+      if (itemListFragment.childNodes) {
+        this.itemList.append(itemListFragment);
+      }
+    }
+  }
 
   _createGroupsFragment(groups, choices, fragment) {
     const groupFragment = fragment || document.createDocumentFragment();
@@ -793,6 +885,30 @@ class Choices {
     }
   }
 
+  _handleSearch(value) {
+    if (!value || !this.input.isFocussed) {
+      return;
+    }
+
+    const choices = this._store.choices;
+    const { searchFloor, searchChoices } = this.config;
+    const hasUnactiveChoices = choices.some(option => !option.active);
+
+    // Check that we have a value to search and the input was an alphanumeric character
+    if (value && value.length >= searchFloor) {
+      const resultCount = searchChoices ? this._searchChoices(value) : 0;
+      // Trigger search event
+      this.passedElement.triggerEvent(EVENTS.search, {
+        value,
+        resultCount,
+      });
+    } else if (hasUnactiveChoices) {
+      // Otherwise reset choices to active
+      this._isSearching = false;
+      this._store.dispatch(activateChoices(true));
+    }
+  }
+
   _canAddItem(activeItems, value) {
     let canAddItem = true;
     let notice = isType('Function', this.config.addItemText)
@@ -914,30 +1030,6 @@ class Choices {
     this._store.dispatch(filterChoices(results));
 
     return results.length;
-  }
-
-  _handleSearch(value) {
-    if (!value || !this.input.isFocussed) {
-      return;
-    }
-
-    const choices = this._store.choices;
-    const { searchFloor, searchChoices } = this.config;
-    const hasUnactiveChoices = choices.some(option => !option.active);
-
-    // Check that we have a value to search and the input was an alphanumeric character
-    if (value && value.length >= searchFloor) {
-      const resultCount = searchChoices ? this._searchChoices(value) : 0;
-      // Trigger search event
-      this.passedElement.triggerEvent(EVENTS.search, {
-        value,
-        resultCount,
-      });
-    } else if (hasUnactiveChoices) {
-      // Otherwise reset choices to active
-      this._isSearching = false;
-      this._store.dispatch(activateChoices(true));
-    }
   }
 
   _addEventListeners() {
@@ -1958,97 +2050,6 @@ class Choices {
       ? this.config.placeholderValue ||
           this.passedElement.element.getAttribute('placeholder')
       : false;
-  }
-
-  _renderChoices() {
-    const { activeGroups, activeChoices } = this._store;
-    let choiceListFragment = document.createDocumentFragment();
-
-    this.choiceList.clear();
-
-    if (this.config.resetScrollPosition) {
-      requestAnimationFrame(() => this.choiceList.scrollToTop());
-    }
-
-    // If we have grouped options
-    if (activeGroups.length >= 1 && !this._isSearching) {
-      // If we have a placeholder choice along with groups
-      const activePlaceholders = activeChoices.filter(
-        activeChoice =>
-          activeChoice.placeholder === true && activeChoice.groupId === -1,
-      );
-      if (activePlaceholders.length >= 1) {
-        choiceListFragment = this._createChoicesFragment(
-          activePlaceholders,
-          choiceListFragment,
-        );
-      }
-      choiceListFragment = this._createGroupsFragment(
-        activeGroups,
-        activeChoices,
-        choiceListFragment,
-      );
-    } else if (activeChoices.length >= 1) {
-      choiceListFragment = this._createChoicesFragment(
-        activeChoices,
-        choiceListFragment,
-      );
-    }
-
-    // If we have choices to show
-    if (
-      choiceListFragment.childNodes &&
-      choiceListFragment.childNodes.length > 0
-    ) {
-      const activeItems = this._store.activeItems;
-      const canAddItem = this._canAddItem(activeItems, this.input.value);
-
-      // ...and we can select them
-      if (canAddItem.response) {
-        // ...append them and highlight the first choice
-        this.choiceList.append(choiceListFragment);
-        this._highlightChoice();
-      } else {
-        // ...otherwise show a notice
-        this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
-      }
-    } else {
-      // Otherwise show a notice
-      let dropdownItem;
-      let notice;
-
-      if (this._isSearching) {
-        notice = isType('Function', this.config.noResultsText)
-          ? this.config.noResultsText()
-          : this.config.noResultsText;
-
-        dropdownItem = this._getTemplate('notice', notice, 'no-results');
-      } else {
-        notice = isType('Function', this.config.noChoicesText)
-          ? this.config.noChoicesText()
-          : this.config.noChoicesText;
-
-        dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-      }
-
-      this.choiceList.append(dropdownItem);
-    }
-  }
-
-  _renderItems() {
-    const activeItems = this._store.activeItems || [];
-    this.itemList.clear();
-
-    if (activeItems.length) {
-      // Create a fragment to store our list items
-      // (so we don't have to update the DOM for each item)
-      const itemListFragment = this._createItemsFragment(activeItems);
-
-      // If we have items to add, append them
-      if (itemListFragment.childNodes) {
-        this.itemList.append(itemListFragment);
-      }
-    }
   }
 
   /* =====  End of Private functions  ====== */

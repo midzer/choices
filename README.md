@@ -32,11 +32,11 @@ Or include Choices directly:
 
 ```html
 <!-- Include base CSS (optional) -->
-<link rel="stylesheet" href="public/styles/base.min.css">
+<link rel="stylesheet" href="public/assets/styles/base.min.css">
 <!-- Include Choices CSS -->
-<link rel="stylesheet" href="public/styles/choices.min.css">
+<link rel="stylesheet" href="public/assets/styles/choices.min.css">
 <!-- Include Choices JavaScript -->
-<script src="/public/scripts/choices.min.js"></script>
+<script src="/public/assets/scripts/choices.min.js"></script>
 ```
 ## Setup
 
