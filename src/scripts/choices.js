@@ -143,6 +143,11 @@ class Choices {
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseOver = this._onMouseOver.bind(this);
     this._onFormReset = this._onFormReset.bind(this);
+    this._onAKey = this._onAKey.bind(this);
+    this._onEnterKey = this._onEnterKey.bind(this);
+    this._onEscapeKey = this._onEscapeKey.bind(this);
+    this._onDirectionKey = this._onDirectionKey.bind(this);
+    this._onDeleteKey = this._onDeleteKey.bind(this);
 
     // If element has already been initialised with Choices, fail silently
     if (this.passedElement.element.getAttribute('data-choice') === 'active') {
@@ -1096,168 +1101,50 @@ class Choices {
     const hasActiveDropdown = this.dropdown.isActive;
     const hasItems = this.itemList.hasChildren;
     const keyString = String.fromCharCode(keyCode);
-    const backKey = KEY_CODES.BACK_KEY;
-    const deleteKey = KEY_CODES.DELETE_KEY;
-    const enterKey = KEY_CODES.ENTER_KEY;
-    const aKey = KEY_CODES.A_KEY;
-    const escapeKey = KEY_CODES.ESC_KEY;
-    const upKey = KEY_CODES.UP_KEY;
-    const downKey = KEY_CODES.DOWN_KEY;
-    const pageUpKey = KEY_CODES.PAGE_UP_KEY;
-    const pageDownKey = KEY_CODES.PAGE_DOWN_KEY;
-    const ctrlDownKey = ctrlKey || metaKey;
+
+    const {
+      BACK_KEY,
+      DELETE_KEY,
+      ENTER_KEY,
+      A_KEY,
+      ESC_KEY,
+      UP_KEY,
+      DOWN_KEY,
+      PAGE_UP_KEY,
+      PAGE_DOWN_KEY,
+    } = KEY_CODES;
+    const hasCtrlDownKeyPressed = ctrlKey || metaKey;
 
     // If a user is typing and the dropdown is not active
     if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
       this.showDropdown();
     }
 
-    const onAKey = () => {
-      // If CTRL + A or CMD + A have been pressed and there are items to select
-      if (ctrlDownKey && hasItems) {
-        this._canSearch = false;
-        if (
-          this.config.removeItems &&
-          !this.input.value &&
-          this.input.element === document.activeElement
-        ) {
-          // Highlight items
-          this.highlightAll();
-        }
-      }
-    };
-
-    const onEnterKey = () => {
-      // If enter key is pressed and the input has a value
-      if (this._isTextElement && target.value) {
-        const value = this.input.value;
-        const canAddItem = this._canAddItem(activeItems, value);
-
-        // All is good, add
-        if (canAddItem.response) {
-          this.hideDropdown(true);
-          this._addItem({ value });
-          this._triggerChange(value);
-          this.clearInput();
-        }
-      }
-
-      if (target.hasAttribute('data-button')) {
-        this._handleButtonAction(activeItems, target);
-        event.preventDefault();
-      }
-
-      if (hasActiveDropdown) {
-        event.preventDefault();
-        const highlighted = this.dropdown.getChild(
-          `.${this.config.classNames.highlightedState}`,
-        );
-
-        // If we have a highlighted choice
-        if (highlighted) {
-          // add enter keyCode value
-          if (activeItems[0]) {
-            activeItems[0].keyCode = enterKey;
-          }
-          this._handleChoiceAction(activeItems, highlighted);
-        }
-      } else if (this._isSelectOneElement) {
-        // Open single select dropdown if it's not active
-        this.showDropdown();
-        event.preventDefault();
-      }
-    };
-
-    const onEscapeKey = () => {
-      if (hasActiveDropdown) {
-        this.hideDropdown(true);
-        this.containerOuter.focus();
-      }
-    };
-
-    const onDirectionKey = () => {
-      // If up or down key is pressed, traverse through options
-      if (hasActiveDropdown || this._isSelectOneElement) {
-        this.showDropdown();
-        this._canSearch = false;
-
-        const directionInt =
-          keyCode === downKey || keyCode === pageDownKey ? 1 : -1;
-        const skipKey =
-          metaKey || keyCode === pageDownKey || keyCode === pageUpKey;
-        const selectableChoiceIdentifier = '[data-choice-selectable]';
-
-        let nextEl;
-        if (skipKey) {
-          if (directionInt > 0) {
-            nextEl = Array.from(
-              this.dropdown.element.querySelectorAll(
-                selectableChoiceIdentifier,
-              ),
-            ).pop();
-          } else {
-            nextEl = this.dropdown.element.querySelector(
-              selectableChoiceIdentifier,
-            );
-          }
-        } else {
-          const currentEl = this.dropdown.element.querySelector(
-            `.${this.config.classNames.highlightedState}`,
-          );
-          if (currentEl) {
-            nextEl = getAdjacentEl(
-              currentEl,
-              selectableChoiceIdentifier,
-              directionInt,
-            );
-          } else {
-            nextEl = this.dropdown.element.querySelector(
-              selectableChoiceIdentifier,
-            );
-          }
-        }
-
-        if (nextEl) {
-          // We prevent default to stop the cursor moving
-          // when pressing the arrow
-          if (
-            !isScrolledIntoView(nextEl, this.choiceList.element, directionInt)
-          ) {
-            this.choiceList.scrollToChoice(nextEl, directionInt);
-          }
-          this._highlightChoice(nextEl);
-        }
-
-        // Prevent default to maintain cursor position whilst
-        // traversing dropdown options
-        event.preventDefault();
-      }
-    };
-
-    const onDeleteKey = () => {
-      // If backspace or delete key is pressed and the input has no value
-      if (hasFocusedInput && !target.value && !this._isSelectOneElement) {
-        this._handleBackspace(activeItems);
-        event.preventDefault();
-      }
-    };
-
     // Map keys to key actions
     const keyDownActions = {
-      [aKey]: onAKey,
-      [enterKey]: onEnterKey,
-      [escapeKey]: onEscapeKey,
-      [upKey]: onDirectionKey,
-      [pageUpKey]: onDirectionKey,
-      [downKey]: onDirectionKey,
-      [pageDownKey]: onDirectionKey,
-      [deleteKey]: onDeleteKey,
-      [backKey]: onDeleteKey,
+      [A_KEY]: this._onAKey,
+      [ENTER_KEY]: this._onEnterKey,
+      [ESC_KEY]: this._onEscapeKey,
+      [UP_KEY]: this._onDirectionKey,
+      [PAGE_UP_KEY]: this._onDirectionKey,
+      [DOWN_KEY]: this._onDirectionKey,
+      [PAGE_DOWN_KEY]: this._onDirectionKey,
+      [DELETE_KEY]: this._onDeleteKey,
+      [BACK_KEY]: this._onDeleteKey,
     };
 
     // If keycode has a function, run it
     if (keyDownActions[keyCode]) {
-      keyDownActions[keyCode]();
+      keyDownActions[keyCode]({
+        target,
+        keyCode,
+        metaKey,
+        activeItems,
+        hasFocusedInput,
+        hasActiveDropdown,
+        hasItems,
+        hasCtrlDownKeyPressed,
+      });
     }
   }
 
@@ -1303,6 +1190,141 @@ class Choices {
     }
 
     this._canSearch = this.config.searchEnabled;
+  }
+
+  _onAKey({ hasItems, hasCtrlDownKeyPressed }) {
+    // If CTRL + A or CMD + A have been pressed and there are items to select
+    if (hasCtrlDownKeyPressed && hasItems) {
+      this._canSearch = false;
+      if (
+        this.config.removeItems &&
+        !this.input.value &&
+        this.input.element === document.activeElement
+      ) {
+        // Highlight items
+        this.highlightAll();
+      }
+    }
+  }
+
+  _onEnterKey({ target, activeItems, hasActiveDropdown }) {
+    const { ENTER_KEY: enterKey } = KEY_CODES;
+    // If enter key is pressed and the input has a value
+    if (this._isTextElement && target.value) {
+      const value = this.input.value;
+      const canAddItem = this._canAddItem(activeItems, value);
+
+      // All is good, add
+      if (canAddItem.response) {
+        this.hideDropdown(true);
+        this._addItem({ value });
+        this._triggerChange(value);
+        this.clearInput();
+      }
+    }
+
+    if (target.hasAttribute('data-button')) {
+      this._handleButtonAction(activeItems, target);
+      event.preventDefault();
+    }
+
+    if (hasActiveDropdown) {
+      event.preventDefault();
+      const highlighted = this.dropdown.getChild(
+        `.${this.config.classNames.highlightedState}`,
+      );
+
+      // If we have a highlighted choice
+      if (highlighted) {
+        // add enter keyCode value
+        if (activeItems[0]) {
+          activeItems[0].keyCode = enterKey; // eslint-disable-line no-param-reassign
+        }
+        this._handleChoiceAction(activeItems, highlighted);
+      }
+    } else if (this._isSelectOneElement) {
+      // Open single select dropdown if it's not active
+      this.showDropdown();
+      event.preventDefault();
+    }
+  }
+
+  _onEscapeKey({ hasActiveDropdown }) {
+    if (hasActiveDropdown) {
+      this.hideDropdown(true);
+      this.containerOuter.focus();
+    }
+  }
+
+  _onDirectionKey({ hasActiveDropdown, keyCode, metaKey }) {
+    const {
+      DOWN_KEY: downKey,
+      PAGE_UP_KEY: pageUpKey,
+      PAGE_DOWN_KEY: pageDownKey,
+    } = KEY_CODES;
+
+    // If up or down key is pressed, traverse through options
+    if (hasActiveDropdown || this._isSelectOneElement) {
+      this.showDropdown();
+      this._canSearch = false;
+
+      const directionInt =
+        keyCode === downKey || keyCode === pageDownKey ? 1 : -1;
+      const skipKey =
+        metaKey || keyCode === pageDownKey || keyCode === pageUpKey;
+      const selectableChoiceIdentifier = '[data-choice-selectable]';
+
+      let nextEl;
+      if (skipKey) {
+        if (directionInt > 0) {
+          nextEl = Array.from(
+            this.dropdown.element.querySelectorAll(selectableChoiceIdentifier),
+          ).pop();
+        } else {
+          nextEl = this.dropdown.element.querySelector(
+            selectableChoiceIdentifier,
+          );
+        }
+      } else {
+        const currentEl = this.dropdown.element.querySelector(
+          `.${this.config.classNames.highlightedState}`,
+        );
+        if (currentEl) {
+          nextEl = getAdjacentEl(
+            currentEl,
+            selectableChoiceIdentifier,
+            directionInt,
+          );
+        } else {
+          nextEl = this.dropdown.element.querySelector(
+            selectableChoiceIdentifier,
+          );
+        }
+      }
+
+      if (nextEl) {
+        // We prevent default to stop the cursor moving
+        // when pressing the arrow
+        if (
+          !isScrolledIntoView(nextEl, this.choiceList.element, directionInt)
+        ) {
+          this.choiceList.scrollToChoice(nextEl, directionInt);
+        }
+        this._highlightChoice(nextEl);
+      }
+
+      // Prevent default to maintain cursor position whilst
+      // traversing dropdown options
+      event.preventDefault();
+    }
+  }
+
+  _onDeleteKey({ target, hasFocusedInput, activeItems }) {
+    // If backspace or delete key is pressed and the input has no value
+    if (hasFocusedInput && !target.value && !this._isSelectOneElement) {
+      this._handleBackspace(activeItems);
+      event.preventDefault();
+    }
   }
 
   _onTouchMove() {
