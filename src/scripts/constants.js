@@ -1,4 +1,4 @@
-import { stripHTML } from './lib/utils';
+import { stripHTML, sortByAlpha } from './lib/utils';
 
 export const DEFAULT_CLASSNAMES = {
   containerOuter: 'choices',
@@ -52,6 +52,7 @@ export const DEFAULT_CONFIG = {
   regexFilter: null,
   shouldSort: true,
   shouldSortItems: false,
+  sortFn: sortByAlpha,
   placeholder: true,
   placeholderValue: null,
   searchPlaceholderValue: null,
@@ -71,6 +72,7 @@ export const DEFAULT_CONFIG = {
   },
   callbackOnInit: null,
   callbackOnCreateTemplates: null,
+  classNames: DEFAULT_CLASSNAMES,
 };
 
 export const EVENTS = {

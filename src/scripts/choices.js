@@ -1,4 +1,5 @@
 import Fuse from 'fuse.js';
+import merge from 'deepmerge';
 
 import './lib/polyfills';
 import Store from './store/store';
@@ -10,12 +11,7 @@ import {
   WrappedInput,
   WrappedSelect,
 } from './components';
-import {
-  DEFAULT_CONFIG,
-  DEFAULT_CLASSNAMES,
-  EVENTS,
-  KEY_CODES,
-} from './constants';
+import { DEFAULT_CONFIG, EVENTS, KEY_CODES } from './constants';
 import { TEMPLATES } from './templates';
 import {
   addChoice,
@@ -33,7 +29,6 @@ import {
   isType,
   strToEl,
   extend,
-  sortByAlpha,
   sortByScore,
   generateId,
   findAncestorByAttrName,
@@ -60,7 +55,7 @@ class Choices {
       }
     }
 
-    this.config = Choices._generateConfig(userConfig);
+    this.config = merge.all([DEFAULT_CONFIG, Choices.userDefaults, userConfig]);
 
     if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
@@ -173,6 +168,7 @@ class Choices {
     this._store.subscribe(this._render);
     this._render();
     this._addEventListeners();
+
     this.initialised = true;
 
     const { callbackOnInit } = this.config;
@@ -2027,18 +2023,6 @@ class Choices {
       },
       [this],
     );
-  }
-
-  static _generateConfig(userConfig) {
-    const defaultConfig = {
-      ...DEFAULT_CONFIG,
-      items: [],
-      choices: [],
-      classNames: DEFAULT_CLASSNAMES,
-      sortFn: sortByAlpha,
-    };
-
-    return extend(defaultConfig, Choices.userDefaults, userConfig);
   }
 
   _generatePlaceholderValue() {
