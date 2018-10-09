@@ -37,6 +37,7 @@ import {
   isIE11,
   existsInArray,
   cloneObject,
+  doKeysMatch,
 } from './lib/utils';
 
 /**
@@ -56,6 +57,10 @@ class Choices {
     }
 
     this.config = merge.all([DEFAULT_CONFIG, Choices.userDefaults, userConfig]);
+
+    if (!doKeysMatch(this.config, DEFAULT_CONFIG)) {
+      console.warn('Unknown config option(s) passed');
+    }
 
     if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
       this.config.renderSelectedChoices = 'auto';
