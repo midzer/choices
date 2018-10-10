@@ -16,21 +16,35 @@ if (process.env.NODE_ENV !== 'production') {
   console.log('Compiling bundle... 👷🏽');
   const compiler = webpack(config);
 
-  app.use(webpackDevMiddleware(compiler, {
-    publicPath: '/assets/scripts/',
-    stats: {
-      colors: true,
-    },
-  }));
+  app.use(
+    webpackDevMiddleware(compiler, {
+      publicPath: '/assets/scripts/',
+      stats: {
+        colors: true,
+      },
+    }),
+  );
 
   app.use(webpackHotMiddleware(compiler));
 }
 
 app.use(express.static(DIST_DIR));
-app.listen(PORT, (err) => {
+
+const server = app.listen(PORT, err => {
   if (err) {
     console.log(err);
   }
 
   console.log(`Listening at http://localhost:${PORT} 👂`);
+});
+
+process.on('SIGTERM', () => {
+  if (server) {
+    server.close(() => {
+      console.log('Shutting down server');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
