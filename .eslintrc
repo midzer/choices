@@ -5,7 +5,8 @@
     "prettier"
   ],
   "plugins": [
-    "prettier"
+    "prettier",
+    "cypress"
   ],
   "env": {
     "es6": true,
@@ -22,16 +23,30 @@
     "afterEach": true
   },
   "rules": {
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": true
-    }],
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
     "no-plusplus": "off",
     "no-unused-expressions": "off",
     "no-underscore-dangle": "off",
-    "prettier/prettier": ["error", {
-      "singleQuote": true,
-      "trailingComma": "all"
-    }]
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "trailingComma": "all"
+      }
+    ]
   }
 }
