@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>Choices</title>
+  <meta name=description itemprop=description content="A lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/images/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/images/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="assets/images/manifest.json">
+  <link rel="mask-icon" href="assets/images/safari-pinned-tab.svg" color="#00bcd4">
+  <link rel="shortcut icon" href="assets/images/favicon.ico">
+  <meta name="msapplication-config" content="/assets/images/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Ignore these -->
+  <link rel="stylesheet" href="assets/styles/base.min.css?version=3.0.2">
+  <!-- End ignore these -->
+
+  <!-- Optional includes -->
+  <script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild,Object.assign"></script>
+  <!-- End optional includes -->
+
+  <!-- Choices includes -->
+  <link rel="stylesheet" href="assets/styles/choices.min.css?version=3.0.2">
+  <script src="assets/scripts/choices.min.js?version=2.8.8"></script>
+  <!-- End Choices includes -->
+
+  <!--[if lt IE 9]>
+    <style>
+        .hidden-ie { display: none; }
+        .visible-ie { display: block; }
+    </style>
+    <![endif]-->
+</head>
+
+<body>
+  <div class="container">
+    <div class="section">
+      <a href="https://github.com/jshjohnson/Choices" class="logo">
+        <img src="assets/images/logo.svg" alt="Choices.js logo" class="logo__img hidden-ie">
+        <h1 class="visible-ie">Choices.js</h1>
+      </a>
+      <h2>Text inputs</h2>
+      <label for="choices-text-remove-button">Limited to 5 values with remove button</label>
+      <input class="form-control" id="choices-text-remove-button" type="text" placeholder="Enter something">
+
+      <label for="choices-text-unique-values">Unique values only, no pasting</label>
+      <input class="form-control" id="choices-text-unique-values" type="text" placeholder="This is a placeholder"
+        class="custom class">
+
+      <label for="choices-text-email-filter">Email addresses only</label>
+      <input class="form-control" id="choices-text-email-filter" type="text" placeholder="This is a placeholder">
+
+      <label for="choices-text-disabled">Disabled</label>
+      <input class="form-control" id="choices-text-disabled" type="text" placeholder="This is a placeholder">
+
+      <label for="choices-text-prepend-append-value">Prepends and appends a value to each items return value</label>
+      <input class="form-control" id="choices-text-prepend-append-value" type="text" placeholder="This is a placeholder">
+
+      <hr>
+
+      <h2>Multiple select input</h2>
+
+      <hr>
+
+      <h2>Single select input</h2>
+
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var textRemove = new Choices('#choices-text-remove-button', {
+        delimiter: ',',
+        editItems: true,
+        maxItemCount: 5,
+        removeItemButton: true,
+      });
+
+      var textUniqueVals = new Choices('#choices-text-unique-values', {
+        paste: false,
+        duplicateItemsAllowed: false,
+        editItems: true,
+      });
+
+      var textEmailFilter = new Choices('#choices-text-email-filter', {
+        editItems: true,
+        regexFilter: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      });
+
+      var textDisabled = new Choices('#choices-text-disabled', {
+        addItems: false,
+        removeItems: false,
+      }).disable();
+
+      var textPrependAppendVal = new Choices('#choices-text-prepend-append-value', {
+        prependValue: 'item-',
+        appendValue: '-' + Date.now(),
+      }).removeActiveItems();
+    });
+  </script>
+
+  <!-- Google Analytics - Ignore me -->
+  <script>
+    window.ga = window.ga || function() { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
+    ga('create', 'UA-31575166-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <!-- End Google Analytics -->
+</body>
+
+</html>

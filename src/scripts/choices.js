@@ -71,6 +71,12 @@ class Choices {
       ? document.querySelector(element)
       : element;
 
+    if (!passedElement) {
+      return console.error(
+        'Could not find passed element or passed element was of an invalid type',
+      );
+    }
+
     this._isTextElement = passedElement.type === 'text';
     this._isSelectOneElement = passedElement.type === 'select-one';
     this._isSelectMultipleElement = passedElement.type === 'select-multiple';
@@ -90,8 +96,8 @@ class Choices {
       });
     }
 
-    if (!this.passedElement) {
-      throw new Error('Could not wrap passed element');
+    if (!passedElement) {
+      return console.error('Passed element was of an invalid type');
     }
 
     if (
