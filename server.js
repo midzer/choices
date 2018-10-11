@@ -39,9 +39,15 @@ const server = app.listen(PORT, err => {
 });
 
 process.on('SIGTERM', () => {
+  console.log('Shutting down server');
   if (server) {
-    server.close(() => {
-      console.log('Shutting down server');
+    server.close(err => {
+      if (err) {
+        console.log('Failed to shut down server');
+        process.exit(1);
+      }
+
+      console.log('Shut down server');
       process.exit(0);
     });
   } else {
