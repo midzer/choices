@@ -11,9 +11,9 @@
     "coverage": "nyc npm run test",
     "cypress:run": "$(npm bin)/cypress run",
     "cypress:open": "$(npm bin)/cypress open",
-    "test": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\"",
-    "test:watch": "npm run test -- --watch --inspect=5556",
-    "test:ci": "concurrently --kill-others --prefix-colors yellow,green \"npm run start\" \"npm run cypress\"",
+    "test:unit": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\" --exit",
+    "test:unit:watch": "npm run test -- --watch --inspect=5556",
+    "test:e2e": "concurrently --kill-others --prefix-colors yellow,green \"npm run start\" \"npm run cypress:run\"",
     "css:watch": "nodemon -e scss -x \"npm run css:build\"",
     "css:build": "npm run css:sass -s && npm run css:prefix -s && npm run css:min -s",
     "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/base.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/choices.scss public/assets/styles/choices.css",
@@ -22,7 +22,7 @@
     "js:build": "concurrently --prefix-colors yellow,green \"webpack --env.minimize --config webpack.config.prod.js\" \"webpack --config webpack.config.prod.js\"",
     "version": "node version.js --current $npm_package_version --new $npm_config_newVersion",
     "postversion": "npm run js:build",
-    "prepush": "npm run lint && npm run test"
+    "prepush": "npm run lint && npm run test:unit"
   },
   "repository": {
     "type": "git",
