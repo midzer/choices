@@ -86,41 +86,43 @@ describe('Choices - text element', () => {
             .type('{enter}');
         });
 
-        it('allows me to remove inputted choices', () => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--multiple')
-            .children()
-            .should($items => {
-              expect($items.length).to.equal(1);
-            });
+        describe('remove button', () => {
+          it('allows me to remove inputted choices', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--multiple')
+              .children()
+              .should($items => {
+                expect($items.length).to.equal(1);
+              });
 
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--multiple .choices__item')
-            .last()
-            .find('.choices__button')
-            .focus()
-            .click();
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--multiple .choices__item')
+              .last()
+              .find('.choices__button')
+              .focus()
+              .click();
 
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--multiple .choices__item')
-            .should($items => {
-              expect($items.length).to.equal(0);
-            });
-        });
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--multiple .choices__item')
+              .should($items => {
+                expect($items.length).to.equal(0);
+              });
+          });
 
-        it('updates the value of the original input', () => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--multiple .choices__item')
-            .last()
-            .find('.choices__button')
-            .focus()
-            .click();
+          it('updates the value of the original input', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--multiple .choices__item')
+              .last()
+              .find('.choices__button')
+              .focus()
+              .click();
 
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__input.is-hidden')
-            .then($input => {
-              expect($input.val()).to.not.contain(textInput);
-            });
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input.is-hidden')
+              .then($input => {
+                expect($input.val()).to.not.contain(textInput);
+              });
+          });
         });
       });
     });
@@ -154,7 +156,7 @@ describe('Choices - text element', () => {
               .should($dropdown => {
                 const dropdownText = $dropdown.text().trim();
                 expect(dropdownText).to.equal(
-                  'Only unique values can be added.',
+                  'Only unique values can be added',
                 );
               });
           });
