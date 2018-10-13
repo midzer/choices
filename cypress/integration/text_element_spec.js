@@ -52,6 +52,32 @@ describe('Choices - text element', () => {
         });
       });
 
+      describe('editing choices', () => {
+        beforeEach(() => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__input--cloned')
+            .type(textInput)
+            .type('{enter}');
+        });
+
+        describe('pressing back space', () => {
+          it('allows me to change my entry', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .type('{backspace}')
+              .type('-edited')
+              .type('{enter}');
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--multiple .choices__item')
+              .last()
+              .should($choice => {
+                expect($choice.data('value')).to.equal(`${textInput}-edited`);
+              });
+          });
+        });
+      });
+
       describe('removing choices', () => {
         beforeEach(() => {
           cy.get('[data-test-hook=basic]')
@@ -162,10 +188,10 @@ describe('Choices - text element', () => {
             .type('{enter}');
 
           cy.get('[data-test-hook=regex-filter]')
-            .find('.choices__list .choices__item')
+            .find('.choices__list--multiple .choices__item')
             .last()
             .should($choice => {
-              expect($choice).to.contain(input);
+              expect($choice.text().trim()).to.equal(input);
             });
         });
       });
@@ -200,6 +226,16 @@ describe('Choices - text element', () => {
             expect($choice.data('value')).to.equal(`before-${textInput}-after`);
           });
       });
+
+      it('displays just the inputted value to the user', () => {
+        cy.get('[data-test-hook=prepend-append]')
+          .find('.choices__list--multiple .choices__item')
+          .last()
+          .should($choice => {
+            expect($choice.text()).to.not.contain(`before-${textInput}-after`);
+            expect($choice.text()).to.contain(textInput);
+          });
+      });
     });
 
     describe('disabled', () => {
@@ -207,6 +243,30 @@ describe('Choices - text element', () => {
         cy.get('[data-test-hook=disabled]')
           .find('.choices__input--cloned')
           .should('be.disabled');
+      });
+    });
+
+    describe('pre-populated choices', () => {
+      it('pre-populates choices', () => {
+        cy.get('[data-test-hook=prepopulated]')
+          .find('.choices__list--multiple .choices__item')
+          .should($choices => {
+            expect($choices.length).to.equal(2);
+          });
+
+        cy.get('[data-test-hook=prepopulated]')
+          .find('.choices__list--multiple .choices__item')
+          .first()
+          .should($choice => {
+            expect($choice.text().trim()).to.equal('Josh Johnson');
+          });
+
+        cy.get('[data-test-hook=prepopulated]')
+          .find('.choices__list--multiple .choices__item')
+          .last()
+          .should($choice => {
+            expect($choice.text().trim()).to.equal('Joe Bloggs');
+          });
       });
     });
   });

@@ -39,10 +39,6 @@
   <body>
     <div class="container">
       <div class="section">
-        <a href="https://github.com/jshjohnson/Choices" class="logo">
-          <img src="../assets/images/logo.svg" alt="Choices.js logo" class="logo__img hidden-ie">
-          <h1 class="visible-ie">Choices.js</h1>
-        </a>
         <h2>Text inputs</h2>
         <div data-test-hook="basic">
           <label for="choices-basic">Basic</label>
@@ -74,14 +70,10 @@
           <input class="form-control" id="choices-prepend-append" type="text" placeholder="This is a placeholder">
         </div>
 
-        <hr>
-
-        <h2>Multiple select input</h2>
-
-        <hr>
-
-        <h2>Single select input</h2>
-
+        <div data-test-hook="prepopulated">
+          <label for="choices-prepopulated">Pre-populated choices</label>
+          <input class="form-control" id="choices-prepopulated" type="text" placeholder="This is a placeholder">
+        </div>
       </div>
     </div>
     <script>
@@ -112,17 +104,17 @@
           prependValue: 'before-',
           appendValue: '-after',
         });
+
+        new Choices('#choices-prepopulated', {
+          items: ['Josh Johnson', {
+            value: 'joe@bloggs.co.uk',
+            label: 'Joe Bloggs',
+            customProperties: {
+              description: 'Joe Blogg is such a generic name'
+            }
+          }],
+        });
       });
     </script>
-
-    <!-- Google Analytics - Ignore me -->
-    <script>
-      window.ga = window.ga || function() { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
-      ga('create', 'UA-31575166-1', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <!-- End Google Analytics -->
   </body>
-
   </html>
