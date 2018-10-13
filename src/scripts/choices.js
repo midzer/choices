@@ -577,15 +577,13 @@ class Choices {
     const activeItems = this._store.activeItems || [];
     this.itemList.clear();
 
-    if (activeItems.length) {
-      // Create a fragment to store our list items
-      // (so we don't have to update the DOM for each item)
-      const itemListFragment = this._createItemsFragment(activeItems);
+    // Create a fragment to store our list items
+    // (so we don't have to update the DOM for each item)
+    const itemListFragment = this._createItemsFragment(activeItems);
 
-      // If we have items to add, append them
-      if (itemListFragment.childNodes) {
-        this.itemList.append(itemListFragment);
-      }
+    // If we have items to add, append them
+    if (itemListFragment.childNodes) {
+      this.itemList.append(itemListFragment);
     }
   }
 

@@ -83,8 +83,6 @@ describe('Choices - text element', () => {
           cy.get('[data-test-hook=basic]')
             .find('.choices__input--cloned')
             .type(`${textInput}`)
-            .type('{enter}')
-            .type(`${textInput}`)
             .type('{enter}');
         });
 
@@ -93,7 +91,7 @@ describe('Choices - text element', () => {
             .find('.choices__list--multiple')
             .children()
             .should($items => {
-              expect($items.length).to.equal(2);
+              expect($items.length).to.equal(1);
             });
 
           cy.get('[data-test-hook=basic]')
@@ -104,10 +102,24 @@ describe('Choices - text element', () => {
             .click();
 
           cy.get('[data-test-hook=basic]')
-            .find('.choices__list--multiple')
-            .first()
+            .find('.choices__list--multiple .choices__item')
             .should($items => {
-              expect($items.length).to.equal(1);
+              expect($items.length).to.equal(0);
+            });
+        });
+
+        it('updates the value of the original input', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .find('.choices__button')
+            .focus()
+            .click();
+
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__input.is-hidden')
+            .then($input => {
+              expect($input.val()).to.not.contain(textInput);
             });
         });
       });
