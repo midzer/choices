@@ -28,11 +28,10 @@
   <body>
     <div class="container">
       <div class="section">
-        <h2>Select multiple inputs</h2>
+        <h2>Select one inputs</h2>
         <div data-test-hook="basic">
           <label for="choices-basic">Basic</label>
-          <select class="form-control" name="choices-basic" id="choices-basic" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-basic" id="choices-basic" placeholder="This is a placeholder">
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -42,8 +41,7 @@
 
         <div data-test-hook="disabled-choice">
           <label for="choices-disabled-choice">Disabled choice</label>
-          <select class="form-control" name="choices-disabled-choice" id="choices-disabled-choice" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-disabled-choice" id="choices-disabled-choice" placeholder="This is a placeholder">
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -51,23 +49,9 @@
           </select>
         </div>
 
-        <div data-test-hook="selection-limit">
-          <label for="choices-selection-limit">Input limit</label>
-          <select class="form-control" name="choices-selection-limit" id="choices-selection-limit" placeholder="This is a placeholder"
-            multiple>
-            <option value="Dropdown item 1">Dropdown item 1</option>
-            <option value="Dropdown item 2">Dropdown item 2</option>
-            <option value="Dropdown item 3">Dropdown item 3</option>
-            <option value="Dropdown item 4">Dropdown item 4</option>
-            <option value="Dropdown item 5">Dropdown item 5</option>
-            <option value="Dropdown item 6">Dropdown item 6</option>
-          </select>
-        </div>
-
         <div data-test-hook="prepend-append">
           <label for="choices-prepend-append">Prepend/append</label>
-          <select class="form-control" name="choices-prepend-append" id="choices-prepend-append" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-prepend-append" id="choices-prepend-append" placeholder="This is a placeholder">
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -83,10 +67,6 @@
 
         new Choices('#choices-disabled-choice', {
           removeItemButton: true,
-        });
-
-        new Choices('#choices-selection-limit', {
-          maxItemCount: 5,
         });
 
         new Choices('#choices-prepend-append', {
