@@ -1,6 +1,6 @@
-describe('Choices - select multiple', () => {
+describe('Choices - select one', () => {
   beforeEach(() => {
-    cy.visit('/select-multiple.html');
+    cy.visit('/select-one.html');
   });
 
   describe('configs', () => {
@@ -39,40 +39,14 @@ describe('Choices - select multiple', () => {
               .click();
 
             cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
+              .find('.choices__list--single .choices__item')
               .last()
               .should($item => {
                 expect($item).to.contain(selectedChoiceText);
               });
           });
 
-          describe('selecting all available choices', () => {
-            beforeEach(() => {
-              for (let index = 0; index <= 4; index++) {
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__input--cloned')
-                  .focus();
-
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__list--dropdown .choices__list')
-                  .children()
-                  .first()
-                  .click();
-              }
-            });
-
-            it('displays dropdown prompt', () => {
-              cy.get('[data-test-hook=basic]')
-                .find('.choices__list--dropdown')
-                .should('be.visible')
-                .should($dropdown => {
-                  const dropdownText = $dropdown.text().trim();
-                  expect(dropdownText).to.equal('No choices to choose from');
-                });
-            });
-          });
-
-          it('removes selected choice from dropdown list', () => {
+          it('does not remove selected choice from dropdown list', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown .choices__list')
               .children()
@@ -82,8 +56,9 @@ describe('Choices - select multiple', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown .choices__list')
               .children()
-              .each($choice => {
-                expect($choice.text().trim()).to.not.equal(selectedChoiceText);
+              .first()
+              .should($item => {
+                expect($item).to.contain(selectedChoiceText);
               });
           });
 
@@ -98,18 +73,6 @@ describe('Choices - select multiple', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__list--dropdown')
                 .should('not.be.visible');
-            });
-
-            describe('typing more into the input', () => {
-              it('re-opens the dropdown', () => {
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__input--cloned')
-                  .type('test');
-
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__list--dropdown')
-                  .should('be.visible');
-              });
             });
           });
         });
@@ -128,30 +91,17 @@ describe('Choices - select multiple', () => {
             .click();
         });
 
-        describe('pressing backspace', () => {
-          it('removes last choice', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__input--cloned')
-              .type('{backspace}');
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple')
-              .children()
-              .should('have.length', 0);
-          });
-        });
-
         describe('remove button', () => {
           it('removes last choice', () => {
             cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
+              .find('.choices__list--single .choices__item')
               .last()
               .find('.choices__button')
               .focus()
               .click();
 
             cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple')
+              .find('.choices__list--single')
               .children()
               .should('have.length', 0);
           });
@@ -161,57 +111,33 @@ describe('Choices - select multiple', () => {
 
     describe('disabled choice', () => {
       describe('selecting a disabled choice', () => {
+        let selectedChoiceText;
+
         beforeEach(() => {
-          cy.get('[data-test-hook=disabled-choice]')
-            .find('.choices__input--cloned')
-            .focus();
+          cy.get('[data-test-hook=disabled-choice]').click();
 
           cy.get('[data-test-hook=disabled-choice]')
             .find('.choices__list--dropdown .choices__item--disabled')
+            .then($choice => {
+              selectedChoiceText = $choice.text().trim();
+            })
             .click();
         });
 
-        it('does not select choice', () => {
-          cy.get('[data-test-hook=disabled-choice]')
-            .find('.choices__list--multiple .choices__item')
-            .should('have.length', 0);
+        it('does not change selected choice', () => {
+          cy.get('[data-test-hook=prepend-append]')
+            .find('.choices__list--single .choices__item')
+            .last()
+            .should($choice => {
+              expect($choice.text()).to.not.contain(selectedChoiceText);
+            });
         });
 
-        it('keeps choice dropdown open', () => {
+        it('closes the dropdown list', () => {
           cy.get('[data-test-hook=disabled-choice]')
             .find('.choices__list--dropdown')
-            .should('be.visible');
+            .should('not.be.visible');
         });
-      });
-    });
-
-    describe('selection limit', () => {
-      const selectionLimit = 5;
-
-      beforeEach(() => {
-        for (let index = 0; index < selectionLimit; index++) {
-          cy.get('[data-test-hook=selection-limit]')
-            .find('.choices__input--cloned')
-            .focus();
-
-          cy.get('[data-test-hook=selection-limit]')
-            .find('.choices__list--dropdown .choices__list')
-            .children()
-            .first()
-            .click();
-        }
-      });
-
-      it('shows dropdown prompt once limit has been reached', () => {
-        cy.get('[data-test-hook=selection-limit]')
-          .find('.choices__list--dropdown')
-          .should('be.visible')
-          .should($dropdown => {
-            const dropdownText = $dropdown.text().trim();
-            expect(dropdownText).to.equal(
-              `Only ${selectionLimit} values can be added`,
-            );
-          });
       });
     });
 
@@ -233,13 +159,9 @@ describe('Choices - select multiple', () => {
           .click();
       });
 
-      it('works', () => {
-        expect(true).to.equal(true);
-      });
-
       it('prepends and appends value to inputted value', () => {
         cy.get('[data-test-hook=prepend-append]')
-          .find('.choices__list--multiple .choices__item')
+          .find('.choices__list--single .choices__item')
           .last()
           .should($choice => {
             expect($choice.data('value')).to.equal(
@@ -250,7 +172,7 @@ describe('Choices - select multiple', () => {
 
       it('displays just the inputted value to the user', () => {
         cy.get('[data-test-hook=prepend-append]')
-          .find('.choices__list--multiple .choices__item')
+          .find('.choices__list--single .choices__item')
           .last()
           .should($choice => {
             expect($choice.text()).to.not.contain(
