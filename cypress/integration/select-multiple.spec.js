@@ -141,7 +141,7 @@ describe('Choices - select multiple', () => {
       describe('searching choices', () => {
         describe('on input', () => {
           describe('searching by label', () => {
-            it('displays choices filtered on inputted value', () => {
+            it('displays choices filtered by inputted value', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__input--cloned')
                 .type('item 2');
@@ -157,7 +157,7 @@ describe('Choices - select multiple', () => {
           });
 
           describe('searching by value', () => {
-            it('displays choices filtered on inputted value', () => {
+            it('displays choices filtered by inputted value', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__input--cloned')
                 .type('find me');
@@ -192,6 +192,12 @@ describe('Choices - select multiple', () => {
     });
 
     describe('remove button', () => {
+      /*
+        {
+          removeItemButton: true,
+        };
+      */
+
       beforeEach(() => {
         cy.get('[data-test-hook=remove-button]')
           .find('.choices__input--cloned')
@@ -248,6 +254,12 @@ describe('Choices - select multiple', () => {
     });
 
     describe('selection limit', () => {
+      /*
+        {
+          maxItemCount: 5,
+        };
+      */
+
       const selectionLimit = 5;
 
       beforeEach(() => {
@@ -278,6 +290,12 @@ describe('Choices - select multiple', () => {
     });
 
     describe('prepend/append', () => {
+      /*
+        {
+          prependValue: 'before-',
+          appendValue: '-after',
+        };
+      */
       let selectedChoiceText;
 
       beforeEach(() => {
@@ -322,14 +340,66 @@ describe('Choices - select multiple', () => {
           });
       });
     });
-  });
 
-  describe('render choice limit', () => {
-    it('only displays given number of choices in the dropdown', () => {
-      cy.get('[data-test-hook=render-choice-limit]')
-        .find('.choices__list--dropdown .choices__list')
-        .children()
-        .should('have.length', 1);
+    describe('render choice limit', () => {
+      /*
+        {
+          renderChoiceLimit: 1,
+        };
+      */
+
+      it('only displays given number of choices in the dropdown', () => {
+        cy.get('[data-test-hook=render-choice-limit]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .should('have.length', 1);
+      });
+    });
+
+    describe('search floor', () => {
+      /*
+        {
+          searchFloor: 10,
+        };
+      */
+
+      describe('on input', () => {
+        describe('search floor not reached', () => {
+          it('displays choices not filtered by inputted value', () => {
+            const searchTerm = 'item 2';
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__input--cloned')
+              .type(searchTerm);
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .first()
+              .should($choice => {
+                expect($choice.text().trim()).to.not.contain(searchTerm);
+              });
+          });
+        });
+
+        describe('search floor reached', () => {
+          it('displays choices filtered by inputted value', () => {
+            const searchTerm = 'Dropdown item 2';
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__input--cloned')
+              .type(searchTerm);
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .first()
+              .should($choice => {
+                expect($choice.text().trim()).to.contain(searchTerm);
+              });
+          });
+        });
+      });
     });
   });
 });

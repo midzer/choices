@@ -81,7 +81,7 @@ describe('Choices - select one', () => {
       describe('searching choices', () => {
         describe('on input', () => {
           describe('searching by label', () => {
-            it('displays choices filtered on inputted value', () => {
+            it('displays choices filtered by inputted value', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__input--cloned')
                 .type('item 2');
@@ -97,7 +97,7 @@ describe('Choices - select one', () => {
           });
 
           describe('searching by value', () => {
-            it('displays choices filtered on inputted value', () => {
+            it('displays choices filtered by inputted value', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__input--cloned')
                 .type('find me');
@@ -132,6 +132,11 @@ describe('Choices - select one', () => {
     });
 
     describe('remove button', () => {
+      /*
+        {
+          removeItemButton: true,
+        }
+      */
       beforeEach(() => {
         cy.get('[data-test-hook=remove-button]')
           .find('.choices__input--cloned')
@@ -196,6 +201,13 @@ describe('Choices - select one', () => {
     });
 
     describe('prepend/append', () => {
+      /*
+        {
+          prependValue: 'before-',
+          appendValue: '-after',
+        };
+      */
+
       let selectedChoiceText;
 
       beforeEach(() => {
@@ -238,11 +250,105 @@ describe('Choices - select one', () => {
     });
 
     describe('render choice limit', () => {
+      /*
+        {
+          renderChoiceLimit: 1
+        }
+      */
+
       it('only displays given number of choices in the dropdown', () => {
         cy.get('[data-test-hook=render-choice-limit]')
           .find('.choices__list--dropdown .choices__list')
           .children()
           .should('have.length', 1);
+      });
+    });
+
+    describe('search disabled', () => {
+      /*
+        {
+          searchEnabled: false
+        }
+      */
+      const selectedChoiceText = 'Dropdown item 3';
+
+      beforeEach(() => {
+        cy.get('[data-test-hook=search-disabled]')
+          .find('.choices')
+          .click();
+      });
+
+      it('does not display a search input', () => {
+        cy.get('[data-test-hook=search-disabled]')
+          .find('.choices__input--cloned')
+          .should('not.exist');
+      });
+
+      it('allows me select choices from a dropdown', () => {
+        cy.get('[data-test-hook=search-disabled]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .last()
+          .click();
+
+        cy.get('[data-test-hook=search-disabled]')
+          .find('.choices__list--single .choices__item')
+          .last()
+          .should($item => {
+            expect($item).to.contain(selectedChoiceText);
+          });
+      });
+    });
+
+    describe('search floor', () => {
+      /*
+        {
+          searchFloor: 10,
+        };
+      */
+
+      describe('on input', () => {
+        beforeEach(() => {
+          cy.get('[data-test-hook=search-floor]')
+            .find('.choices__input--cloned')
+            .focus();
+        });
+
+        describe('search floor not reached', () => {
+          it('displays choices not filtered by inputted value', () => {
+            const searchTerm = 'item 2';
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__input--cloned')
+              .type(searchTerm);
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .first()
+              .should($choice => {
+                expect($choice.text().trim()).to.not.contain(searchTerm);
+              });
+          });
+        });
+
+        describe('search floor reached', () => {
+          it('displays choices filtered by inputted value', () => {
+            const searchTerm = 'Dropdown item 2';
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__input--cloned')
+              .type(searchTerm);
+
+            cy.get('[data-test-hook=search-floor]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .first()
+              .should($choice => {
+                expect($choice.text().trim()).to.contain(searchTerm);
+              });
+          });
+        });
       });
     });
   });
