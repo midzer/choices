@@ -76,6 +76,24 @@
             <option value="Dropdown item 3">Dropdown item 3</option>
           </select>
         </div>
+
+        <div data-test-hook="search-disabled">
+          <label for="choices-search-disabled">Search disabled</label>
+          <select class="form-control" name="choices-search-disabled" id="choices-search-disabled" placeholder="This is a placeholder">
+            <option value="Dropdown item 1">Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Dropdown item 3">Dropdown item 3</option>
+          </select>
+        </div>
+
+        <div data-test-hook="search-floor">
+          <label for="choices-search-floor">Search floor</label>
+          <select class="form-control" name="choices-search-floor" id="choices-search-floor" placeholder="This is a placeholder">
+            <option value="Dropdown item 1">Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Dropdown item 3">Dropdown item 3</option>
+          </select>
+        </div>
       </div>
     </div>
     <script>
@@ -97,6 +115,14 @@
 
         new Choices('#choices-render-choice-limit', {
           renderChoiceLimit: 1
+        });
+
+        new Choices('#choices-search-disabled', {
+          searchEnabled: false
+        })
+
+        new Choices('#choices-search-floor', {
+          searchFloor: 10,
         });
       });
     </script>
