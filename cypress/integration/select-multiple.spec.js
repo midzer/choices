@@ -5,13 +5,13 @@ describe('Choices - select multiple', () => {
 
   describe('configs', () => {
     describe('basic', () => {
-      describe('selecting choices', () => {
-        beforeEach(() => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__input--cloned')
-            .focus();
-        });
+      beforeEach(() => {
+        cy.get('[data-test-hook=basic]')
+          .find('.choices__input--cloned')
+          .focus();
+      });
 
+      describe('selecting choices', () => {
         describe('focusing on text input', () => {
           const selectedChoiceText = 'Dropdown item 1';
 
@@ -61,7 +61,7 @@ describe('Choices - select multiple', () => {
               }
             });
 
-            it('displays dropdown prompt', () => {
+            it('displays "no choices to choose" prompt', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__list--dropdown')
                 .should('be.visible')
@@ -118,17 +118,13 @@ describe('Choices - select multiple', () => {
       describe('removing choices', () => {
         beforeEach(() => {
           cy.get('[data-test-hook=basic]')
-            .find('.choices__input--cloned')
-            .focus();
-
-          cy.get('[data-test-hook=basic]')
             .find('.choices__list--dropdown .choices__list')
             .children()
             .last()
             .click();
         });
 
-        describe('pressing backspace', () => {
+        describe('on backspace', () => {
           it('removes last choice', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__input--cloned')
@@ -140,21 +136,87 @@ describe('Choices - select multiple', () => {
               .should('have.length', 0);
           });
         });
+      });
 
-        describe('remove button', () => {
-          it('removes last choice', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
-              .last()
-              .find('.choices__button')
-              .focus()
-              .click();
+      describe('searching choices', () => {
+        describe('on input', () => {
+          describe('searching by label', () => {
+            it('displays choices filtered on inputted value', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('item 2');
 
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple')
-              .children()
-              .should('have.length', 0);
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown .choices__list')
+                .children()
+                .first()
+                .should($choice => {
+                  expect($choice.text().trim()).to.equal('Dropdown item 2');
+                });
+            });
           });
+
+          describe('searching by value', () => {
+            it('displays choices filtered on inputted value', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('find me');
+
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown .choices__list')
+                .children()
+                .first()
+                .should($choice => {
+                  expect($choice.text().trim()).to.equal('Dropdown item 3');
+                });
+            });
+          });
+
+          describe('no results found', () => {
+            it('displays "no results found" prompt', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('faergge');
+
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown')
+                .should('be.visible')
+                .should($dropdown => {
+                  const dropdownText = $dropdown.text().trim();
+                  expect(dropdownText).to.equal('No results found');
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe('remove button', () => {
+      beforeEach(() => {
+        cy.get('[data-test-hook=remove-button]')
+          .find('.choices__input--cloned')
+          .focus();
+
+        cy.get('[data-test-hook=remove-button]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .last()
+          .click();
+      });
+
+      describe('on click', () => {
+        it('removes respective choice', () => {
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .find('.choices__button')
+            .focus()
+            .click();
+
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple')
+            .children()
+            .should('have.length', 0);
         });
       });
     });
@@ -202,7 +264,7 @@ describe('Choices - select multiple', () => {
         }
       });
 
-      it('shows dropdown prompt once limit has been reached', () => {
+      it('displays "limit reached" prompt', () => {
         cy.get('[data-test-hook=selection-limit]')
           .find('.choices__list--dropdown')
           .should('be.visible')
@@ -259,6 +321,15 @@ describe('Choices - select multiple', () => {
             expect($choice.text()).to.contain(selectedChoiceText);
           });
       });
+    });
+  });
+
+  describe('render choice limit', () => {
+    it('only displays given number of choices in the dropdown', () => {
+      cy.get('[data-test-hook=render-choice-limit]')
+        .find('.choices__list--dropdown .choices__list')
+        .children()
+        .should('have.length', 1);
     });
   });
 });

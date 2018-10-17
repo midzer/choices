@@ -34,6 +34,16 @@
           <input class="form-control" id="choices-basic" type="text" placeholder="Enter something">
         </div>
 
+        <div data-test-hook="edit-items">
+          <label for="choices-edit-items">Edit items</label>
+          <input class="form-control" id="choices-edit-items" type="text" placeholder="Enter something">
+        </div>
+
+        <div data-test-hook="remove-button">
+          <label for="choices-remove-button">Remove button</label>
+          <input class="form-control" id="choices-remove-button" type="text" placeholder="Enter something">
+        </div>
+
         <div data-test-hook="unique-values">
           <label for="choices-unique-values">Unique values</label>
           <input class="form-control" id="choices-unique-values" type="text" placeholder="This is a placeholder">
@@ -67,8 +77,13 @@
     </div>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        new Choices('#choices-basic', {
+        new Choices('#choices-basic');
+
+        new Choices('#choices-edit-items', {
           editItems: true,
+        });
+
+        new Choices('#choices-remove-button', {
           removeItemButton: true,
         });
 

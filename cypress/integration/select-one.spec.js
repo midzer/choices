@@ -5,13 +5,13 @@ describe('Choices - select one', () => {
 
   describe('configs', () => {
     describe('basic', () => {
-      describe('selecting choices', () => {
-        beforeEach(() => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__input--cloned')
-            .focus();
-        });
+      beforeEach(() => {
+        cy.get('[data-test-hook=basic]')
+          .find('.choices__input--cloned')
+          .focus();
+      });
 
+      describe('selecting choice', () => {
         describe('focusing on text input', () => {
           const selectedChoiceText = 'Dropdown item 1';
 
@@ -78,29 +78,83 @@ describe('Choices - select one', () => {
         });
       });
 
-      describe('removing choices', () => {
-        beforeEach(() => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__input--cloned')
-            .focus();
+      describe('searching choices', () => {
+        describe('on input', () => {
+          describe('searching by label', () => {
+            it('displays choices filtered on inputted value', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('item 2');
 
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--dropdown .choices__list')
-            .children()
-            .last()
-            .click();
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown .choices__list')
+                .children()
+                .first()
+                .should($choice => {
+                  expect($choice.text().trim()).to.equal('Dropdown item 2');
+                });
+            });
+          });
+
+          describe('searching by value', () => {
+            it('displays choices filtered on inputted value', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('find me');
+
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown .choices__list')
+                .children()
+                .first()
+                .should($choice => {
+                  expect($choice.text().trim()).to.equal('Dropdown item 3');
+                });
+            });
+          });
+
+          describe('no results found', () => {
+            it('displays "no results found" prompt', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('faergge');
+
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown')
+                .should('be.visible')
+                .should($dropdown => {
+                  const dropdownText = $dropdown.text().trim();
+                  expect(dropdownText).to.equal('No results found');
+                });
+            });
+          });
         });
+      });
+    });
 
-        describe('remove button', () => {
-          it('removes last choice', () => {
-            cy.get('[data-test-hook=basic]')
+    describe('remove button', () => {
+      beforeEach(() => {
+        cy.get('[data-test-hook=remove-button]')
+          .find('.choices__input--cloned')
+          .focus();
+
+        cy.get('[data-test-hook=remove-button]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .last()
+          .click();
+      });
+
+      describe('remove button', () => {
+        describe('on click', () => {
+          it('removes selected choice', () => {
+            cy.get('[data-test-hook=remove-button]')
               .find('.choices__list--single .choices__item')
               .last()
               .find('.choices__button')
               .focus()
               .click();
 
-            cy.get('[data-test-hook=basic]')
+            cy.get('[data-test-hook=remove-button]')
               .find('.choices__list--single')
               .children()
               .should('have.length', 0);
@@ -180,6 +234,15 @@ describe('Choices - select one', () => {
             );
             expect($choice.text()).to.contain(selectedChoiceText);
           });
+      });
+    });
+
+    describe('render choice limit', () => {
+      it('only displays given number of choices in the dropdown', () => {
+        cy.get('[data-test-hook=render-choice-limit]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .should('have.length', 1);
       });
     });
   });

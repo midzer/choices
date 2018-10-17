@@ -7,8 +7,8 @@ describe('Choices - text element', () => {
     const textInput = 'testing';
 
     describe('basic', () => {
-      describe('adding choices', () => {
-        it('allows me to input choices', () => {
+      describe('adding items', () => {
+        it('allows me to input items', () => {
           cy.get('[data-test-hook=basic]')
             .find('.choices__input--cloned')
             .type(textInput)
@@ -51,78 +51,78 @@ describe('Choices - text element', () => {
           });
         });
       });
+    });
 
-      describe('editing choices', () => {
-        beforeEach(() => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__input--cloned')
-            .type(textInput)
-            .type('{enter}');
-        });
-
-        describe('pressing back space', () => {
-          it('allows me to change my entry', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__input--cloned')
-              .type('{backspace}')
-              .type('-edited')
-              .type('{enter}');
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
-              .last()
-              .should($choice => {
-                expect($choice.data('value')).to.equal(`${textInput}-edited`);
-              });
-          });
-        });
+    describe('editing items', () => {
+      beforeEach(() => {
+        cy.get('[data-test-hook=edit-items]')
+          .find('.choices__input--cloned')
+          .type(textInput)
+          .type('{enter}');
       });
 
-      describe('removing choices', () => {
-        beforeEach(() => {
-          cy.get('[data-test-hook=basic]')
+      describe('on back space', () => {
+        it('allows me to change my entry', () => {
+          cy.get('[data-test-hook=edit-items]')
             .find('.choices__input--cloned')
-            .type(`${textInput}`)
+            .type('{backspace}')
+            .type('-edited')
             .type('{enter}');
+
+          cy.get('[data-test-hook=edit-items]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .should($choice => {
+              expect($choice.data('value')).to.equal(`${textInput}-edited`);
+            });
+        });
+      });
+    });
+
+    describe('remove button', () => {
+      beforeEach(() => {
+        cy.get('[data-test-hook=remove-button]')
+          .find('.choices__input--cloned')
+          .type(`${textInput}`)
+          .type('{enter}');
+      });
+
+      describe('on click', () => {
+        it('removes respective choice', () => {
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple')
+            .children()
+            .should($items => {
+              expect($items.length).to.equal(1);
+            });
+
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .find('.choices__button')
+            .focus()
+            .click();
+
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple .choices__item')
+            .should($items => {
+              expect($items.length).to.equal(0);
+            });
         });
 
-        describe('remove button', () => {
-          it('allows me to remove inputted choices', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple')
-              .children()
-              .should($items => {
-                expect($items.length).to.equal(1);
-              });
+        it('updates the value of the original input', () => {
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .find('.choices__button')
+            .focus()
+            .click();
 
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
-              .last()
-              .find('.choices__button')
-              .focus()
-              .click();
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
-              .should($items => {
-                expect($items.length).to.equal(0);
-              });
-          });
-
-          it('updates the value of the original input', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--multiple .choices__item')
-              .last()
-              .find('.choices__button')
-              .focus()
-              .click();
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__input.is-hidden')
-              .then($input => {
-                expect($input.val()).to.not.contain(textInput);
-              });
-          });
+          cy.get('[data-test-hook=remove-button]')
+            .find('.choices__input.is-hidden')
+            .then($input => {
+              expect($input.val()).to.not.contain(textInput);
+            });
         });
       });
     });
