@@ -31,8 +31,17 @@
         <h2>Select multiple inputs</h2>
         <div data-test-hook="basic">
           <label for="choices-basic">Basic</label>
-          <select class="form-control" name="choices-basic" id="choices-basic" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-basic" id="choices-basic" placeholder="This is a placeholder" multiple>
+            <option value="Dropdown item 1">Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Find me">Dropdown item 3</option>
+            <option value="Dropdown item 4">Dropdown item 4</option>
+          </select>
+        </div>
+
+        <div data-test-hook="remove-button">
+          <label for="choices-remove-button">Remove button</label>
+          <select class="form-control" name="choices-remove-button" id="choices-remove-button" placeholder="This is a placeholder" multiple>
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -42,8 +51,7 @@
 
         <div data-test-hook="disabled-choice">
           <label for="choices-disabled-choice">Disabled choice</label>
-          <select class="form-control" name="choices-disabled-choice" id="choices-disabled-choice" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-disabled-choice" id="choices-disabled-choice" placeholder="This is a placeholder" multiple>
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -53,8 +61,7 @@
 
         <div data-test-hook="selection-limit">
           <label for="choices-selection-limit">Input limit</label>
-          <select class="form-control" name="choices-selection-limit" id="choices-selection-limit" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-selection-limit" id="choices-selection-limit" placeholder="This is a placeholder" multiple>
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -66,8 +73,16 @@
 
         <div data-test-hook="prepend-append">
           <label for="choices-prepend-append">Prepend/append</label>
-          <select class="form-control" name="choices-prepend-append" id="choices-prepend-append" placeholder="This is a placeholder"
-            multiple>
+          <select class="form-control" name="choices-prepend-append" id="choices-prepend-append" placeholder="This is a placeholder" multiple>
+            <option value="Dropdown item 1">Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Dropdown item 3">Dropdown item 3</option>
+          </select>
+        </div>
+
+        <div data-test-hook="render-choice-limit">
+          <label for="choices-render-choice-limit">Render choice limit</label>
+          <select class="form-control" name="choices-render-choice-limit" id="choices-render-choice-limit" placeholder="This is a placeholder" multiple>
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
             <option value="Dropdown item 3">Dropdown item 3</option>
@@ -77,13 +92,13 @@
     </div>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        new Choices('#choices-basic', {
+        new Choices('#choices-basic');
+
+        new Choices('#choices-remove-button', {
           removeItemButton: true,
         });
 
-        new Choices('#choices-disabled-choice', {
-          removeItemButton: true,
-        });
+        new Choices('#choices-disabled-choice');
 
         new Choices('#choices-selection-limit', {
           maxItemCount: 5,
@@ -92,6 +107,10 @@
         new Choices('#choices-prepend-append', {
           prependValue: 'before-',
           appendValue: '-after',
+        });
+
+        new Choices('#choices-render-choice-limit', {
+          renderChoiceLimit: 1
         });
       });
     </script>
