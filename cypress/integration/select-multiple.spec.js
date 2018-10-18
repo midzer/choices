@@ -197,7 +197,6 @@ describe('Choices - select multiple', () => {
           removeItemButton: true,
         };
       */
-
       beforeEach(() => {
         cy.get('[data-test-hook=remove-button]')
           .find('.choices__input--cloned')
@@ -259,7 +258,6 @@ describe('Choices - select multiple', () => {
           maxItemCount: 5,
         };
       */
-
       const selectionLimit = 5;
 
       beforeEach(() => {
@@ -347,7 +345,6 @@ describe('Choices - select multiple', () => {
           renderChoiceLimit: 1,
         };
       */
-
       it('only displays given number of choices in the dropdown', () => {
         cy.get('[data-test-hook=render-choice-limit]')
           .find('.choices__list--dropdown .choices__list')
@@ -398,6 +395,22 @@ describe('Choices - select multiple', () => {
                 expect($choice.text().trim()).to.contain(searchTerm);
               });
           });
+        });
+      });
+    });
+
+    describe('placeholder', () => {
+      /*
+        {
+          placeholder: true,
+          placeholderValue: 'I am a placeholder',
+        }
+      */
+      describe('when no value has been inputted', () => {
+        it('displays a placeholder', () => {
+          cy.get('[data-test-hook=placeholder]')
+            .find('.choices__input--cloned')
+            .should('have.attr', 'placeholder', 'I am a placeholder');
         });
       });
     });

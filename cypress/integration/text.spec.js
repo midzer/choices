@@ -283,5 +283,21 @@ describe('Choices - text element', () => {
           });
       });
     });
+
+    describe('placeholder', () => {
+      /*
+        {
+          placeholder: true,
+          placeholderValue: 'I am a placeholder',
+        }
+      */
+      describe('when no value has been inputted', () => {
+        it('displays a placeholder', () => {
+          cy.get('[data-test-hook=placeholder]')
+            .find('.choices__input--cloned')
+            .should('have.attr', 'placeholder', 'I am a placeholder');
+        });
+      });
+    });
   });
 });
