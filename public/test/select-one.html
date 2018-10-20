@@ -94,6 +94,11 @@
             <option value="Dropdown item 3">Dropdown item 3</option>
           </select>
         </div>
+
+        <div data-test-hook="remote-data">
+          <label for="choices-remote-data">Remote data</label>
+          <select class="form-control" name="choices-remote-data" id="choices-remote-data"></select>
+        </div>
       </div>
     </div>
     <script>
@@ -123,6 +128,20 @@
 
         new Choices('#choices-search-floor', {
           searchFloor: 10,
+        });
+
+        new Choices('#choices-remote-data', {
+          shouldSort: false,
+        }).ajax((callback) => {
+          fetch('/data')
+            .then((response) => {
+              response.json().then((data) => {
+                callback(data, 'value', 'label');
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         });
       });
     </script>

@@ -414,5 +414,48 @@ describe('Choices - select multiple', () => {
         });
       });
     });
+
+    describe('remote data', () => {
+      beforeEach(() => {
+        cy.reload(true);
+      });
+
+      describe('when loading data', () => {
+        it('shows a loading message as a placeholder', () => {
+          cy.get('[data-test-hook=remote-data]')
+            .find('.choices__input--cloned')
+            .should('have.attr', 'placeholder', 'Loading...');
+        });
+
+        describe('opening the dropdown', () => {
+          it('displays "no choices to choose" prompt', () => {
+            cy.get('[data-test-hook=remote-data]').click();
+            cy.get('[data-test-hook=remote-data]')
+              .find('.choices__list--dropdown')
+              .should('be.visible')
+              .should($dropdown => {
+                const dropdownText = $dropdown.text().trim();
+                expect(dropdownText).to.equal('No choices to choose from');
+              });
+          });
+        });
+      });
+
+      describe('when data has loaded', () => {
+        describe('opening the dropdown', () => {
+          it('displays the loaded data', () => {
+            cy.wait(2000);
+            cy.get('[data-test-hook=remote-data]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .should('have.length', 50)
+              .each(($choice, index) => {
+                expect($choice.text().trim()).to.equal(`Label ${index + 1}`);
+                expect($choice.data('value')).to.equal(`Value ${index + 1}`);
+              });
+          });
+        });
+      });
+    });
   });
 });
