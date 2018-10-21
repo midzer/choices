@@ -189,6 +189,58 @@ describe('Choices - select multiple', () => {
           });
         });
       });
+
+      describe('scrolling choices', () => {
+        const choicesCount = 4;
+
+        it('highlights first choice on dropdown open', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list .is-highlighted')
+            .should($choice => {
+              expect($choice.text().trim()).to.equal('Dropdown item 1');
+            });
+        });
+
+        it('scrolls to next choice on down arrow', () => {
+          for (let index = 0; index < choicesCount; index++) {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown .choices__list .is-highlighted')
+              .should($choice => {
+                expect($choice.text().trim()).to.equal(
+                  `Dropdown item ${index + 1}`,
+                );
+              });
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .type('{downarrow}');
+          }
+        });
+
+        it('scrolls up to previous choice on up arrow', () => {
+          // scroll to last choice
+          for (let index = 0; index < choicesCount; index++) {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .type('{downarrow}');
+          }
+
+          // scroll up to first choice
+          for (let index = choicesCount; index > 0; index--) {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown .choices__list .is-highlighted')
+              .should($choice => {
+                expect($choice.text().trim()).to.equal(
+                  `Dropdown item ${index}`,
+                );
+              });
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .type('{uparrow}');
+          }
+        });
+      });
     });
 
     describe('remove button', () => {
