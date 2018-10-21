@@ -59,6 +59,15 @@
           </select>
         </div>
 
+        <div data-test-hook="add-items-disabled">
+          <label for="choices-add-items-disabled">Add items disabled</label>
+          <select class="form-control" name="choices-add-items-disabled" id="choices-add-items-disabled">
+            <option value="Dropdown item 1" selected>Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Dropdown item 3">Dropdown item 3</option>
+          </select>
+        </div>
+
         <div data-test-hook="prepend-append">
           <label for="choices-prepend-append">Prepend/append</label>
           <select class="form-control" name="choices-prepend-append" id="choices-prepend-append">
@@ -111,6 +120,10 @@
 
         new Choices('#choices-disabled-choice', {
           removeItemButton: true,
+        });
+
+        new Choices('#choices-add-items-disabled', {
+          addItems: false,
         });
 
         new Choices('#choices-prepend-append', {

@@ -252,6 +252,54 @@ describe('Choices - select one', () => {
       });
     });
 
+    describe('adding items disabled', () => {
+      /*
+        {
+          addItems: false,
+        }
+      */
+      beforeEach(() => {
+        cy.get('[data-test-hook=add-items-disabled]')
+          .find('.choices')
+          .click();
+      });
+
+      it('disables the search input', () => {
+        cy.get('[data-test-hook=add-items-disabled]')
+          .find('.choices__input--cloned')
+          .should('be.disabled');
+      });
+
+      describe('on click', () => {
+        it('opens choice dropdown', () => {
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--dropdown')
+            .should('be.visible');
+        });
+      });
+
+      describe('attempting to select choice', () => {
+        let selectedChoice;
+
+        it('does not select choice', () => {
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--dropdown .choices__item')
+            .last()
+            .then($lastChoice => {
+              selectedChoice = $lastChoice;
+            })
+            .click();
+
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--single .choices__item')
+            .last()
+            .should($item => {
+              expect($item.text()).to.not.contain(selectedChoice.text());
+            });
+        });
+      });
+    });
+
     describe('prepend/append', () => {
       /*
         {

@@ -304,11 +304,59 @@ describe('Choices - select multiple', () => {
       });
     });
 
+    describe('adding items disabled', () => {
+      /*
+        {
+          addItems: false,
+        }
+      */
+      beforeEach(() => {
+        cy.get('[data-test-hook=add-items-disabled]')
+          .find('.choices')
+          .click();
+      });
+
+      it('disables the search input', () => {
+        cy.get('[data-test-hook=add-items-disabled]')
+          .find('.choices__input--cloned')
+          .should('be.disabled');
+      });
+
+      describe('on click', () => {
+        it('opens choice dropdown', () => {
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--dropdown')
+            .should('be.visible');
+        });
+      });
+
+      describe('attempting to select choice', () => {
+        let selectedChoice;
+
+        it('does not select choice', () => {
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--dropdown .choices__item')
+            .last()
+            .then($lastChoice => {
+              selectedChoice = $lastChoice;
+            })
+            .click();
+
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices__list--multiple .choices__item')
+            .last()
+            .should($item => {
+              expect($item.text()).to.not.contain(selectedChoice.text());
+            });
+        });
+      });
+    });
+
     describe('selection limit', () => {
       /*
         {
           maxItemCount: 5,
-        };
+        }
       */
       const selectionLimit = 5;
 
@@ -344,7 +392,7 @@ describe('Choices - select multiple', () => {
         {
           prependValue: 'before-',
           appendValue: '-after',
-        };
+        }
       */
       let selectedChoiceText;
 
@@ -361,10 +409,6 @@ describe('Choices - select multiple', () => {
             selectedChoiceText = $choice.text().trim();
           })
           .click();
-      });
-
-      it('works', () => {
-        expect(true).to.equal(true);
       });
 
       it('prepends and appends value to inputted value', () => {
@@ -395,7 +439,7 @@ describe('Choices - select multiple', () => {
       /*
         {
           renderChoiceLimit: 1,
-        };
+        }
       */
       it('only displays given number of choices in the dropdown', () => {
         cy.get('[data-test-hook=render-choice-limit]')
@@ -409,9 +453,8 @@ describe('Choices - select multiple', () => {
       /*
         {
           searchFloor: 10,
-        };
+        }
       */
-
       describe('on input', () => {
         describe('search floor not reached', () => {
           it('displays choices not filtered by inputted value', () => {

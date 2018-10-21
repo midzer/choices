@@ -59,6 +59,15 @@
           </select>
         </div>
 
+        <div data-test-hook="add-items-disabled">
+          <label for="choices-add-items-disabled">Add items disabled</label>
+          <select class="form-control" name="choices-add-items-disabled" id="choices-add-items-disabled" multiple>
+            <option value="Dropdown item 1" selected>Dropdown item 1</option>
+            <option value="Dropdown item 2">Dropdown item 2</option>
+            <option value="Dropdown item 3">Dropdown item 3</option>
+          </select>
+        </div>
+
         <div data-test-hook="selection-limit">
           <label for="choices-selection-limit">Input limit</label>
           <select class="form-control" name="choices-selection-limit" id="choices-selection-limit" multiple>
@@ -99,7 +108,7 @@
         </div>
 
         <div data-test-hook="placeholder">
-          <label for="choices-placeholder">Search floor</label>
+          <label for="choices-placeholder">Placeholder</label>
           <select class="form-control" name="choices-placeholder" id="choices-placeholder" multiple>
             <option value="Dropdown item 1">Dropdown item 1</option>
             <option value="Dropdown item 2">Dropdown item 2</option>
@@ -122,6 +131,10 @@
         });
 
         new Choices('#choices-disabled-choice');
+
+        new Choices('#choices-add-items-disabled', {
+          addItems: false,
+        });
 
         new Choices('#choices-selection-limit', {
           maxItemCount: 5,
