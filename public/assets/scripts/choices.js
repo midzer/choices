@@ -1,4 +1,4 @@
-/*! choices.js v4.0.0 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.1 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -2161,7 +2161,6 @@ var Choices = function () {
     this._prevState = {};
     this._currentValue = '';
     this._canSearch = this.config.searchEnabled;
-    this._isDisabled = this.config.addItems;
     this._isScrollingOnIe = false;
     this._highlightPosition = 0;
     this._wasTap = true;
@@ -2259,11 +2258,9 @@ var Choices = function () {
   }, {
     key: 'enable',
     value: function enable() {
-      if (!this._isDisabled) {
-        return this;
+      if (this.passedElement.isDisabled) {
+        this.passedElement.enable();
       }
-
-      this.passedElement.enable();
 
       if (this.containerOuter.isDisabled) {
         this._addEventListeners();
@@ -2271,26 +2268,20 @@ var Choices = function () {
         this.containerOuter.enable();
       }
 
-      this._isDisabled = false;
-
       return this;
     }
   }, {
     key: 'disable',
     value: function disable() {
-      if (this._isDisabled) {
-        return this;
+      if (!this.passedElement.isDisabled) {
+        this.passedElement.disable();
       }
-
-      this.passedElement.disable();
 
       if (!this.containerOuter.isDisabled) {
         this._removeEventListeners();
         this.input.disable();
         this.containerOuter.disable();
       }
-
-      this._isDisabled = true;
 
       return this;
     }
