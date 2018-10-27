@@ -28,7 +28,16 @@ With [Yarn](https://yarnpkg.com/):
 yarn add choices.js
 ```
 
-From a [CDN](https://www.jsdelivr.com/package/npm/choices.js)
+From a [CDN](https://www.jsdelivr.com/package/npm/choices.js):
+
+```html
+<!-- Include base CSS (optional) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@3/assets/styles/css/base.min.css">
+<!-- Include Choices CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@3/assets/styles/css/choices.min.css">
+<!-- Include Choices JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js@3/assets/scripts/dist/choices.min.js"></script>
+```
 
 Or include Choices directly:
 
