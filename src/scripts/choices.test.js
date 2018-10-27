@@ -202,7 +202,8 @@ describe('choices', () => {
 
       describe('when already enabled', () => {
         beforeEach(() => {
-          instance._isDisabled = false;
+          instance.passedElement.isDisabled = false;
+          instance.containerOuter.isDisabled = false;
           output = instance.enable();
         });
 
@@ -217,37 +218,22 @@ describe('choices', () => {
       });
 
       describe('when not already enabled', () => {
-        describe('containerOuter enabled', () => {
-          beforeEach(() => {
-            instance._isDisabled = true;
-            output = instance.enable();
-          });
-
-          returnsInstance(output);
-
-          it('enables passedElement', () => {
-            expect(passedElementEnableSpy.called).to.equal(true);
-          });
+        beforeEach(() => {
+          instance.passedElement.isDisabled = true;
+          instance.containerOuter.isDisabled = true;
+          instance.enable();
         });
 
-        describe('containerOuter disabled', () => {
-          beforeEach(() => {
-            instance._isDisabled = true;
-            instance.containerOuter.isDisabled = true;
-            instance.enable();
-          });
+        it('adds event listeners', () => {
+          expect(addEventListenersSpy.called).to.equal(true);
+        });
 
-          it('adds event listeners', () => {
-            expect(addEventListenersSpy.called).to.equal(true);
-          });
+        it('enables input', () => {
+          expect(inputEnableSpy.called).to.equal(true);
+        });
 
-          it('enables input', () => {
-            expect(inputEnableSpy.called).to.equal(true);
-          });
-
-          it('enables containerOuter', () => {
-            expect(containerOuterEnableSpy.called).to.equal(true);
-          });
+        it('enables containerOuter', () => {
+          expect(containerOuterEnableSpy.called).to.equal(true);
         });
       });
     });
@@ -274,7 +260,8 @@ describe('choices', () => {
 
       describe('when already disabled', () => {
         beforeEach(() => {
-          instance._isDisabled = true;
+          instance.passedElement.isDisabled = true;
+          instance.containerOuter.isDisabled = true;
           output = instance.disable();
         });
 
@@ -289,38 +276,22 @@ describe('choices', () => {
       });
 
       describe('when not already disabled', () => {
-        describe('containerOuter disabled', () => {
-          beforeEach(() => {
-            instance._isDisabled = false;
-            instance.containerOuter.isDisabled = true;
-            output = instance.disable();
-          });
-
-          returnsInstance(output);
-
-          it('disables passedElement', () => {
-            expect(passedElementDisableSpy.called).to.equal(true);
-          });
+        beforeEach(() => {
+          instance.passedElement.isDisabled = false;
+          instance.containerOuter.isDisabled = false;
+          output = instance.disable();
         });
 
-        describe('containerOuter enabled', () => {
-          beforeEach(() => {
-            instance._isDisabled = false;
-            instance.containerOuter.isDisabled = false;
-            instance.disable();
-          });
+        it('removes event listeners', () => {
+          expect(removeEventListenersSpy.called).to.equal(true);
+        });
 
-          it('removes event listeners', () => {
-            expect(removeEventListenersSpy.called).to.equal(true);
-          });
+        it('disables input', () => {
+          expect(inputDisableSpy.called).to.equal(true);
+        });
 
-          it('disables input', () => {
-            expect(inputDisableSpy.called).to.equal(true);
-          });
-
-          it('enables containerOuter', () => {
-            expect(containerOuterDisableSpy.called).to.equal(true);
-          });
+        it('enables containerOuter', () => {
+          expect(containerOuterDisableSpy.called).to.equal(true);
         });
       });
     });

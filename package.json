@@ -12,7 +12,7 @@
     "cypress:run": "$(npm bin)/cypress run",
     "cypress:open": "$(npm bin)/cypress open",
     "test:unit": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\" --exit",
-    "test:unit:watch": "npm run test -- --watch --inspect=5556",
+    "test:unit:watch": "npm run test:unit -- --watch --inspect=5556",
     "test:e2e": "run-p --race start cypress:run",
     "test": "run-p test:unit test:e2e",
     "js:watch": "NODE_ENV=development node server.js",
