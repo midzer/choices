@@ -941,5 +941,8 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 ## License
 MIT License
 
+## Web component
+Want to use Choices as a web component? You're in luck. Adidas have built one for their design system which can be found [here](https://github.com/adidas/choicesjs-stencil).
+
 ## Misc
 Thanks to [@mikefrancis](https://github.com/mikefrancis/) for [sending me on a hunt](https://twitter.com/_mikefrancis/status/701797835826667520) for a non-jQuery solution for select boxes that eventually led to this being built!
