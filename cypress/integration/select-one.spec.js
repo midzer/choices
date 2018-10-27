@@ -576,7 +576,7 @@ describe('Choices - select one', () => {
       });
     });
 
-    describe('dependencies', () => {
+    describe('parent/child', () => {
       describe('selecting "Parent choice 2"', () => {
         it('enables the child Choices instance', () => {
           cy.get('[data-test-hook=dependencies]')
