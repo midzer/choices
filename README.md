@@ -51,9 +51,12 @@ Or include Choices directly:
 ```
 ## Setup
 
+If you pass a selector which targets multiple elements, an array of Choices instances
+will be returned. If you target one element, that instance will be returned.
+
 ```js
   // Pass multiple elements:
-  const choices = new Choices(elements);
+  const [firstInstance, secondInstance] = new Choices(elements);
 
   // Pass single element:
   const choices = new Choices(element);

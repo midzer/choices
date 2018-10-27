@@ -55,10 +55,12 @@ describe('Choices - text element', () => {
 
     describe('editing items', () => {
       beforeEach(() => {
-        cy.get('[data-test-hook=edit-items]')
-          .find('.choices__input--cloned')
-          .type(textInput)
-          .type('{enter}');
+        for (let index = 0; index < 3; index++) {
+          cy.get('[data-test-hook=edit-items]')
+            .find('.choices__input--cloned')
+            .type(textInput)
+            .type('{enter}');
+        }
       });
 
       describe('on back space', () => {
@@ -75,6 +77,36 @@ describe('Choices - text element', () => {
             .should($choice => {
               expect($choice.data('value')).to.equal(`${textInput}-edited`);
             });
+        });
+      });
+
+      describe('on cmd+a', () => {
+        beforeEach(() => {
+          cy.get('[data-test-hook=edit-items]')
+            .find('.choices__input--cloned')
+            .type('{cmd}a');
+        });
+
+        it('highlights all items', () => {
+          cy.get('[data-test-hook=edit-items]')
+            .find('.choices__list--multiple .choices__item')
+            .each($choice => {
+              expect($choice.hasClass('is-highlighted')).to.equal(true);
+            });
+        });
+
+        describe('on backspace', () => {
+          it('clears all inputted values', () => {
+            // two backspaces are needed as Cypress has an issue where
+            // it will also insert an 'a' character into the text input
+            cy.get('[data-test-hook=edit-items]')
+              .find('.choices__input--cloned')
+              .type('{backspace}{backspace}');
+
+            cy.get('[data-test-hook=edit-items]')
+              .find('.choices__list--multiple .choices__item')
+              .should('have.length', 0);
+          });
         });
       });
     });
