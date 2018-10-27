@@ -579,23 +579,23 @@ describe('Choices - select one', () => {
     describe('parent/child', () => {
       describe('selecting "Parent choice 2"', () => {
         it('enables the child Choices instance', () => {
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(1)
             .should('have.class', 'is-disabled');
 
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(0)
             .click();
 
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices__list--dropdown .choices__list')
             .children()
             .eq(1)
             .click();
 
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(1)
             .should('not.have.class', 'is-disabled');
@@ -605,7 +605,7 @@ describe('Choices - select one', () => {
       describe('changing selection from "Parent choice 2" to something else', () => {
         it('disables the child Choices instance', () => {
           // open parent instance and select second choice
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(0)
             .click()
@@ -614,13 +614,13 @@ describe('Choices - select one', () => {
             .eq(1)
             .click();
 
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(1)
             .should('not.have.class', 'is-disabled');
 
           // open parent instance and select third choice
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(0)
             .click()
@@ -629,7 +629,7 @@ describe('Choices - select one', () => {
             .eq(2)
             .click();
 
-          cy.get('[data-test-hook=dependencies]')
+          cy.get('[data-test-hook=parent-child]')
             .find('.choices')
             .eq(1)
             .should('have.class', 'is-disabled');
