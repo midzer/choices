@@ -3,7 +3,7 @@ describe('Choices - text element', () => {
     cy.visit('/text.html');
   });
 
-  describe('configs', () => {
+  describe('scenarios', () => {
     const textInput = 'testing';
 
     describe('basic', () => {
