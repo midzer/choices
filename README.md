@@ -932,8 +932,10 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 | `npm run start`      | Fire up local server for development                         |
 | `npm run test:unit`  | Run sequence of tests once                                   |
 | `npm run test:unit:watch` | Fire up test server and re-test on file change          |
-| `npm run test:e2e`    | Run sequence of e2e tests                                   |
-| `npm run test`    | Run both unit and e2e tests                                 |
+| `npm run test:e2e`    | Run sequence of e2e tests (with local server)               |
+| `npm run test`    | Run both unit and e2e tests                                     |
+| `npm run cypress:open`    | Run Cypress e2e tests (GUI)                        |
+| `npm run cypress:run`    | Run Cypress e2e tests (CLI)                                  |
 | `npm run js:build`   | Compile Choices to an uglified JavaScript file               |
 | `npm run css:watch`  | Watch SCSS files for changes. On a change, run build process |
 | `npm run css:build`  | Compile, minify and prefix SCSS files to CSS                 |

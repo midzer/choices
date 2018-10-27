@@ -512,5 +512,72 @@ describe('Choices - select one', () => {
         }
       });
     });
+
+    describe('choice groups', () => {
+      const choicesInGroup = 3;
+      let groupValue;
+
+      beforeEach(() => {
+        cy.get('[data-test-hook=groups]')
+          .find('.choices__list--dropdown .choices__list .choices__group')
+          .first()
+          .then($group => {
+            groupValue = $group.text().trim();
+          });
+      });
+
+      describe('selecting all choices in group', () => {
+        it('removes group from dropdown', () => {
+          for (let index = 0; index < choicesInGroup; index++) {
+            cy.get('[data-test-hook=groups]')
+              .find('.choices__input--cloned')
+              .focus();
+
+            cy.get('[data-test-hook=groups]')
+              .find('.choices__list--dropdown .choices__list .choices__item')
+              .first()
+              .click();
+          }
+
+          cy.get('[data-test-hook=groups]')
+            .find('.choices__list--dropdown .choices__list .choices__group')
+            .first()
+            .should($group => {
+              expect($group.text().trim()).to.not.equal(groupValue);
+            });
+        });
+      });
+
+      describe('deselecting all choices in group', () => {
+        beforeEach(() => {
+          for (let index = 0; index < choicesInGroup; index++) {
+            cy.get('[data-test-hook=groups]')
+              .find('.choices__input--cloned')
+              .focus();
+
+            cy.get('[data-test-hook=groups]')
+              .find('.choices__list--dropdown .choices__list .choices__item')
+              .first()
+              .click();
+          }
+        });
+
+        it('shows group in dropdown', () => {
+          for (let index = 0; index < choicesInGroup; index++) {
+            cy.get('[data-test-hook=groups]')
+              .find('.choices__input--cloned')
+              .focus()
+              .type('{backspace}');
+          }
+
+          cy.get('[data-test-hook=groups]')
+            .find('.choices__list--dropdown .choices__list .choices__group')
+            .first()
+            .should($group => {
+              expect($group.text().trim()).to.equal(groupValue);
+            });
+        });
+      });
+    });
   });
 });
