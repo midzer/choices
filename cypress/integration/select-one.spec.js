@@ -14,7 +14,7 @@ describe('Choices - select one', () => {
 
       describe('selecting choice', () => {
         describe('focusing on text input', () => {
-          const selectedChoiceText = 'Dropdown item 1';
+          const selectedChoiceText = 'Choice 1';
 
           it('displays a dropdown of choices', () => {
             cy.get('[data-test-hook=basic]')
@@ -26,9 +26,7 @@ describe('Choices - select one', () => {
               .children()
               .should('have.length', 4)
               .each(($choice, index) => {
-                expect($choice.text().trim()).to.equal(
-                  `Dropdown item ${index + 1}`,
-                );
+                expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
               });
           });
 
@@ -92,7 +90,7 @@ describe('Choices - select one', () => {
                 .children()
                 .first()
                 .should($choice => {
-                  expect($choice.text().trim()).to.equal('Dropdown item 2');
+                  expect($choice.text().trim()).to.equal('Choice 2');
                 });
             });
           });
@@ -108,7 +106,7 @@ describe('Choices - select one', () => {
                 .children()
                 .first()
                 .should($choice => {
-                  expect($choice.text().trim()).to.equal('Dropdown item 3');
+                  expect($choice.text().trim()).to.equal('Choice 3');
                 });
             });
           });
@@ -319,7 +317,7 @@ describe('Choices - select one', () => {
           searchEnabled: false
         }
       */
-      const selectedChoiceText = 'Dropdown item 3';
+      const selectedChoiceText = 'Choice 3';
 
       beforeEach(() => {
         cy.get('[data-test-hook=search-disabled]')
@@ -383,7 +381,7 @@ describe('Choices - select one', () => {
 
         describe('search floor reached', () => {
           it('displays choices filtered by inputted value', () => {
-            const searchTerm = 'Dropdown item 2';
+            const searchTerm = 'Choice 2';
 
             cy.get('[data-test-hook=search-floor]')
               .find('.choices__input--cloned')
@@ -468,7 +466,7 @@ describe('Choices - select one', () => {
         cy.get('[data-test-hook=scrolling-dropdown]')
           .find('.choices__list--dropdown .choices__list .is-highlighted')
           .should($choice => {
-            expect($choice.text().trim()).to.equal('Dropdown item 1');
+            expect($choice.text().trim()).to.equal('Choice 1');
           });
       });
 
@@ -477,9 +475,7 @@ describe('Choices - select one', () => {
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
-              expect($choice.text().trim()).to.equal(
-                `Dropdown item ${index + 1}`,
-              );
+              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
@@ -503,7 +499,7 @@ describe('Choices - select one', () => {
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
-              expect($choice.text().trim()).to.equal(`Dropdown item ${index}`);
+              expect($choice.text().trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
@@ -576,6 +572,67 @@ describe('Choices - select one', () => {
             .should($group => {
               expect($group.text().trim()).to.equal(groupValue);
             });
+        });
+      });
+    });
+
+    describe('dependencies', () => {
+      describe('selecting "Parent choice 2"', () => {
+        it('enables the child Choices instance', () => {
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(1)
+            .should('have.class', 'is-disabled');
+
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(0)
+            .click();
+
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .eq(1)
+            .click();
+
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(1)
+            .should('not.have.class', 'is-disabled');
+        });
+      });
+
+      describe('changing selection from "Parent choice 2" to something else', () => {
+        it('disables the child Choices instance', () => {
+          // open parent instance and select second choice
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(0)
+            .click()
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .eq(1)
+            .click();
+
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(1)
+            .should('not.have.class', 'is-disabled');
+
+          // open parent instance and select third choice
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(0)
+            .click()
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .eq(2)
+            .click();
+
+          cy.get('[data-test-hook=dependencies]')
+            .find('.choices')
+            .eq(1)
+            .should('have.class', 'is-disabled');
         });
       });
     });

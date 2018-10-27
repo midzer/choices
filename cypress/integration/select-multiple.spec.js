@@ -13,7 +13,7 @@ describe('Choices - select multiple', () => {
 
       describe('selecting choices', () => {
         describe('focusing on text input', () => {
-          const selectedChoiceText = 'Dropdown item 1';
+          const selectedChoiceText = 'Choice 1';
 
           it('displays a dropdown of choices', () => {
             cy.get('[data-test-hook=basic]')
@@ -26,7 +26,7 @@ describe('Choices - select multiple', () => {
               .should('have.length', 4)
               .each(($choice, index) => {
                 expect($choice.text().trim()).to.equal(
-                  `Dropdown item ${index + 1}`,
+                  `Choice ${index + 1}`,
                 );
               });
           });
@@ -151,7 +151,7 @@ describe('Choices - select multiple', () => {
                 .children()
                 .first()
                 .should($choice => {
-                  expect($choice.text().trim()).to.equal('Dropdown item 2');
+                  expect($choice.text().trim()).to.equal('Choice 2');
                 });
             });
           });
@@ -167,7 +167,7 @@ describe('Choices - select multiple', () => {
                 .children()
                 .first()
                 .should($choice => {
-                  expect($choice.text().trim()).to.equal('Dropdown item 3');
+                  expect($choice.text().trim()).to.equal('Choice 3');
                 });
             });
           });
@@ -424,7 +424,7 @@ describe('Choices - select multiple', () => {
 
         describe('search floor reached', () => {
           it('displays choices filtered by inputted value', () => {
-            const searchTerm = 'Dropdown item 2';
+            const searchTerm = 'Choice 2';
 
             cy.get('[data-test-hook=search-floor]')
               .find('.choices__input--cloned')
@@ -520,7 +520,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=scrolling-dropdown]')
           .find('.choices__list--dropdown .choices__list .is-highlighted')
           .should($choice => {
-            expect($choice.text().trim()).to.equal('Dropdown item 1');
+            expect($choice.text().trim()).to.equal('Choice 1');
           });
       });
 
@@ -530,7 +530,7 @@ describe('Choices - select multiple', () => {
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
               expect($choice.text().trim()).to.equal(
-                `Dropdown item ${index + 1}`,
+                `Choice ${index + 1}`,
               );
             });
 
@@ -555,7 +555,7 @@ describe('Choices - select multiple', () => {
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
-              expect($choice.text().trim()).to.equal(`Dropdown item ${index}`);
+              expect($choice.text().trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
