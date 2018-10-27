@@ -129,6 +129,22 @@
             <option value="Dropdown item 15">Dropdown item 15</option>
           </select>
         </div>
+
+        <div data-test-hook="groups">
+          <label for="choices-groups">Choice groups</label>
+          <select class="form-control" name="choices-groups" id="choices-groups" multiple>
+            <optgroup label="UK">
+              <option value="London">London</option>
+              <option value="Manchester">Manchester</option>
+              <option value="Liverpool">Liverpool</option>
+            </optgroup>
+            <optgroup label="FR">
+              <option value="Paris">Paris</option>
+              <option value="Lyon">Lyon</option>
+              <option value="Marseille">Marseille</option>
+            </optgroup>
+          </select>
+        </div>
       </div>
     </div>
     <script>
@@ -181,6 +197,8 @@
         new Choices('#choices-scrolling-dropdown', {
           shouldSort: false,
         });
+
+        new Choices('#choices-groups');
       });
     </script>
   </body>
