@@ -1,4 +1,4 @@
-# Choices.js ![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master) [![CDNJS](https://img.shields.io/cdnjs/v/choices.js.svg)](https://cdnjs.com/libraries/choices.js) [![npm](https://img.shields.io/npm/v/choices.js.svg)](https://www.npmjs.com/package/choices.js) [![codebeat badge](https://codebeat.co/badges/07c7b2d9-d5aa-4772-9fbb-a153e62d0f81)](https://codebeat.co/projects/github-com-jshjohnson-choices-develop)
+# Choices.js ![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master) [![CDNJS](https://img.shields.io/cdnjs/v/choices.js.svg)](https://cdnjs.com/libraries/choices.js) [![npm](https://img.shields.io/npm/v/choices.js.svg)](https://www.npmjs.com/package/choices.js) [![codebeat badge](https://codebeat.co/badges/55120150-5866-42d8-8010-6aaaff5d3fa1)](https://codebeat.co/projects/github-com-jshjohnson-choices-master)
 A vanilla, lightweight (~20kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
