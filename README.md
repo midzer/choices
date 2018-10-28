@@ -109,7 +109,7 @@ will be returned. If you target one element, that instance will be returned.
       return `Press Enter to add <b>"${value}"</b>`;
     },
     maxItemText: (maxItemCount) => {
-      return `Only ${maxItemCount} values can be added.`;
+      return `Only ${maxItemCount} values can be added`;
     },
     itemComparer: (choice, item) => {
       return choice === item;
@@ -467,7 +467,7 @@ const example = new Choices(element, {
 **Usage:** The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example), otherwise pass a string.
 
 ### maxItemText
-**Type:** `String/Function` **Default:** `Only ${maxItemCount} values can be added.`
+**Type:** `String/Function` **Default:** `Only ${maxItemCount} values can be added`
 
 **Input types affected:** `text`
 
