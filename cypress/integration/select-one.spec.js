@@ -12,68 +12,68 @@ describe('Choices - select one', () => {
           .click();
       });
 
-      describe('selecting choice', () => {
-        describe('focusing on text input', () => {
-          const selectedChoiceText = 'Choice 1';
+      describe('focusing on text input', () => {
+        it('displays a dropdown of choices', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown')
+            .should('be.visible');
 
-          it('displays a dropdown of choices', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .should('have.length', 4)
+            .each(($choice, index) => {
+              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
+            });
+        });
+
+        describe('pressing escape', () => {
+          beforeEach(() => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .type('{esc}');
+          });
+
+          it('closes the dropdown', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown')
-              .should('be.visible');
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .should('have.length', 4)
-              .each(($choice, index) => {
-                expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
-              });
+              .should('not.be.visible');
           });
+        });
+      });
 
-          it('allows me select choices from a dropdown', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .first()
-              .click();
+      describe('selecting choices', () => {
+        const selectedChoiceText = 'Choice 1';
 
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--single .choices__item')
-              .last()
-              .should($item => {
-                expect($item).to.contain(selectedChoiceText);
-              });
-          });
+        it('allows me select choices from a dropdown', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .click();
 
-          it('does not remove selected choice from dropdown list', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .first()
-              .click();
-
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .first()
-              .should($item => {
-                expect($item).to.contain(selectedChoiceText);
-              });
-          });
-
-          describe('pressing escape', () => {
-            beforeEach(() => {
-              cy.get('[data-test-hook=basic]')
-                .find('.choices__input--cloned')
-                .type('{esc}');
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--single .choices__item')
+            .last()
+            .should($item => {
+              expect($item).to.contain(selectedChoiceText);
             });
+        });
 
-            it('closes the dropdown', () => {
-              cy.get('[data-test-hook=basic]')
-                .find('.choices__list--dropdown')
-                .should('not.be.visible');
+        it('does not remove selected choice from dropdown list', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .click();
+
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .should($item => {
+              expect($item).to.contain(selectedChoiceText);
             });
-          });
         });
       });
 
@@ -150,18 +150,40 @@ describe('Choices - select one', () => {
 
       describe('remove button', () => {
         describe('on click', () => {
-          it('removes selected choice', () => {
+          let removedChoiceText;
+
+          beforeEach(() => {
+            cy.get('[data-test-hook=remove-button]')
+              .find('.choices__list--single .choices__item')
+              .last()
+              .then($choice => {
+                removedChoiceText = $choice.text().trim();
+              })
+              .click();
+
             cy.get('[data-test-hook=remove-button]')
               .find('.choices__list--single .choices__item')
               .last()
               .find('.choices__button')
               .focus()
               .click();
+          });
 
+          it('removes selected choice', () => {
             cy.get('[data-test-hook=remove-button]')
               .find('.choices__list--single')
               .children()
               .should('have.length', 0);
+          });
+
+          it('updates the value of the original input', () => {
+            cy.get('[data-test-hook=remove-button]')
+              .find('.choices__input.is-hidden')
+              .should($select => {
+                const val = $select.val() || [];
+
+                expect(val).to.not.contain(removedChoiceText);
+              });
           });
         });
       });

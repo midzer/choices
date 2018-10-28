@@ -11,33 +11,64 @@ describe('Choices - select multiple', () => {
           .focus();
       });
 
-      describe('selecting choices', () => {
-        describe('focusing on text input', () => {
-          const selectedChoiceText = 'Choice 1';
+      describe('focusing on text input', () => {
+        it('displays a dropdown of choices', () => {
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown')
+            .should('be.visible');
 
-          it('displays a dropdown of choices', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown')
-              .should('be.visible');
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .should('have.length', 4)
+            .each(($choice, index) => {
+              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
+            });
+        });
 
+        describe('pressing escape', () => {
+          beforeEach(() => {
             cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .should('have.length', 4)
-              .each(($choice, index) => {
-                expect($choice.text().trim()).to.equal(
-                  `Choice ${index + 1}`,
-                );
-              });
+              .find('.choices__input--cloned')
+              .type('{esc}');
           });
 
-          it('allows me select choices from a dropdown', () => {
+          it('closes the dropdown', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown')
+              .should('not.be.visible');
+          });
+
+          describe('typing more into the input', () => {
+            it('re-opens the dropdown', () => {
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__input--cloned')
+                .type('test');
+
+              cy.get('[data-test-hook=basic]')
+                .find('.choices__list--dropdown')
+                .should('be.visible');
+            });
+          });
+        });
+      });
+
+      describe('selecting choices', () => {
+        describe('selecting a single choice', () => {
+          let selectedChoiceText;
+
+          beforeEach(() => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown .choices__list')
               .children()
               .first()
+              .then($choice => {
+                selectedChoiceText = $choice.text().trim();
+              })
               .click();
+          });
 
+          it('allows me select choices from a dropdown', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--multiple .choices__item')
               .last()
@@ -46,39 +77,15 @@ describe('Choices - select multiple', () => {
               });
           });
 
-          describe('selecting all available choices', () => {
-            beforeEach(() => {
-              for (let index = 0; index <= 4; index++) {
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__input--cloned')
-                  .focus();
-
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__list--dropdown .choices__list')
-                  .children()
-                  .first()
-                  .click();
-              }
-            });
-
-            it('displays "no choices to choose" prompt', () => {
-              cy.get('[data-test-hook=basic]')
-                .find('.choices__list--dropdown')
-                .should('be.visible')
-                .should($dropdown => {
-                  const dropdownText = $dropdown.text().trim();
-                  expect(dropdownText).to.equal('No choices to choose from');
-                });
-            });
+          it('updates the value of the original input', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input.is-hidden')
+              .should($select => {
+                expect($select.val()).to.contain(selectedChoiceText);
+              });
           });
 
           it('removes selected choice from dropdown list', () => {
-            cy.get('[data-test-hook=basic]')
-              .find('.choices__list--dropdown .choices__list')
-              .children()
-              .first()
-              .click();
-
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown .choices__list')
               .children()
@@ -86,54 +93,68 @@ describe('Choices - select multiple', () => {
                 expect($choice.text().trim()).to.not.equal(selectedChoiceText);
               });
           });
+        });
 
-          describe('pressing escape', () => {
-            beforeEach(() => {
+        describe('selecting all available choices', () => {
+          beforeEach(() => {
+            for (let index = 0; index <= 4; index++) {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__input--cloned')
-                .type('{esc}');
-            });
+                .focus();
 
-            it('closes the dropdown', () => {
               cy.get('[data-test-hook=basic]')
-                .find('.choices__list--dropdown')
-                .should('not.be.visible');
-            });
+                .find('.choices__list--dropdown .choices__list')
+                .children()
+                .first()
+                .click();
+            }
+          });
 
-            describe('typing more into the input', () => {
-              it('re-opens the dropdown', () => {
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__input--cloned')
-                  .type('test');
-
-                cy.get('[data-test-hook=basic]')
-                  .find('.choices__list--dropdown')
-                  .should('be.visible');
+          it('displays "no choices to choose" prompt', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown')
+              .should('be.visible')
+              .should($dropdown => {
+                const dropdownText = $dropdown.text().trim();
+                expect(dropdownText).to.equal('No choices to choose from');
               });
-            });
           });
         });
       });
 
       describe('removing choices', () => {
+        let removedChoiceText;
+
         beforeEach(() => {
           cy.get('[data-test-hook=basic]')
             .find('.choices__list--dropdown .choices__list')
             .children()
             .last()
+            .then($choice => {
+              removedChoiceText = $choice.text().trim();
+            })
             .click();
+
+          cy.get('[data-test-hook=basic]')
+            .find('.choices__input--cloned')
+            .type('{backspace}');
         });
 
         describe('on backspace', () => {
           it('removes last choice', () => {
             cy.get('[data-test-hook=basic]')
-              .find('.choices__input--cloned')
-              .type('{backspace}');
-
-            cy.get('[data-test-hook=basic]')
               .find('.choices__list--multiple')
               .children()
               .should('have.length', 0);
+          });
+
+          it('updates the value of the original input', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input.is-hidden')
+              .should($select => {
+                const val = $select.val() || [];
+                expect(val).to.not.contain(removedChoiceText);
+              });
           });
         });
       });
@@ -529,9 +550,7 @@ describe('Choices - select multiple', () => {
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
-              expect($choice.text().trim()).to.equal(
-                `Choice ${index + 1}`,
-              );
+              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')

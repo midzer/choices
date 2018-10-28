@@ -223,7 +223,7 @@ export const TEMPLATES = {
   },
   option(data) {
     return strToEl(`
-      <option value="${data.value}" ${data.selected ? 'selected' : ''} ${
+      <option value="${data.value}" ${data.active ? 'selected' : ''} ${
       data.disabled ? 'disabled' : ''
     }>${data.label}</option>
     `);
