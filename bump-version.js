@@ -1,10 +1,8 @@
-// Example usage: npm --newVersion=3.0.2 run version
-
 const fs = require('fs');
 const path = require('path');
 
 const config = {
-  files: ['package.json', 'public/index.html', 'version.js'],
+  files: ['public/index.html'],
 };
 
 /**
@@ -37,21 +35,20 @@ const argvToObject = () => {
  */
 const updateVersion = ({ files }) => {
   const args = argvToObject();
-  const currentVersion = args.current;
-  const newVersion = args.new || currentVersion;
+  const version = args.current;
 
-  console.log(`Updating version from ${currentVersion} to ${newVersion}`);
+  console.log(`Updating version to ${version}`);
 
   files.forEach(file => {
     const filePath = path.join(__dirname, file);
-    const regex = new RegExp(currentVersion, 'g');
+    const regex = new RegExp(/\?version=(.*?)\"/, 'g');
 
     let contents = fs.readFileSync(filePath, 'utf-8');
-    contents = contents.replace(regex, newVersion);
+    contents = contents.replace(regex, `?version=${version}"`);
     fs.writeFileSync(filePath, contents);
   });
 
-  console.log(`Updated version to ${newVersion}`);
+  console.log(`Updated version to ${version}`);
 };
 
 updateVersion(config);

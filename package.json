@@ -11,7 +11,7 @@
     "coverage": "nyc npm run test:unit",
     "cypress:run": "$(npm bin)/cypress run",
     "cypress:open": "$(npm bin)/cypress open",
-    "test:unit": "mocha --require ./config/test.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\" --exit",
+    "test:unit": "mocha --require ./config/jsdom.js --compilers js:babel-core/register \"./src/**/**/**/**/*.test.js\" --exit",
     "test:unit:watch": "npm run test:unit -- --watch --inspect=5556",
     "test:e2e": "run-p --race start cypress:run",
     "test": "run-p test:unit test:e2e",
@@ -24,7 +24,7 @@
     "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/base.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/choices.scss public/assets/styles/choices.css",
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' public/assets/styles/*.css -d public/assets/styles",
     "css:min": "csso public/assets/styles/base.css public/assets/styles/base.min.css && csso public/assets/styles/choices.css public/assets/styles/choices.min.css",
-    "version": "node version.js --current $npm_package_version",
+    "bump-version": "node bump-version.js --current $npm_package_version",
     "gh-pages": "git subtree push --prefix public origin gh-pages",
     "postversion": "npm run js:build",
     "prepush": "run-p lint test:unit"
