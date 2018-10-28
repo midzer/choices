@@ -38,7 +38,7 @@ From a [CDN](https://www.jsdelivr.com/package/npm/choices.js):
 <!-- Include Choices CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@4/public/assets/styles/css/choices.min.css">
 <!-- Include Choices JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/choices.js@4/public/assets/scripts/dist/choices.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js@4/public/assets/scripts/choices.min.js"></script>
 ```
 
 Or include Choices directly:
