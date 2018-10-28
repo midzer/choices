@@ -97,8 +97,8 @@
     {
       "basePath": "src",
       "files": [
-        "public/scripts/*",
-        "public/styles/*",
+        "public/assets/scripts/*",
+        "public/assets/styles/*",
         "src/icons/*"
       ]
     }
