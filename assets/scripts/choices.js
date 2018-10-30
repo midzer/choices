@@ -1,4 +1,4 @@
-/*! choices.js v4.0.2 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.3 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
