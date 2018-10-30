@@ -240,10 +240,10 @@ describe('Choices - select one', () => {
       });
 
       describe('on click', () => {
-        it('opens choice dropdown', () => {
+        it('does not open choice dropdown', () => {
           cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices__list--dropdown')
-            .should('be.visible');
+            .should('not.be.visible');
         });
       });
 

@@ -1406,7 +1406,7 @@ class Choices {
 
   _onClick({ target }) {
     if (this.containerOuter.element.contains(target)) {
-      if (!this.dropdown.isActive) {
+      if (!this.dropdown.isActive && !this.containerOuter.isDisabled) {
         if (this._isTextElement) {
           if (document.activeElement !== this.input.element) {
             this.input.focus();
