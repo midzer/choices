@@ -237,9 +237,11 @@ describe('Choices - select one', () => {
         it('does not open choice dropdown', () => {
           cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices')
-            .click()
+            .click();
+
+          cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices__list--dropdown')
-            .should('not.be.visible');
+            .should('not.have.class', 'is-active');
         });
       });
     });
@@ -255,9 +257,11 @@ describe('Choices - select one', () => {
         it('does not open choice dropdown', () => {
           cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices')
-            .click()
+            .click();
+
+          cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices__list--dropdown')
-            .should('not.be.visible');
+            .should('not.have.class', 'is-active');
         });
       });
     });

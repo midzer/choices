@@ -291,7 +291,7 @@ describe('Choices - select multiple', () => {
             .find('.choices')
             .click()
             .find('.choices__list--dropdown')
-            .should('not.be.visible');
+            .should('not.have.class', 'is-active');
         });
       });
     });
@@ -309,7 +309,7 @@ describe('Choices - select multiple', () => {
             .find('.choices')
             .click()
             .find('.choices__list--dropdown')
-            .should('not.be.visible');
+            .should('not.have.class', 'is-active');
         });
       });
     });
