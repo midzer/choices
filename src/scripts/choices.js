@@ -1229,7 +1229,6 @@ class Choices {
     }
 
     if (hasActiveDropdown) {
-      event.preventDefault();
       const highlighted = this.dropdown.getChild(
         `.${this.config.classNames.highlightedState}`,
       );
@@ -1242,6 +1241,8 @@ class Choices {
         }
         this._handleChoiceAction(activeItems, highlighted);
       }
+
+      event.preventDefault();
     } else if (this._isSelectOneElement) {
       // Open single select dropdown if it's not active
       this.showDropdown();
