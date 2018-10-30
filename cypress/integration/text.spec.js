@@ -217,6 +217,7 @@ describe('Choices - text element', () => {
       });
 
       it('hides dropdown prompt once limit has been reached', () => {
+        cy.wait(500); // allow for animation frame
         cy.get('[data-test-hook=input-limit]')
           .find('.choices__list--dropdown')
           .should('not.be.visible');
