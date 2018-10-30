@@ -289,9 +289,7 @@ describe('Choices - select multiple', () => {
         it('does not open choice dropdown', () => {
           cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices')
-            .click();
-
-          cy.get('[data-test-hook=add-items-disabled]')
+            .click()
             .find('.choices__list--dropdown')
             .should('not.be.visible');
         });
@@ -309,9 +307,7 @@ describe('Choices - select multiple', () => {
         it('does not opens choice dropdown', () => {
           cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices')
-            .click();
-
-          cy.get('[data-test-hook=disabled-via-attr]')
+            .click()
             .find('.choices__list--dropdown')
             .should('not.be.visible');
         });
