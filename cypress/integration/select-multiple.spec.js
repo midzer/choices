@@ -293,6 +293,7 @@ describe('Choices - select multiple', () => {
 
       describe('on click', () => {
         it('does not open choice dropdown', () => {
+          cy.wait(500); // allow for animation frame
           cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices__list--dropdown')
             .should('not.be.visible');
