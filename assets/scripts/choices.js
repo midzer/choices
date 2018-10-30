@@ -1,4 +1,4 @@
-/*! choices.js v4.0.5 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.6 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -2219,12 +2219,19 @@ var Choices = function () {
       this._createTemplates();
       this._createElements();
       this._createStructure();
+
       // Set initial state (We need to clone the state because some reducers
       // modify the inner objects properties in the state) 🤢
       this._initialState = (0, _utils.cloneObject)(this._store.state);
       this._store.subscribe(this._render);
       this._render();
       this._addEventListeners();
+
+      var shouldDisable = !this.config.addItems || this.passedElement.element.hasAttribute('disabled');
+
+      if (shouldDisable) {
+        this.disable();
+      }
 
       this.initialised = true;
 
@@ -3970,10 +3977,6 @@ var Choices = function () {
       } else if (this._placeholderValue) {
         this.input.placeholder = this._placeholderValue;
         this.input.setWidth(true);
-      }
-
-      if (!this.config.addItems || this.passedElement.element.hasAttribute('disabled')) {
-        this.disable();
       }
 
       this.containerOuter.element.appendChild(this.containerInner.element);
