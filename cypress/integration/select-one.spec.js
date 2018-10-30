@@ -246,27 +246,6 @@ describe('Choices - select one', () => {
             .should('not.be.visible');
         });
       });
-
-      describe('attempting to select choice', () => {
-        let selectedChoice;
-
-        it('does not select choice', () => {
-          cy.get('[data-test-hook=add-items-disabled]')
-            .find('.choices__list--dropdown .choices__item')
-            .last()
-            .then($lastChoice => {
-              selectedChoice = $lastChoice;
-            })
-            .click();
-
-          cy.get('[data-test-hook=add-items-disabled]')
-            .find('.choices__list--single .choices__item')
-            .last()
-            .should($item => {
-              expect($item.text()).to.not.contain(selectedChoice.text());
-            });
-        });
-      });
     });
 
     describe('disabled via attribute', () => {
@@ -287,27 +266,6 @@ describe('Choices - select one', () => {
           cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices__list--dropdown')
             .should('be.visible');
-        });
-      });
-
-      describe('attempting to select choice', () => {
-        let selectedChoice;
-
-        it('does not select choice', () => {
-          cy.get('[data-test-hook=disabled-via-attr]')
-            .find('.choices__list--dropdown .choices__item')
-            .last()
-            .then($lastChoice => {
-              selectedChoice = $lastChoice;
-            })
-            .click();
-
-          cy.get('[data-test-hook=disabled-via-attr]')
-            .find('.choices__list--single .choices__item')
-            .last()
-            .should($item => {
-              expect($item.text()).to.not.contain(selectedChoice.text());
-            });
         });
       });
     });
