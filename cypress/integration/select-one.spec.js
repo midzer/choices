@@ -227,12 +227,6 @@ describe('Choices - select one', () => {
           addItems: false,
         }
       */
-      beforeEach(() => {
-        cy.get('[data-test-hook=add-items-disabled]')
-          .find('.choices')
-          .click();
-      });
-
       it('disables the search input', () => {
         cy.get('[data-test-hook=add-items-disabled]')
           .find('.choices__input--cloned')
@@ -241,7 +235,10 @@ describe('Choices - select one', () => {
 
       describe('on click', () => {
         it('does not open choice dropdown', () => {
-          cy.wait(500); // allow for animation frame
+          cy.get('[data-test-hook=add-items-disabled]')
+            .find('.choices')
+            .click();
+
           cy.get('[data-test-hook=add-items-disabled]')
             .find('.choices__list--dropdown')
             .should('not.be.visible');
@@ -250,12 +247,6 @@ describe('Choices - select one', () => {
     });
 
     describe('disabled via attribute', () => {
-      beforeEach(() => {
-        cy.get('[data-test-hook=disabled-via-attr]')
-          .find('.choices')
-          .click();
-      });
-
       it('disables the search input', () => {
         cy.get('[data-test-hook=disabled-via-attr]')
           .find('.choices__input--cloned')
@@ -264,7 +255,10 @@ describe('Choices - select one', () => {
 
       describe('on click', () => {
         it('does not open choice dropdown', () => {
-          cy.wait(500); // allow for animation frame
+          cy.get('[data-test-hook=disabled-via-attr]')
+            .find('.choices')
+            .click();
+
           cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices__list--dropdown')
             .should('not.be.visible');
