@@ -284,9 +284,17 @@ describe('Choices - text element', () => {
       });
     });
 
-    describe('disabled', () => {
+    describe('adding items disabled', () => {
       it('does not allow me to input data', () => {
-        cy.get('[data-test-hook=disabled]')
+        cy.get('[data-test-hook=adding-items-disabled]')
+          .find('.choices__input--cloned')
+          .should('be.disabled');
+      });
+    });
+
+    describe('disabled via attribute', () => {
+      it('does not allow me to input data', () => {
+        cy.get('[data-test-hook=disabled-via-attr]')
           .find('.choices__input--cloned')
           .should('be.disabled');
       });

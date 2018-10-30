@@ -68,6 +68,15 @@
           </select>
         </div>
 
+        <div data-test-hook="disabled-via-attr">
+          <label for="choices-disabled-via-attr">Disabled via attribute</label>
+          <select class="form-control" name="choices-disabled-via-attr" id="choices-disabled-via-attr" disabled>
+            <option value="Choice 1" selected>Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
+
         <div data-test-hook="prepend-append">
           <label for="choices-prepend-append">Prepend/append</label>
           <select class="form-control" name="choices-prepend-append" id="choices-prepend-append">
@@ -178,6 +187,8 @@
         new Choices('#choices-add-items-disabled', {
           addItems: false,
         });
+
+        new Choices('#choices-disabled-via-attr');
 
         new Choices('#choices-prepend-append', {
           prependValue: 'before-',

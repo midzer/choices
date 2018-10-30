@@ -1830,7 +1830,10 @@ class Choices {
       this.input.setWidth(true);
     }
 
-    if (!this.config.addItems) {
+    if (
+      !this.config.addItems ||
+      this.passedElement.element.hasAttribute('disabled')
+    ) {
       this.disable();
     }
 

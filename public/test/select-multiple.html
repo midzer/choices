@@ -68,6 +68,15 @@
           </select>
         </div>
 
+        <div data-test-hook="disabled-via-attr">
+          <label for="choices-disabled-via-attr">Disabled via attribute</label>
+          <select class="form-control" name="choices-disabled-via-attr" id="choices-disabled-via-attr" multiple disabled>
+            <option value="Choice 1" selected>Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
+
         <div data-test-hook="selection-limit">
           <label for="choices-selection-limit">Input limit</label>
           <select class="form-control" name="choices-selection-limit" id="choices-selection-limit" multiple>
@@ -172,6 +181,8 @@
         new Choices('#choices-add-items-disabled', {
           addItems: false,
         });
+
+        new Choices('#choices-disabled-via-attr');
 
         new Choices('#choices-selection-limit', {
           maxItemCount: 5,
