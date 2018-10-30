@@ -1,4 +1,4 @@
-/*! choices.js v4.0.3 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.4 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3347,7 +3347,6 @@ var Choices = function () {
       }
 
       if (hasActiveDropdown) {
-        event.preventDefault();
         var highlighted = this.dropdown.getChild('.' + this.config.classNames.highlightedState);
 
         // If we have a highlighted choice
@@ -3358,6 +3357,8 @@ var Choices = function () {
           }
           this._handleChoiceAction(activeItems, highlighted);
         }
+
+        event.preventDefault();
       } else if (this._isSelectOneElement) {
         // Open single select dropdown if it's not active
         this.showDropdown();
