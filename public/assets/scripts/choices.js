@@ -1,4 +1,4 @@
-/*! choices.js v4.0.4 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.0.5 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3521,7 +3521,7 @@ var Choices = function () {
       var target = _ref9.target;
 
       if (this.containerOuter.element.contains(target)) {
-        if (!this.dropdown.isActive) {
+        if (!this.dropdown.isActive && !this.containerOuter.isDisabled) {
           if (this._isTextElement) {
             if (document.activeElement !== this.input.element) {
               this.input.focus();
@@ -3972,7 +3972,7 @@ var Choices = function () {
         this.input.setWidth(true);
       }
 
-      if (!this.config.addItems) {
+      if (!this.config.addItems || this.passedElement.element.hasAttribute('disabled')) {
         this.disable();
       }
 
