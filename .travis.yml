@@ -8,5 +8,5 @@ install:
   - npm install
 script:
   - npm run test:unit
-  - npm run test:e2e
   - npm run coverage
+  - npm run test:e2e

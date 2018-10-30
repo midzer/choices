@@ -178,12 +178,21 @@ class Choices {
     this._createTemplates();
     this._createElements();
     this._createStructure();
+
     // Set initial state (We need to clone the state because some reducers
     // modify the inner objects properties in the state) 🤢
     this._initialState = cloneObject(this._store.state);
     this._store.subscribe(this._render);
     this._render();
     this._addEventListeners();
+
+    const shouldDisable =
+      !this.config.addItems ||
+      this.passedElement.element.hasAttribute('disabled');
+
+    if (shouldDisable) {
+      this.disable();
+    }
 
     this.initialised = true;
 
@@ -1828,13 +1837,6 @@ class Choices {
     } else if (this._placeholderValue) {
       this.input.placeholder = this._placeholderValue;
       this.input.setWidth(true);
-    }
-
-    if (
-      !this.config.addItems ||
-      this.passedElement.element.hasAttribute('disabled')
-    ) {
-      this.disable();
     }
 
     this.containerOuter.element.appendChild(this.containerInner.element);
