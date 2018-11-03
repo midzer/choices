@@ -170,6 +170,11 @@
             <option value="Child choice 3">Child choice 3</option>
           </select>
         </div>
+
+        <div data-test-hook="custom-properties">
+          <label for="choices-custom-properties">Custom properties</label>
+          <select class="form-control" name="choices-custom-properties" id="choices-custom-properties"></select>
+        </div>
       </div>
     </div>
     <script>
@@ -236,6 +241,36 @@
           } else {
             child.disable();
           }
+        });
+
+        new Choices('#choices-custom-properties', {
+          searchFields: ['label', 'value', 'customProperties.country'],
+          choices: [
+            {
+              id: 1,
+              value: 'London',
+              label: 'London',
+              customProperties: {
+                country: 'United Kingdom',
+              },
+            },
+            {
+              id: 2,
+              value: 'Berlin',
+              label: 'Berlin',
+              customProperties: {
+                country: 'Germany',
+              },
+            },
+            {
+              id: 3,
+              value: 'Lisbon',
+              label: 'Lisbon',
+              customProperties: {
+                country: 'Portugal',
+              },
+            }
+          ]
         });
       });
     </script>
