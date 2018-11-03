@@ -40,7 +40,7 @@ if (process.env.NODE_ENV !== 'production') {
 
     setTimeout(() => {
       res.status(200).send(fakeData);
-    }, 2000);
+    }, 1000);
   });
 }
 

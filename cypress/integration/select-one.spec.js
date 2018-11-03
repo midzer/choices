@@ -128,6 +128,42 @@ describe('Choices - select one', () => {
           });
         });
       });
+
+      describe('interacting with dropdown', () => {
+        describe('opening dropdown', () => {
+          it('opens dropdown', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('button.open-dropdown')
+              .focus()
+              .click();
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown')
+              .should('be.visible');
+          });
+        });
+
+        describe('closing dropdown', () => {
+          beforeEach(() => {
+            // ensure dropdown is already open
+            cy.get('[data-test-hook=basic]')
+              .find('button.open-dropdown')
+              .focus()
+              .click();
+          });
+
+          it('closes dropdown', () => {
+            cy.get('[data-test-hook=basic]')
+              .find('button.close-dropdown')
+              .focus()
+              .click();
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__list--dropdown')
+              .should('not.be.visible');
+          });
+        });
+      });
     });
 
     describe('remove button', () => {
@@ -452,7 +488,7 @@ describe('Choices - select one', () => {
       describe('when data has loaded', () => {
         describe('opening the dropdown', () => {
           it('displays the loaded data', () => {
-            cy.wait(2000);
+            cy.wait(1000);
             cy.get('[data-test-hook=remote-data]')
               .find('.choices__list--dropdown .choices__list')
               .children()
