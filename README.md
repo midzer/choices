@@ -530,23 +530,22 @@ classNames: {
 
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various data attributes defined [here](https://github.com/jshjohnson/Choices/blob/67f29c286aa21d88847adfcd6304dc7d068dc01f/assets/scripts/src/choices.js#L1993-L2067).
+**Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various data attributes defined [here](https://github.com/jshjohnson/Choices/blob/master/src/scripts/templates.js).
 
 **Example:**
 
 ```js
 const example = new Choices(element, {
   callbackOnCreateTemplates: function (template) {
-    var classNames = this.config.classNames;
     return {
-      item: (data) => {
+      item: (classNames, data) => {
         return template(`
           <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
             <span>&bigstar;</span> ${data.label}
           </div>
         `);
       },
-      choice: (data) => {
+      choice: (classNames, data) => {
         return template(`
           <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
             <span>&bigstar;</span> ${data.label}
