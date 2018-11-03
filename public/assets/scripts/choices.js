@@ -1,4 +1,4 @@
-/*! choices.js v4.0.6 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.1.0 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3002,8 +3002,11 @@ var Choices = function () {
       var isLoading = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
       var placeholderItem = this.itemList.getChild('.' + this.config.classNames.placeholder);
+
       if (isLoading) {
+        this.disable();
         this.containerOuter.addLoadingState();
+
         if (this._isSelectOneElement) {
           if (!placeholderItem) {
             placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
@@ -3015,6 +3018,7 @@ var Choices = function () {
           this.input.placeholder = this.config.loadingText;
         }
       } else {
+        this.enable();
         this.containerOuter.removeLoadingState();
 
         if (this._isSelectOneElement) {
