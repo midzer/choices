@@ -166,6 +166,11 @@
             </optgroup>
           </select>
         </div>
+
+        <div data-test-hook="custom-properties">
+          <label for="choices-custom-properties">Custom properties</label>
+          <select class="form-control" name="choices-custom-properties" id="choices-custom-properties" multiple></select>
+        </div>
       </div>
     </div>
     <script>
@@ -225,6 +230,36 @@
         });
 
         new Choices('#choices-groups');
+
+        new Choices('#choices-custom-properties', {
+          searchFields: ['label', 'value', 'customProperties.country'],
+          choices: [
+            {
+              id: 1,
+              value: 'London',
+              label: 'London',
+              customProperties: {
+                country: 'United Kingdom',
+              },
+            },
+            {
+              id: 2,
+              value: 'Berlin',
+              label: 'Berlin',
+              customProperties: {
+                country: 'Germany',
+              },
+            },
+            {
+              id: 3,
+              value: 'Lisbon',
+              label: 'Lisbon',
+              customProperties: {
+                country: 'Portugal',
+              },
+            }
+          ]
+        });
       });
     </script>
   </body>

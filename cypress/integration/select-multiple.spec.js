@@ -643,5 +643,50 @@ describe('Choices - select multiple', () => {
         });
       });
     });
+
+    describe('custom properties', () => {
+      beforeEach(() => {
+        cy.get('[data-test-hook=custom-properties]')
+          .find('.choices__input--cloned')
+          .focus();
+      });
+
+      describe('on input', () => {
+        it('filters choices based on custom property', () => {
+          const data = [
+            {
+              country: 'Germany',
+              city: 'Berlin',
+            },
+            {
+              country: 'United Kingdom',
+              city: 'London',
+            },
+            {
+              country: 'Portugal',
+              city: 'Lisbon',
+            },
+          ];
+
+          data.forEach(({ country, city }) => {
+            cy.get('[data-test-hook=custom-properties]')
+              .find('.choices__input--cloned')
+              .type(country);
+
+            cy.get('[data-test-hook=custom-properties]')
+              .find('.choices__list--dropdown .choices__list')
+              .children()
+              .first()
+              .should($choice => {
+                expect($choice.text().trim()).to.equal(city);
+              });
+
+            cy.get('[data-test-hook=custom-properties]')
+              .find('.choices__input--cloned')
+              .type('{selectall}{del}');
+          });
+        });
+      });
+    });
   });
 });
