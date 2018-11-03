@@ -874,8 +874,11 @@ class Choices {
     let placeholderItem = this.itemList.getChild(
       `.${this.config.classNames.placeholder}`,
     );
+
     if (isLoading) {
+      this.disable();
       this.containerOuter.addLoadingState();
+
       if (this._isSelectOneElement) {
         if (!placeholderItem) {
           placeholderItem = this._getTemplate(
@@ -890,6 +893,7 @@ class Choices {
         this.input.placeholder = this.config.loadingText;
       }
     } else {
+      this.enable();
       this.containerOuter.removeLoadingState();
 
       if (this._isSelectOneElement) {

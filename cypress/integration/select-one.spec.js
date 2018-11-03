@@ -471,16 +471,13 @@ describe('Choices - select one', () => {
             });
         });
 
-        describe('opening the dropdown', () => {
-          it('displays "no choices to choose" prompt', () => {
-            cy.get('[data-test-hook=remote-data]').click();
+        describe('on click', () => {
+          it('does not opens choice dropdown', () => {
             cy.get('[data-test-hook=remote-data]')
+              .find('.choices')
+              .click()
               .find('.choices__list--dropdown')
-              .should('be.visible')
-              .should($dropdown => {
-                const dropdownText = $dropdown.text().trim();
-                expect(dropdownText).to.equal('No choices to choose from');
-              });
+              .should('not.have.class', 'is-active');
           });
         });
       });
