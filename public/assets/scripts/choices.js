@@ -1,4 +1,4 @@
-/*! choices.js v4.1.0 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.1.1 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3256,6 +3256,7 @@ var Choices = function () {
       // If keycode has a function, run it
       if (keyDownActions[keyCode]) {
         keyDownActions[keyCode]({
+          event: event,
           target: target,
           keyCode: keyCode,
           metaKey: metaKey,
@@ -3333,7 +3334,8 @@ var Choices = function () {
   }, {
     key: '_onEnterKey',
     value: function _onEnterKey(_ref4) {
-      var target = _ref4.target,
+      var event = _ref4.event,
+          target = _ref4.target,
           activeItems = _ref4.activeItems,
           hasActiveDropdown = _ref4.hasActiveDropdown;
       var enterKey = _constants.KEY_CODES.ENTER_KEY;
@@ -3389,7 +3391,8 @@ var Choices = function () {
   }, {
     key: '_onDirectionKey',
     value: function _onDirectionKey(_ref6) {
-      var hasActiveDropdown = _ref6.hasActiveDropdown,
+      var event = _ref6.event,
+          hasActiveDropdown = _ref6.hasActiveDropdown,
           keyCode = _ref6.keyCode,
           metaKey = _ref6.metaKey;
       var downKey = _constants.KEY_CODES.DOWN_KEY,
@@ -3439,7 +3442,8 @@ var Choices = function () {
   }, {
     key: '_onDeleteKey',
     value: function _onDeleteKey(_ref7) {
-      var target = _ref7.target,
+      var event = _ref7.event,
+          target = _ref7.target,
           hasFocusedInput = _ref7.hasFocusedInput,
           activeItems = _ref7.activeItems;
 
