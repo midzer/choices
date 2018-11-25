@@ -189,6 +189,15 @@
             </select>
           </form>
         </div>
+
+        <div data-test-hook="set-choice-by-value">
+          <label for="choices-set-choice-by-value">Dynamically set choice by value</label>
+          <select class="form-control" name="choices-set-choice-by-value" id="choices-set-choice-by-value">
+            <option value="Choice 1">Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
       </div>
     </div>
     <script>
@@ -308,6 +317,8 @@
         });
 
         new Choices('#choices-within-form');
+
+        new Choices('#choices-set-choice-by-value').setChoiceByValue('Choice 2');
       });
     </script>
   </body>
