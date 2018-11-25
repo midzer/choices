@@ -818,5 +818,40 @@ describe('Choices - select multiple', () => {
         });
       });
     });
+
+    describe('dynamically setting choice by value', () => {
+      const dynamicallySelectedChoiceValue = 'Choice 2';
+
+      it('selects choice', () => {
+        cy.get('[data-test-hook=set-choice-by-value]')
+          .find('.choices__list--multiple .choices__item')
+          .last()
+          .should($choice => {
+            expect($choice.text().trim()).to.equal(
+              dynamicallySelectedChoiceValue,
+            );
+          });
+      });
+
+      it('removes choice from dropdown list', () => {
+        cy.get('[data-test-hook=set-choice-by-value]')
+          .find('.choices__list--dropdown .choices__list')
+          .children()
+          .each($choice => {
+            expect($choice.text().trim()).to.not.equal(
+              dynamicallySelectedChoiceValue,
+            );
+          });
+      });
+
+      it('updates the value of the original input', () => {
+        cy.get('[data-test-hook=set-choice-by-value]')
+          .find('.choices__input.is-hidden')
+          .should($select => {
+            const val = $select.val() || [];
+            expect(val).to.contain(dynamicallySelectedChoiceValue);
+          });
+      });
+    });
   });
 });

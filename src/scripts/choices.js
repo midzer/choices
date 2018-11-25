@@ -1628,24 +1628,14 @@ class Choices {
     }
 
     // Trigger change event
-    if (group && group.value) {
-      this.passedElement.triggerEvent(EVENTS.addItem, {
-        id,
-        value: passedValue,
-        label: passedLabel,
-        customProperties: passedCustomProperties,
-        groupValue: group.value,
-        keyCode: passedKeyCode,
-      });
-    } else {
-      this.passedElement.triggerEvent(EVENTS.addItem, {
-        id,
-        value: passedValue,
-        label: passedLabel,
-        customProperties: passedCustomProperties,
-        keyCode: passedKeyCode,
-      });
-    }
+    this.passedElement.triggerEvent(EVENTS.addItem, {
+      id,
+      value: passedValue,
+      label: passedLabel,
+      customProperties: passedCustomProperties,
+      groupValue: group && group.value ? group.value : undefined,
+      keyCode: passedKeyCode,
+    });
 
     return this;
   }
@@ -2044,7 +2034,7 @@ class Choices {
       this._addItem({
         value: foundChoice.value,
         label: foundChoice.label,
-        id: foundChoice.id,
+        choiceId: foundChoice.id,
         groupId: foundChoice.groupId,
         customProperties: foundChoice.customProperties,
         placeholder: foundChoice.placeholder,
