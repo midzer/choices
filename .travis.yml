@@ -7,6 +7,6 @@ before_install:
 install:
   - npm install
 script:
-  - npm run test:unit
-  - npm run coverage
-  - npm run test:e2e
+  - npm run test
+after_script:
+  - npm run bundlesize
