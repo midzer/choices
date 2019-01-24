@@ -1,4 +1,4 @@
-/*! choices.js v4.1.3 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v4.1.4 | (c) 2019 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
    //CommonJS2
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -2110,7 +2110,12 @@ var Choices = function () {
       }
     }
 
-    this.config = _deepmerge2.default.all([_constants.DEFAULT_CONFIG, Choices.userDefaults, userConfig]);
+    this.config = _deepmerge2.default.all([_constants.DEFAULT_CONFIG, Choices.userDefaults, userConfig],
+    // When merging array configs, replace with a copy of the userConfig array,
+    // instead of concatenating with the default array
+    { arrayMerge: function arrayMerge(destinationArray, sourceArray) {
+        return [].concat(_toConsumableArray(sourceArray));
+      } });
 
     if (!(0, _utils.doKeysMatch)(this.config, _constants.DEFAULT_CONFIG)) {
       console.warn('Unknown config option(s) passed');
@@ -2145,7 +2150,7 @@ var Choices = function () {
       });
     }
 
-    if (!passedElement) {
+    if (!this.passedElement) {
       return console.error('Passed element was of an invalid type');
     }
 
