@@ -1,5 +1,5 @@
 # Choices.js ![Build Status](https://travis-ci.org/jshjohnson/Choices.svg?branch=master) [![](https://data.jsdelivr.com/v1/package/npm/choices.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/choices.js) [![npm](https://img.shields.io/npm/v/choices.js.svg)](https://www.npmjs.com/package/choices.js) [![codebeat badge](https://codebeat.co/badges/55120150-5866-42d8-8010-6aaaff5d3fa1)](https://codebeat.co/projects/github-com-jshjohnson-choices-master)
-A vanilla, lightweight (~25kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
+A vanilla, lightweight (~22kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://joshuajohnson.co.uk/Choices/)
 
@@ -919,6 +919,8 @@ Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES
 * Array.prototype.map
 * Array.prototype.find
 * Array.prototype.some
+* Array.prototype.includes
+* Array.from
 * Array.prototype.reduce
 * Array.prototype.indexOf
 * Object.assign
