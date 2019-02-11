@@ -987,6 +987,19 @@ class Choices {
           ? this.config.uniqueItemText(value)
           : this.config.uniqueItemText;
       }
+
+      if (
+        isType('Function', this.config.addItemFilter) &&
+        this.config.addItemFilter(value) &&
+        this._isTextElement &&
+        this.config.addItems &&
+        canAddItem
+      ) {
+        canAddItem = false;
+        notice = isType('Function', this.config.customAddItemText)
+          ? this.config.customAddItemText(value)
+          : this.config.customAddItemText;
+      }
     }
 
     return {
