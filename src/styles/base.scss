@@ -121,6 +121,14 @@ h6,
   font-size: $global-font-size-h6;
 }
 
+p {
+  margin-bottom: 8px;
+}
+
+label + p {
+  margin-top: -4px;
+}
+
 .container {
   display: block;
   margin: auto;
