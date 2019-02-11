@@ -1919,13 +1919,12 @@ class Choices {
           selected: o.selected,
           disabled: o.disabled || o.parentNode.disabled,
           placeholder: o.hasAttribute('placeholder'),
+          customProperties: o.getAttribute('data-custom-properties'),
         });
       });
 
       // If sorting is enabled or the user is searching, filter choices
-      if (this.config.shouldSort) {
-        allChoices.sort(filter);
-      }
+      if (this.config.shouldSort) allChoices.sort(filter);
 
       // Determine whether there is a selected choice
       const hasSelectedChoice = allChoices.some(choice => choice.selected);
