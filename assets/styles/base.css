@@ -113,6 +113,14 @@ h6,
   font-size: 14px;
 }
 
+p {
+  margin-bottom: 8px;
+}
+
+label + p {
+  margin-top: -4px;
+}
+
 .container {
   display: block;
   margin: auto;
