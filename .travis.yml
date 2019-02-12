@@ -1,12 +1,44 @@
 language: node_js
 node_js:
-  - "8"
-before_install:
-  - '[ "${TRAVIS_NODE_VERSION}" != "0.8" ] || npm install -g npm@1.4.28'
-  - npm install -g npm@latest
+  - 10
+cache:
+  directories:
+    - ~/.npm
+    - ~/.cache
 install:
-  - npm install
-script:
-  - npm run test
-after_script:
-  - npm run bundlesize
+  - npm ci
+jobs:
+  include:
+    - stage: Judging bundle size
+      script: npm run bundlesize
+
+    - stage: Linting code
+      script: npm run lint
+
+    - stage: Running tests
+      script: npm run test
+
+    - stage: Building for publish
+      if: branch = master
+      script: npm run build && npm run bump-cache
+
+    - stage: Publishing to NPM
+      if: branch = master
+      script: echo "Publishing to NPM..."
+      deploy:
+        provider: npm
+        email: $NPM_EMAIL_ADDRESS
+        api_key: $NPM_API_KEY
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - stage: Publishing to GitHub releases
+      if: branch = master
+      script: echo "Publishing to Github releases..."
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        skip_cleanup: true
+        on:
+          tags: true
