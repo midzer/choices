@@ -18,10 +18,6 @@ jobs:
     - stage: Running tests
       script: npm run test
 
-    - stage: Building for publish
-      if: branch = master
-      script: npm run build && npm run bump-cache
-
     - stage: Publishing to NPM
       if: branch = master
       script: echo "Publishing to NPM..."
