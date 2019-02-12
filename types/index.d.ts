@@ -30,6 +30,15 @@ declare namespace Choices {
     "addItem": CustomEvent;
 
     /**
+     * A filter that will need to pass for a user to successfully add an item.
+     *
+     * **Input types affected:** text
+     *
+     * @default null
+     */
+    addItemFilterFn?: () => any;
+
+    /**
      * Triggered each time an item is removed (programmatically or by the user).
      *
      * **Input types affected:** text, select-one, select-multiple
@@ -406,15 +415,6 @@ declare namespace Choices {
     resetScrollPosition?: boolean;
 
     /**
-     * A filter that will need to pass for a user to successfully add an item.
-     *
-     * **Input types affected:** text
-     *
-     * @default null
-     */
-    regexFilter?: RegExp;
-
-    /**
      * Whether choices and groups should be sorted. If false, choices/groups will appear in the order they were given.
      *
      * **Input types affected:** select-one, select-multiple
@@ -763,13 +763,6 @@ export default class Choices {
    * **Input types affected:** text, select-multiple
    */
   hideDropdown(blurInput?: boolean): this;
-
-  /**
-   * Toggle dropdown between showing/hidden.
-   *
-   * **Input types affected:** text, select-multiple
-   */
-  toggleDropdown(): this;
 
   /**
    * Get value(s) of input (i.e. inputted items (text) or selected choices (select)). Optionally pass an argument of `true` to only return values rather than value objects.
