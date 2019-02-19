@@ -17,24 +17,3 @@ jobs:
 
     - stage: Running tests
       script: npm run test
-
-    - stage: Publishing to NPM
-      if: branch = master
-      script: echo "Publishing to NPM..."
-      deploy:
-        provider: npm
-        email: $NPM_EMAIL_ADDRESS
-        api_key: $NPM_API_KEY
-        skip_cleanup: true
-        on:
-          tags: true
-
-    - stage: Publishing to GitHub releases
-      if: branch = master
-      script: echo "Publishing to Github releases..."
-      deploy:
-        provider: releases
-        api_key: $GITHUB_OAUTH_TOKEN
-        skip_cleanup: true
-        on:
-          tags: true
