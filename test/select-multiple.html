@@ -31,8 +31,6 @@
         <h2>Select multiple inputs</h2>
         <div data-test-hook="basic">
           <label for="choices-basic">Basic</label>
-          <button class="open-dropdown push-bottom">Open dropdown</button>
-          <button class="close-dropdown push-bottom">Close dropdown</button>
           <button class="disable push-bottom">Disable</button>
           <button class="enable push-bottom">Enable</button>
           <select class="form-control" name="choices-basic" id="choices-basic" multiple>
@@ -176,6 +174,11 @@
           <select class="form-control" name="choices-custom-properties" id="choices-custom-properties" multiple></select>
         </div>
 
+        <div data-test-hook="non-string-values">
+          <label for="choices-non-string-values">Non-string values</label>
+          <select class="form-control" name="choices-non-string-values" id="choices-non-string-values"></select>
+        </div>
+
         <div data-test-hook="within-form">
           <form>
             <label for="choices-within-form">Within form</label>
@@ -206,14 +209,6 @@
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const choicesBasic = new Choices('#choices-basic');
-
-        document.querySelector('button.open-dropdown').addEventListener('click', () => {
-          choicesBasic.showDropdown();
-        });
-
-        document.querySelector('button.close-dropdown').addEventListener('click', () => {
-          choicesBasic.hideDropdown();
-        });
 
         document.querySelector('button.disable').addEventListener('click', () => {
           choicesBasic.disable();
@@ -303,8 +298,35 @@
               customProperties: {
                 country: 'Portugal',
               },
-            }
-          ]
+            },
+          ],
+        });
+
+        new Choices('#choices-non-string-values', {
+          choices: [
+            {
+              id: 1,
+              label: 'Number',
+              value: 1,
+            },
+            {
+              id: 2,
+              label: 'Boolean',
+              value: true,
+            },
+            {
+              id: 3,
+              label: 'Object',
+              value: {
+                test: true,
+              },
+            },
+            {
+              id: 4,
+              label: 'Array',
+              value: ['test'],
+            },
+          ],
         });
 
         new Choices('#choices-within-form');
