@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./public/assets/scripts/choices.min.js",
   "types": "./types/index.d.ts",
@@ -99,7 +99,7 @@
     "classnames": "^2.2.6",
     "custom-event-polyfill": "^0.3.0",
     "deepmerge": "^2.2.1",
-    "fuse.js": "^3.4.2",
+    "fuse.js": "3.4.2",
     "redux": "^3.3.1"
   },
   "npmName": "choices.js",
