@@ -1,7 +1,6 @@
 import Fuse from 'fuse.js';
 import merge from 'deepmerge';
 
-import './lib/polyfills';
 import Store from './store/store';
 import {
   Dropdown,
