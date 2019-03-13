@@ -411,7 +411,7 @@ class Choices {
   }
 
   setChoices(choices = [], value = '', label = '', replaceChoices = false) {
-    if (!this._isSelectElement || !choices.length || !value) {
+    if (!this._isSelectElement || !value) {
       return this;
     }
 
