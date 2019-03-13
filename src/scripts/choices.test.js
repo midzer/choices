@@ -1339,14 +1339,14 @@ describe('choices', () => {
         addChoiceStub = stub();
         containerOuterRemoveLoadingStateStub = stub();
 
-        instance._clearChoices = clearChoicesStub;
+        instance.clearChoices = clearChoicesStub;
         instance._addGroup = addGroupStub;
         instance._addChoice = addChoiceStub;
         instance.containerOuter.removeLoadingState = containerOuterRemoveLoadingStateStub;
       });
 
       afterEach(() => {
-        instance._clearChoices.reset();
+        instance.clearChoices.reset();
         instance._addGroup.reset();
         instance._addChoice.reset();
         instance.containerOuter.removeLoadingState.reset();
