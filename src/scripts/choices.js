@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import Fuse from 'fuse.js';
 import merge from 'deepmerge';
 
