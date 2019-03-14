@@ -43,7 +43,7 @@ import {
  * Choices
  * @author Josh Johnson<josh@joshuajohnson.co.uk>
  */
-class Choices {
+export class Choices {
   constructor(element = '[data-choice]', userConfig = {}) {
     if (isType('String', element)) {
       const elements = Array.from(document.querySelectorAll(element));
@@ -2083,5 +2083,3 @@ class Choices {
 }
 
 Choices.userDefaults = {};
-// We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
-module.exports = Choices;
