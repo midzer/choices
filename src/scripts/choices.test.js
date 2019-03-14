@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { spy, stub } from 'sinon';
 
-import Choices from './choices';
+import { Choices } from './choices';
 import { EVENTS, ACTION_TYPES } from './constants';
 
 describe('choices', () => {
