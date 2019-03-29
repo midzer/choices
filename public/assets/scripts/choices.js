@@ -2114,13 +2114,13 @@ function () {
       var label = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-      if (!this._isSelectElement || !choices.length || !value) {
+      if (!this._isSelectElement || !value) {
         return this;
       } // Clear choices if needed
 
 
       if (replaceChoices) {
-        this._clearChoices();
+        this.clearChoices();
       }
 
       this.containerOuter.removeLoadingState();
@@ -2152,6 +2152,11 @@ function () {
       this._setLoading(false);
 
       return this;
+    }
+  }, {
+    key: "clearChoices",
+    value: function clearChoices() {
+      this._store.dispatch((0, _choices.clearChoices)());
     }
   }, {
     key: "clearStore",
@@ -3096,7 +3101,7 @@ function () {
       var target = event.target,
           shiftKey = event.shiftKey; // If we have our mouse down on the scrollbar and are on IE11...
 
-      if (target === this.choiceList && (0, _utils.isIE11)()) {
+      if (this.choiceList.element.contains(target) && (0, _utils.isIE11)()) {
         this._isScrollingOnIe = true;
       }
 
@@ -3450,11 +3455,6 @@ function () {
           keyCode: keyCode
         });
       }
-    }
-  }, {
-    key: "_clearChoices",
-    value: function _clearChoices() {
-      this._store.dispatch((0, _choices.clearChoices)());
     }
   }, {
     key: "_addGroup",
