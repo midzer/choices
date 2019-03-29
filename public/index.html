@@ -16,16 +16,16 @@
   <meta name="theme-color" content="#ffffff">
 
   <!-- Ignore these -->
-  <link rel="stylesheet" href="assets/styles/base.min.css?version=6.0.3">
+  <link rel="stylesheet" href="assets/styles/base.min.css?version=7.0.0">
   <!-- End ignore these -->
 
   <!-- Optional includes -->
-  <script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild,Object.assign"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es5%2Ces6%2CArray.prototype.includes%2Cfetch"></script>
   <!-- End optional includes -->
 
   <!-- Choices includes -->
-  <link rel="stylesheet" href="assets/styles/choices.min.css?version=6.0.3">
-  <script src="assets/scripts/choices.min.js?version=6.0.3"></script>
+  <link rel="stylesheet" href="assets/styles/choices.min.css?version=7.0.0">
+  <script src="assets/scripts/choices.min.js?version=7.0.0"></script>
   <!-- End Choices includes -->
 
   <!--[if lt IE 9]>
@@ -344,7 +344,7 @@
 
       var textEmailFilter = new Choices('#choices-text-email-filter', {
         editItems: true,
-        addItemFilterFn: (value) => {
+        addItemFilterFn: function (value) {
           if (!value) {
             return false;
           }
