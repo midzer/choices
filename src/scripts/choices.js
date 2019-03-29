@@ -411,13 +411,13 @@ class Choices {
   }
 
   setChoices(choices = [], value = '', label = '', replaceChoices = false) {
-    if (!this._isSelectElement || !choices.length || !value) {
+    if (!this._isSelectElement || !value) {
       return this;
     }
 
     // Clear choices if needed
     if (replaceChoices) {
-      this._clearChoices();
+      this.clearChoices();
     }
 
     this.containerOuter.removeLoadingState();
@@ -446,6 +446,10 @@ class Choices {
     this._setLoading(false);
 
     return this;
+  }
+
+  clearChoices() {
+    this._store.dispatch(clearChoices());
   }
 
   clearStore() {
@@ -1727,10 +1731,6 @@ class Choices {
         keyCode,
       });
     }
-  }
-
-  _clearChoices() {
-    this._store.dispatch(clearChoices());
   }
 
   _addGroup({ group, id, valueKey = 'value', labelKey = 'label' }) {

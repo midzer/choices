@@ -1339,14 +1339,14 @@ describe('choices', () => {
         addChoiceStub = stub();
         containerOuterRemoveLoadingStateStub = stub();
 
-        instance._clearChoices = clearChoicesStub;
+        instance.clearChoices = clearChoicesStub;
         instance._addGroup = addGroupStub;
         instance._addChoice = addChoiceStub;
         instance.containerOuter.removeLoadingState = containerOuterRemoveLoadingStateStub;
       });
 
       afterEach(() => {
-        instance._clearChoices.reset();
+        instance.clearChoices.reset();
         instance._addGroup.reset();
         instance._addChoice.reset();
         instance.containerOuter.removeLoadingState.reset();
@@ -1370,15 +1370,6 @@ describe('choices', () => {
       });
 
       describe('passing invalid arguments', () => {
-        describe('passing an empty array', () => {
-          beforeEach(() => {
-            instance._isSelectElement = true;
-            instance.setChoices([], value, label, false);
-          });
-
-          returnsEarly();
-        });
-
         describe('passing no value', () => {
           beforeEach(() => {
             instance._isSelectElement = true;
@@ -1426,6 +1417,22 @@ describe('choices', () => {
                 placeholder: choices[index].placeholder,
               });
             });
+          });
+        });
+
+        describe('passing an empty array with a true replaceChoices flag', () => {
+          it('choices are cleared', () => {
+            instance._isSelectElement = true;
+            instance.setChoices([], value, label, true);
+            expect(clearChoicesStub.called).to.equal(true);
+          });
+        });
+
+        describe('passing an empty array with a false replaceChoices flag', () => {
+          it('choices stay the same', () => {
+            instance._isSelectElement = true;
+            instance.setChoices([], value, label, false);
+            expect(clearChoicesStub.called).to.equal(false);
           });
         });
 
