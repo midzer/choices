@@ -920,7 +920,7 @@ Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES
 **Polyfill example used for the demo:**
 
 ```html
-<script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild"></script>
+<script src="https://cdn.polyfill.io/v2/polyfill.js?features=es5,fetch,Element.prototype.classList,requestAnimationFrame,Node.insertBefore,Node.firstChild,CustomEvent"></script>
 ```
 
 **Features used in Choices:**
@@ -936,6 +936,7 @@ Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES
 * Object.assign
 * Element.prototype.classList
 * window.requestAnimationFrame
+* CustomEvent
 
 ## Development
 To setup a local environment: clone this repo, navigate into it's directory in a terminal window and run the following command:
