@@ -281,7 +281,8 @@ var calcWidthOfInput = function calcWidthOfInput(input, callback) {
         testEl.style.fontStyle = inputStyle.fontStyle;
         testEl.style.letterSpacing = inputStyle.letterSpacing;
         testEl.style.textTransform = inputStyle.textTransform;
-        testEl.style.padding = inputStyle.padding;
+        testEl.style.paddingLeft = inputStyle.paddingLeft;
+        testEl.style.paddingRight = inputStyle.paddingRight;
       }
     }
 
@@ -550,7 +551,7 @@ if (typeof self !== 'undefined') {
 var result = Object(_ponyfill_js__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"])(root);
 /* harmony default export */ __webpack_exports__["a"] = (result);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(14)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(15)(module)))
 
 /***/ }),
 /* 3 */
@@ -702,7 +703,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.TEMPLATES = void 0;
 
-var _classnames = _interopRequireDefault(__webpack_require__(27));
+var _classnames = _interopRequireDefault(__webpack_require__(28));
 
 var _utils = __webpack_require__(0);
 
@@ -1643,23 +1644,25 @@ var _fuse = _interopRequireDefault(__webpack_require__(11));
 
 var _deepmerge = _interopRequireDefault(__webpack_require__(12));
 
-var _store = _interopRequireDefault(__webpack_require__(13));
+__webpack_require__(13);
 
-var _components = __webpack_require__(20);
+var _store = _interopRequireDefault(__webpack_require__(14));
+
+var _components = __webpack_require__(21);
 
 var _constants = __webpack_require__(1);
 
 var _templates = __webpack_require__(5);
 
-var _choices = __webpack_require__(28);
+var _choices = __webpack_require__(29);
 
-var _items = __webpack_require__(29);
+var _items = __webpack_require__(30);
 
-var _groups = __webpack_require__(30);
+var _groups = __webpack_require__(31);
 
-var _misc = __webpack_require__(31);
+var _misc = __webpack_require__(32);
 
-var _general = __webpack_require__(32);
+var _general = __webpack_require__(33);
 
 var _utils = __webpack_require__(0);
 
@@ -2774,13 +2777,13 @@ function () {
   }, {
     key: "_addEventListeners",
     value: function _addEventListeners() {
-      document.addEventListener('keyup', this._onKeyUp);
-      document.addEventListener('keydown', this._onKeyDown);
-      document.addEventListener('click', this._onClick);
-      document.addEventListener('touchmove', this._onTouchMove);
-      document.addEventListener('touchend', this._onTouchEnd);
-      document.addEventListener('mousedown', this._onMouseDown);
-      document.addEventListener('mouseover', this._onMouseOver);
+      window.delegateEvent.add('keyup', this._onKeyUp);
+      window.delegateEvent.add('keydown', this._onKeyDown);
+      window.delegateEvent.add('click', this._onClick);
+      window.delegateEvent.add('touchmove', this._onTouchMove);
+      window.delegateEvent.add('touchend', this._onTouchEnd);
+      window.delegateEvent.add('mousedown', this._onMouseDown);
+      window.delegateEvent.add('mouseover', this._onMouseOver);
 
       if (this._isSelectOneElement) {
         this.containerOuter.element.addEventListener('focus', this._onFocus);
@@ -2799,13 +2802,13 @@ function () {
   }, {
     key: "_removeEventListeners",
     value: function _removeEventListeners() {
-      document.removeEventListener('keyup', this._onKeyUp);
-      document.removeEventListener('keydown', this._onKeyDown);
-      document.removeEventListener('click', this._onClick);
-      document.removeEventListener('touchmove', this._onTouchMove);
-      document.removeEventListener('touchend', this._onTouchEnd);
-      document.removeEventListener('mousedown', this._onMouseDown);
-      document.removeEventListener('mouseover', this._onMouseOver);
+      window.delegateEvent.remove('keyup', this._onKeyUp);
+      window.delegateEvent.remove('keydown', this._onKeyDown);
+      window.delegateEvent.remove('click', this._onClick);
+      window.delegateEvent.remove('touchmove', this._onTouchMove);
+      window.delegateEvent.remove('touchend', this._onTouchEnd);
+      window.delegateEvent.remove('mousedown', this._onMouseDown);
+      window.delegateEvent.remove('mouseover', this._onMouseOver);
 
       if (this._isSelectOneElement) {
         this.containerOuter.element.removeEventListener('focus', this._onFocus);
@@ -3154,7 +3157,7 @@ function () {
           this.hideDropdown();
         }
       } else {
-        var hasHighlightedItems = this._store.highlightedActiveItems;
+        var hasHighlightedItems = this._store.highlightedActiveItems.length > 0;
 
         if (hasHighlightedItems) {
           this.unhighlightAll();
@@ -5007,6 +5010,61 @@ var deepmerge_1 = deepmerge;
 "use strict";
 
 
+window.delegateEvent = function delegateEvent() {
+  var events;
+  var addedListenerTypes;
+
+  if (typeof events === 'undefined') {
+    events = new Map();
+  }
+
+  if (typeof addedListenerTypes === 'undefined') {
+    addedListenerTypes = [];
+  }
+
+  function _callback(event) {
+    var type = events.get(event.type);
+    if (!type) return;
+    type.forEach(function (fn) {
+      return fn(event);
+    });
+  }
+
+  return {
+    add: function add(type, fn) {
+      // Cache list of events.
+      if (events.has(type)) {
+        events.get(type).push(fn);
+      } else {
+        events.set(type, [fn]);
+      } // Setup events.
+
+
+      if (addedListenerTypes.indexOf(type) === -1) {
+        document.documentElement.addEventListener(type, _callback, true);
+        addedListenerTypes.push(type);
+      }
+    },
+    remove: function remove(type, fn) {
+      if (!events.get(type)) return;
+      events.set(type, events.get(type).filter(function (item) {
+        return item !== fn;
+      }));
+
+      if (!events.get(type).length) {
+        addedListenerTypes.splice(addedListenerTypes.indexOf(type), 1);
+      }
+    }
+  };
+}();
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5014,7 +5072,7 @@ exports.default = void 0;
 
 var _redux = __webpack_require__(6);
 
-var _index = _interopRequireDefault(__webpack_require__(15));
+var _index = _interopRequireDefault(__webpack_require__(16));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5236,7 +5294,7 @@ function () {
 exports.default = Store;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = function(originalModule) {
@@ -5266,7 +5324,7 @@ module.exports = function(originalModule) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5279,13 +5337,13 @@ exports.default = void 0;
 
 var _redux = __webpack_require__(6);
 
-var _items = _interopRequireDefault(__webpack_require__(16));
+var _items = _interopRequireDefault(__webpack_require__(17));
 
-var _groups = _interopRequireDefault(__webpack_require__(17));
+var _groups = _interopRequireDefault(__webpack_require__(18));
 
-var _choices = _interopRequireDefault(__webpack_require__(18));
+var _choices = _interopRequireDefault(__webpack_require__(19));
 
-var _general = _interopRequireDefault(__webpack_require__(19));
+var _general = _interopRequireDefault(__webpack_require__(20));
 
 var _utils = __webpack_require__(0);
 
@@ -5317,7 +5375,7 @@ var _default = rootReducer;
 exports.default = _default;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5393,7 +5451,7 @@ function items() {
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5435,7 +5493,7 @@ function groups() {
 }
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5567,7 +5625,7 @@ function choices() {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5605,7 +5663,7 @@ var _default = general;
 exports.default = _default;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5651,22 +5709,22 @@ Object.defineProperty(exports, "WrappedSelect", {
   }
 });
 
-var _dropdown = _interopRequireDefault(__webpack_require__(21));
+var _dropdown = _interopRequireDefault(__webpack_require__(22));
 
-var _container = _interopRequireDefault(__webpack_require__(22));
+var _container = _interopRequireDefault(__webpack_require__(23));
 
-var _input = _interopRequireDefault(__webpack_require__(23));
+var _input = _interopRequireDefault(__webpack_require__(24));
 
-var _list = _interopRequireDefault(__webpack_require__(24));
+var _list = _interopRequireDefault(__webpack_require__(25));
 
-var _wrappedInput = _interopRequireDefault(__webpack_require__(25));
+var _wrappedInput = _interopRequireDefault(__webpack_require__(26));
 
-var _wrappedSelect = _interopRequireDefault(__webpack_require__(26));
+var _wrappedSelect = _interopRequireDefault(__webpack_require__(27));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5760,7 +5818,7 @@ function () {
 exports.default = Dropdown;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6009,7 +6067,7 @@ function () {
 exports.default = Container;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6216,7 +6274,7 @@ function () {
 exports.default = Input;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6343,7 +6401,7 @@ function () {
 exports.default = List;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6425,7 +6483,7 @@ function (_WrappedElement) {
 exports.default = WrappedInput;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6523,7 +6581,7 @@ function (_WrappedElement) {
 exports.default = WrappedSelect;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -6580,7 +6638,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6647,7 +6705,7 @@ var clearChoices = function clearChoices() {
 exports.clearChoices = clearChoices;
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6705,7 +6763,7 @@ var highlightItem = function highlightItem(id, highlighted) {
 exports.highlightItem = highlightItem;
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6732,7 +6790,7 @@ var addGroup = function addGroup(value, id, active, disabled) {
 exports.addGroup = addGroup;
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6761,7 +6819,7 @@ var resetTo = function resetTo(state) {
 exports.resetTo = resetTo;
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
