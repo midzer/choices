@@ -334,7 +334,7 @@ describe('Choices - select multiple', () => {
       });
 
       describe('on click', () => {
-        it('does not opens choice dropdown', () => {
+        it('does not open choice dropdown', () => {
           cy.get('[data-test-hook=disabled-via-attr]')
             .find('.choices')
             .click()
@@ -515,7 +515,7 @@ describe('Choices - select multiple', () => {
         });
 
         describe('on click', () => {
-          it('does not opens choice dropdown', () => {
+          it('does not open choice dropdown', () => {
             cy.get('[data-test-hook=remote-data]')
               .find('.choices')
               .click()
@@ -567,6 +567,8 @@ describe('Choices - select multiple', () => {
 
       it('scrolls to next choice on down arrow', () => {
         for (let index = 0; index < choicesCount; index++) {
+          cy.wait(100);
+
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
             .should($choice => {
