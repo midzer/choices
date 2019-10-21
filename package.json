@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "7.0.2",
+  "version": "7.0.4",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./public/assets/scripts/choices.min.js",
   "types": "./types/index.d.ts",
@@ -23,11 +23,10 @@
     "css:sass": "node-sass --output-style expanded --include-path  scss src/styles/base.scss public/assets/styles/base.css && node-sass --output-style expanded --include-path scss src/styles/choices.scss public/assets/styles/choices.css",
     "css:prefix": "postcss --use autoprefixer -b 'last 2 versions' public/assets/styles/*.css -d public/assets/styles",
     "css:min": "csso public/assets/styles/base.css public/assets/styles/base.min.css && csso public/assets/styles/choices.css public/assets/styles/choices.min.css",
-    "bump-cache": "node bump-cache.js --current $npm_package_version",
     "deploy": "git subtree push --prefix public origin gh-pages",
     "prepush": "run-p lint test:unit && npm run bundlesize",
     "preversion": "npm test",
-    "postversion": "npm run bump-cache && git commit --all --no-verify -m 'updated version to $npm_package_version' && git push --no-verify --atomic",
+    "postversion": "git push --no-verify --atomic",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -56,7 +55,7 @@
     "js"
   ],
   "devDependencies": {
-    "@babel/core": "^7.2.2",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/plugin-transform-modules-commonjs": "^7.2.0",
     "@babel/plugin-transform-spread": "^7.2.2",
