@@ -1,9 +1,9 @@
 import WrappedElement from './wrapped-element';
-import templates from './../templates';
 
 export default class WrappedSelect extends WrappedElement {
-  constructor({ element, classNames }) {
+  constructor({ element, classNames, template }) {
     super({ element, classNames });
+    this.template = template;
   }
 
   get placeholderOption() {
@@ -22,9 +22,9 @@ export default class WrappedSelect extends WrappedElement {
     const fragment = document.createDocumentFragment();
     const addOptionToFragment = data => {
       // Create a standard select option
-      const template = templates.option(data);
+      const option = this.template(data);
       // Append it to fragment
-      fragment.appendChild(template);
+      fragment.appendChild(option);
     };
 
     // Add each list item to list
