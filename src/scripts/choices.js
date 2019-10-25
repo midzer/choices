@@ -822,8 +822,9 @@ class Choices {
     }
 
     // If we are clicking on an option
-    const id = element.getAttribute('data-id');
+    const { id } = element.dataset;
     const choice = this._store.getChoiceById(id);
+    if (!choice) return;
     const passedKeyCode =
       activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
     const hasActiveDropdown = this.dropdown.isActive;
@@ -835,7 +836,7 @@ class Choices {
       choice,
     });
 
-    if (choice && !choice.selected && !choice.disabled) {
+    if (!choice.selected && !choice.disabled) {
       const canAddItem = this._canAddItem(activeItems, choice.value);
 
       if (canAddItem.response) {
@@ -855,7 +856,7 @@ class Choices {
 
     this.clearInput();
 
-    // We wont to close the dropdown if we are dealing with a single select box
+    // We want to close the dropdown if we are dealing with a single select box
     if (hasActiveDropdown && this._isSelectOneElement) {
       this.hideDropdown(true);
       this.containerOuter.focus();
