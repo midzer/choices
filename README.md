@@ -1053,6 +1053,7 @@ Choices is compiled using [Babel](https://babeljs.io/) to enable support for [ES
 - Array.prototype.indexOf
 - Object.assign
 - Element.prototype.classList
+- Element.prototype.closest
 - window.requestAnimationFrame
 - CustomEvent
 
