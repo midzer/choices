@@ -950,6 +950,13 @@ export default class Choices {
   ): this;
 
   /**
+   * Clear all choices from select.
+   *
+   * **Input types affected:** select-one, select-multiple
+   */
+  clearChoices(): this;
+
+  /**
    * Removes all items, choices and groups. Use with caution.
    *
    * **Input types affected:** text, select-one, select-multiple
