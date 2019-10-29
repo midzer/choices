@@ -28,8 +28,6 @@ export const getType = obj => Object.prototype.toString.call(obj).slice(8, -1);
 export const isType = (type, obj) =>
   obj !== undefined && obj !== null && getType(obj) === type;
 
-export const isElement = element => element instanceof Element;
-
 export const wrap = (element, wrapper = document.createElement('div')) => {
   if (element.nextSibling) {
     element.parentNode.insertBefore(wrapper, element.nextSibling);
@@ -80,7 +78,7 @@ export const isScrolledIntoView = (el, parent, direction = 1) => {
 };
 
 export const sanitise = value => {
-  if (!isType('String', value)) {
+  if (typeof value !== 'string') {
     return value;
   }
 
@@ -145,15 +143,12 @@ export const getWindowHeight = () => {
   );
 };
 
-export const isIE11 = () =>
-  !!(
-    navigator.userAgent.match(/Trident/) &&
-    navigator.userAgent.match(/rv[ :]11/)
-  );
+export const isIE11 = userAgent =>
+  !!(userAgent.match(/Trident/) && userAgent.match(/rv[ :]11/));
 
 export const existsInArray = (array, value, key = 'value') =>
   array.some(item => {
-    if (isType('String', value)) {
+    if (typeof value === 'string') {
       return item[key] === value.trim();
     }
 

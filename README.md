@@ -67,14 +67,11 @@ Or include Choices directly:
 
 ## Setup
 
-If you pass a selector which targets multiple elements, an array of Choices instances
-will be returned. If you target one element, that instance will be returned.
+**Note:** If you pass a selector which targets multiple elements, the first matching element will be used. Versions prior to 8.x.x would return multiple Choices instances.
 
 ```js
-  // Pass multiple elements:
-  const [firstInstance, secondInstance] = new Choices(elements);
-
-  // Pass single element:
+  // Pass single element
+  const element = document.querySelector('.js-choice');
   const choices = new Choices(element);
 
   // Pass reference
@@ -84,8 +81,8 @@ will be returned. If you target one element, that instance will be returned.
   // Pass jQuery element
   const choices = new Choices($('.js-choice')[0]);
 
-   // Passing options (with default options)
-  const choices = new Choices(elements, {
+  // Passing options (with default options)
+  const choices = new Choices(element, {
     silent: false,
     items: [],
     choices: [],

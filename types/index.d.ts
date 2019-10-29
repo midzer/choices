@@ -778,16 +778,6 @@ export default class Choices {
   );
 
   /**
-   * It's impossible to declare in TypeScript what Choices constructor is actually doing:
-   * @see {@link https://github.com/Microsoft/TypeScript/issues/27594}
-   * it returns array of Choices in case if selectorOrElement is string
-   * and one instance of Choices otherwise
-   * This little hack will at least allow to use it in Typescript
-   *
-   */
-  [index: number]: this;
-
-  /**
    * Creates a new instance of Choices, adds event listeners, creates templates and renders a Choices element to the DOM.
    *
    * @note This is called implicitly when a new instance of Choices is created. This would be used after a Choices instance had already been destroyed `(using destroy())`.

@@ -48,10 +48,6 @@ const USER_DEFAULTS = /** @type {Partial<import('../../types/index').Choices.Opt
  * @typedef {import('../../types/index').Choices.Choice} Choice
  */
 class Choices {
-  /* ========================================
-  =            Static properties            =
-  ======================================== */
-
   static get defaults() {
     return Object.preventExtensions({
       get options() {
@@ -63,17 +59,11 @@ class Choices {
     });
   }
 
+  /**
+   * @param {string | HTMLInputElement | HTMLSelectElement} element
+   * @param {Partial<import('../../types/index').Choices.Options>} userConfig
+   */
   constructor(element = '[data-choice]', userConfig = {}) {
-    if (isType('String', element)) {
-      const elements = Array.from(document.querySelectorAll(element));
-
-      // If there are multiple elements, create a new instance
-      // for each element besides the first one (as that already has an instance)
-      if (elements.length > 1) {
-        return this._generateInstances(elements, userConfig);
-      }
-    }
-
     this.config = merge.all(
       [DEFAULT_CONFIG, Choices.defaults.options, userConfig],
       // When merging array configs, replace with a copy of the userConfig array,
@@ -90,6 +80,7 @@ class Choices {
         userConfig.addItemFilter instanceof RegExp
           ? userConfig.addItemFilter
           : new RegExp(userConfig.addItemFilter);
+
       this.config.addItemFilter = re.test.bind(re);
     }
 
@@ -105,19 +96,18 @@ class Choices {
       this.config.renderSelectedChoices = 'auto';
     }
 
-    // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-    const passedElement = isType('String', element)
-      ? document.querySelector(element)
-      : element;
+    const passedElement =
+      typeof element === 'string' ? document.querySelector(element) : element;
 
-    if (!passedElement) {
-      if (!this.config.silent) {
-        console.error(
-          'Could not find passed element or passed element was of an invalid type',
-        );
-      }
-
-      return;
+    if (
+      !(
+        passedElement instanceof HTMLInputElement ||
+        passedElement instanceof HTMLSelectElement
+      )
+    ) {
+      throw TypeError(
+        'Expected one of the following types text|select-one|select-multiple',
+      );
     }
 
     this._isTextElement = passedElement.type === 'text';
@@ -132,21 +122,17 @@ class Choices {
         classNames: this.config.classNames,
         delimiter: this.config.delimiter,
       });
-    } else if (this._isSelectElement) {
+    } else {
       this.passedElement = new WrappedSelect({
         element: passedElement,
         classNames: this.config.classNames,
-        template: data => this.config.templates.option(data),
+        template: data => this._templates.option(data),
       });
-    }
-
-    if (!this.passedElement) {
-      return console.error('Passed element was of an invalid type');
     }
 
     this.initialised = false;
 
-    this._store = new Store(this.render);
+    this._store = new Store();
     this._initialState = {};
     this._currentState = {};
     this._prevState = {};
@@ -205,28 +191,30 @@ class Choices {
     this._onDirectionKey = this._onDirectionKey.bind(this);
     this._onDeleteKey = this._onDeleteKey.bind(this);
 
-    if (!this.config.silent) {
-      if (this.config.shouldSortItems === true && this._isSelectOneElement) {
+    if (this.config.shouldSortItems === true && this._isSelectOneElement) {
+      if (!this.config.silent) {
         console.warn(
           "shouldSortElements: Type of passed element is 'select-one', falling back to false.",
         );
       }
+    }
 
-      // If element has already been initialised with Choices, fail silently
-      if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+    // If element has already been initialised with Choices, fail silently
+    if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+      if (!this.config.silent) {
         console.warn(
           'Trying to initialise Choices on element already initialised',
         );
       }
+
+      this.initialised = true;
+
+      return;
     }
 
     // Let's go
     this.init();
   }
-
-  /* ========================================
-  =            Public methods              =
-  ======================================== */
 
   init() {
     if (this.initialised) {
@@ -256,7 +244,7 @@ class Choices {
 
     const { callbackOnInit } = this.config;
     // Run callback if it is a function
-    if (callbackOnInit && isType('Function', callbackOnInit)) {
+    if (callbackOnInit && typeof callbackOnInit === 'function') {
       callbackOnInit.call(this);
     }
   }
@@ -275,8 +263,7 @@ class Choices {
     }
 
     this.clearStore();
-
-    this.config.templates = null;
+    this._templates = null;
     this.initialised = false;
   }
 
@@ -459,7 +446,7 @@ class Choices {
     }
 
     // If only one value has been passed, convert to array
-    const choiceValue = isType('Array', value) ? value : [value];
+    const choiceValue = Array.isArray(value) ? value : [value];
 
     // Loop through each value and
     choiceValue.forEach(val => this._findAndSelectChoiceByValue(val));
@@ -649,12 +636,6 @@ class Choices {
     return this;
   }
 
-  /* =====  End of Public methods  ====== */
-
-  /* =============================================
-  =                Private functions            =
-  ============================================= */
-
   _render() {
     if (this._store.isLoading()) {
       return;
@@ -743,15 +724,17 @@ class Choices {
       let notice;
 
       if (this._isSearching) {
-        notice = isType('Function', this.config.noResultsText)
-          ? this.config.noResultsText()
-          : this.config.noResultsText;
+        notice =
+          typeof this.config.noResultsText === 'function'
+            ? this.config.noResultsText()
+            : this.config.noResultsText;
 
         dropdownItem = this._getTemplate('notice', notice, 'no-results');
       } else {
-        notice = isType('Function', this.config.noChoicesText)
-          ? this.config.noChoicesText()
-          : this.config.noChoicesText;
+        notice =
+          typeof this.config.noChoicesText === 'function'
+            ? this.config.noChoicesText()
+            : this.config.noChoicesText;
 
         dropdownItem = this._getTemplate('notice', notice, 'no-choices');
       }
@@ -1126,9 +1109,10 @@ class Choices {
 
   _canAddItem(activeItems, value) {
     let canAddItem = true;
-    let notice = isType('Function', this.config.addItemText)
-      ? this.config.addItemText(value)
-      : this.config.addItemText;
+    let notice =
+      typeof this.config.addItemText === 'function'
+        ? this.config.addItemText(value)
+        : this.config.addItemText;
 
     if (!this._isSelectOneElement) {
       const isDuplicateValue = existsInArray(activeItems, value);
@@ -1140,9 +1124,10 @@ class Choices {
         // If there is a max entry limit and we have reached that limit
         // don't update
         canAddItem = false;
-        notice = isType('Function', this.config.maxItemText)
-          ? this.config.maxItemText(this.config.maxItemCount)
-          : this.config.maxItemText;
+        notice =
+          typeof this.config.maxItemText === 'function'
+            ? this.config.maxItemText(this.config.maxItemCount)
+            : this.config.maxItemText;
       }
 
       if (
@@ -1151,9 +1136,10 @@ class Choices {
         canAddItem
       ) {
         canAddItem = false;
-        notice = isType('Function', this.config.uniqueItemText)
-          ? this.config.uniqueItemText(value)
-          : this.config.uniqueItemText;
+        notice =
+          typeof this.config.uniqueItemText === 'function'
+            ? this.config.uniqueItemText(value)
+            : this.config.uniqueItemText;
       }
 
       if (
@@ -1178,10 +1164,11 @@ class Choices {
   }
 
   _searchChoices(value) {
-    const newValue = isType('String', value) ? value.trim() : value;
-    const currentValue = isType('String', this._currentValue)
-      ? this._currentValue.trim()
-      : this._currentValue;
+    const newValue = typeof value === 'string' ? value.trim() : value;
+    const currentValue =
+      typeof this._currentValue === 'string'
+        ? this._currentValue.trim()
+        : this._currentValue;
 
     if (newValue.length < 1 && newValue === `${currentValue} `) {
       return 0;
@@ -1307,7 +1294,7 @@ class Choices {
     const { activeItems } = this._store;
     const hasFocusedInput = this.input.isFocussed;
     const hasActiveDropdown = this.dropdown.isActive;
-    const hasItems = this.itemList.hasChildren;
+    const hasItems = this.itemList.hasChildren();
     const keyString = String.fromCharCode(keyCode);
 
     const {
@@ -1560,7 +1547,10 @@ class Choices {
   _onMouseDown(event) {
     const { target, shiftKey } = event;
     // If we have our mouse down on the scrollbar and are on IE11...
-    if (this.choiceList.element.contains(target) && isIE11()) {
+    if (
+      this.choiceList.element.contains(target) &&
+      isIE11(navigator.userAgent)
+    ) {
       this._isScrollingOnIe = true;
     }
 
@@ -1777,7 +1767,7 @@ class Choices {
     placeholder = false,
     keyCode = null,
   }) {
-    let passedValue = isType('String', value) ? value.trim() : value;
+    let passedValue = typeof value === 'string' ? value.trim() : value;
 
     const passedKeyCode = keyCode;
     const passedCustomProperties = customProperties;
@@ -1939,9 +1929,9 @@ class Choices {
       return null;
     }
 
-    const { templates, classNames } = this.config;
+    const { classNames } = this.config;
 
-    return templates[template].call(this, classNames, ...args);
+    return this._templates[template].call(this, classNames, ...args);
   }
 
   _createTemplates() {
@@ -1950,12 +1940,12 @@ class Choices {
 
     if (
       callbackOnCreateTemplates &&
-      isType('Function', callbackOnCreateTemplates)
+      typeof callbackOnCreateTemplates === 'function'
     ) {
       userTemplates = callbackOnCreateTemplates.call(this, strToEl);
     }
 
-    this.config.templates = merge(TEMPLATES, userTemplates);
+    this._templates = merge(TEMPLATES, userTemplates);
   }
 
   _createElements() {
@@ -2228,17 +2218,6 @@ class Choices {
         keyCode: foundChoice.keyCode,
       });
     }
-  }
-
-  _generateInstances(elements, config) {
-    return elements.reduce(
-      (instances, element) => {
-        instances.push(new Choices(element, config));
-
-        return instances;
-      },
-      [this],
-    );
   }
 
   _generatePlaceholderValue() {

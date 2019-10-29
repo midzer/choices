@@ -1,6 +1,6 @@
 {
   "name": "choices.js",
-  "version": "7.1.5",
+  "version": "8.0.0",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./public/assets/scripts/choices.js",
   "types": "./types/index.d.ts",
@@ -8,7 +8,6 @@
     "start": "run-p js:watch css:watch",
     "build": "run-p js:build css:build",
     "lint": "eslint src/scripts",
-    "coverage": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=text-summary mocha",
     "bundlesize": "bundlesize",
     "cypress:run": "$(npm bin)/cypress run",
     "cypress:open": "$(npm bin)/cypress open",
@@ -16,6 +15,7 @@
     "test": "run-s test:unit test:e2e",
     "test:unit": "NODE_ENV=test mocha",
     "test:unit:watch": "NODE_ENV=test mocha --watch --inspect=5556",
+    "test:unit:coverage": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=text-summary mocha",
     "test:e2e": "run-p --race start cypress:run",
     "js:watch": "NODE_ENV=development node server.js",
     "js:build": "webpack --config webpack.config.prod.js",

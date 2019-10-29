@@ -21,6 +21,10 @@ describe('components/list', () => {
     it('assigns choices element to class', () => {
       expect(instance.element).to.eql(choicesElement);
     });
+
+    it('sets the height of the element', () => {
+      expect(instance.height).to.eql(choicesElement.scrollTop);
+    });
   });
 
   describe('clear', () => {
@@ -60,6 +64,33 @@ describe('components/list', () => {
       const expectedResponse = childElement;
       const actualResponse = instance.getChild(`.${childClass}`);
       expect(expectedResponse).to.eql(actualResponse);
+    });
+  });
+
+  describe('hasChildren', () => {
+    describe('when list has children', () => {
+      it('returns true', () => {
+        const childElement = document.createElement('span');
+        instance.element.appendChild(childElement);
+        const response = instance.hasChildren();
+        expect(response).to.equal(true);
+      });
+    });
+
+    describe('when list does not have children', () => {
+      it('returns false', () => {
+        instance.element.innerHTML = '';
+        const response = instance.hasChildren();
+        expect(response).to.equal(false);
+      });
+    });
+  });
+
+  describe('scrollToTop', () => {
+    it("sets the position's scroll position to 0", () => {
+      instance.element.scrollTop = 10;
+      instance.scrollToTop();
+      expect(instance.element.scrollTop).to.equal(0);
     });
   });
 });

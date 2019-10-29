@@ -64,7 +64,8 @@
       },
       "rules": {
         "no-restricted-syntax": "off",
-        "compat/compat": "off"
+        "compat/compat": "off",
+        "no-new": "off"
       }
     },
     {

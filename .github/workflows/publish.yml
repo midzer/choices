@@ -20,7 +20,7 @@ jobs:
           npm ci
           npm run build
           npx bundlesize
-          npm run coverage
+          npm run test:unit:coverage
           npm run test:e2e
         env:
           CI: true

@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 const { JSDOM } = require('jsdom');
 
 const jsdom = new JSDOM(
@@ -36,6 +38,8 @@ global.HTMLElement = window.HTMLElement;
 global.Option = window.Option;
 global.HTMLOptionElement = window.HTMLOptionElement;
 global.HTMLOptGroupElement = window.HTMLOptGroupElement;
+global.HTMLSelectElement = window.HTMLSelectElement;
+global.HTMLInputElement = window.HTMLInputElement;
 global.DocumentFragment = window.DocumentFragment;
 global.requestAnimationFrame = window.requestAnimationFrame;
 

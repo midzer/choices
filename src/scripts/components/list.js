@@ -6,7 +6,6 @@ export default class List {
 
     this.scrollPos = this.element.scrollTop;
     this.height = this.element.offsetHeight;
-    this.hasChildren = !!this.element.children;
   }
 
   clear() {
@@ -19,6 +18,10 @@ export default class List {
 
   getChild(selector) {
     return this.element.querySelector(selector);
+  }
+
+  hasChildren() {
+    return this.element.hasChildNodes();
   }
 
   scrollToTop() {
@@ -37,52 +40,52 @@ export default class List {
     // Scroll position of dropdown
     const containerScrollPos = this.element.scrollTop + dropdownHeight;
     // Difference between the choice and scroll position
-    const endpoint =
+    const destination =
       direction > 0
         ? this.element.scrollTop + choicePos - containerScrollPos
         : choice.offsetTop;
 
     requestAnimationFrame(time => {
-      this._animateScroll(time, endpoint, direction);
+      this._animateScroll(time, destination, direction);
     });
   }
 
-  _scrollDown(scrollPos, strength, endpoint) {
-    const easing = (endpoint - scrollPos) / strength;
+  _scrollDown(scrollPos, strength, destination) {
+    const easing = (destination - scrollPos) / strength;
     const distance = easing > 1 ? easing : 1;
 
     this.element.scrollTop = scrollPos + distance;
   }
 
-  _scrollUp(scrollPos, strength, endpoint) {
-    const easing = (scrollPos - endpoint) / strength;
+  _scrollUp(scrollPos, strength, destination) {
+    const easing = (scrollPos - destination) / strength;
     const distance = easing > 1 ? easing : 1;
 
     this.element.scrollTop = scrollPos - distance;
   }
 
-  _animateScroll(time, endpoint, direction) {
+  _animateScroll(time, destination, direction) {
     const strength = SCROLLING_SPEED;
     const choiceListScrollTop = this.element.scrollTop;
     let continueAnimation = false;
 
     if (direction > 0) {
-      this._scrollDown(choiceListScrollTop, strength, endpoint);
+      this._scrollDown(choiceListScrollTop, strength, destination);
 
-      if (choiceListScrollTop < endpoint) {
+      if (choiceListScrollTop < destination) {
         continueAnimation = true;
       }
     } else {
-      this._scrollUp(choiceListScrollTop, strength, endpoint);
+      this._scrollUp(choiceListScrollTop, strength, destination);
 
-      if (choiceListScrollTop > endpoint) {
+      if (choiceListScrollTop > destination) {
         continueAnimation = true;
       }
     }
 
     if (continueAnimation) {
       requestAnimationFrame(() => {
-        this._animateScroll(time, endpoint, direction);
+        this._animateScroll(time, destination, direction);
       });
     }
   }
