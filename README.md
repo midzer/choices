@@ -595,8 +595,23 @@ classNames: {
 **Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various data attributes defined [here](https://github.com/jshjohnson/Choices/blob/master/src/scripts/templates.js).
+If you want just extend a little original template then you may use `Choices.defaults.templates` to get access to
+original template function.
 
 **Example:**
+
+```js
+const example = new Choices(element, {
+  callbackOnCreateTemplates: () => ({
+    input: (...args) =>
+      Object.assign(Choices.defaults.templates.input.call(this, ...args), {
+        type: 'email',
+      }),
+  }),
+});
+```
+
+or more complex:
 
 ```js
 const example = new Choices(element, {
