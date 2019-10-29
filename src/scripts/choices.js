@@ -31,7 +31,6 @@ import {
   sortByScore,
   generateId,
   findAncestorByAttrName,
-  fetchFromObject,
   isIE11,
   existsInArray,
   cloneObject,
@@ -43,6 +42,10 @@ const USER_DEFAULTS = /** @type {Partial<import('../../types/index').Choices.Opt
 /**
  * Choices
  * @author Josh Johnson<josh@joshuajohnson.co.uk>
+ */
+
+/**
+ * @typedef {import('../../types/index').Choices.Choice} Choice
  */
 class Choices {
   /* ========================================
@@ -222,7 +225,7 @@ class Choices {
   }
 
   /* ========================================
-  =            Public functions            =
+  =            Public methods              =
   ======================================== */
 
   init() {
@@ -460,14 +463,126 @@ class Choices {
     return this;
   }
 
-  setChoices(choices = [], value = '', label = '', replaceChoices = false) {
-    if (!this._isSelectElement || !value) {
-      return this;
+  /**
+   * Set choices of select input via an array of objects (or function that returns array of object or promise of it),
+   * a value field name and a label field name.
+   * This behaves the same as passing items via the choices option but can be called after initialising Choices.
+   * This can also be used to add groups of choices (see example 2); Optionally pass a true `replaceChoices` value to remove any existing choices.
+   * Optionally pass a `customProperties` object to add additional data to your choices (useful when searching/filtering etc).
+   *
+   * **Input types affected:** select-one, select-multiple
+   *
+   * @template {object[] | ((instance: Choices) => object[] | Promise<object[]>)} T
+   * @param {T} [choicesArrayOrFetcher]
+   * @param {string} [value = 'value'] - name of `value` field
+   * @param {string} [label = 'label'] - name of 'label' field
+   * @param {boolean} [replaceChoices = false] - whether to replace of add choices
+   * @returns {this | Promise<this>}
+   *
+   * @example
+   * ```js
+   * const example = new Choices(element);
+   *
+   * example.setChoices([
+   *   {value: 'One', label: 'Label One', disabled: true},
+   *   {value: 'Two', label: 'Label Two', selected: true},
+   *   {value: 'Three', label: 'Label Three'},
+   * ], 'value', 'label', false);
+   * ```
+   *
+   * @example
+   * ```js
+   * const example = new Choices(element);
+   *
+   * example.setChoices(async () => {
+   *   try {
+   *      const items = await fetch('/items');
+   *      return items.json()
+   *   } catch(err) {
+   *      console.error(err)
+   *   }
+   * });
+   * ```
+   *
+   * @example
+   * ```js
+   * const example = new Choices(element);
+   *
+   * example.setChoices([{
+   *   label: 'Group one',
+   *   id: 1,
+   *   disabled: false,
+   *   choices: [
+   *     {value: 'Child One', label: 'Child One', selected: true},
+   *     {value: 'Child Two', label: 'Child Two',  disabled: true},
+   *     {value: 'Child Three', label: 'Child Three'},
+   *   ]
+   * },
+   * {
+   *   label: 'Group two',
+   *   id: 2,
+   *   disabled: false,
+   *   choices: [
+   *     {value: 'Child Four', label: 'Child Four', disabled: true},
+   *     {value: 'Child Five', label: 'Child Five'},
+   *     {value: 'Child Six', label: 'Child Six', customProperties: {
+   *       description: 'Custom description about child six',
+   *       random: 'Another random custom property'
+   *     }},
+   *   ]
+   * }], 'value', 'label', false);
+   * ```
+   */
+  setChoices(
+    choicesArrayOrFetcher = [],
+    value = 'value',
+    label = 'label',
+    replaceChoices = false,
+  ) {
+    if (!this.initialised)
+      throw new ReferenceError(
+        `setChoices was called on a non-initialized instance of Choices`,
+      );
+    if (!this._isSelectElement)
+      throw new TypeError(`setChoices can't be used with INPUT based Choices`);
+
+    if (typeof value !== 'string' || !value) {
+      throw new TypeError(
+        `value parameter must be a name of 'value' field in passed objects`,
+      );
     }
 
     // Clear choices if needed
     if (replaceChoices) {
       this.clearChoices();
+    }
+
+    if (!Array.isArray(choicesArrayOrFetcher)) {
+      if (typeof choicesArrayOrFetcher !== 'function')
+        throw new TypeError(
+          `.setChoices must be called either with array of choices with a function resulting into Promise of array of choices`,
+        );
+
+      // it's a choices fetcher
+      requestAnimationFrame(() => this._handleLoadingState(true));
+      const fetcher = choicesArrayOrFetcher(this);
+      if (typeof fetcher === 'object' && typeof fetcher.then === 'function') {
+        // that's a promise
+        return fetcher
+          .then(data => this.setChoices(data, value, label, replaceChoices))
+          .catch(err => {
+            if (!this.config.silent) console.error(err);
+          })
+          .then(() => this._handleLoadingState(false))
+          .then(() => this);
+      }
+      // function returned something else than promise, let's check if it's an array of choices
+      if (!Array.isArray(fetcher))
+        throw new TypeError(
+          `.setChoices first argument function must return either array of choices or Promise, got: ${typeof fetcher}`,
+        );
+      // recursion with results, it's sync and choices were cleared already
+      return this.setChoices(fetcher, value, label, false);
     }
 
     this.containerOuter.removeLoadingState();
@@ -492,7 +607,7 @@ class Choices {
     };
 
     this._setLoading(true);
-    choices.forEach(addGroupsAndChoices);
+    choicesArrayOrFetcher.forEach(addGroupsAndChoices);
     this._setLoading(false);
 
     return this;
@@ -519,18 +634,7 @@ class Choices {
     return this;
   }
 
-  ajax(fn) {
-    if (!this.initialised || !this._isSelectElement || !fn) {
-      return this;
-    }
-
-    requestAnimationFrame(() => this._handleLoadingState(true));
-    fn(this._ajaxCallback());
-
-    return this;
-  }
-
-  /* =====  End of Public functions  ====== */
+  /* =====  End of Public methods  ====== */
 
   /* =============================================
   =                Private functions            =
@@ -1051,55 +1155,6 @@ class Choices {
     return {
       response: canAddItem,
       notice,
-    };
-  }
-
-  _ajaxCallback() {
-    return (results, value, label) => {
-      if (!results || !value) {
-        return;
-      }
-
-      const parsedResults = isType('Object', results) ? [results] : results;
-
-      if (
-        parsedResults &&
-        isType('Array', parsedResults) &&
-        parsedResults.length
-      ) {
-        // Remove loading states/text
-        this._handleLoadingState(false);
-        this._setLoading(true);
-        // Add each result as a choice
-        parsedResults.forEach(result => {
-          if (result.choices) {
-            this._addGroup({
-              group: result,
-              id: result.id || null,
-              valueKey: value,
-              labelKey: label,
-            });
-          } else {
-            this._addChoice({
-              value: fetchFromObject(result, value),
-              label: fetchFromObject(result, label),
-              isSelected: result.selected,
-              isDisabled: result.disabled,
-              customProperties: result.customProperties,
-              placeholder: result.placeholder,
-            });
-          }
-        });
-
-        this._setLoading(false);
-
-        if (this._isSelectOneElement) {
-          this._selectPlaceholderChoice();
-        }
-      } else {
-        // No results, remove loading state
-        this._handleLoadingState(false);
-      }
     };
   }
 
