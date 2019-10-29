@@ -34,25 +34,29 @@ export default class Input {
   }
 
   addEventListeners() {
-    this.element.addEventListener('input', this._onInput);
     this.element.addEventListener('paste', this._onPaste);
-    this.element.addEventListener('focus', this._onFocus);
-    this.element.addEventListener('blur', this._onBlur);
-
-    if (this.element.form) {
-      this.element.form.addEventListener('reset', this._onFormReset);
-    }
+    this.element.addEventListener('input', this._onInput, {
+      passive: true,
+    });
+    this.element.addEventListener('focus', this._onFocus, {
+      passive: true,
+    });
+    this.element.addEventListener('blur', this._onBlur, {
+      passive: true,
+    });
   }
 
   removeEventListeners() {
-    this.element.removeEventListener('input', this._onInput);
+    this.element.removeEventListener('input', this._onInput, {
+      passive: true,
+    });
     this.element.removeEventListener('paste', this._onPaste);
-    this.element.removeEventListener('focus', this._onFocus);
-    this.element.removeEventListener('blur', this._onBlur);
-
-    if (this.element.form) {
-      this.element.form.removeEventListener('reset', this._onFormReset);
-    }
+    this.element.removeEventListener('focus', this._onFocus, {
+      passive: true,
+    });
+    this.element.removeEventListener('blur', this._onBlur, {
+      passive: true,
+    });
   }
 
   enable() {
