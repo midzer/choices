@@ -92,7 +92,7 @@ will be returned. If you target one element, that instance will be returned.
     renderChoiceLimit: -1,
     maxItemCount: -1,
     addItems: true,
-    addItemFilterFn: null,
+    addItemFilter: null,
     removeItems: true,
     removeItemButton: false,
     editItems: false,
@@ -370,23 +370,29 @@ Pass an array of objects:
 
 **Usage:** Whether the scroll position should reset after adding an item.
 
-### addItemFilterFn
+### addItemFilter
 
-**Type:** `Function` **Default:** `null`
+**Type:** `string | RegExp | Function` **Default:** `null`
 
 **Input types affected:** `text`
 
-**Usage:** A filter function that will need to return `true` for a user to successfully add an item.
+**Usage:** A RegExp or string (will be passed to RegExp constructor internally) or filter function that will need to return `true` for a user to successfully add an item.
 
 **Example:**
 
 ```js
 // Only adds items matching the text test
 new Choices(element, {
-  addItemFilterFn: (value) => {
-    return (value !== 'test');
+  addItemFilter: (value) => {
+    return ['orange', 'apple', 'banana'].includes(value);
   };
 });
+
+// only items ending to `-red`
+new Choices(element, {
+  addItemFilter: '-red$';
+});
+
 ```
 
 ### shouldSort

@@ -18,6 +18,7 @@ declare namespace Choices {
     type stringFunction = () => string;
     type noticeStringFunction = (value: string) => string;
     type noticeLimitFunction = (maxItemCount: number) => string;
+    type filterFunction = (value: string) => boolean;
   }
 
   interface Choice {
@@ -403,7 +404,7 @@ declare namespace Choices {
      *
      * @default null
      */
-    addItemFilterFn: (value: string) => boolean;
+    addItemFilter: string | RegExp | Choices.Types.filterFunction;
 
     /**
      * The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the **default config** [https://github.com/jshjohnson/Choices#setup] for an example), otherwise pass a string.
