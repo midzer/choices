@@ -7,7 +7,7 @@
     "plugin:prettier/recommended",
     "plugin:compat/recommended"
   ],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "sort-class-members"],
   "env": {
     "es6": true,
     "browser": true
@@ -36,6 +36,23 @@
       {
         "array": false,
         "object": true
+      }
+    ],
+    "curly": ["error", "all"],
+    "newline-before-return": "error",
+    "sort-class-members/sort-class-members": [
+      2,
+      {
+        "order": [
+          "[static-properties]",
+          "[static-methods]",
+          "[properties]",
+          "[conventional-private-properties]",
+          "constructor",
+          "[methods]",
+          "[conventional-private-methods]"
+        ],
+        "accessorPairPositioning": "getThenSet"
       }
     ]
   },

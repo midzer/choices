@@ -351,11 +351,13 @@ class Choices {
 
   highlightAll() {
     this._store.items.forEach(item => this.highlightItem(item));
+
     return this;
   }
 
   unhighlightAll() {
     this._store.items.forEach(item => this.unhighlightItem(item));
+
     return this;
   }
 
@@ -431,6 +433,7 @@ class Choices {
     const values = this._store.activeItems.reduce((selectedItems, item) => {
       const itemValue = valueOnly ? item.value : item;
       selectedItems.push(itemValue);
+
       return selectedItems;
     }, []);
 
@@ -446,6 +449,7 @@ class Choices {
     }
 
     items.forEach(value => this._setChoiceOrItem(value));
+
     return this;
   }
 
@@ -539,12 +543,14 @@ class Choices {
     label = 'label',
     replaceChoices = false,
   ) {
-    if (!this.initialised)
+    if (!this.initialised) {
       throw new ReferenceError(
         `setChoices was called on a non-initialized instance of Choices`,
       );
-    if (!this._isSelectElement)
+    }
+    if (!this._isSelectElement) {
       throw new TypeError(`setChoices can't be used with INPUT based Choices`);
+    }
 
     if (typeof value !== 'string' || !value) {
       throw new TypeError(
@@ -558,10 +564,11 @@ class Choices {
     }
 
     if (!Array.isArray(choicesArrayOrFetcher)) {
-      if (typeof choicesArrayOrFetcher !== 'function')
+      if (typeof choicesArrayOrFetcher !== 'function') {
         throw new TypeError(
           `.setChoices must be called either with array of choices with a function resulting into Promise of array of choices`,
         );
+      }
 
       // it's a choices fetcher
       requestAnimationFrame(() => this._handleLoadingState(true));
@@ -571,21 +578,26 @@ class Choices {
         return fetcher
           .then(data => this.setChoices(data, value, label, replaceChoices))
           .catch(err => {
-            if (!this.config.silent) console.error(err);
+            if (!this.config.silent) {
+              console.error(err);
+            }
           })
           .then(() => this._handleLoadingState(false))
           .then(() => this);
       }
       // function returned something else than promise, let's check if it's an array of choices
-      if (!Array.isArray(fetcher))
+      if (!Array.isArray(fetcher)) {
         throw new TypeError(
           `.setChoices first argument function must return either array of choices or Promise, got: ${typeof fetcher}`,
         );
+      }
+
       // recursion with results, it's sync and choices were cleared already
       return this.setChoices(fetcher, value, label, false);
     }
 
     this.containerOuter.removeLoadingState();
+
     const addGroupsAndChoices = groupOrChoice => {
       if (groupOrChoice.choices) {
         this._addGroup({
@@ -615,10 +627,13 @@ class Choices {
 
   clearChoices() {
     this._store.dispatch(clearChoices());
+
+    return this;
   }
 
   clearStore() {
     this._store.dispatch(clearAll());
+
     return this;
   }
 
@@ -769,6 +784,7 @@ class Choices {
         if (this._isSelectOneElement) {
           return choice.groupId === group.id;
         }
+
         return (
           choice.groupId === group.id &&
           (this.config.renderSelectedChoices === 'always' || !choice.selected)
@@ -833,6 +849,7 @@ class Choices {
         } else {
           acc.normalChoices.push(choice);
         }
+
         return acc;
       },
       { placeholderChoices: [], normalChoices: [] },
@@ -980,7 +997,9 @@ class Choices {
     // If we are clicking on an option
     const { id } = element.dataset;
     const choice = this._store.getChoiceById(id);
-    if (!choice) return;
+    if (!choice) {
+      return;
+    }
     const passedKeyCode =
       activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
     const hasActiveDropdown = this.dropdown.isActive;
@@ -1921,6 +1940,7 @@ class Choices {
     }
 
     const { templates, classNames } = this.config;
+
     return templates[template].call(this, classNames, ...args);
   }
 
@@ -2068,7 +2088,9 @@ class Choices {
       });
 
       // If sorting is enabled or the user is searching, filter choices
-      if (this.config.shouldSort) allChoices.sort(filter);
+      if (this.config.shouldSort) {
+        allChoices.sort(filter);
+      }
 
       // Determine whether there is a selected choice
       const hasSelectedChoice = allChoices.some(choice => choice.selected);
@@ -2212,6 +2234,7 @@ class Choices {
     return elements.reduce(
       (instances, element) => {
         instances.push(new Choices(element, config));
+
         return instances;
       },
       [this],

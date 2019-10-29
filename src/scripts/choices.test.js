@@ -15,16 +15,16 @@ describe('choices', () => {
     });
   };
 
+  beforeEach(() => {
+    passedElement = document.createElement('input');
+    passedElement.type = 'text';
+    passedElement.className = 'js-choices';
+    document.body.appendChild(passedElement);
+
+    instance = new Choices(passedElement);
+  });
+
   describe('public methods', () => {
-    beforeEach(() => {
-      passedElement = document.createElement('input');
-      passedElement.type = 'text';
-      passedElement.className = 'js-choices';
-      document.body.appendChild(passedElement);
-
-      instance = new Choices(passedElement);
-    });
-
     afterEach(() => {
       output = null;
       instance = null;
@@ -798,6 +798,29 @@ describe('choices', () => {
       });
     });
 
+    describe('clearChoices', () => {
+      let storeDispatchStub;
+
+      beforeEach(() => {
+        storeDispatchStub = stub();
+        instance._store.dispatch = storeDispatchStub;
+
+        output = instance.clearChoices();
+      });
+
+      afterEach(() => {
+        instance._store.dispatch.reset();
+      });
+
+      returnsInstance(output);
+
+      it('dispatches clearChoices action', () => {
+        expect(storeDispatchStub.lastCall.args[0]).to.eql({
+          type: ACTION_TYPES.CLEAR_CHOICES,
+        });
+      });
+    });
+
     describe('clearStore', () => {
       let storeDispatchStub;
 
@@ -930,6 +953,7 @@ describe('choices', () => {
             expect(inst).to.eq(choice);
             fetcherCalled = true;
             await new Promise(resolve => setTimeout(resolve, 1000));
+
             return [
               { label: 'l1', value: 'v1', customProperties: 'prop1' },
               { label: 'l2', value: 'v2', customProperties: 'prop2' },
@@ -1440,7 +1464,9 @@ describe('choices', () => {
         });
       });
     });
+  });
 
+  describe('private methods', () => {
     describe('_createGroupsFragment', () => {
       let _createChoicesFragmentStub;
       const choices = [
