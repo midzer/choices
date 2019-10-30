@@ -6,17 +6,11 @@ export default class Dropdown {
   }
 
   /**
-   * Determine how far the top of our element is from
-   * the top of the window
-   * @return {Number} Vertical position
+   * Bottom position of dropdown in viewport coordinates
+   * @type {number} Vertical position
    */
-  distanceFromTopWindow() {
-    this.dimensions = this.element.getBoundingClientRect();
-    this.position = Math.ceil(
-      this.dimensions.top + window.pageYOffset + this.element.offsetHeight,
-    );
-
-    return this.position;
+  get distanceFromTopWindow() {
+    return this.element.getBoundingClientRect().bottom;
   }
 
   /**

@@ -384,7 +384,7 @@ class Choices {
 
     requestAnimationFrame(() => {
       this.dropdown.show();
-      this.containerOuter.open(this.dropdown.distanceFromTopWindow());
+      this.containerOuter.open(this.dropdown.distanceFromTopWindow);
 
       if (!preventInputFocus && this._canSearch) {
         this.input.focus();
@@ -1463,9 +1463,9 @@ class Choices {
       let nextEl;
       if (skipKey) {
         if (directionInt > 0) {
-          nextEl = Array.from(
-            this.dropdown.element.querySelectorAll(selectableChoiceIdentifier),
-          ).pop();
+          nextEl = this.dropdown.element.querySelector(
+            `${selectableChoiceIdentifier}:last-of-type`,
+          );
         } else {
           nextEl = this.dropdown.element.querySelector(
             selectableChoiceIdentifier,
