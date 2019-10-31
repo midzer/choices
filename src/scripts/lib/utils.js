@@ -1,16 +1,8 @@
 export const getRandomNumber = (min, max) =>
   Math.floor(Math.random() * (max - min) + min);
 
-export const generateChars = length => {
-  let chars = '';
-
-  for (let i = 0; i < length; i++) {
-    const randomChar = getRandomNumber(0, 36);
-    chars += randomChar.toString(36);
-  }
-
-  return chars;
-};
+export const generateChars = length =>
+  Array.from({ length }, () => getRandomNumber(0, 36).toString(36)).join('');
 
 export const generateId = (element, prefix) => {
   let id =
@@ -44,19 +36,30 @@ export const wrap = (element, wrapper = document.createElement('div')) => {
  */
 export const findAncestorByAttrName = (el, attr) => el.closest(`[${attr}]`);
 
-export const getAdjacentEl = (startEl, className, direction = 1) => {
-  if (!startEl || !className) {
-    return;
-  }
+export const getAdjacentEl =
+  /**
+   * @param {Element} startEl
+   * @param {string} selector
+   * @param {1 | -1} direction
+   * @returns {Element | undefined}
+   */
+  (startEl, selector, direction = 1) => {
+    if (!(startEl instanceof Element) || typeof selector !== 'string') {
+      return undefined;
+    }
 
-  const parent = startEl.parentNode.parentNode;
-  const children = Array.from(parent.querySelectorAll(className));
+    const prop = `${direction > 0 ? 'next' : 'previous'}ElementSibling`;
 
-  const startPos = children.indexOf(startEl);
-  const operatorDirection = direction > 0 ? 1 : -1;
+    let sibling = startEl[prop];
+    while (sibling) {
+      if (sibling.matches(selector)) {
+        return sibling;
+      }
+      sibling = sibling[prop];
+    }
 
-  return children[startPos + operatorDirection];
-};
+    return sibling;
+  };
 
 export const isScrolledIntoView = (el, parent, direction = 1) => {
   if (!el) {
