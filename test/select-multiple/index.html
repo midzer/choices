@@ -15,55 +15,63 @@
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="../assets/images/apple-touch-icon.png"
+      href="../../assets/images/apple-touch-icon.png"
     />
     <link
       rel="icon"
       type="image/png"
-      href="../assets/images/favicon-32x32.png"
+      href="../../assets/images/favicon-32x32.png"
       sizes="32x32"
     />
     <link
       rel="icon"
       type="image/png"
-      href="../assets/images/favicon-16x16.png"
+      href="../../assets/images/favicon-16x16.png"
       sizes="16x16"
     />
-    <link rel="manifest" href="../assets/images/manifest.json" />
+    <link rel="manifest" href="../../assets/images/manifest.json" />
     <link
       rel="mask-icon"
-      href="../assets/images/safari-pinned-tab.svg"
+      href="../../assets/images/safari-pinned-tab.svg"
       color="#00bcd4"
     />
-    <link rel="shortcut icon" href="../assets/images/favicon.ico" />
+    <link rel="shortcut icon" href="../../assets/images/favicon.ico" />
     <meta
       name="msapplication-config"
-      content="../assets/images/browserconfig.xml"
+      content="../../assets/images/browserconfig.xml"
     />
     <meta name="theme-color" content="#ffffff" />
 
     <!-- Ignore these -->
-    <link rel="stylesheet" href="../assets/styles/base.min.css?version=6.0.3" />
+    <link
+      rel="stylesheet"
+      href="../../assets/styles/base.min.css?version=6.0.3"
+    />
     <!-- End ignore these -->
 
     <!-- Choices includes -->
     <link
       rel="stylesheet"
-      href="../assets/styles/choices.min.css?version=6.0.3"
+      href="../../assets/styles/choices.min.css?version=6.0.3"
     />
-    <script src="../assets/scripts/choices.min.js?version=6.0.3"></script>
+    <script src="../../assets/scripts/choices.min.js?version=6.0.3"></script>
     <!-- End Choices includes -->
   </head>
 
   <body>
     <div class="container">
       <div class="section">
-        <h2>Select one inputs</h2>
+        <h2>Select multiple inputs</h2>
         <div data-test-hook="basic">
           <label for="choices-basic">Basic</label>
           <button class="disable push-bottom">Disable</button>
           <button class="enable push-bottom">Enable</button>
-          <select class="form-control" name="choices-basic" id="choices-basic">
+          <select
+            class="form-control"
+            name="choices-basic"
+            id="choices-basic"
+            multiple
+          >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
             <option value="Find me">Choice 3</option>
@@ -77,6 +85,7 @@
             class="form-control"
             name="choices-remove-button"
             id="choices-remove-button"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -91,6 +100,7 @@
             class="form-control"
             name="choices-disabled-choice"
             id="choices-disabled-choice"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -105,6 +115,7 @@
             class="form-control"
             name="choices-add-items-disabled"
             id="choices-add-items-disabled"
+            multiple
           >
             <option value="Choice 1" selected>Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -118,11 +129,29 @@
             class="form-control"
             name="choices-disabled-via-attr"
             id="choices-disabled-via-attr"
+            multiple
             disabled
           >
             <option value="Choice 1" selected>Choice 1</option>
             <option value="Choice 2">Choice 2</option>
             <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
+
+        <div data-test-hook="selection-limit">
+          <label for="choices-selection-limit">Input limit</label>
+          <select
+            class="form-control"
+            name="choices-selection-limit"
+            id="choices-selection-limit"
+            multiple
+          >
+            <option value="Choice 1">Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+            <option value="Choice 4">Choice 4</option>
+            <option value="Choice 5">Choice 5</option>
+            <option value="Choice 6">Choice 6</option>
           </select>
         </div>
 
@@ -132,6 +161,7 @@
             class="form-control"
             name="choices-prepend-append"
             id="choices-prepend-append"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -145,19 +175,7 @@
             class="form-control"
             name="choices-render-choice-limit"
             id="choices-render-choice-limit"
-          >
-            <option value="Choice 1">Choice 1</option>
-            <option value="Choice 2">Choice 2</option>
-            <option value="Choice 3">Choice 3</option>
-          </select>
-        </div>
-
-        <div data-test-hook="search-disabled">
-          <label for="choices-search-disabled">Search disabled</label>
-          <select
-            class="form-control"
-            name="choices-search-disabled"
-            id="choices-search-disabled"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -171,7 +189,42 @@
             class="form-control"
             name="choices-search-floor"
             id="choices-search-floor"
+            multiple
           >
+            <option value="Choice 1">Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
+
+        <div data-test-hook="placeholder-via-option-value">
+          <label for="choices-placeholder-via-option-value"
+            >Placeholder via empty option value</label
+          >
+          <select
+            class="form-control"
+            name="choices-placeholder-via-option-value"
+            id="choices-placeholder-via-option-value"
+            multiple
+          >
+            <option value="">I am a placeholder</option>
+            <option value="Choice 1">Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+        </div>
+
+        <div data-test-hook="placeholder-via-option-attr">
+          <label for="choices-placeholder-via-option-attr"
+            >Placeholder via option attribute</label
+          >
+          <select
+            class="form-control"
+            name="choices-placeholder-via-option-attr"
+            id="choices-placeholder-via-option-attr"
+            multiple
+          >
+            <option placeholder>I am a placeholder</option>
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
             <option value="Choice 3">Choice 3</option>
@@ -184,7 +237,10 @@
             class="form-control"
             name="choices-remote-data"
             id="choices-remote-data"
-          ></select>
+            multiple
+          >
+            <option value="">I am a placeholder</option>
+          </select>
         </div>
 
         <div data-test-hook="scrolling-dropdown">
@@ -193,6 +249,7 @@
             class="form-control"
             name="choices-scrolling-dropdown"
             id="choices-scrolling-dropdown"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -233,32 +290,13 @@
           </select>
         </div>
 
-        <div data-test-hook="parent-child">
-          <label for="choices-parent">Parent</label>
-          <select
-            class="form-control"
-            name="choices-parent"
-            id="choices-parent"
-          >
-            <option value="Parent choice 1">Parent choice 1</option>
-            <option value="Parent choice 2">Parent choice 2</option>
-            <option value="Parent choice 3">Parent choice 3</option>
-          </select>
-
-          <label for="choices-child">Child</label>
-          <select class="form-control" name="choices-child" id="choices-child">
-            <option value="Child choice 1">Child choice 1</option>
-            <option value="Child choice 2">Child choice 2</option>
-            <option value="Child choice 3">Child choice 3</option>
-          </select>
-        </div>
-
         <div data-test-hook="custom-properties">
           <label for="choices-custom-properties">Custom properties</label>
           <select
             class="form-control"
             name="choices-custom-properties"
             id="choices-custom-properties"
+            multiple
           ></select>
         </div>
 
@@ -278,6 +316,7 @@
               class="form-control"
               name="choices-within-form"
               id="choices-within-form"
+              multiple
             >
               <option value="Choice 1">Choice 1</option>
             </select>
@@ -292,6 +331,7 @@
             class="form-control"
             name="choices-set-choice-by-value"
             id="choices-set-choice-by-value"
+            multiple
           >
             <option value="Choice 1">Choice 1</option>
             <option value="Choice 2">Choice 2</option>
@@ -305,6 +345,7 @@
             class="form-control"
             name="choices-search-by-label"
             id="choices-search-by-label"
+            multiple
           >
             <option value="value1">label1</option>
             <option value="value2">label2</option>
@@ -332,15 +373,17 @@
           removeItemButton: true,
         });
 
-        new Choices('#choices-disabled-choice', {
-          removeItemButton: true,
-        });
+        new Choices('#choices-disabled-choice');
 
         new Choices('#choices-add-items-disabled', {
           addItems: false,
         });
 
         new Choices('#choices-disabled-via-attr');
+
+        new Choices('#choices-selection-limit', {
+          maxItemCount: 5,
+        });
 
         new Choices('#choices-prepend-append', {
           prependValue: 'before-',
@@ -351,19 +394,19 @@
           renderChoiceLimit: 1,
         });
 
-        new Choices('#choices-search-disabled', {
-          searchEnabled: false,
-        });
-
         new Choices('#choices-search-floor', {
           searchFloor: 5,
         });
 
+        new Choices('#choices-placeholder-via-option-value');
+
+        new Choices('#choices-placeholder-via-option-attr');
+
         new Choices('#choices-remote-data', {
           shouldSort: false,
         }).setChoices(async () => {
-          const res = await fetch('/data');
-          return res.json();
+          const data = await fetch('/data');
+          return data.json();
         });
 
         new Choices('#choices-scrolling-dropdown', {
@@ -371,17 +414,6 @@
         });
 
         new Choices('#choices-groups');
-
-        const parent = new Choices('#choices-parent');
-        const child = new Choices('#choices-child').disable();
-
-        parent.passedElement.element.addEventListener('change', event => {
-          if (event.detail.value === 'Parent choice 2') {
-            child.enable();
-          } else {
-            child.disable();
-          }
-        });
 
         new Choices('#choices-custom-properties', {
           searchFields: ['label', 'value', 'customProperties.country'],
