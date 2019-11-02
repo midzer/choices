@@ -1133,7 +1133,7 @@ describe('choices', () => {
           const fetcher = async inst => {
             expect(inst).to.eq(choice);
             fetcherCalled = true;
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 800));
 
             return [
               { label: 'l1', value: 'v1', customProperties: 'prop1' },
@@ -1142,15 +1142,10 @@ describe('choices', () => {
           };
           expect(choice._store.choices.length).to.equal(0);
           const promise = choice.setChoices(fetcher);
-          await new Promise(resolve =>
-            requestAnimationFrame(() => {
-              expect(handleLoadingStateSpy.callCount).to.equal(1);
-              resolve();
-            }),
-          );
           expect(fetcherCalled).to.be.true;
           const res = await promise;
           expect(res).to.equal(choice);
+          expect(handleLoadingStateSpy.callCount).to.equal(2);
           expect(choice._store.choices[1].value).to.equal('v2');
           expect(choice._store.choices[1].label).to.equal('l2');
           expect(choice._store.choices[1].customProperties).to.equal('prop2');
