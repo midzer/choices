@@ -149,6 +149,7 @@ class Choices {
      * @type {HTMLElement['dir']}
      */
     this._direction = this.passedElement.element.dir;
+
     if (!this._direction) {
       const { direction: elementDirection } = window.getComputedStyle(
         this.passedElement.element,
@@ -160,6 +161,7 @@ class Choices {
         this._direction = elementDirection;
       }
     }
+
     this._idNames = {
       itemChoice: 'item-choice',
     };
@@ -849,7 +851,9 @@ class Choices {
     let choiceLimit = rendererableChoices.length;
 
     // Prepend placeholeder
-    const sortedChoices = [...placeholderChoices, ...normalChoices];
+    const sortedChoices = this._isSelectOneElement
+      ? [...placeholderChoices, ...normalChoices]
+      : normalChoices;
 
     if (this._isSearching) {
       choiceLimit = searchResultLimit;
@@ -2075,7 +2079,7 @@ class Choices {
           label: o.innerHTML,
           selected: o.selected,
           disabled: o.disabled || o.parentNode.disabled,
-          placeholder: o.hasAttribute('placeholder'),
+          placeholder: o.value === '' || o.hasAttribute('placeholder'),
           customProperties: o.getAttribute('data-custom-properties'),
         });
       });
@@ -2224,14 +2228,28 @@ class Choices {
   }
 
   _generatePlaceholderValue() {
-    if (this._isSelectOneElement) {
-      return false;
+    if (this._isSelectElement) {
+      const { placeholderOption } = this.passedElement;
+
+      return placeholderOption ? placeholderOption.text : false;
     }
 
-    return this.config.placeholder
-      ? this.config.placeholderValue ||
-          this.passedElement.element.getAttribute('placeholder')
-      : false;
+    const { placeholder, placeholderValue } = this.config;
+    const {
+      element: { dataset },
+    } = this.passedElement;
+
+    if (placeholder) {
+      if (placeholderValue) {
+        return placeholderValue;
+      }
+
+      if (dataset.placeholder) {
+        return dataset.placeholder;
+      }
+    }
+
+    return false;
   }
 
   /* =====  End of Private functions  ====== */
