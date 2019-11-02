@@ -1,0 +1,116 @@
+name: Browsers
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'package-lock.json'
+      - '.browserslistrc'
+      - '.babelrc'
+      - 'webpack.config.*'
+      - 'public/index.html'
+      - '.github/actions-scripts/__snapshots__/**'
+
+jobs:
+  selenium:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macOS-10.14]
+        browser: [ie, firefox]
+        exclude:
+          # On Windows, run tests with only IE and Edge
+          - os: windows-latest
+            browser: safari
+          # On macOS, run tests with only on safari
+          - os: macOS-10.14
+            browser: ie
+          - os: macOS-10.14
+            browser: chrome
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: |
+          npm ci
+          npm run build
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+          HUSKY_SKIP_INSTALL: true
+
+      # install drivers
+      - name: Enable Safari Driver
+        run: |
+          # brew tap homebrew/cask-versions
+          # brew cask install safari-technology-preview
+          sudo safaridriver --enable
+          defaults write -app Safari IncludeDevelopMenu 1
+          defaults write -app Safari AllowJavaScriptFromAppleEvents 1
+          defaults write -app Safari IncludeInternalDebugMenu 1
+          defaults write -app Safari AllowRemoteAutomation 1
+          safaridriver -p 0 &
+        if: matrix.browser == 'safari'
+
+      - run: |
+          brew cask install firefox
+          brew install geckodriver
+        if: matrix.browser == 'firefox' && matrix.os == 'macOS-10.14'
+
+      - run: echo "::add-path::$env:GeckoWebDriver"
+        if: matrix.browser == 'firefox' && matrix.os == 'windows-latest'
+
+      - run: echo "::add-path::$env:IEWebDriver"
+        if: matrix.browser == 'ie' && matrix.os == 'windows-latest'
+
+      - run: echo "::add-path::$env:ChromeWebDriver"
+        if: matrix.browser == 'chrome' && matrix.os == 'windows-latest'
+
+      - run: npm i --no-optional --no-audit selenium-webdriver pixelmatch pngjs
+      - run: node .github/actions-scripts/selenium.js
+        env:
+          BROWSER: ${{ matrix.browser }}
+          PORT: 0
+          NODE_ENV: production # prevent watching
+
+      - uses: actions/upload-artifact@master
+        if: failure()
+        with:
+          name: screenshot-${{ matrix.browser }}-${{ matrix.os }}
+          path: screenshot
+
+  puppeteer:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: |
+          npm ci
+          npm run build
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+          HUSKY_SKIP_INSTALL: true
+      - run: npm i --no-optional --no-audit puppeteer pixelmatch pngjs
+      - run: node .github/actions-scripts/puppeteer.js
+        env:
+          PORT: 0
+          NODE_ENV: production # prevent watching
+
+      - uses: actions/upload-artifact@master
+        if: failure()
+        with:
+          name: screenshot-puppeteer-darwin
+          path: screenshot
