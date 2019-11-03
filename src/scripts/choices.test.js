@@ -63,6 +63,36 @@ describe('choices', () => {
             ...config,
           });
         });
+
+        describe('passing the searchEnabled config option with a value of false', () => {
+          describe('passing a select-multiple element', () => {
+            it('sets searchEnabled to true', () => {
+              document.body.innerHTML = `
+              <select data-choice multiple></select>
+              `;
+
+              instance = new Choices('[data-choice]', {
+                searchEnabled: false,
+              });
+
+              expect(instance.config.searchEnabled).to.equal(true);
+            });
+          });
+        });
+
+        describe('passing the renderSelectedChoices config option with an unexpected value', () => {
+          it('sets renderSelectedChoices to "auto"', () => {
+            document.body.innerHTML = `
+            <select data-choice multiple></select>
+            `;
+
+            instance = new Choices('[data-choice]', {
+              renderSelectedChoices: 'test',
+            });
+
+            expect(instance.config.renderSelectedChoices).to.equal('auto');
+          });
+        });
       });
     });
 
