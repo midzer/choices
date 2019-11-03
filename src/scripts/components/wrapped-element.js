@@ -1,14 +1,37 @@
 import { dispatchEvent } from '../lib/utils';
 
-export default class WrappedElement {
-  constructor({ element, classNames }) {
-    Object.assign(this, { element, classNames });
+/**
+ * @typedef {import('../../../types/index').Choices.passedElement} passedElement
+ * @typedef {import('../../../types/index').Choices.ClassNames} ClassNames
+ */
 
-    if (!(element instanceof Element)) {
+export default class WrappedElement {
+  /**
+   * @param {{
+   *  element: HTMLInputElement | HTMLSelectElement,
+   *  classNames: ClassNames,
+   * }} args
+   */
+  constructor({ element, classNames }) {
+    this.element = element;
+    this.classNames = classNames;
+
+    if (
+      !(element instanceof HTMLInputElement) &&
+      !(element instanceof HTMLSelectElement)
+    ) {
       throw new TypeError('Invalid element passed');
     }
 
     this.isDisabled = false;
+  }
+
+  get isActive() {
+    return this.element.dataset.choice === 'active';
+  }
+
+  get dir() {
+    return this.element.dir;
   }
 
   get value() {
@@ -26,7 +49,7 @@ export default class WrappedElement {
     this.element.hidden = true;
 
     // Remove element from tab index
-    this.element.tabIndex = '-1';
+    this.element.tabIndex = -1;
 
     // Backup original styles if any
     const origStyle = this.element.getAttribute('style');

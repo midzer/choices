@@ -31,11 +31,40 @@ describe('components/wrappedElement', () => {
     it('sets isDisabled flag to false', () => {
       expect(instance.isDisabled).to.eql(false);
     });
+
+    describe('passing an element that is not an instance of HTMLInputElement or HTMLSelectElement', () => {
+      it('throws a TypeError', () => {
+        element = document.createElement('div');
+        expect(
+          () =>
+            new WrappedElement({
+              element,
+              classNames: DEFAULT_CLASSNAMES,
+            }),
+        ).to.throw(TypeError, 'Invalid element passed');
+      });
+    });
   });
 
   describe('value getter', () => {
     it('returns element value', () => {
       expect(instance.value).to.eql(element.value);
+    });
+  });
+
+  describe('isActive getter', () => {
+    it('returns whether the "data-choice" attribute is set to "active"', () => {
+      instance.element.dataset.choice = 'active';
+      expect(instance.isActive).to.equal(true);
+
+      instance.element.dataset.choice = 'inactive';
+      expect(instance.isActive).to.equal(false);
+    });
+  });
+
+  describe('dir getter', () => {
+    it('returns the direction of the element', () => {
+      expect(instance.dir).to.equal(instance.element.dir);
     });
   });
 

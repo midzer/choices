@@ -10,7 +10,14 @@ import {
   WrappedInput,
   WrappedSelect,
 } from './components';
-import { DEFAULT_CONFIG, EVENTS, KEY_CODES } from './constants';
+import {
+  DEFAULT_CONFIG,
+  EVENTS,
+  KEY_CODES,
+  TEXT_TYPE,
+  SELECT_ONE_TYPE,
+  SELECT_MULTIPLE_TYPE,
+} from './constants';
 import { TEMPLATES } from './templates';
 import {
   addChoice,
@@ -20,8 +27,7 @@ import {
 } from './actions/choices';
 import { addItem, removeItem, highlightItem } from './actions/items';
 import { addGroup } from './actions/groups';
-import { clearAll, resetTo } from './actions/misc';
-import { setIsLoading } from './actions/general';
+import { clearAll, resetTo, setIsLoading } from './actions/misc';
 import {
   isScrolledIntoView,
   getAdjacentEl,
@@ -37,15 +43,17 @@ import {
   diff,
 } from './lib/utils';
 
-const USER_DEFAULTS = /** @type {Partial<import('../../types/index').Choices.Options>} */ ({});
+/**
+ * @typedef {import('../../types/index').Choices.Choice} Choice
+ * @typedef {import('../../types/index').Choices.Options} Options
+ */
+
+/** @type {Partial<Options>} */
+const USER_DEFAULTS = {};
 
 /**
  * Choices
  * @author Josh Johnson<josh@joshuajohnson.co.uk>
- */
-
-/**
- * @typedef {import('../../types/index').Choices.Choice} Choice
  */
 class Choices {
   static get defaults() {
@@ -61,14 +69,15 @@ class Choices {
 
   /**
    * @param {string | HTMLInputElement | HTMLSelectElement} element
-   * @param {Partial<import('../../types/index').Choices.Options>} userConfig
+   * @param {Partial<Options>} userConfig
    */
   constructor(element = '[data-choice]', userConfig = {}) {
+    /** @type {Partial<Options>} */
     this.config = merge.all(
       [DEFAULT_CONFIG, Choices.defaults.options, userConfig],
       // When merging array configs, replace with a copy of the userConfig array,
       // instead of concatenating with the default array
-      { arrayMerge: (destinationArray, sourceArray) => [...sourceArray] },
+      { arrayMerge: (_, sourceArray) => [...sourceArray] },
     );
 
     // Convert addItemFilter to function
@@ -110,9 +119,9 @@ class Choices {
       );
     }
 
-    this._isTextElement = passedElement.type === 'text';
-    this._isSelectOneElement = passedElement.type === 'select-one';
-    this._isSelectMultipleElement = passedElement.type === 'select-multiple';
+    this._isTextElement = passedElement.type === TEXT_TYPE;
+    this._isSelectOneElement = passedElement.type === SELECT_ONE_TYPE;
+    this._isSelectMultipleElement = passedElement.type === SELECT_MULTIPLE_TYPE;
     this._isSelectElement =
       this._isSelectOneElement || this._isSelectMultipleElement;
 
@@ -148,7 +157,7 @@ class Choices {
      * or when calculated direction is different from the document
      * @type {HTMLElement['dir']}
      */
-    this._direction = this.passedElement.element.dir;
+    this._direction = this.passedElement.dir;
 
     if (!this._direction) {
       const { direction: elementDirection } = window.getComputedStyle(
@@ -193,16 +202,8 @@ class Choices {
     this._onDirectionKey = this._onDirectionKey.bind(this);
     this._onDeleteKey = this._onDeleteKey.bind(this);
 
-    if (this.config.shouldSortItems === true && this._isSelectOneElement) {
-      if (!this.config.silent) {
-        console.warn(
-          "shouldSortElements: Type of passed element is 'select-one', falling back to false.",
-        );
-      }
-    }
-
     // If element has already been initialised with Choices, fail silently
-    if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+    if (this.passedElement.isActive) {
       if (!this.config.silent) {
         console.warn(
           'Trying to initialise Choices on element already initialised',
@@ -781,7 +782,7 @@ class Choices {
 
     // If sorting is enabled, filter groups
     if (this.config.shouldSort) {
-      groups.sort(this.config.sortFn);
+      groups.sort(this.config.sorter);
     }
 
     groups.forEach(group => {
@@ -807,7 +808,7 @@ class Choices {
       searchResultLimit,
       renderChoiceLimit,
     } = this.config;
-    const filter = this._isSearching ? sortByScore : this.config.sortFn;
+    const filter = this._isSearching ? sortByScore : this.config.sorter;
     const appendChoice = choice => {
       const shouldRender =
         renderSelectedChoices === 'auto'
@@ -857,7 +858,7 @@ class Choices {
 
     if (this._isSearching) {
       choiceLimit = searchResultLimit;
-    } else if (renderChoiceLimit > 0 && !withinGroup) {
+    } else if (renderChoiceLimit && renderChoiceLimit > 0 && !withinGroup) {
       choiceLimit = renderChoiceLimit;
     }
 
@@ -873,11 +874,11 @@ class Choices {
 
   _createItemsFragment(items, fragment = document.createDocumentFragment()) {
     // Create fragment to add elements to
-    const { shouldSortItems, sortFn, removeItemButton } = this.config;
+    const { shouldSortItems, sorter, removeItemButton } = this.config;
 
     // If sorting is enabled, filter items
     if (shouldSortItems && !this._isSelectOneElement) {
-      items.sort(sortFn);
+      items.sort(sorter);
     }
 
     if (this._isTextElement) {
@@ -896,7 +897,7 @@ class Choices {
     };
 
     // Add each list item to list
-    items.forEach(item => addItemToFragment(item));
+    items.forEach(addItemToFragment);
 
     return fragment;
   }
@@ -1501,7 +1502,7 @@ class Choices {
         if (
           !isScrolledIntoView(nextEl, this.choiceList.element, directionInt)
         ) {
-          this.choiceList.scrollToChoice(nextEl, directionInt);
+          this.choiceList.scrollToChildElement(nextEl, directionInt);
         }
         this._highlightChoice(nextEl);
       }
@@ -1640,18 +1641,18 @@ class Choices {
     }
 
     const focusActions = {
-      text: () => {
+      [TEXT_TYPE]: () => {
         if (target === this.input.element) {
           this.containerOuter.addFocusState();
         }
       },
-      'select-one': () => {
+      [SELECT_ONE_TYPE]: () => {
         this.containerOuter.addFocusState();
         if (target === this.input.element) {
           this.showDropdown(true);
         }
       },
-      'select-multiple': () => {
+      [SELECT_MULTIPLE_TYPE]: () => {
         if (target === this.input.element) {
           this.showDropdown(true);
           // If element is a select box, the focused element is the container and the dropdown
@@ -1671,7 +1672,7 @@ class Choices {
       const { activeItems } = this._store;
       const hasHighlightedItems = activeItems.some(item => item.highlighted);
       const blurActions = {
-        text: () => {
+        [TEXT_TYPE]: () => {
           if (target === this.input.element) {
             this.containerOuter.removeFocusState();
             if (hasHighlightedItems) {
@@ -1680,7 +1681,7 @@ class Choices {
             this.hideDropdown(true);
           }
         },
-        'select-one': () => {
+        [SELECT_ONE_TYPE]: () => {
           this.containerOuter.removeFocusState();
           if (
             target === this.input.element ||
@@ -1689,7 +1690,7 @@ class Choices {
             this.hideDropdown(true);
           }
         },
-        'select-multiple': () => {
+        [SELECT_MULTIPLE_TYPE]: () => {
           if (target === this.input.element) {
             this.containerOuter.removeFocusState();
             this.hideDropdown(true);
@@ -1906,7 +1907,14 @@ class Choices {
     const isDisabled = group.disabled ? group.disabled : false;
 
     if (groupChoices) {
-      this._store.dispatch(addGroup(group.label, groupId, true, isDisabled));
+      this._store.dispatch(
+        addGroup({
+          value: group.label,
+          id: groupId,
+          active: true,
+          disabled: isDisabled,
+        }),
+      );
 
       const addGroupChoices = choice => {
         const isOptDisabled =
@@ -1926,7 +1934,12 @@ class Choices {
       groupChoices.forEach(addGroupChoices);
     } else {
       this._store.dispatch(
-        addGroup(group.label, group.id, false, group.disabled),
+        addGroup({
+          value: group.label,
+          id: group.id,
+          active: false,
+          disabled: group.disabled,
+        }),
       );
     }
   }
@@ -2069,7 +2082,7 @@ class Choices {
       );
     } else {
       const passedOptions = this.passedElement.options;
-      const filter = this.config.sortFn;
+      const filter = this.config.sorter;
       const allChoices = this._presetChoices;
 
       // Create array of options from option elements
@@ -2211,7 +2224,7 @@ class Choices {
     const { choices } = this._store;
     // Check 'value' property exists and the choice isn't already selected
     const foundChoice = choices.find(choice =>
-      this.config.itemComparer(choice.value, val),
+      this.config.valueComparer(choice.value, val),
     );
 
     if (foundChoice && !foundChoice.selected) {
@@ -2251,8 +2264,6 @@ class Choices {
 
     return false;
   }
-
-  /* =====  End of Private functions  ====== */
 }
 
 export default Choices;
