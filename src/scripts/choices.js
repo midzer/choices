@@ -611,13 +611,13 @@ class Choices {
 
     this.containerOuter.removeLoadingState();
 
-    this._setLoading(true);
+    this._startLoading();
 
     choicesArrayOrFetcher.forEach(groupOrChoice => {
       if (groupOrChoice.choices) {
         this._addGroup({
+          id: parseInt(groupOrChoice.id, 10) || null,
           group: groupOrChoice,
-          id: groupOrChoice.id || null,
           valueKey: value,
           labelKey: label,
         });
@@ -633,7 +633,7 @@ class Choices {
       }
     });
 
-    this._setLoading(false);
+    this._stopLoading();
 
     return this;
   }
@@ -1073,8 +1073,12 @@ class Choices {
     }
   }
 
-  _setLoading(isLoading) {
-    this._store.dispatch(setIsLoading(isLoading));
+  _startLoading() {
+    this._store.dispatch(setIsLoading(true));
+  }
+
+  _stopLoading() {
+    this._store.dispatch(setIsLoading(false));
   }
 
   _handleLoadingState(setLoading = true) {
@@ -1271,39 +1275,21 @@ class Choices {
     documentElement.removeEventListener('touchend', this._onTouchEnd, true);
     documentElement.removeEventListener('mousedown', this._onMouseDown, true);
 
-    documentElement.removeEventListener('keyup', this._onKeyUp, {
-      passive: true,
-    });
-    documentElement.removeEventListener('click', this._onClick, {
-      passive: true,
-    });
-    documentElement.removeEventListener('touchmove', this._onTouchMove, {
-      passive: true,
-    });
-    documentElement.removeEventListener('mouseover', this._onMouseOver, {
-      passive: true,
-    });
+    documentElement.removeEventListener('keyup', this._onKeyUp);
+    documentElement.removeEventListener('click', this._onClick);
+    documentElement.removeEventListener('touchmove', this._onTouchMove);
+    documentElement.removeEventListener('mouseover', this._onMouseOver);
 
     if (this._isSelectOneElement) {
-      this.containerOuter.element.removeEventListener('focus', this._onFocus, {
-        passive: true,
-      });
-      this.containerOuter.element.removeEventListener('blur', this._onBlur, {
-        passive: true,
-      });
+      this.containerOuter.element.removeEventListener('focus', this._onFocus);
+      this.containerOuter.element.removeEventListener('blur', this._onBlur);
     }
 
-    this.input.element.removeEventListener('focus', this._onFocus, {
-      passive: true,
-    });
-    this.input.element.removeEventListener('blur', this._onBlur, {
-      passive: true,
-    });
+    this.input.element.removeEventListener('focus', this._onFocus);
+    this.input.element.removeEventListener('blur', this._onBlur);
 
     if (this.input.element.form) {
-      this.input.element.form.removeEventListener('reset', this._onFormReset, {
-        passive: true,
-      });
+      this.input.element.form.removeEventListener('reset', this._onFormReset);
     }
 
     this.input.removeEventListeners();
@@ -1801,7 +1787,7 @@ class Choices {
     const passedCustomProperties = customProperties;
     const { items } = this._store;
     const passedLabel = label || passedValue;
-    const passedOptionId = parseInt(choiceId, 10) || -1;
+    const passedOptionId = choiceId || -1;
     const group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
     const id = items ? items.length + 1 : 1;
 
@@ -1895,12 +1881,12 @@ class Choices {
 
     this._store.dispatch(
       addChoice({
-        value,
-        label: choiceLabel,
         id: choiceId,
         groupId,
-        disabled: isDisabled,
         elementId: choiceElementId,
+        value,
+        label: choiceLabel,
+        disabled: isDisabled,
         customProperties,
         placeholder,
         keyCode,
@@ -2067,7 +2053,7 @@ class Choices {
     if (this._isSelectElement) {
       this._highlightPosition = 0;
       this._isSearching = false;
-      this._setLoading(true);
+      this._startLoading();
 
       if (this._presetGroups.length) {
         this._addPredefinedGroups(this._presetGroups);
@@ -2075,7 +2061,7 @@ class Choices {
         this._addPredefinedChoices(this._presetChoices);
       }
 
-      this._setLoading(false);
+      this._stopLoading();
     }
 
     if (this._isTextElement) {
@@ -2113,13 +2099,11 @@ class Choices {
       choices.sort(this.config.sorter);
     }
 
-    // Determine whether there is a selected choice
     const hasSelectedChoice = choices.some(choice => choice.selected);
     const firstEnabledChoiceIndex = choices.findIndex(
-      _choice => _choice.disabled === undefined || !_choice.disabled,
+      choice => choice.disabled === undefined || !choice.disabled,
     );
 
-    // Add each choice
     choices.forEach((choice, index) => {
       const { value, label, customProperties, placeholder } = choice;
 
