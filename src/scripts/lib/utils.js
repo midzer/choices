@@ -59,12 +59,6 @@ export const wrap = (element, wrapper = document.createElement('div')) => {
 };
 
 /**
- * @param {HTMLElement} el
- * @param {string} attr
- */
-export const findAncestorByAttrName = (el, attr) => el.closest(`[${attr}]`);
-
-/**
  * @param {Element} startEl
  * @param {string} selector
  * @param {1 | -1} direction
@@ -184,13 +178,6 @@ export const dispatchEvent = (element, type, customArgs = null) => {
 
   return element.dispatchEvent(event);
 };
-
-/**
- * @param {string} userAgent
- * @returns {boolean}
- */
-export const isIE11 = userAgent =>
-  !!(userAgent.match(/Trident/) && userAgent.match(/rv[ :]11/));
 
 /**
  * @param {array} array
