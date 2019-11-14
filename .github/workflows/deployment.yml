@@ -45,7 +45,7 @@ jobs:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
 
   publish-npm:
-    needs: build
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
