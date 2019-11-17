@@ -359,6 +359,21 @@
             <option value="value2">label2</option>
           </select>
         </div>
+
+        <div data-test-hook="new-destroy-init">
+          <label for="choices-new-destroy-init">New, Destroy, Init</label>
+          <select
+            class="form-control"
+            name="choices-new-destroy-init"
+            id="choices-new-destroy-init"
+          >
+            <option value="Choice 1">Choice 1</option>
+            <option value="Choice 2">Choice 2</option>
+            <option value="Choice 3">Choice 3</option>
+          </select>
+          <button class="destroy">Destroy</button>
+          <button class="init">Init</button>
+        </div>
       </div>
     </div>
     <script>
@@ -523,6 +538,16 @@
         );
 
         new Choices('#choices-search-by-label', { searchFields: ['label'] });
+
+        const newDestroyInitChoices = new Choices('#choices-new-destroy-init');
+        document
+          .querySelector('button.destroy')
+          .addEventListener('click', () => {
+            newDestroyInitChoices.destroy();
+          });
+        document.querySelector('button.init').addEventListener('click', () => {
+          newDestroyInitChoices.init();
+        });
       });
     </script>
   </body>
