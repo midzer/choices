@@ -4616,10 +4616,7 @@ function () {
   _proto._onKeyDown = function _onKeyDown(event) {
     var _keyDownActions;
 
-    var target = event.target,
-        keyCode = event.keyCode,
-        ctrlKey = event.ctrlKey,
-        metaKey = event.metaKey;
+    var keyCode = event.keyCode;
     var activeItems = this._store.activeItems;
     var hasFocusedInput = this.input.isFocussed;
     var hasActiveDropdown = this.dropdown.isActive;
@@ -4633,8 +4630,7 @@ function () {
         UP_KEY = KEY_CODES.UP_KEY,
         DOWN_KEY = KEY_CODES.DOWN_KEY,
         PAGE_UP_KEY = KEY_CODES.PAGE_UP_KEY,
-        PAGE_DOWN_KEY = KEY_CODES.PAGE_DOWN_KEY;
-    var hasCtrlDownKeyPressed = ctrlKey || metaKey; // If a user is typing and the dropdown is not active
+        PAGE_DOWN_KEY = KEY_CODES.PAGE_DOWN_KEY; // If a user is typing and the dropdown is not active
 
     if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
       this.showDropdown();
@@ -4646,14 +4642,10 @@ function () {
     if (keyDownActions[keyCode]) {
       keyDownActions[keyCode]({
         event: event,
-        target: target,
-        keyCode: keyCode,
-        metaKey: metaKey,
         activeItems: activeItems,
         hasFocusedInput: hasFocusedInput,
         hasActiveDropdown: hasActiveDropdown,
-        hasItems: hasItems,
-        hasCtrlDownKeyPressed: hasCtrlDownKeyPressed
+        hasItems: hasItems
       });
     }
   };
@@ -4699,10 +4691,12 @@ function () {
   };
 
   _proto._onAKey = function _onAKey(_ref3) {
-    var hasItems = _ref3.hasItems,
-        hasCtrlDownKeyPressed = _ref3.hasCtrlDownKeyPressed;
+    var event = _ref3.event,
+        hasItems = _ref3.hasItems;
+    var ctrlKey = event.ctrlKey,
+        metaKey = event.metaKey;
+    var hasCtrlDownKeyPressed = ctrlKey || metaKey; // If CTRL + A or CMD + A have been pressed and there are items to select
 
-    // If CTRL + A or CMD + A have been pressed and there are items to select
     if (hasCtrlDownKeyPressed && hasItems) {
       this._canSearch = false;
       var shouldHightlightAll = this.config.removeItems && !this.input.value && this.input.element === document.activeElement;
@@ -4715,9 +4709,9 @@ function () {
 
   _proto._onEnterKey = function _onEnterKey(_ref4) {
     var event = _ref4.event,
-        target = _ref4.target,
         activeItems = _ref4.activeItems,
         hasActiveDropdown = _ref4.hasActiveDropdown;
+    var target = event.target;
     var enterKey = KEY_CODES.ENTER_KEY;
     var targetWasButton = target.hasAttribute('data-button');
 
@@ -4775,9 +4769,9 @@ function () {
 
   _proto._onDirectionKey = function _onDirectionKey(_ref6) {
     var event = _ref6.event,
-        hasActiveDropdown = _ref6.hasActiveDropdown,
-        keyCode = _ref6.keyCode,
-        metaKey = _ref6.metaKey;
+        hasActiveDropdown = _ref6.hasActiveDropdown;
+    var keyCode = event.keyCode,
+        metaKey = event.metaKey;
     var downKey = KEY_CODES.DOWN_KEY,
         pageUpKey = KEY_CODES.PAGE_UP_KEY,
         pageDownKey = KEY_CODES.PAGE_DOWN_KEY; // If up or down key is pressed, traverse through options
@@ -4824,11 +4818,10 @@ function () {
 
   _proto._onDeleteKey = function _onDeleteKey(_ref7) {
     var event = _ref7.event,
-        target = _ref7.target,
         hasFocusedInput = _ref7.hasFocusedInput,
         activeItems = _ref7.activeItems;
+    var target = event.target; // If backspace or delete key is pressed and the input has no value
 
-    // If backspace or delete key is pressed and the input has no value
     if (hasFocusedInput && !target.value && !this._isSelectOneElement) {
       this._handleBackspace(activeItems);
 
