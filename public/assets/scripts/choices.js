@@ -4622,6 +4622,7 @@ function () {
     var hasActiveDropdown = this.dropdown.isActive;
     var hasItems = this.itemList.hasChildren();
     var keyString = String.fromCharCode(keyCode);
+    var wasAlphaNumericChar = /[a-zA-Z0-9-_ ]/.test(keyString);
     var BACK_KEY = KEY_CODES.BACK_KEY,
         DELETE_KEY = KEY_CODES.DELETE_KEY,
         ENTER_KEY = KEY_CODES.ENTER_KEY,
@@ -4630,14 +4631,23 @@ function () {
         UP_KEY = KEY_CODES.UP_KEY,
         DOWN_KEY = KEY_CODES.DOWN_KEY,
         PAGE_UP_KEY = KEY_CODES.PAGE_UP_KEY,
-        PAGE_DOWN_KEY = KEY_CODES.PAGE_DOWN_KEY; // If a user is typing and the dropdown is not active
+        PAGE_DOWN_KEY = KEY_CODES.PAGE_DOWN_KEY;
 
-    if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
+    if (!this._isTextElement && !hasActiveDropdown && wasAlphaNumericChar) {
       this.showDropdown();
+
+      if (!this.input.isFocussed) {
+        /*
+          We update the input value with the pressed key as
+          the input was not focussed at the time of key press
+          therefore does not have the value of the key.
+        */
+        this.input.value += keyString.toLowerCase();
+      }
     } // Map keys to key actions
 
 
-    var keyDownActions = (_keyDownActions = {}, _keyDownActions[A_KEY] = this._onAKey, _keyDownActions[ENTER_KEY] = this._onEnterKey, _keyDownActions[ESC_KEY] = this._onEscapeKey, _keyDownActions[UP_KEY] = this._onDirectionKey, _keyDownActions[PAGE_UP_KEY] = this._onDirectionKey, _keyDownActions[DOWN_KEY] = this._onDirectionKey, _keyDownActions[PAGE_DOWN_KEY] = this._onDirectionKey, _keyDownActions[DELETE_KEY] = this._onDeleteKey, _keyDownActions[BACK_KEY] = this._onDeleteKey, _keyDownActions); // If keycode has a function, run it
+    var keyDownActions = (_keyDownActions = {}, _keyDownActions[A_KEY] = this._onAKey, _keyDownActions[ENTER_KEY] = this._onEnterKey, _keyDownActions[ESC_KEY] = this._onEscapeKey, _keyDownActions[UP_KEY] = this._onDirectionKey, _keyDownActions[PAGE_UP_KEY] = this._onDirectionKey, _keyDownActions[DOWN_KEY] = this._onDirectionKey, _keyDownActions[PAGE_DOWN_KEY] = this._onDirectionKey, _keyDownActions[DELETE_KEY] = this._onDeleteKey, _keyDownActions[BACK_KEY] = this._onDeleteKey, _keyDownActions);
 
     if (keyDownActions[keyCode]) {
       keyDownActions[keyCode]({
@@ -4674,7 +4684,8 @@ function () {
         this.hideDropdown(true);
       }
     } else {
-      var userHasRemovedValue = (keyCode === backKey || keyCode === deleteKey) && !target.value;
+      var wasRemovalKeyCode = keyCode === backKey || keyCode === deleteKey;
+      var userHasRemovedValue = wasRemovalKeyCode && !target.value;
       var canReactivateChoices = !this._isTextElement && this._isSearching;
       var canSearch = this._canSearch && canAddItem.response;
 
