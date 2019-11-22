@@ -5,13 +5,6 @@ describe('Choices - select one', () => {
 
   describe('scenarios', () => {
     describe('basic', () => {
-      beforeEach(() => {
-        // open dropdown
-        cy.get('[data-test-hook=basic]')
-          .find('.choices')
-          .click();
-      });
-
       describe('focusing on container', () => {
         describe('pressing enter key', () => {
           it('toggles the dropdown', () => {
@@ -22,7 +15,7 @@ describe('Choices - select one', () => {
 
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown')
-              .should('not.be.visible');
+              .should('be.visible');
 
             cy.get('[data-test-hook=basic]')
               .find('.choices')
@@ -31,42 +24,38 @@ describe('Choices - select one', () => {
 
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown')
-              .should('be.visible');
+              .should('not.be.visible');
           });
         });
-      });
 
-      describe('focusing on text input', () => {
-        it('displays a dropdown of choices', () => {
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--dropdown')
-            .should('be.visible');
+        describe('pressing an alpha-numeric key', () => {
+          it('opens the dropdown and the input value', () => {
+            const inputValue = 'test';
 
-          cy.get('[data-test-hook=basic]')
-            .find('.choices__list--dropdown .choices__list')
-            .children()
-            .should('have.length', 4)
-            .each(($choice, index) => {
-              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
-            });
-        });
-
-        describe('pressing escape', () => {
-          beforeEach(() => {
             cy.get('[data-test-hook=basic]')
-              .find('.choices__input--cloned')
-              .type('{esc}');
-          });
+              .find('.choices')
+              .focus()
+              .type(inputValue);
 
-          it('closes the dropdown', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown')
-              .should('not.be.visible');
+              .should('be.visible');
+
+            cy.get('[data-test-hook=basic]')
+              .find('.choices__input--cloned')
+              .should('have.value', inputValue);
           });
         });
       });
 
       describe('selecting choices', () => {
+        beforeEach(() => {
+          // open dropdown
+          cy.get('[data-test-hook=basic]')
+            .find('.choices')
+            .click();
+        });
+
         const selectedChoiceText = 'Choice 1';
 
         it('allows selecting choices from dropdown', () => {
@@ -102,6 +91,13 @@ describe('Choices - select one', () => {
       });
 
       describe('searching choices', () => {
+        beforeEach(() => {
+          // open dropdown
+          cy.get('[data-test-hook=basic]')
+            .find('.choices')
+            .click();
+        });
+
         describe('on input', () => {
           describe('searching by label', () => {
             it('displays choices filtered by inputted value', () => {
