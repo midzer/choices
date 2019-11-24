@@ -456,7 +456,7 @@ class Choices {
   }
 
   /**
-   * @param {string[] | import('../../types/index').Choices.Item[]} items
+   * @param {string[] | Item[]} items
    */
   setValue(items) {
     if (!this.initialised) {
@@ -1625,6 +1625,7 @@ class Choices {
         this._handleChoiceAction(activeItems, item);
       }
     }
+
     event.preventDefault();
   }
 
@@ -1859,39 +1860,26 @@ class Choices {
       value: passedValue,
       label: passedLabel,
       customProperties: passedCustomProperties,
-      groupValue: group && group.value ? group.value : undefined,
+      groupValue: group && group.value ? group.value : null,
       keyCode: passedKeyCode,
     });
-
-    return this;
   }
 
+  /**
+   * @param {Item} item
+   */
   _removeItem(item) {
-    if (!item || !isType('Object', item)) {
-      return this;
-    }
-
-    const { id, value, label, choiceId, groupId } = item;
+    const { id, value, label, customProperties, choiceId, groupId } = item;
     const group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
 
     this._store.dispatch(removeItem(id, choiceId));
-
-    if (group && group.value) {
-      this.passedElement.triggerEvent(EVENTS.removeItem, {
-        id,
-        value,
-        label,
-        groupValue: group.value,
-      });
-    } else {
-      this.passedElement.triggerEvent(EVENTS.removeItem, {
-        id,
-        value,
-        label,
-      });
-    }
-
-    return this;
+    this.passedElement.triggerEvent(EVENTS.removeItem, {
+      id,
+      value,
+      label,
+      customProperties,
+      groupValue: group && group.value ? group.value : null,
+    });
   }
 
   _addChoice({
