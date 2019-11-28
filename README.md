@@ -467,7 +467,7 @@ For backward compatibility, `<option placeholder>This is a placeholder</option>`
 
 **Type:** `String` **Default:** `null`
 
-**Input types affected:** `text`, `select-multiple`
+**Input types affected:** `text`
 
 **Usage:** The value of the inputs placeholder.
 
