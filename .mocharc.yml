@@ -1,7 +1,8 @@
 require:
-  - '@babel/register'
+  - 'ts-node/register'
   - './config/jsdom.js'
-
 exit: true
-
-spec: src/**/*.test.js
+spec: src/**/**/*.test.ts
+extension:
+  - ts
+  - js
