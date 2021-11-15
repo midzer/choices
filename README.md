@@ -8,7 +8,7 @@
 
 A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
-[Demo](https://joshuajohnson.co.uk/Choices/)
+[Demo](https://choices-js.github.io/Choices/)
 
 ## TL;DR
 
