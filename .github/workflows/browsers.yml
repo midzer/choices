@@ -79,13 +79,13 @@ jobs:
           brew install geckodriver
         if: matrix.browser == 'firefox' && matrix.os == 'macos-latest'
 
-      - run: echo "::add-path::$env:GeckoWebDriver"
+      - run: echo "$env:GeckoWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'firefox' && matrix.os == 'windows-latest'
 
-      - run: echo "::add-path::$env:IEWebDriver"
+      - run: echo "$env:IEWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'ie' && matrix.os == 'windows-latest'
 
-      - run: echo "::add-path::$env:ChromeWebDriver"
+      - run: echo "$env:ChromeWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'chrome' && matrix.os == 'windows-latest'
 
       - run: npm i --no-optional --no-audit selenium-webdriver pixelmatch pngjs
