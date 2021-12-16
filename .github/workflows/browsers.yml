@@ -75,14 +75,14 @@ jobs:
         if: matrix.browser == 'safari'
 
       - run: |
-          brew cask install firefox
+          brew install --cask firefox
           brew install geckodriver
         if: matrix.browser == 'firefox' && matrix.os == 'macos-latest'
 
       - run: echo "$env:GeckoWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'firefox' && matrix.os == 'windows-latest'
 
-      - run: echo "$env:IEWebDriver" >> $GITHUB_PATH
+      - run: echo "C:\SeleniumWebDrivers\IEDriver" >> $GITHUB_PATH
         if: matrix.browser == 'ie' && matrix.os == 'windows-latest'
 
       - run: echo "$env:ChromeWebDriver" >> $GITHUB_PATH
