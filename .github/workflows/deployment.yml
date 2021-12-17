@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 1
       - uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: npm ci
         env:
@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 1
       - uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
           registry-url: https://registry.npmjs.org/
       - name: Build
         run: |

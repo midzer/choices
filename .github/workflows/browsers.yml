@@ -18,14 +18,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
-        browser: [ie, firefox, safari]
+        browser: [edge, firefox, safari]
         exclude:
-          # On Windows, run tests with only IE and Edge
+          # On Windows, run tests with Edge only
           - os: windows-latest
             browser: safari
           # On macOS, run tests with only on safari
           - os: macos-latest
-            browser: ie
+            browser: edge
           - os: macos-latest
             browser: chrome
           # Safari workaround is not working in Catalina
@@ -82,8 +82,8 @@ jobs:
       - run: echo "$env:GeckoWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'firefox' && matrix.os == 'windows-latest'
 
-      - run: echo "C:\SeleniumWebDrivers\IEDriver" >> $GITHUB_PATH
-        if: matrix.browser == 'ie' && matrix.os == 'windows-latest'
+      - run: echo "$env:EdgeWebDriver" >> $GITHUB_PATH
+        if: matrix.browser == 'edge' && matrix.os == 'windows-latest'
 
       - run: echo "$env:ChromeWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'chrome' && matrix.os == 'windows-latest'
