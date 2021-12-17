@@ -1,12 +1,6 @@
 import { expect } from 'chai';
-import {
-  DEFAULT_CLASSNAMES,
-  DEFAULT_CONFIG,
-  EVENTS,
-  ACTION_TYPES,
-  KEY_CODES,
-  SCROLLING_SPEED,
-} from './constants';
+import { EVENTS, ACTION_TYPES, KEY_CODES, SCROLLING_SPEED } from './constants';
+import { DEFAULT_CLASSNAMES, DEFAULT_CONFIG } from './defaults';
 
 describe('constants', () => {
   describe('type checks', () => {
@@ -145,7 +139,7 @@ describe('constants', () => {
       });
 
       it('exports each value as a number', () => {
-        Object.keys(KEY_CODES).forEach(key => {
+        Object.keys(KEY_CODES).forEach((key) => {
           expect(KEY_CODES[key]).to.be.a('number');
         });
       });

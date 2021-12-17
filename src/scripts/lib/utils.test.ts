@@ -84,7 +84,7 @@ describe('utils', () => {
       expect(getType([])).to.equal('Array');
       expect(getType(() => {})).to.equal('Function');
       expect(getType(new Error())).to.equal('Error');
-      expect(getType(new RegExp(/''/g))).to.equal('RegExp');
+      expect(getType(/''/g)).to.equal('RegExp');
       expect(getType(new String())).to.equal('String'); // eslint-disable-line
       expect(getType('')).to.equal('String');
     });
