@@ -4,11 +4,14 @@ import sinonChai from 'sinon-chai';
 
 import Choices from './choices';
 
-import { EVENTS, ACTION_TYPES, DEFAULT_CONFIG, KEY_CODES } from './constants';
+import { EVENTS, ACTION_TYPES, KEY_CODES } from './constants';
 import { WrappedSelect, WrappedInput } from './components/index';
 import { removeItem } from './actions/items';
-import { Item, Choice, Group } from './interfaces';
 import templates from './templates';
+import { Choice } from './interfaces/choice';
+import { Group } from './interfaces/group';
+import { Item } from './interfaces/item';
+import { DEFAULT_CONFIG } from './defaults';
 
 chai.use(sinonChai);
 
@@ -563,21 +566,21 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('opens containerOuter', done => {
+        it('opens containerOuter', (done) => {
           requestAnimationFrame(() => {
             expect(containerOuterOpenSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('shows dropdown with blurInput flag', done => {
+        it('shows dropdown with blurInput flag', (done) => {
           requestAnimationFrame(() => {
             expect(dropdownShowSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('triggers event on passedElement', done => {
+        it('triggers event on passedElement', (done) => {
           requestAnimationFrame(() => {
             expect(passedElementTriggerEventStub.called).to.equal(true);
             expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(
@@ -595,7 +598,7 @@ describe('choices', () => {
             output = instance.showDropdown(true);
           });
 
-          it('focuses input', done => {
+          it('focuses input', (done) => {
             requestAnimationFrame(() => {
               expect(inputFocusSpy.called).to.equal(true);
               done();
@@ -661,21 +664,21 @@ describe('choices', () => {
           expect(output).to.eql(instance);
         });
 
-        it('closes containerOuter', done => {
+        it('closes containerOuter', (done) => {
           requestAnimationFrame(() => {
             expect(containerOuterCloseSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('hides dropdown with blurInput flag', done => {
+        it('hides dropdown with blurInput flag', (done) => {
           requestAnimationFrame(() => {
             expect(dropdownHideSpy.called).to.equal(true);
             done();
           });
         });
 
-        it('triggers event on passedElement', done => {
+        it('triggers event on passedElement', (done) => {
           requestAnimationFrame(() => {
             expect(passedElementTriggerEventStub.called).to.equal(true);
             expect(passedElementTriggerEventStub.lastCall.args[0]).to.eql(
@@ -693,14 +696,14 @@ describe('choices', () => {
             output = instance.hideDropdown(true);
           });
 
-          it('removes active descendants', done => {
+          it('removes active descendants', (done) => {
             requestAnimationFrame(() => {
               expect(inputRemoveActiveDescendantSpy.called).to.equal(true);
               done();
             });
           });
 
-          it('blurs input', done => {
+          it('blurs input', (done) => {
             requestAnimationFrame(() => {
               expect(inputBlurSpy.called).to.equal(true);
               done();
@@ -1192,7 +1195,8 @@ describe('choices', () => {
           const fetcher = async (inst): Promise<Choice[]> => {
             expect(inst).to.eq(choice);
             fetcherCalled = true;
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // eslint-disable-next-line no-promise-executor-return
+            await new Promise((resolve) => setTimeout(resolve, 800));
 
             return [
               { label: 'l1', value: 'v1', customProperties: { prop1: true } },
@@ -1381,7 +1385,7 @@ describe('choices', () => {
           });
 
           it('returns all active item values', () => {
-            expect(output).to.eql(items.map(item => item.value));
+            expect(output).to.eql(items.map((item) => item.value));
           });
         });
       });
@@ -1612,7 +1616,8 @@ describe('choices', () => {
         instance.clearChoices = clearChoicesStub;
         instance._addGroup = addGroupStub;
         instance._addChoice = addChoiceStub;
-        instance.containerOuter.removeLoadingState = containerOuterRemoveLoadingStateStub;
+        instance.containerOuter.removeLoadingState =
+          containerOuterRemoveLoadingStateStub;
       });
 
       afterEach(() => {
@@ -2093,7 +2098,7 @@ describe('choices', () => {
           KEY_CODES.PAGE_DOWN_KEY,
         ];
 
-        keyCodes.forEach(keyCode => {
+        keyCodes.forEach((keyCode) => {
           it(`calls _onDirectionKey with the expected arguments`, () => {
             const event = {
               keyCode,
@@ -2143,7 +2148,7 @@ describe('choices', () => {
       describe('delete key', () => {
         const keyCodes = [KEY_CODES.DELETE_KEY, KEY_CODES.BACK_KEY];
 
-        keyCodes.forEach(keyCode => {
+        keyCodes.forEach((keyCode) => {
           it(`calls _onDeleteKey with the expected arguments`, () => {
             const event = {
               keyCode,
@@ -2188,10 +2193,10 @@ describe('choices', () => {
           );
         });
 
-        it('triggers a REMOVE_ITEM event on the passed element', done => {
+        it('triggers a REMOVE_ITEM event on the passed element', (done) => {
           passedElement.addEventListener(
             'removeItem',
-            event => {
+            (event) => {
               expect(event.detail).to.eql({
                 id: item.id,
                 value: item.value,
@@ -2226,10 +2231,10 @@ describe('choices', () => {
             instance._store.getGroupById.reset();
           });
 
-          it("includes the group's value in the triggered event", done => {
+          it("includes the group's value in the triggered event", (done) => {
             passedElement.addEventListener(
               'removeItem',
-              event => {
+              (event) => {
                 expect(event.detail).to.eql({
                   id: itemWithGroup.id,
                   value: itemWithGroup.value,

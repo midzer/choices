@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { stub } from 'sinon';
+import { DEFAULT_CLASSNAMES } from '../defaults';
 import Input from './input';
-import { DEFAULT_CLASSNAMES } from '../constants';
 
 describe('components/input', () => {
   let instance;

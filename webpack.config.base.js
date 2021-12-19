@@ -1,3 +1,4 @@
+const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path');
 
 const include = path.resolve(__dirname, './src/scripts');
@@ -10,16 +11,6 @@ module.exports = {
   entry: ['./src/scripts/choices'],
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        loader: 'eslint-loader',
-        test: /\.js?$/,
-        include,
-        exclude,
-        options: {
-          quiet: true,
-        },
-      },
       {
         loader: 'babel-loader',
         test: /\.ts?$/,
@@ -40,6 +31,12 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"]
   },
+  plugins: [new ESLintPlugin({
+    context: include,
+    files: '**/*.js',
+    exclude: 'node_modules',
+    quiet: true
+  })],
   output: {
     library: 'Choices',
     libraryTarget: 'window',

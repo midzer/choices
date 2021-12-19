@@ -18,14 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
-        browser: [ie, firefox, safari]
+        browser: [edge, firefox, safari, chrome]
         exclude:
-          # On Windows, run tests with only IE and Edge
           - os: windows-latest
             browser: safari
-          # On macOS, run tests with only on safari
           - os: macos-latest
-            browser: ie
+            browser: edge
           - os: macos-latest
             browser: chrome
           # Safari workaround is not working in Catalina
@@ -75,17 +73,17 @@ jobs:
         if: matrix.browser == 'safari'
 
       - run: |
-          brew cask install firefox
+          brew install --cask firefox
           brew install geckodriver
         if: matrix.browser == 'firefox' && matrix.os == 'macos-latest'
 
-      - run: echo "::add-path::$env:GeckoWebDriver"
+      - run: echo "$env:GeckoWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'firefox' && matrix.os == 'windows-latest'
 
-      - run: echo "::add-path::$env:IEWebDriver"
-        if: matrix.browser == 'ie' && matrix.os == 'windows-latest'
+      - run: echo "$env:EdgeWebDriver" >> $GITHUB_PATH
+        if: matrix.browser == 'edge' && matrix.os == 'windows-latest'
 
-      - run: echo "::add-path::$env:ChromeWebDriver"
+      - run: echo "$env:ChromeWebDriver" >> $GITHUB_PATH
         if: matrix.browser == 'chrome' && matrix.os == 'windows-latest'
 
       - run: npm i --no-optional --no-audit selenium-webdriver pixelmatch pngjs

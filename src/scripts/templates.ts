@@ -1,9 +1,13 @@
-import { ClassNames, Item, Choice, Group, PassedElement } from './interfaces';
-
 /**
  * Helpers to create HTML elements used by Choices
  * Can be overridden by providing `callbackOnCreateTemplates` option
  */
+
+import { Choice } from './interfaces/choice';
+import { ClassNames } from './interfaces/class-names';
+import { Group } from './interfaces/group';
+import { Item } from './interfaces/item';
+import { PassedElementType } from './interfaces/passed-element-type';
 
 const templates = {
   containerOuter(
@@ -12,7 +16,7 @@ const templates = {
     isSelectElement: boolean,
     isSelectOneElement: boolean,
     searchEnabled: boolean,
-    passedElementType: PassedElement['type'],
+    passedElementType: PassedElementType,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
       className: containerOuter,

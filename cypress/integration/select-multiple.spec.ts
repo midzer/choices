@@ -62,7 +62,7 @@ describe('Choices - select multiple', () => {
               .find('.choices__list--dropdown .choices__list')
               .children()
               .first()
-              .then($choice => {
+              .then(($choice) => {
                 selectedChoiceText = $choice.text().trim();
               })
               .click();
@@ -72,7 +72,7 @@ describe('Choices - select multiple', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--multiple .choices__item')
               .last()
-              .should($item => {
+              .should(($item) => {
                 expect($item).to.contain(selectedChoiceText);
               });
           });
@@ -80,7 +80,7 @@ describe('Choices - select multiple', () => {
           it('updates the value of the original input', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__input[hidden]')
-              .should($select => {
+              .should(($select) => {
                 expect($select.val()).to.contain(selectedChoiceText);
               });
           });
@@ -89,7 +89,7 @@ describe('Choices - select multiple', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown .choices__list')
               .children()
-              .each($choice => {
+              .each(($choice) => {
                 expect($choice.text().trim()).to.not.equal(selectedChoiceText);
               });
           });
@@ -114,7 +114,7 @@ describe('Choices - select multiple', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__list--dropdown')
               .should('be.visible')
-              .should($dropdown => {
+              .should(($dropdown) => {
                 const dropdownText = $dropdown.text().trim();
                 expect(dropdownText).to.equal('No choices to choose from');
               });
@@ -130,7 +130,7 @@ describe('Choices - select multiple', () => {
             .find('.choices__list--dropdown .choices__list')
             .children()
             .last()
-            .then($choice => {
+            .then(($choice) => {
               removedChoiceText = $choice.text().trim();
             })
             .click();
@@ -151,7 +151,7 @@ describe('Choices - select multiple', () => {
           it('updates the value of the original input', () => {
             cy.get('[data-test-hook=basic]')
               .find('.choices__input[hidden]')
-              .should($select => {
+              .should(($select) => {
                 const val = $select.val() || [];
                 expect(val).to.not.contain(removedChoiceText);
               });
@@ -171,7 +171,7 @@ describe('Choices - select multiple', () => {
                 .find('.choices__list--dropdown .choices__list')
                 .children()
                 .first()
-                .should($choice => {
+                .should(($choice) => {
                   expect($choice.text().trim()).to.equal('Choice 2');
                 });
             });
@@ -187,7 +187,7 @@ describe('Choices - select multiple', () => {
                 .find('.choices__list--dropdown .choices__list')
                 .children()
                 .first()
-                .should($choice => {
+                .should(($choice) => {
                   expect($choice.text().trim()).to.equal('Choice 3');
                 });
             });
@@ -202,7 +202,7 @@ describe('Choices - select multiple', () => {
               cy.get('[data-test-hook=basic]')
                 .find('.choices__list--dropdown')
                 .should('be.visible')
-                .should($dropdown => {
+                .should(($dropdown) => {
                   const dropdownText = $dropdown.text().trim();
                   expect(dropdownText).to.equal('No results found');
                 });
@@ -346,10 +346,10 @@ describe('Choices - select multiple', () => {
 
     describe('selection limit', () => {
       /*
-        {
-          maxItemCount: 5,
-        }
-      */
+          {
+            maxItemCount: 5,
+          }
+        */
       const selectionLimit = 5;
 
       beforeEach(() => {
@@ -370,7 +370,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=selection-limit]')
           .find('.choices__list--dropdown')
           .should('be.visible')
-          .should($dropdown => {
+          .should(($dropdown) => {
             const dropdownText = $dropdown.text().trim();
             expect(dropdownText).to.equal(
               `Only ${selectionLimit} values can be added`,
@@ -397,7 +397,7 @@ describe('Choices - select multiple', () => {
           .find('.choices__list--dropdown .choices__list')
           .children()
           .last()
-          .then($choice => {
+          .then(($choice) => {
             selectedChoiceText = $choice.text().trim();
           })
           .click();
@@ -407,7 +407,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=prepend-append]')
           .find('.choices__list--multiple .choices__item')
           .last()
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.data('value')).to.equal(
               `before-${selectedChoiceText}-after`,
             );
@@ -418,7 +418,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=prepend-append]')
           .find('.choices__list--multiple .choices__item')
           .last()
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.text()).to.not.contain(
               `before-${selectedChoiceText}-after`,
             );
@@ -460,7 +460,7 @@ describe('Choices - select multiple', () => {
               .find('.choices__list--dropdown .choices__list')
               .children()
               .first()
-              .should($choice => {
+              .should(($choice) => {
                 expect($choice.text().trim()).to.not.contain(searchTerm);
               });
           });
@@ -478,7 +478,7 @@ describe('Choices - select multiple', () => {
               .find('.choices__list--dropdown .choices__list')
               .children()
               .first()
-              .should($choice => {
+              .should(($choice) => {
                 expect($choice.text().trim()).to.contain(searchTerm);
               });
           });
@@ -570,7 +570,7 @@ describe('Choices - select multiple', () => {
       beforeEach(() => {
         cy.get('[data-test-hook=scrolling-dropdown]')
           .find('.choices__list--dropdown .choices__list .choices__item')
-          .then($choices => {
+          .then(($choices) => {
             choicesCount = $choices.length;
           });
 
@@ -582,19 +582,20 @@ describe('Choices - select multiple', () => {
       it('highlights first choice on dropdown open', () => {
         cy.get('[data-test-hook=scrolling-dropdown]')
           .find('.choices__list--dropdown .choices__list .is-highlighted')
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.text().trim()).to.equal('Choice 1');
           });
       });
 
       it('scrolls to next choice on down arrow', () => {
-        for (let index = 0; index < choicesCount; index++) {
+        for (let index = 1; index <= choicesCount; index++) {
           cy.wait(100);
 
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
-            .should($choice => {
-              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
+            .invoke('text')
+            .then((text) => {
+              expect(text.trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
@@ -617,8 +618,9 @@ describe('Choices - select multiple', () => {
 
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
-            .should($choice => {
-              expect($choice.text().trim()).to.equal(`Choice ${index}`);
+            .invoke('text')
+            .then((text) => {
+              expect(text.trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
@@ -636,7 +638,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=groups]')
           .find('.choices__list--dropdown .choices__list .choices__group')
           .first()
-          .then($group => {
+          .then(($group) => {
             groupValue = $group.text().trim();
           });
       });
@@ -657,7 +659,7 @@ describe('Choices - select multiple', () => {
           cy.get('[data-test-hook=groups]')
             .find('.choices__list--dropdown .choices__list .choices__group')
             .first()
-            .should($group => {
+            .should(($group) => {
               expect($group.text().trim()).to.not.equal(groupValue);
             });
         });
@@ -688,7 +690,7 @@ describe('Choices - select multiple', () => {
           cy.get('[data-test-hook=groups]')
             .find('.choices__list--dropdown .choices__list .choices__group')
             .first()
-            .should($group => {
+            .should(($group) => {
               expect($group.text().trim()).to.equal(groupValue);
             });
         });
@@ -728,7 +730,7 @@ describe('Choices - select multiple', () => {
               .find('.choices__list--dropdown .choices__list')
               .children()
               .first()
-              .should($choice => {
+              .should(($choice) => {
                 expect($choice.text().trim()).to.equal(city);
               });
 
@@ -742,9 +744,7 @@ describe('Choices - select multiple', () => {
 
     describe('non-string values', () => {
       beforeEach(() => {
-        cy.get('[data-test-hook=non-string-values]')
-          .find('.choices')
-          .click();
+        cy.get('[data-test-hook=non-string-values]').find('.choices').click();
       });
 
       it('displays expected amount of choices in dropdown', () => {
@@ -760,7 +760,7 @@ describe('Choices - select multiple', () => {
           .find('.choices__list--dropdown .choices__list')
           .children()
           .first()
-          .then($choice => {
+          .then(($choice) => {
             $selectedChoice = $choice;
           })
           .click();
@@ -768,7 +768,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=non-string-values]')
           .find('.choices__list--single .choices__item')
           .last()
-          .should($item => {
+          .should(($item) => {
             expect($item.text().trim()).to.equal($selectedChoice.text().trim());
           });
       });
@@ -778,7 +778,7 @@ describe('Choices - select multiple', () => {
       describe('selecting choice', () => {
         describe('on enter key', () => {
           it('selects choice', () => {
-            cy.get('[data-test-hook=within-form] form').then($form => {
+            cy.get('[data-test-hook=within-form] form').then(($form) => {
               $form.submit(() => {
                 // this will fail the test if the form submits
                 throw new Error('Form submitted');
@@ -793,7 +793,7 @@ describe('Choices - select multiple', () => {
             cy.get('[data-test-hook=within-form]')
               .find('.choices__list--multiple .choices__item')
               .last()
-              .should($item => {
+              .should(($item) => {
                 expect($item).to.contain('Choice 1');
               });
           });
@@ -808,7 +808,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=set-choice-by-value]')
           .find('.choices__list--multiple .choices__item')
           .last()
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.text().trim()).to.equal(
               dynamicallySelectedChoiceValue,
             );
@@ -819,7 +819,7 @@ describe('Choices - select multiple', () => {
         cy.get('[data-test-hook=set-choice-by-value]')
           .find('.choices__list--dropdown .choices__list')
           .children()
-          .each($choice => {
+          .each(($choice) => {
             expect($choice.text().trim()).to.not.equal(
               dynamicallySelectedChoiceValue,
             );
@@ -829,7 +829,7 @@ describe('Choices - select multiple', () => {
       it('updates the value of the original input', () => {
         cy.get('[data-test-hook=set-choice-by-value]')
           .find('.choices__input[hidden]')
-          .should($select => {
+          .should(($select) => {
             const val = $select.val() || [];
             expect(val).to.contain(dynamicallySelectedChoiceValue);
           });
@@ -846,7 +846,7 @@ describe('Choices - select multiple', () => {
           .find('.choices__list--dropdown .choices__list')
           .children()
           .first()
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.text().trim()).to.equal('No results found');
           });
       });
@@ -860,7 +860,7 @@ describe('Choices - select multiple', () => {
           .find('.choices__list--dropdown .choices__list')
           .children()
           .first()
-          .should($choice => {
+          .should(($choice) => {
             expect($choice.text().trim()).to.equal('label1');
           });
       });
