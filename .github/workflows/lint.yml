@@ -39,3 +39,6 @@ jobs:
       #   run: |
       #     npm run js:build
       #     npx eslint --no-ignore ./public/assets/scripts/*.js
+
+      - name: run stylelint
+        run: npm run lint:scss
