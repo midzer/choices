@@ -18,12 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
-        browser: [edge, firefox, safari]
+        browser: [edge, firefox, safari, chrome]
         exclude:
-          # On Windows, run tests with Edge only
           - os: windows-latest
             browser: safari
-          # On macOS, run tests with only on safari
           - os: macos-latest
             browser: edge
           - os: macos-latest

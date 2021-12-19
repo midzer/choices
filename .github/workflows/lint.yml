@@ -32,7 +32,10 @@ jobs:
           echo $CHANGED_TS
           node node_modules/eslint/bin/eslint.js $CHANGED_TS
 
-      - name: Lint JS bundle
-        run: |
-          npm run js:build
-          npx eslint --no-ignore ./public/assets/scripts/*.js
+      ## Can't use same eslint config for TypeScript and JavaScript
+      ## TypeScript rules cause rule definition not found errors
+      ## Can be re-enabled if this is resolved: https://github.com/eslint/eslint/issues/14851
+      # - name: Lint JS bundle
+      #   run: |
+      #     npm run js:build
+      #     npx eslint --no-ignore ./public/assets/scripts/*.js
