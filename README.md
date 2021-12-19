@@ -2,10 +2,6 @@
 
 ---
 
-### I'm looking for active maintainers for this project as I no longer have the time to support it. Please get in touch if you're interested 👍
-
----
-
 A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://choices-js.github.io/Choices/)
@@ -1113,6 +1109,10 @@ To setup a local environment: clone this repo, navigate into its directory in a 
 | `npm run js:build`        | Compile Choices to an uglified JavaScript file               |
 | `npm run css:watch`       | Watch SCSS files for changes. On a change, run build process |
 | `npm run css:build`       | Compile, minify and prefix SCSS files to CSS                 |
+
+### Interested in contributing?
+
+We're always interested in having more active maintainers.  Please get in touch if you're interested 👍
 
 ## License
 
