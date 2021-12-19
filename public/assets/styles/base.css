@@ -21,7 +21,7 @@ body {
 }
 
 body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-size: 16px;
   line-height: 1.4;
   color: #ffffff;
@@ -126,7 +126,6 @@ label + p {
   max-width: 40em;
   padding: 48px;
 }
-
 @media (max-width: 620px) {
   .container {
     padding: 0;
@@ -138,7 +137,6 @@ label + p {
   padding: 24px;
   color: #333;
 }
-
 .section a,
 .section a:visited,
 .section a:focus {
