@@ -565,15 +565,13 @@ describe('Choices - select multiple', () => {
     });
 
     describe('dropdown scrolling', () => {
-      let choicesCount: number;
-      // let choicesItems: number[];
+      let choicesCount;
 
       beforeEach(() => {
         cy.get('[data-test-hook=scrolling-dropdown]')
           .find('.choices__list--dropdown .choices__list .choices__item')
           .then(($choices) => {
             choicesCount = $choices.length;
-            // choicesItems = Array.from({ length: 10 }, (_, i) => i + 1);
           });
 
         cy.get('[data-test-hook=scrolling-dropdown]')
@@ -590,13 +588,14 @@ describe('Choices - select multiple', () => {
       });
 
       it('scrolls to next choice on down arrow', () => {
-        for (let index = 0; index < choicesCount; index++) {
+        for (let index = 1; index <= choicesCount; index++) {
           cy.wait(100);
 
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
-            .should(($choice) => {
-              expect($choice.text().trim()).to.equal(`Choice ${index + 1}`);
+            .invoke('text')
+            .then((text) => {
+              expect(text.trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
@@ -619,8 +618,9 @@ describe('Choices - select multiple', () => {
 
           cy.get('[data-test-hook=scrolling-dropdown]')
             .find('.choices__list--dropdown .choices__list .is-highlighted')
-            .should(($choice) => {
-              expect($choice.text().trim()).to.equal(`Choice ${index}`);
+            .invoke('text')
+            .then((text) => {
+              expect(text.trim()).to.equal(`Choice ${index}`);
             });
 
           cy.get('[data-test-hook=scrolling-dropdown]')
