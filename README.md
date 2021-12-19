@@ -191,6 +191,16 @@ Or include Choices directly:
 | Group  | A group is a collection of choices. A group should be seen as equivalent to a `<optgroup></optgroup>` element within a select input.                                                                                                                                                                                    |
 | Item   | An item is an inputted value (text input) or a selected choice (select element). In the context of a select element, an item is equivalent to a selected option element: `<option value="Hello" selected></option>` whereas in the context of a text input an item is equivalent to `<input type="text" value="Hello">` |
 
+## Input Types
+
+Choices works with the following input types, referenced in the documentation as noted.
+
+| HTML Element                                                                                           | Documentation "Input Type" |
+| -------------------------------------------------------------------------------------------------------| -------------------------- |
+| [`<input type="text">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input)               | `text`                     |
+| [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)                         | `select-single`            |
+| [`<select multiple>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select#attr-multiple)  | `select-multiple`          |
+
 ## Configuration options
 
 ### silent
