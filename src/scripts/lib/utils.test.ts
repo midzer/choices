@@ -1,19 +1,20 @@
 /* eslint-disable no-new-wrappers */
 import { expect } from 'chai';
 import { stub } from 'sinon';
+
 import {
-  getRandomNumber,
+  cloneObject,
+  diff,
+  dispatchEvent,
+  existsInArray,
   generateChars,
   generateId,
+  getRandomNumber,
   getType,
   isType,
   sanitise,
   sortByAlpha,
   sortByScore,
-  existsInArray,
-  cloneObject,
-  dispatchEvent,
-  diff,
 } from './utils';
 
 describe('utils', () => {
@@ -113,7 +114,7 @@ describe('utils', () => {
         const value = '<script>somethingMalicious();</script>';
         const output = sanitise(value);
         expect(output).to.equal(
-          '&lt;script&rt;somethingMalicious();&lt;/script&rt;',
+          '&lt;script&gt;somethingMalicious();&lt;/script&gt;',
         );
       });
     });
