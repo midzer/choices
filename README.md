@@ -109,6 +109,7 @@ Or include Choices directly:
     removeItems: true,
     removeItemButton: false,
     editItems: false,
+    allowHTML: true
     duplicateItemsAllowed: true,
     delimiter: ',',
     paste: true,
@@ -313,6 +314,14 @@ Pass an array of objects:
 **Input types affected:** `text`
 
 **Usage:** Whether a user can edit items. An item's value can be edited by pressing the backspace.
+
+### allowHTML
+
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `text`, `select-one`, `select-multiple
+
+**Usage:** Whether HTML should be shown properly when showing choices. (Can be used to perform XSS attacks if not disabled or handled correctly)
 
 ### duplicateItemsAllowed
 

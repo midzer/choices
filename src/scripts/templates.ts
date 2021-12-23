@@ -4,14 +4,14 @@
  */
 
 import { Choice } from './interfaces/choice';
-import { ClassNames } from './interfaces/class-names';
 import { Group } from './interfaces/group';
 import { Item } from './interfaces/item';
+import { Options } from './interfaces/options';
 import { PassedElementType } from './interfaces/passed-element-type';
 
 const templates = {
   containerOuter(
-    { containerOuter }: Pick<ClassNames, 'containerOuter'>,
+    { classNames: { containerOuter } }: Options,
     dir: HTMLElement['dir'],
     isSelectElement: boolean,
     isSelectOneElement: boolean,
@@ -46,19 +46,19 @@ const templates = {
   },
 
   containerInner({
-    containerInner,
-  }: Pick<ClassNames, 'containerInner'>): HTMLDivElement {
+    classNames: { containerInner },
+  }: Options): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
       className: containerInner,
     });
   },
 
-  itemList(
-    {
+  itemList({
+    classNames: {
       list,
       listSingle,
       listItems,
-    }: Pick<ClassNames, 'list' | 'listSingle' | 'listItems'>,
+    }}: Options,
     isSelectOneElement: boolean,
   ): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
@@ -67,26 +67,22 @@ const templates = {
   },
 
   placeholder(
-    { placeholder }: Pick<ClassNames, 'placeholder'>,
+    { allowHTML, classNames: { placeholder } }: Options,
     value: string,
   ): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
       className: placeholder,
-      innerHTML: value,
+      [allowHTML ? 'innerHTML' : 'innerText']: value,
     });
   },
 
-  item(
-    {
+  item({ allowHTML, classNames: {
       item,
       button,
       highlightedState,
       itemSelectable,
       placeholder,
-    }: Pick<
-      ClassNames,
-      'item' | 'button' | 'highlightedState' | 'itemSelectable' | 'placeholder'
-    >,
+    } }: Options,
     {
       id,
       value,
@@ -101,7 +97,7 @@ const templates = {
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
       className: item,
-      innerHTML: label,
+      [allowHTML ? 'innerHTML' : 'innerText']: label,
     });
 
     Object.assign(div.dataset, {
@@ -135,7 +131,7 @@ const templates = {
       const removeButton = Object.assign(document.createElement('button'), {
         type: 'button',
         className: button,
-        innerHTML: REMOVE_ITEM_TEXT,
+        [allowHTML ? 'innerHTML' : 'innerText']: REMOVE_ITEM_TEXT,
       });
       removeButton.setAttribute(
         'aria-label',
@@ -149,7 +145,7 @@ const templates = {
   },
 
   choiceList(
-    { list }: Pick<ClassNames, 'list'>,
+    { classNames: { list } }: Options,
     isSelectOneElement: boolean,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
@@ -164,12 +160,13 @@ const templates = {
     return div;
   },
 
-  choiceGroup(
-    {
+  choiceGroup({
+    allowHTML,
+    classNames: {
       group,
       groupHeading,
       itemDisabled,
-    }: Pick<ClassNames, 'group' | 'groupHeading' | 'itemDisabled'>,
+    } }: Options,
     { id, value, disabled }: Group,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
@@ -191,30 +188,24 @@ const templates = {
     div.appendChild(
       Object.assign(document.createElement('div'), {
         className: groupHeading,
-        innerHTML: value,
+        [allowHTML ? 'innerHTML' : 'innerText']: value,
       }),
     );
 
     return div;
   },
 
-  choice(
-    {
+  choice({
+    allowHTML,
+    classNames: {
       item,
       itemChoice,
       itemSelectable,
       selectedState,
       itemDisabled,
       placeholder,
-    }: Pick<
-      ClassNames,
-      | 'item'
-      | 'itemChoice'
-      | 'itemSelectable'
-      | 'selectedState'
-      | 'itemDisabled'
-      | 'placeholder'
-    >,
+    }
+  }: Options,
     {
       id,
       value,
@@ -229,7 +220,7 @@ const templates = {
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
       id: elementId,
-      innerHTML: label,
+      [allowHTML ? 'innerHTML' : 'innerText']: label,
       className: `${item} ${itemChoice}`,
     });
 
@@ -263,7 +254,7 @@ const templates = {
   },
 
   input(
-    { input, inputCloned }: Pick<ClassNames, 'input' | 'inputCloned'>,
+    { classNames: { input, inputCloned } }: Options,
     placeholderValue: string,
   ): HTMLInputElement {
     const inp = Object.assign(document.createElement('input'), {
@@ -283,9 +274,11 @@ const templates = {
   },
 
   dropdown({
-    list,
-    listDropdown,
-  }: Pick<ClassNames, 'list' | 'listDropdown'>): HTMLDivElement {
+    classNames: {
+      list,
+      listDropdown,
+    }
+  }: Options): HTMLDivElement {
     const div = document.createElement('div');
 
     div.classList.add(list, listDropdown);
@@ -294,14 +287,16 @@ const templates = {
     return div;
   },
 
-  notice(
-    {
+  notice({
+    allowHTML,
+    classNames: {
       item,
       itemChoice,
       noResults,
       noChoices,
-    }: Pick<ClassNames, 'item' | 'itemChoice' | 'noResults' | 'noChoices'>,
-    innerHTML: string,
+    }
+  }: Options,
+    innerText: string,
     type: 'no-choices' | 'no-results' | '' = '',
   ): HTMLDivElement {
     const classes = [item, itemChoice];
@@ -313,7 +308,7 @@ const templates = {
     }
 
     return Object.assign(document.createElement('div'), {
-      innerHTML,
+      [allowHTML ? 'innerHTML' : 'innerText']: innerText,
       className: classes.join(' '),
     });
   },
