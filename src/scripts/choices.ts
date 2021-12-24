@@ -152,7 +152,9 @@ class Choices implements Choices {
     userConfig: Partial<Options> = {},
   ) {
     if (userConfig.allowHTML === undefined) {
-      console.warn('Deprecation warning: allowHTML in the future will be defaulted to false. You must explicitly set it to true to properly display html tags in choices.');
+      console.warn(
+        'Deprecation warning: allowHTML in the future will be defaulted to false. You must explicitly set it to true to properly display html tags in choices.',
+      );
     }
 
     this.config = merge.all<Options>(

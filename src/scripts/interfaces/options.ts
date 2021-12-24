@@ -160,11 +160,11 @@ export interface Options {
   editItems: boolean;
 
   /**
-   * Whether HTML should be shown properly when showing choices. 
+   * Whether HTML should be shown properly when showing choices.
    * (Can be used to perform XSS attacks if not disabled or handled correctly)
-   * 
+   *
    * **Input types affected:** text, select-one, select-multiple
-   * 
+   *
    * @default true
    */
   allowHTML: boolean;
