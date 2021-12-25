@@ -26,7 +26,7 @@ describe('choices', () => {
     passedElement.className = 'js-choices';
     document.body.appendChild(passedElement);
 
-    instance = new Choices(passedElement);
+    instance = new Choices(passedElement, { allowHTML: true });
   });
 
   afterEach(() => {
@@ -55,6 +55,7 @@ describe('choices', () => {
           `;
 
           const config = {
+            allowHTML: true,
             renderChoiceLimit: 5,
           };
           instance = new Choices('[data-choice]', config);
@@ -73,6 +74,7 @@ describe('choices', () => {
               `;
 
               instance = new Choices('[data-choice]', {
+                allowHTML: true,
                 searchEnabled: false,
               });
 
@@ -88,6 +90,7 @@ describe('choices', () => {
             `;
 
             instance = new Choices('[data-choice]', {
+              allowHTML: true,
               renderSelectedChoices: 'test' as any,
             });
 
@@ -108,7 +111,7 @@ describe('choices', () => {
         const inputs = document.querySelectorAll('[data-choice]');
         expect(inputs.length).to.equal(3);
 
-        instance = new Choices();
+        instance = new Choices(undefined, { allowHTML: true });
 
         expect(instance.passedElement.element.id).to.equal(inputs[0].id);
       });
@@ -116,7 +119,7 @@ describe('choices', () => {
       describe('when an element cannot be found in the DOM', () => {
         it('throws an error', () => {
           document.body.innerHTML = ``;
-          expect(() => new Choices()).to.throw(
+          expect(() => new Choices(undefined, { allowHTML: true })).to.throw(
             TypeError,
             'Expected one of the following types text|select-one|select-multiple',
           );
@@ -133,7 +136,7 @@ describe('choices', () => {
         });
 
         it('sets the initialised flag to true', () => {
-          instance = new Choices('#input-1');
+          instance = new Choices('#input-1', { allowHTML: true });
           expect(instance.initialised).to.equal(true);
         });
 
@@ -141,6 +144,7 @@ describe('choices', () => {
           const initSpy = spy();
           // initialise with the same element
           instance = new Choices('#input-1', {
+            allowHTML: true,
             silent: true,
             callbackOnInit: initSpy,
           });
@@ -156,12 +160,12 @@ describe('choices', () => {
           `;
 
           // initialise once
-          new Choices('#input-1', { silent: true });
+          new Choices('#input-1', { allowHTML: true, silent: true });
         });
 
         it('sets the initialised flag to true', () => {
           // initialise with the same element
-          instance = new Choices('#input-1', { silent: true });
+          instance = new Choices('#input-1', { allowHTML: true, silent: true });
 
           expect(instance.initialised).to.equal(true);
         });
@@ -170,6 +174,7 @@ describe('choices', () => {
           const initSpy = spy();
           // initialise with the same element
           instance = new Choices('#input-1', {
+            allowHTML: true,
             silent: true,
             callbackOnInit: initSpy,
           });
@@ -185,7 +190,7 @@ describe('choices', () => {
             <input data-choice type="text" id="input-1" />
             `;
 
-            instance = new Choices('[data-choice]');
+            instance = new Choices('[data-choice]', { allowHTML: true });
 
             expect(instance.passedElement).to.be.an.instanceOf(WrappedInput);
           });
@@ -197,7 +202,7 @@ describe('choices', () => {
             <select data-choice id="select-1"></select>
             `;
 
-            instance = new Choices('[data-choice]');
+            instance = new Choices('[data-choice]', { allowHTML: true });
 
             expect(instance.passedElement).to.be.an.instanceOf(WrappedSelect);
           });
@@ -211,7 +216,7 @@ describe('choices', () => {
             <input data-choice type="text" id="input-1" />
             `;
 
-            instance = new Choices('[data-choice]');
+            instance = new Choices('[data-choice]', { allowHTML: true });
 
             expect(instance.passedElement).to.be.an.instanceOf(WrappedInput);
           });
@@ -223,7 +228,7 @@ describe('choices', () => {
             <select data-choice id="select-1"></select>
             `;
 
-            instance = new Choices('[data-choice]');
+            instance = new Choices('[data-choice]', { allowHTML: true });
 
             expect(instance.passedElement).to.be.an.instanceOf(WrappedSelect);
           });
@@ -235,7 +240,7 @@ describe('choices', () => {
           document.body.innerHTML = `
           <div data-choice id="div-1"></div>
           `;
-          expect(() => new Choices('[data-choice]')).to.throw(
+          expect(() => new Choices('[data-choice]', { allowHTML: true })).to.throw(
             TypeError,
             'Expected one of the following types text|select-one|select-multiple',
           );
@@ -250,6 +255,7 @@ describe('choices', () => {
 
       beforeEach(() => {
         instance = new Choices(passedElement, {
+          allowHTML: true,
           callbackOnInit: callbackOnInitSpy,
           silent: true,
         });
@@ -330,7 +336,7 @@ describe('choices', () => {
         passedElement.className = 'js-choices';
         document.body.appendChild(passedElement);
 
-        instance = new Choices(passedElement);
+        instance = new Choices(passedElement, { allowHTML: true });
       });
 
       describe('not already initialised', () => {
@@ -1188,7 +1194,7 @@ describe('choices', () => {
       describe('select element', () => {
         it('fetches and sets choices', async () => {
           document.body.innerHTML = '<select id="test" />';
-          const choice = new Choices('#test');
+          const choice = new Choices('#test', { allowHTML: true });
           const handleLoadingStateSpy = spy(choice, '_handleLoadingState');
 
           let fetcherCalled = false;
@@ -2063,7 +2069,7 @@ describe('choices', () => {
           output = instance._getTemplate(templateKey, customArg);
           expect(output).to.deep.equal(element);
           expect(instance._templates[templateKey]).to.have.been.calledOnceWith(
-            instance.config.classNames,
+            instance.config,
             customArg,
           );
         });
