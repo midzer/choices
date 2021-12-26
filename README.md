@@ -646,6 +646,8 @@ classNames: {
 If you want just extend a little original template then you may use `Choices.defaults.templates` to get access to
 original template function.
 
+Templates receive the full Choices config as the first argument to any template, which allows you to conditionally display things based on the options specified.
+
 **Example:**
 
 ```js
@@ -665,7 +667,7 @@ or more complex:
 const example = new Choices(element, {
   callbackOnCreateTemplates: function(template) {
     return {
-      item: (classNames, data) => {
+      item: ({ classNames }, data) => {
         return template(`
           <div class="${classNames.item} ${
           data.highlighted
@@ -680,7 +682,7 @@ const example = new Choices(element, {
           </div>
         `);
       },
-      choice: (classNames, data) => {
+      choice: ({ classNames }, data) => {
         return template(`
           <div class="${classNames.item} ${classNames.itemChoice} ${
           data.disabled ? classNames.itemDisabled : classNames.itemSelectable

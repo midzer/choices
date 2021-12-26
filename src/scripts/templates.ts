@@ -8,13 +8,11 @@ import { Group } from './interfaces/group';
 import { Item } from './interfaces/item';
 import { PassedElementType } from './interfaces/passed-element-type';
 
-// Not the most ideal solution to requiring Options from ./interfaces/options and creating a circular dep
-// Fixing the circular would require merging the interfaces/templates or doing something like below.
-type Options = Record<'classNames' | 'allowHTML', any>;
+type TemplateOptions = Record<'classNames' | 'allowHTML', any>;
 
 const templates = {
   containerOuter(
-    { classNames: { containerOuter } }: Options,
+    { classNames: { containerOuter } }: TemplateOptions,
     dir: HTMLElement['dir'],
     isSelectElement: boolean,
     isSelectOneElement: boolean,
@@ -48,14 +46,14 @@ const templates = {
     return div;
   },
 
-  containerInner({ classNames: { containerInner } }: Options): HTMLDivElement {
+  containerInner({ classNames: { containerInner } }: TemplateOptions): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
       className: containerInner,
     });
   },
 
   itemList(
-    { classNames: { list, listSingle, listItems } }: Options,
+    { classNames: { list, listSingle, listItems } }: TemplateOptions,
     isSelectOneElement: boolean,
   ): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
@@ -64,7 +62,7 @@ const templates = {
   },
 
   placeholder(
-    { allowHTML, classNames: { placeholder } }: Options,
+    { allowHTML, classNames: { placeholder } }: TemplateOptions,
     value: string,
   ): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
@@ -83,7 +81,7 @@ const templates = {
         itemSelectable,
         placeholder,
       },
-    }: Options,
+    }: TemplateOptions,
     {
       id,
       value,
@@ -146,7 +144,7 @@ const templates = {
   },
 
   choiceList(
-    { classNames: { list } }: Options,
+    { classNames: { list } }: TemplateOptions,
     isSelectOneElement: boolean,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
@@ -162,7 +160,7 @@ const templates = {
   },
 
   choiceGroup(
-    { allowHTML, classNames: { group, groupHeading, itemDisabled } }: Options,
+    { allowHTML, classNames: { group, groupHeading, itemDisabled } }: TemplateOptions,
     { id, value, disabled }: Group,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
@@ -202,7 +200,7 @@ const templates = {
         itemDisabled,
         placeholder,
       },
-    }: Options,
+    }: TemplateOptions,
     {
       id,
       value,
@@ -251,7 +249,7 @@ const templates = {
   },
 
   input(
-    { classNames: { input, inputCloned } }: Options,
+    { classNames: { input, inputCloned } }: TemplateOptions,
     placeholderValue: string,
   ): HTMLInputElement {
     const inp = Object.assign(document.createElement('input'), {
@@ -270,7 +268,7 @@ const templates = {
     return inp;
   },
 
-  dropdown({ classNames: { list, listDropdown } }: Options): HTMLDivElement {
+  dropdown({ classNames: { list, listDropdown } }: TemplateOptions): HTMLDivElement {
     const div = document.createElement('div');
 
     div.classList.add(list, listDropdown);
@@ -283,7 +281,7 @@ const templates = {
     {
       allowHTML,
       classNames: { item, itemChoice, noResults, noChoices },
-    }: Options,
+    }: TemplateOptions,
     innerText: string,
     type: 'no-choices' | 'no-results' | '' = '',
   ): HTMLDivElement {
