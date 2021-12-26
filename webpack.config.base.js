@@ -8,7 +8,7 @@ const exclude = /node_modules/;
  * @type {import('webpack').Configuration}
  */
 module.exports = {
-  entry: ['./src/scripts/choices'],
+  entry: ['./src/index'],
   module: {
     rules: [
       {
