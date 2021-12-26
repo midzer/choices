@@ -292,7 +292,7 @@ function () {
     }
 
     if (userConfig.allowHTML === undefined) {
-      console.warn('Deprecation warning: allowHTML in the future will be defaulted to false. You must explicitly set it to true to properly display html tags in choices.');
+      console.warn('Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.');
     }
 
     this.config = deepmerge_1.default.all([defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig], // When merging array configs, replace with a copy of the userConfig array,
