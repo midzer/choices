@@ -160,6 +160,19 @@ export interface Options {
   editItems: boolean;
 
   /**
+   * Whether HTML should be rendered in all Choices elements.
+   * If `false`, all elements (placeholder, items, etc.) will be treated as plain text.
+   * If `true`, this can be used to perform XSS scripting attacks if you load choices from a remote source.
+   *
+   * **Deprecation Warning:** This will default to `false` in a future release.
+   *
+   * **Input types affected:** text, select-one, select-multiple
+   *
+   * @default true
+   */
+  allowHTML: boolean;
+
+  /**
    * Whether each inputted/chosen item should be unique.
    *
    * **Input types affected:** text, select-multiple

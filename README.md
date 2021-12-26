@@ -109,6 +109,7 @@ Or include Choices directly:
     removeItems: true,
     removeItemButton: false,
     editItems: false,
+    allowHTML: true
     duplicateItemsAllowed: true,
     delimiter: ',',
     paste: true,
@@ -313,6 +314,16 @@ Pass an array of objects:
 **Input types affected:** `text`
 
 **Usage:** Whether a user can edit items. An item's value can be edited by pressing the backspace.
+
+### allowHTML
+
+**Type:** `Boolean` **Default:** `true`
+
+**Input types affected:** `text`, `select-one`, `select-multiple`
+
+**Usage:** Whether HTML should be rendered in all Choices elements. If `false`, all elements (placeholder, items, etc.) will be treated as plain text. If `true`, this can be used to perform XSS scripting attacks if you load choices from a remote source.
+
+**Deprecation Warning:** This will default to `false` in a future release. 
 
 ### duplicateItemsAllowed
 
@@ -637,6 +648,8 @@ classNames: {
 If you want just extend a little original template then you may use `Choices.defaults.templates` to get access to
 original template function.
 
+Templates receive the full Choices config as the first argument to any template, which allows you to conditionally display things based on the options specified.
+
 **Example:**
 
 ```js
@@ -656,7 +669,7 @@ or more complex:
 const example = new Choices(element, {
   callbackOnCreateTemplates: function(template) {
     return {
-      item: (classNames, data) => {
+      item: ({ classNames }, data) => {
         return template(`
           <div class="${classNames.item} ${
           data.highlighted
@@ -671,7 +684,7 @@ const example = new Choices(element, {
           </div>
         `);
       },
-      choice: (classNames, data) => {
+      choice: ({ classNames }, data) => {
         return template(`
           <div class="${classNames.item} ${classNames.itemChoice} ${
           data.disabled ? classNames.itemDisabled : classNames.itemSelectable

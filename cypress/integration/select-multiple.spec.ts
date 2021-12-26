@@ -1,6 +1,10 @@
 describe('Choices - select multiple', () => {
   beforeEach(() => {
-    cy.visit('/select-multiple');
+    cy.visit('/select-multiple', {
+      onBeforeLoad(win) {
+        cy.stub(win.console, 'warn').as('consoleWarn');
+      },
+    });
   });
 
   describe('scenarios', () => {
@@ -863,6 +867,79 @@ describe('Choices - select multiple', () => {
           .should(($choice) => {
             expect($choice.text().trim()).to.equal('label1');
           });
+      });
+    });
+
+    describe('allow html', () => {
+      describe('is undefined', () => {
+        it('logs a deprecation warning', () => {
+          cy.get('@consoleWarn').should(
+            'be.calledOnceWithExactly',
+            'Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.',
+          );
+        });
+
+        it('does not show as text when selected', () => {
+          cy.get('[data-test-hook=allowhtml-undefined]')
+            .find('.choices__list--multiple .choices__item')
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('Choice 1');
+            });
+        });
+
+        it('does not show html as text in dropdown', () => {
+          cy.get('[data-test-hook=allowhtml-undefined]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('Choice 2');
+            });
+        });
+      });
+
+      describe('set to true', () => {
+        it('does not show as text when selected', () => {
+          cy.get('[data-test-hook=allowhtml-true]')
+            .find('.choices__list--multiple .choices__item')
+
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('Choice 1');
+            });
+        });
+
+        it('does not show html as text in dropdown', () => {
+          cy.get('[data-test-hook=allowhtml-true]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('Choice 2');
+            });
+        });
+      });
+
+      describe('set to false', () => {
+        it('shows html as text when selected', () => {
+          cy.get('[data-test-hook=allowhtml-false]')
+            .find('.choices__list--multiple .choices__item')
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('<b>Choice 1</b>');
+            });
+        });
+
+        it('shows html as text', () => {
+          cy.get('[data-test-hook=allowhtml-false]')
+            .find('.choices__list--dropdown .choices__list')
+            .children()
+            .first()
+            .should(($choice) => {
+              expect($choice.text().trim()).to.equal('<b>Choice 2</b>');
+            });
+        });
       });
     });
   });

@@ -151,6 +151,12 @@ class Choices implements Choices {
       | HTMLSelectElement = '[data-choice]',
     userConfig: Partial<Options> = {},
   ) {
+    if (userConfig.allowHTML === undefined) {
+      console.warn(
+        'Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.',
+      );
+    }
+
     this.config = merge.all<Options>(
       [DEFAULT_CONFIG, Choices.defaults.options, userConfig],
       // When merging array configs, replace with a copy of the userConfig array,
@@ -2105,9 +2111,7 @@ class Choices implements Choices {
   }
 
   _getTemplate(template: string, ...args: any): any {
-    const { classNames } = this.config;
-
-    return this._templates[template].call(this, classNames, ...args);
+    return this._templates[template].call(this, this.config, ...args);
   }
 
   _createTemplates(): void {

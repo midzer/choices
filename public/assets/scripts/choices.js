@@ -1,4 +1,4 @@
-/*! choices.js v9.0.1 | © 2021 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v9.1.0 | © 2021 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -289,6 +289,10 @@ function () {
 
     if (userConfig === void 0) {
       userConfig = {};
+    }
+
+    if (userConfig.allowHTML === undefined) {
+      console.warn('Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.');
     }
 
     this.config = deepmerge_1.default.all([defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig], // When merging array configs, replace with a copy of the userConfig array,
@@ -2209,8 +2213,7 @@ function () {
       args[_i - 1] = arguments[_i];
     }
 
-    var classNames = this.config.classNames;
-    return (_a = this._templates[template]).call.apply(_a, __spreadArray([this, classNames], args, false));
+    return (_a = this._templates[template]).call.apply(_a, __spreadArray([this, this.config], args, false));
   };
 
   Choices.prototype._createTemplates = function () {
@@ -3483,6 +3486,7 @@ exports.DEFAULT_CONFIG = {
   removeItems: true,
   removeItemButton: false,
   editItems: false,
+  allowHTML: true,
   duplicateItemsAllowed: true,
   delimiter: ',',
   paste: true,
@@ -3644,7 +3648,7 @@ var sanitise = function (value) {
     return value;
   }
 
-  return value.replace(/&/g, '&amp;').replace(/>/g, '&rt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  return value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 };
 
 exports.sanitise = sanitise;
@@ -4376,7 +4380,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 var templates = {
   containerOuter: function (_a, dir, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
-    var containerOuter = _a.containerOuter;
+    var containerOuter = _a.classNames.containerOuter;
     var div = Object.assign(document.createElement('div'), {
       className: containerOuter
     });
@@ -4403,32 +4407,39 @@ var templates = {
     return div;
   },
   containerInner: function (_a) {
-    var containerInner = _a.containerInner;
+    var containerInner = _a.classNames.containerInner;
     return Object.assign(document.createElement('div'), {
       className: containerInner
     });
   },
   itemList: function (_a, isSelectOneElement) {
-    var list = _a.list,
-        listSingle = _a.listSingle,
-        listItems = _a.listItems;
+    var _b = _a.classNames,
+        list = _b.list,
+        listSingle = _b.listSingle,
+        listItems = _b.listItems;
     return Object.assign(document.createElement('div'), {
       className: "".concat(list, " ").concat(isSelectOneElement ? listSingle : listItems)
     });
   },
   placeholder: function (_a, value) {
-    var placeholder = _a.placeholder;
-    return Object.assign(document.createElement('div'), {
-      className: placeholder,
-      innerHTML: value
-    });
+    var _b;
+
+    var allowHTML = _a.allowHTML,
+        placeholder = _a.classNames.placeholder;
+    return Object.assign(document.createElement('div'), (_b = {
+      className: placeholder
+    }, _b[allowHTML ? 'innerHTML' : 'innerText'] = value, _b));
   },
   item: function (_a, _b, removeItemButton) {
-    var item = _a.item,
-        button = _a.button,
-        highlightedState = _a.highlightedState,
-        itemSelectable = _a.itemSelectable,
-        placeholder = _a.placeholder;
+    var _c, _d;
+
+    var allowHTML = _a.allowHTML,
+        _e = _a.classNames,
+        item = _e.item,
+        button = _e.button,
+        highlightedState = _e.highlightedState,
+        itemSelectable = _e.itemSelectable,
+        placeholder = _e.placeholder;
     var id = _b.id,
         value = _b.value,
         label = _b.label,
@@ -4437,10 +4448,9 @@ var templates = {
         disabled = _b.disabled,
         highlighted = _b.highlighted,
         isPlaceholder = _b.placeholder;
-    var div = Object.assign(document.createElement('div'), {
-      className: item,
-      innerHTML: label
-    });
+    var div = Object.assign(document.createElement('div'), (_c = {
+      className: item
+    }, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c));
     Object.assign(div.dataset, {
       item: '',
       id: id,
@@ -4471,11 +4481,10 @@ var templates = {
       /** @todo This MUST be localizable, not hardcoded! */
 
       var REMOVE_ITEM_TEXT = 'Remove item';
-      var removeButton = Object.assign(document.createElement('button'), {
+      var removeButton = Object.assign(document.createElement('button'), (_d = {
         type: 'button',
-        className: button,
-        innerHTML: REMOVE_ITEM_TEXT
-      });
+        className: button
+      }, _d[allowHTML ? 'innerHTML' : 'innerText'] = REMOVE_ITEM_TEXT, _d));
       removeButton.setAttribute('aria-label', "".concat(REMOVE_ITEM_TEXT, ": '").concat(value, "'"));
       removeButton.dataset.button = '';
       div.appendChild(removeButton);
@@ -4484,7 +4493,7 @@ var templates = {
     return div;
   },
   choiceList: function (_a, isSelectOneElement) {
-    var list = _a.list;
+    var list = _a.classNames.list;
     var div = Object.assign(document.createElement('div'), {
       className: list
     });
@@ -4497,9 +4506,13 @@ var templates = {
     return div;
   },
   choiceGroup: function (_a, _b) {
-    var group = _a.group,
-        groupHeading = _a.groupHeading,
-        itemDisabled = _a.itemDisabled;
+    var _c;
+
+    var allowHTML = _a.allowHTML,
+        _d = _a.classNames,
+        group = _d.group,
+        groupHeading = _d.groupHeading,
+        itemDisabled = _d.itemDisabled;
     var id = _b.id,
         value = _b.value,
         disabled = _b.disabled;
@@ -4517,19 +4530,22 @@ var templates = {
       div.setAttribute('aria-disabled', 'true');
     }
 
-    div.appendChild(Object.assign(document.createElement('div'), {
-      className: groupHeading,
-      innerHTML: value
-    }));
+    div.appendChild(Object.assign(document.createElement('div'), (_c = {
+      className: groupHeading
+    }, _c[allowHTML ? 'innerHTML' : 'innerText'] = value, _c)));
     return div;
   },
   choice: function (_a, _b, selectText) {
-    var item = _a.item,
-        itemChoice = _a.itemChoice,
-        itemSelectable = _a.itemSelectable,
-        selectedState = _a.selectedState,
-        itemDisabled = _a.itemDisabled,
-        placeholder = _a.placeholder;
+    var _c;
+
+    var allowHTML = _a.allowHTML,
+        _d = _a.classNames,
+        item = _d.item,
+        itemChoice = _d.itemChoice,
+        itemSelectable = _d.itemSelectable,
+        selectedState = _d.selectedState,
+        itemDisabled = _d.itemDisabled,
+        placeholder = _d.placeholder;
     var id = _b.id,
         value = _b.value,
         label = _b.label,
@@ -4538,11 +4554,9 @@ var templates = {
         isDisabled = _b.disabled,
         isSelected = _b.selected,
         isPlaceholder = _b.placeholder;
-    var div = Object.assign(document.createElement('div'), {
-      id: elementId,
-      innerHTML: label,
-      className: "".concat(item, " ").concat(itemChoice)
-    });
+    var div = Object.assign(document.createElement('div'), (_c = {
+      id: elementId
+    }, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c.className = "".concat(item, " ").concat(itemChoice), _c));
 
     if (isSelected) {
       div.classList.add(selectedState);
@@ -4572,10 +4586,12 @@ var templates = {
     return div;
   },
   input: function (_a, placeholderValue) {
-    var input = _a.input,
-        inputCloned = _a.inputCloned;
+    var _b = _a.classNames,
+        input = _b.input,
+        inputCloned = _b.inputCloned;
     var inp = Object.assign(document.createElement('input'), {
-      type: 'text',
+      type: 'search',
+      name: 'search_terms',
       className: "".concat(input, " ").concat(inputCloned),
       autocomplete: 'off',
       autocapitalize: 'off',
@@ -4587,18 +4603,23 @@ var templates = {
     return inp;
   },
   dropdown: function (_a) {
-    var list = _a.list,
-        listDropdown = _a.listDropdown;
+    var _b = _a.classNames,
+        list = _b.list,
+        listDropdown = _b.listDropdown;
     var div = document.createElement('div');
     div.classList.add(list, listDropdown);
     div.setAttribute('aria-expanded', 'false');
     return div;
   },
-  notice: function (_a, innerHTML, type) {
-    var item = _a.item,
-        itemChoice = _a.itemChoice,
-        noResults = _a.noResults,
-        noChoices = _a.noChoices;
+  notice: function (_a, innerText, type) {
+    var _b;
+
+    var allowHTML = _a.allowHTML,
+        _c = _a.classNames,
+        item = _c.item,
+        itemChoice = _c.itemChoice,
+        noResults = _c.noResults,
+        noChoices = _c.noChoices;
 
     if (type === void 0) {
       type = '';
@@ -4612,10 +4633,7 @@ var templates = {
       classes.push(noResults);
     }
 
-    return Object.assign(document.createElement('div'), {
-      innerHTML: innerHTML,
-      className: classes.join(' ')
-    });
+    return Object.assign(document.createElement('div'), (_b = {}, _b[allowHTML ? 'innerHTML' : 'innerText'] = innerText, _b.className = classes.join(' '), _b));
   },
   option: function (_a) {
     var label = _a.label,
