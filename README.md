@@ -1,7 +1,5 @@
 # Choices.js [![Actions Status](https://github.com/jshjohnson/Choices/workflows/Build%20and%20test/badge.svg)](https://github.com/jshjohnson/Choices/actions) [![Actions Status](https://github.com/jshjohnson/Choices/workflows/Bundle%20size%20checks/badge.svg)](https://github.com/jshjohnson/Choices/actions) [![npm](https://img.shields.io/npm/v/choices.js.svg)](https://www.npmjs.com/package/choices.js)
 
----
-
 A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
 
 [Demo](https://choices-js.github.io/Choices/)
@@ -22,6 +20,18 @@ A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input 
 ### Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼
 
 ---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Setup](#setup)
+- [Terminology](#terminology)
+- [Input Types](#input-types)
+- [Configuration Options](#configuration-options)
+- [Callbacks](#callbacks)
+- [Events](#events)
+- [Development](#development)
+- [License](#license)
 
 ## Installation
 
@@ -198,7 +208,7 @@ Choices works with the following input types, referenced in the documentation as
 | [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)                         | `select-single`            |
 | [`<select multiple>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select#attr-multiple)  | `select-multiple`          |
 
-## Configuration options
+## Configuration Options
 
 ### silent
 
