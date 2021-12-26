@@ -240,7 +240,9 @@ describe('choices', () => {
           document.body.innerHTML = `
           <div data-choice id="div-1"></div>
           `;
-          expect(() => new Choices('[data-choice]', { allowHTML: true })).to.throw(
+          expect(
+            () => new Choices('[data-choice]', { allowHTML: true }),
+          ).to.throw(
             TypeError,
             'Expected one of the following types text|select-one|select-multiple',
           );

@@ -153,7 +153,7 @@ class Choices implements Choices {
   ) {
     if (userConfig.allowHTML === undefined) {
       console.warn(
-        'Deprecation warning: allowHTML in the future will be defaulted to false. You must explicitly set it to true to properly display html tags in choices.',
+        'Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.',
       );
     }
 

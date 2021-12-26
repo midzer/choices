@@ -8,6 +8,7 @@ import { Group } from './interfaces/group';
 import { Item } from './interfaces/item';
 import { PassedElementType } from './interfaces/passed-element-type';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TemplateOptions = Record<'classNames' | 'allowHTML', any>;
 
 const templates = {
@@ -46,7 +47,9 @@ const templates = {
     return div;
   },
 
-  containerInner({ classNames: { containerInner } }: TemplateOptions): HTMLDivElement {
+  containerInner({
+    classNames: { containerInner },
+  }: TemplateOptions): HTMLDivElement {
     return Object.assign(document.createElement('div'), {
       className: containerInner,
     });
@@ -160,7 +163,10 @@ const templates = {
   },
 
   choiceGroup(
-    { allowHTML, classNames: { group, groupHeading, itemDisabled } }: TemplateOptions,
+    {
+      allowHTML,
+      classNames: { group, groupHeading, itemDisabled },
+    }: TemplateOptions,
     { id, value, disabled }: Group,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
@@ -268,7 +274,9 @@ const templates = {
     return inp;
   },
 
-  dropdown({ classNames: { list, listDropdown } }: TemplateOptions): HTMLDivElement {
+  dropdown({
+    classNames: { list, listDropdown },
+  }: TemplateOptions): HTMLDivElement {
     const div = document.createElement('div');
 
     div.classList.add(list, listDropdown);

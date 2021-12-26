@@ -319,9 +319,11 @@ Pass an array of objects:
 
 **Type:** `Boolean` **Default:** `true`
 
-**Input types affected:** `text`, `select-one`, `select-multiple
+**Input types affected:** `text`, `select-one`, `select-multiple`
 
-**Usage:** Whether HTML should be shown properly when showing choices. (Can be used to perform XSS attacks if not disabled or handled correctly)
+**Usage:** Whether HTML should be rendered in all Choices elements. If `false`, all elements (placeholder, items, etc.) will be treated as plain text. If `true`, this can be used to perform XSS scripting attacks if you load choices from a remote source.
+
+**Deprecation Warning:** This will default to `false` in a future release. 
 
 ### duplicateItemsAllowed
 
