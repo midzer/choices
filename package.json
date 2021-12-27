@@ -38,6 +38,7 @@
   "files": [
     "public/assets/scripts",
     "public/assets/styles",
+    "public/types",
     "src",
     "!src/**/*.test.js",
     "types"
@@ -117,6 +118,7 @@
       "files": [
         "public/assets/scripts/*",
         "public/assets/styles/*",
+        "public/types/*",
         "src/icons/*"
       ]
     }
