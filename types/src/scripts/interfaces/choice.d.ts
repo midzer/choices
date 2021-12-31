@@ -9,7 +9,7 @@ export interface Choice {
     label: string;
     placeholder?: boolean;
     selected?: boolean;
-    value: string;
+    value: any;
     score?: number;
     choices?: Choice[];
 }
