@@ -36,15 +36,15 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: '12.x'
 
       - name: Cache node modules
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-build-${{ matrix.browser }}
@@ -93,7 +93,7 @@ jobs:
           PORT: 0
           NODE_ENV: production # prevent watching
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: screenshot-${{ matrix.browser }}-${{ matrix.os }}
@@ -102,11 +102,11 @@ jobs:
   puppeteer:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Cache node modules
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-build-puppeteer
@@ -124,7 +124,7 @@ jobs:
           PORT: 0
           NODE_ENV: production # prevent watching
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: screenshot-puppeteer-darwin
