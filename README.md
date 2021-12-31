@@ -30,6 +30,7 @@ A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input 
 - [Configuration Options](#configuration-options)
 - [Callbacks](#callbacks)
 - [Events](#events)
+- [Methods](#methods)
 - [Development](#development)
 - [License](#license)
 
