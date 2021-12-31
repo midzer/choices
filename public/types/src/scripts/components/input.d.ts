@@ -16,6 +16,7 @@ export default class Input {
     set placeholder(placeholder: string);
     get value(): string;
     set value(value: string);
+    get rawValue(): string;
     addEventListeners(): void;
     removeEventListeners(): void;
     enable(): void;

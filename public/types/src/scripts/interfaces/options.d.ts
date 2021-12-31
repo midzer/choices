@@ -1,4 +1,4 @@
-import { FuseOptions } from 'fuse.js';
+import IFuseOptions from 'fuse.js';
 import { Choices } from './choices';
 import { Choice } from './choice';
 import { ClassNames } from './class-names';
@@ -408,9 +408,9 @@ export interface Options {
      */
     classNames: ClassNames;
     /**
-     * Choices uses the great Fuse library for searching. You can find more options here: https://github.com/krisk/Fuse#options
+     * Choices uses the great Fuse library for searching. You can find more options here: https://fusejs.io/api/options.html
      */
-    fuseOptions: FuseOptions<Choice>;
+    fuseOptions: IFuseOptions<Choices>;
     /**
      * Function to run once Choices initialises.
      *

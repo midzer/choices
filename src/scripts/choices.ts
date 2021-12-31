@@ -1323,11 +1323,10 @@ class Choices implements Choices {
     // If new value matches the desired length and is not the same as the current value with a space
     const haystack = this._store.searchableChoices;
     const needle = newValue;
-    const keys = [...this.config.searchFields];
     const options = Object.assign(this.config.fuseOptions, {
-      keys,
+      keys: [...this.config.searchFields],
       includeMatches: true,
-    });
+    }) as Fuse.IFuseOptions<Choice>;
     const fuse = new Fuse(haystack, options);
     const results: Result<Choice>[] = fuse.search(needle) as any[]; // see https://github.com/krisk/Fuse/issues/303
 
