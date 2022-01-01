@@ -1763,6 +1763,21 @@ describe('choices', () => {
 
         instance._onKeyUp({ target: null, keyCode: null });
       });
+
+      it('is fired with a searchFloor of 0', (done) => {
+        instance.config.searchFloor = 0;
+        instance.input.value = '';
+        instance.input.focus();
+        instance.passedElement.element.addEventListener('search', (event) => {
+          expect(event.detail).to.eql({
+            value: instance.input.value,
+            resultCount: 0,
+          });
+          done();
+        });
+
+        instance._onKeyUp({ target: null, keyCode: null });
+      });
     });
   });
 
