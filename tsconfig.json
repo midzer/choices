@@ -16,7 +16,8 @@
     "noUnusedParameters": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "newLine": "lf"
   },
   "include": ["./src/**/*", "./cypress/**/*"]
 }

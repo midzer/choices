@@ -1736,12 +1736,30 @@ describe('choices', () => {
 
   describe('events', () => {
     describe('search', () => {
+      const choices: Choice[] = [
+        {
+          id: 1,
+          value: '1',
+          label: 'Test 1',
+          selected: false,
+          disabled: false,
+        },
+        {
+          id: 2,
+          value: '2',
+          label: 'Test 2',
+          selected: false,
+          disabled: false,
+        },
+      ];
+
       beforeEach(() => {
         document.body.innerHTML = `
         <select data-choice multiple></select>
         `;
 
         instance = new Choices('[data-choice]', {
+          choices,
           allowHTML: false,
           searchEnabled: true,
         });
@@ -1753,13 +1771,44 @@ describe('choices', () => {
 
         instance.input.value = query;
         instance.input.focus();
-        instance.passedElement.element.addEventListener('search', (event) => {
-          expect(event.detail).to.eql({
-            value: query,
-            resultCount: 0,
-          });
-          done();
-        });
+        instance.passedElement.element.addEventListener(
+          'search',
+          (event) => {
+            expect(event.detail).to.eql({
+              value: query,
+              resultCount: 0,
+            });
+            done();
+          },
+          { once: true },
+        );
+
+        instance._onKeyUp({ target: null, keyCode: null });
+      });
+
+      it('uses Fuse options', (done) => {
+        instance.input.value = 'test';
+        instance.input.focus();
+        instance.passedElement.element.addEventListener(
+          'search',
+          (event) => {
+            expect(event.detail.resultCount).to.eql(2);
+
+            instance.config.fuseOptions.isCaseSensitive = true;
+            instance.config.fuseOptions.minMatchCharLength = 4;
+            instance.passedElement.element.addEventListener(
+              'search',
+              (eventCaseSensitive) => {
+                expect(eventCaseSensitive.detail.resultCount).to.eql(0);
+                done();
+              },
+              { once: true },
+            );
+
+            instance._onKeyUp({ target: null, keyCode: null });
+          },
+          { once: true },
+        );
 
         instance._onKeyUp({ target: null, keyCode: null });
       });
