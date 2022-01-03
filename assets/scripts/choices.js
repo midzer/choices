@@ -1,4 +1,4 @@
-/*! choices.js v9.1.0 | © 2021 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v10.0.0 | © 2022 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1390,7 +1390,7 @@ function () {
   };
 
   Choices.prototype._handleSearch = function (value) {
-    if (!value || !this.input.isFocussed) {
+    if (!this.input.isFocussed) {
       return;
     }
 
@@ -1402,7 +1402,7 @@ function () {
       return !option.active;
     }); // Check that we have a value to search and the input was an alphanumeric character
 
-    if (value && value.length >= searchFloor) {
+    if (value !== null && typeof value !== 'undefined' && value.length >= searchFloor) {
       var resultCount = searchChoices ? this._searchChoices(value) : 0; // Trigger search event
 
       this.passedElement.triggerEvent(constants_1.EVENTS.search, {
