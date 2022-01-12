@@ -40,7 +40,7 @@ $choices-z-index: 1;
   }
 
   &.is-open {
-    overflow: initial;
+    overflow: visible;
   }
 
   &.is-disabled {
@@ -191,6 +191,10 @@ $choices-z-index: 1;
   margin: 0;
   padding-left: 0;
   list-style: none;
+
+  &[aria-expanded] {
+    @extend .choices__list--dropdown;
+  }
 }
 
 .#{$choices-selector}__list--single {
