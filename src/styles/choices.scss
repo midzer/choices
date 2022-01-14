@@ -193,7 +193,7 @@ $choices-z-index: 1;
   list-style: none;
 
   &[aria-expanded] {
-    @extend .choices__list--dropdown;
+    @extend %choices-dropdown;
   }
 }
 
@@ -249,7 +249,7 @@ $choices-z-index: 1;
   }
 }
 
-.#{$choices-selector}__list--dropdown {
+%choices-dropdown {
   visibility: hidden;
   z-index: $choices-z-index;
   position: absolute;
@@ -329,6 +329,10 @@ $choices-z-index: 1;
       }
     }
   }
+}
+
+.#{$choices-selector}__list--dropdown {
+  @extend %choices-dropdown;
 }
 
 .#{$choices-selector}__item {
