@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'src/scripts/**'
+      - 'src/styles/**'
       - package-lock.json
       - '.browserslistrc'
 
