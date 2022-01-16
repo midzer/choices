@@ -120,7 +120,7 @@ Or include Choices directly:
     removeItems: true,
     removeItemButton: false,
     editItems: false,
-    allowHTML: true
+    allowHTML: true,
     duplicateItemsAllowed: true,
     delimiter: ',',
     paste: true,
@@ -206,7 +206,7 @@ Choices works with the following input types, referenced in the documentation as
 | HTML Element                                                                                           | Documentation "Input Type" |
 | -------------------------------------------------------------------------------------------------------| -------------------------- |
 | [`<input type="text">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input)               | `text`                     |
-| [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)                         | `select-single`            |
+| [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)                         | `select-one`               |
 | [`<select multiple>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select#attr-multiple)  | `select-multiple`          |
 
 ## Configuration Options
@@ -215,7 +215,7 @@ Choices works with the following input types, referenced in the documentation as
 
 **Type:** `Boolean` **Default:** `false`
 
-**Input types affected:** `text`, `select-single`, `select-multiple`
+**Input types affected:** `text`, `select-one`, `select-multiple`
 
 **Usage:** Optionally suppress console errors and warnings.
 
