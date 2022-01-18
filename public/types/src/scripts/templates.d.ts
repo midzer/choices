@@ -8,7 +8,7 @@ import { Item } from './interfaces/item';
 import { PassedElementType } from './interfaces/passed-element-type';
 declare type TemplateOptions = Record<'classNames' | 'allowHTML', any>;
 declare const templates: {
-    containerOuter({ classNames: { containerOuter } }: TemplateOptions, dir: HTMLElement['dir'], isSelectElement: boolean, isSelectOneElement: boolean, searchEnabled: boolean, passedElementType: PassedElementType): HTMLDivElement;
+    containerOuter({ classNames: { containerOuter } }: TemplateOptions, dir: HTMLElement['dir'], isSelectElement: boolean, isSelectOneElement: boolean, searchEnabled: boolean, passedElementType: PassedElementType, labelId: string): HTMLDivElement;
     containerInner({ classNames: { containerInner }, }: TemplateOptions): HTMLDivElement;
     itemList({ classNames: { list, listSingle, listItems } }: TemplateOptions, isSelectOneElement: boolean): HTMLDivElement;
     placeholder({ allowHTML, classNames: { placeholder } }: TemplateOptions, value: string): HTMLDivElement;

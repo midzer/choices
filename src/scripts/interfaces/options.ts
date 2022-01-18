@@ -454,6 +454,11 @@ export interface Options {
   fuseOptions: Fuse.IFuseOptions<Choices>;
 
   /**
+   * ID of the connected label to improve a11y. If set, aria-labeledby will be added.
+   */
+  labelId: string;
+
+  /**
    * Function to run once Choices initialises.
    *
    * **Input types affected:** text, select-one, select-multiple

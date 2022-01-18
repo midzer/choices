@@ -19,6 +19,7 @@ const templates = {
     isSelectOneElement: boolean,
     searchEnabled: boolean,
     passedElementType: PassedElementType,
+    labelId: string,
   ): HTMLDivElement {
     const div = Object.assign(document.createElement('div'), {
       className: containerOuter,
@@ -43,6 +44,9 @@ const templates = {
 
     div.setAttribute('aria-haspopup', 'true');
     div.setAttribute('aria-expanded', 'false');
+    if (labelId) {
+      div.setAttribute('aria-labeledby', labelId);
+    }
 
     return div;
   },

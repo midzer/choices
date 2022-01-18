@@ -186,6 +186,7 @@ Or include Choices directly:
     fuseOptions: {
       includeScore: true
     },
+    labelId: '',
     callbackOnInit: null,
     callbackOnCreateTemplates: null
   });
@@ -600,6 +601,14 @@ const example = new Choices(element, {
   valueComparer: (a, b) => value.trim() === b.trim(),
 };
 ```
+
+### labelId
+
+**Type:** `String` **Default:** ``
+
+**Input types affected:** `select-one`, `select-multiple`
+
+**Usage:** The labelId improves accessibility. If set, it will add aria-labeledby to the choices element.
 
 ### classNames
 
