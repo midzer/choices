@@ -320,6 +320,14 @@
 .choices__input:focus {
   outline: 0;
 }
+.choices__input::-webkit-search-decoration, .choices__input::-webkit-search-cancel-button, .choices__input::-webkit-search-results-button, .choices__input::-webkit-search-results-decoration {
+  display: none;
+}
+.choices__input::-ms-clear, .choices__input::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
 [dir=rtl] .choices__input {
   padding-right: 2px;
   padding-left: 0;
