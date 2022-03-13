@@ -553,7 +553,7 @@ class Choices implements Choices {
     return this;
   }
 
-  setChoiceByValue(value: string): this {
+  setChoiceByValue(value: string | string[]): this {
     if (!this.initialised || this._isTextElement) {
       return this;
     }
