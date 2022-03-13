@@ -66,7 +66,7 @@ declare class Choices implements Choices {
     hideDropdown(preventInputBlur?: boolean): this;
     getValue(valueOnly?: boolean): string[] | Item[] | Item | string;
     setValue(items: string[] | Item[]): this;
-    setChoiceByValue(value: string): this;
+    setChoiceByValue(value: string | string[]): this;
     /**
      * Set choices of select input via an array of objects (or function that returns array of object or promise of it),
      * a value field name and a label field name.
