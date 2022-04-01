@@ -45,7 +45,7 @@ const templates = {
     div.setAttribute('aria-haspopup', 'true');
     div.setAttribute('aria-expanded', 'false');
     if (labelId) {
-      div.setAttribute('aria-labeledby', labelId);
+      div.setAttribute('aria-labelledby', labelId);
     }
 
     return div;

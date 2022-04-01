@@ -412,7 +412,7 @@ export interface Options {
      */
     fuseOptions: Fuse.IFuseOptions<Choices>;
     /**
-     * ID of the connected label to improve a11y. If set, aria-labeledby will be added.
+     * ID of the connected label to improve a11y. If set, aria-labelledby will be added.
      */
     labelId: string;
     /**
