@@ -615,7 +615,7 @@ const example = new Choices(element, {
 
 **Input types affected:** `select-one`, `select-multiple`
 
-**Usage:** The labelId improves accessibility. If set, it will add aria-labeledby to the choices element.
+**Usage:** The labelId improves accessibility. If set, it will add aria-labelledby to the choices element.
 
 ### classNames
 

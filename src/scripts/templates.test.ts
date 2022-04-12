@@ -95,7 +95,7 @@ describe('templates', () => {
               tabindex="0"
               aria-haspopup="true"
               aria-expanded="false"
-              aria-labeledby="${labelId}"
+              aria-labelledby="${labelId}"
               dir="${direction}"
               >
             </div>
