@@ -5078,7 +5078,7 @@ module.exports = createStore => (reducer, state, middleware) =>
 module.exports = createStore => (reducer,...args) => {
   const listeners = []
   const wrapped = (state, action) => (
-    action && action.type != '@@init' && window.requestAnimationFrame(() => listeners.forEach(listener => listener())),
+    action && action.type != '@@init' && setTimeout(() => listeners.forEach(listener => listener()), 0),
     reducer(state, action)
   )
   const store = createStore(wrapped, ...args)
