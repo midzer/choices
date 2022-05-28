@@ -5,7 +5,7 @@
 ![Dependencies](https://badgen.net/npm/dependents/@midzer/choices)
 ![npm bundle size](https://badgen.net/bundlephobia/minzip/@midzer/choices)
 
-A vanilla, lightweight (~16kb gzipped 🎉), configurable select plugin. Similar to Select2 and Selectize but without the jQuery dependency. Forked from [Choices.js v10.1.0](https://github.com/Choices-js/Choices).
+A fast, vanilla, lightweight (~16kb gzipped 🎉), configurable select plugin for modern browsers. Similar to Select2 and Selectize but without the jQuery dependency. Forked from [Choices.js v10.1.0](https://github.com/Choices-js/Choices).
 
 [Demo](https://midzer.github.io/choices/)
 
@@ -22,9 +22,9 @@ A vanilla, lightweight (~16kb gzipped 🎉), configurable select plugin. Similar
 
 ## Differences to original Choices.js
 
-- replaced fuse.js by kmp search
+- replaced fuse.js by [KMP algorithm](https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm)
 - dropped IE11 support
-- `deepmerge` dependency replaced by smaller vanilla utility
+- `deepmerge` dependency replaced by vanilla utility
 - `redux` dependency replaced by smaller `pico-redux`
 
 ---
