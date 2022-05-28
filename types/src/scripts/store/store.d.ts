@@ -1,10 +1,9 @@
-import { Store as IStore, AnyAction } from 'redux';
 import { Choice } from '../interfaces/choice';
 import { Group } from '../interfaces/group';
 import { Item } from '../interfaces/item';
 import { State } from '../interfaces/state';
 export default class Store {
-    _store: IStore;
+    _store: any;
     constructor();
     /**
      * Subscribe store to function call (wrapped Redux method)
@@ -13,7 +12,7 @@ export default class Store {
     /**
      * Dispatch event to store (wrapped Redux method)
      */
-    dispatch(action: AnyAction): void;
+    dispatch(action: any): void;
     /**
      * Get store object (wrapping Redux method)
      */
