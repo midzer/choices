@@ -1,6 +1,6 @@
 {
   "name": "@midzer/choices",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A vanilla JS customisable text input/select box plugin",
   "main": "./public/assets/scripts/choices.js",
   "types": "./public/types/src/index.d.ts",
