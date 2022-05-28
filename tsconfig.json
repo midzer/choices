@@ -13,7 +13,7 @@
     "target": "es5",
     "lib": ["es2017", "dom"],
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noImplicitAny": false,
     "strictNullChecks": true,
     "types": ["cypress"],

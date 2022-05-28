@@ -92,15 +92,17 @@ export default function choices(
         const choice = obj;
         // Set active state based on whether choice is
         // within filtered results
-        choice.active = filterChoicesAction.results.some(({ item, score }) => {
-          if (item.id === choice.id) {
-            choice.score = score;
+        choice.active = filterChoicesAction.results.some(
+          ({ item /*, score*/ }) => {
+            if (item.id === choice.id) {
+              //choice.score = score;
 
-            return true;
-          }
+              return true;
+            }
 
-          return false;
-        });
+            return false;
+          },
+        );
 
         return choice;
       });

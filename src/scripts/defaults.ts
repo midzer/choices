@@ -71,9 +71,6 @@ export const DEFAULT_CONFIG: Options = {
   addItemText: (value) => `Press Enter to add <b>"${sanitise(value)}"</b>`,
   maxItemText: (maxItemCount) => `Only ${maxItemCount} values can be added`,
   valueComparer: (value1, value2) => value1 === value2,
-  fuseOptions: {
-    includeScore: true,
-  },
   labelId: '',
   callbackOnInit: null,
   callbackOnCreateTemplates: null,

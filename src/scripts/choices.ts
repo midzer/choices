@@ -1,7 +1,3 @@
-import merge from 'deepmerge';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import Fuse from 'fuse.js';
-
 import {
   activateChoices,
   addChoice,
@@ -39,6 +35,7 @@ import { State } from './interfaces/state';
 import {
   diff,
   existsInArray,
+  extend,
   generateId,
   getAdjacentEl,
   getType,
@@ -51,16 +48,11 @@ import { defaultState } from './reducers';
 import Store from './store/store';
 import templates from './templates';
 
-/** @see {@link http://browserhacks.com/#hack-acea075d0ac6954f275a70023906050c} */
-const IS_IE11 =
-  '-ms-scroll-limit' in document.documentElement.style &&
-  '-ms-ime-align' in document.documentElement.style;
-
 const USER_DEFAULTS: Partial<Options> = {};
 
 /**
  * Choices
- * @author Josh Johnson<josh@joshuajohnson.co.uk>
+ * @author midzer<midzer.de>
  */
 class Choices implements Choices {
   static get defaults(): {
@@ -117,8 +109,6 @@ class Choices implements Choices {
 
   _canSearch: boolean;
 
-  _isScrollingOnIe: boolean;
-
   _highlightPosition: number;
 
   _wasTap: boolean;
@@ -157,12 +147,7 @@ class Choices implements Choices {
       );
     }
 
-    this.config = merge.all<Options>(
-      [DEFAULT_CONFIG, Choices.defaults.options, userConfig],
-      // When merging array configs, replace with a copy of the userConfig array,
-      // instead of concatenating with the default array
-      { arrayMerge: (_, sourceArray) => [...sourceArray] },
-    );
+    this.config = extend(true, DEFAULT_CONFIG, Choices.defaults.options, userConfig) as Options;
 
     const invalidConfigOptions = diff(this.config, DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
@@ -234,7 +219,6 @@ class Choices implements Choices {
     this._prevState = defaultState;
     this._currentValue = '';
     this._canSearch = !!this.config.searchEnabled;
-    this._isScrollingOnIe = false;
     this._highlightPosition = 0;
     this._wasTap = true;
     this._placeholderValue = this._generatePlaceholderValue();
@@ -407,6 +391,7 @@ class Choices implements Choices {
 
     return this;
   }
+
 
   highlightItem(item: Item, runEvent = true): this {
     if (!item || !item.id) {
@@ -1100,7 +1085,7 @@ class Choices implements Choices {
         this.unhighlightItem(item);
       }
     });
-
+    
     // Focus input as without focus, a user cannot do anything with a
     // highlighted item
     this.input.focus();
@@ -1320,19 +1305,73 @@ class Choices implements Choices {
         ? this._currentValue.trim()
         : this._currentValue;
 
-    if (newValue.length < 1 && newValue === `${currentValue} `) {
+    const { searchFloor, searchResultLimit, shouldSort } = this.config;
+
+    if (newValue.length < searchFloor || newValue === `${currentValue} `) {
       return 0;
     }
 
     // If new value matches the desired length and is not the same as the current value with a space
     const haystack = this._store.searchableChoices;
-    const needle = newValue;
-    const options = Object.assign(this.config.fuseOptions, {
-      keys: [...this.config.searchFields],
-      includeMatches: true,
-    }) as Fuse.IFuseOptions<Choice>;
-    const fuse = new Fuse(haystack, options);
-    const results: Result<Choice>[] = fuse.search(needle) as any[]; // see https://github.com/krisk/Fuse/issues/303
+    const needle = newValue.toLowerCase();
+
+    function kmpSearch(pattern, text) {
+      if (pattern.length == 0) return 0; // Immediate match
+
+      // Compute longest suffix-prefix table
+      var lsp = [0]; // Base case
+      for (var i = 1; i < pattern.length; i++) {
+        var j = lsp[i - 1]; // Start by assuming we're extending the previous LSP
+        while (j > 0 && pattern.charAt(i) != pattern.charAt(j)) j = lsp[j - 1];
+        if (pattern.charAt(i) == pattern.charAt(j)) j++;
+        lsp.push(j);
+      }
+
+      // Walk through text string
+      var j = 0; // Number of chars matched in pattern
+      for (var i = 0; i < text.length; i++) {
+        while (j > 0 && text.charAt(i) != pattern.charAt(j)) j = lsp[j - 1]; // Fall back in the pattern
+        if (text.charAt(i) == pattern.charAt(j)) {
+          j++; // Next char matched, increment position
+          if (j == pattern.length) return i - (j - 1);
+        }
+      }
+      return -1; // Not found
+    }
+    const results: Result<Choice>[] = [];
+    //let results: Choice[];
+    let count = 0;
+    for (let i = 0, j = haystack.length; i < j; i++) {
+      const entry = haystack[i];
+      if (kmpSearch(needle, entry.value.toLowerCase()) != -1) {
+        //const choice: Choice = entry;
+        results.push({
+          item: entry,
+        } as Result<Choice>);
+        if (++count === searchResultLimit) {
+          break;
+        }
+      }
+    }
+    // Sort
+    if (shouldSort) {
+      results.sort(function(a, b) {
+        var aIndex = a.item.value.toLowerCase().indexOf(needle);
+        var bIndex = b.item.value.toLowerCase().indexOf(needle);
+        if (aIndex < bIndex) {
+          return -1;
+        }
+        if (aIndex > bIndex) {
+          return 1;
+        }
+        return 0;
+      });
+    }
+    // Give score
+    let score = 0;
+    for (let i = 0; i < results.length; i++) {
+      results[i].item.score = ++score;
+    }
 
     this._currentValue = newValue;
     this._highlightPosition = 0;
@@ -1717,19 +1756,6 @@ class Choices implements Choices {
       return;
     }
 
-    // If we have our mouse down on the scrollbar and are on IE11...
-    if (IS_IE11 && this.choiceList.element.contains(target)) {
-      // check if click was on a scrollbar area
-      const firstChoice = this.choiceList.element
-        .firstElementChild as HTMLElement;
-
-      const isOnScrollbar =
-        this._direction === 'ltr'
-          ? event.offsetX >= firstChoice.offsetWidth
-          : event.offsetX < firstChoice.offsetLeft;
-      this._isScrollingOnIe = isOnScrollbar;
-    }
-
     if (target === this.input.element) {
       return;
     }
@@ -1756,7 +1782,7 @@ class Choices implements Choices {
    * Handles mouseover event over this.dropdown
    * @param {MouseEvent} event
    */
-  _onMouseOver({ target }: Pick<MouseEvent, 'target'>): void {
+   _onMouseOver({ target }: Pick<MouseEvent, 'target'>): void {
     if (target instanceof HTMLElement && 'choice' in target.dataset) {
       this._highlightChoice(target);
     }
@@ -1833,7 +1859,7 @@ class Choices implements Choices {
     const blurWasWithinContainer =
       target && this.containerOuter.element.contains(target as Node);
 
-    if (blurWasWithinContainer && !this._isScrollingOnIe) {
+    if (blurWasWithinContainer) {
       const { activeItems } = this._store;
       const hasHighlightedItems = activeItems.some((item) => item.highlighted);
       const blurActions = {
@@ -1867,12 +1893,6 @@ class Choices implements Choices {
       };
 
       blurActions[this.passedElement.element.type]();
-    } else {
-      // On IE11, clicking the scollbar blurs our input and thus
-      // closes the dropdown. To stop this, we refocus our input
-      // if we know we are on IE *and* are scrolling.
-      this._isScrollingOnIe = false;
-      this.input.element.focus();
     }
   }
 
@@ -2128,7 +2148,7 @@ class Choices implements Choices {
       userTemplates = callbackOnCreateTemplates.call(this, strToEl);
     }
 
-    this._templates = merge(templates, userTemplates);
+    this._templates = extend(true, templates, userTemplates) as typeof templates;
   }
 
   _createElements(): void {

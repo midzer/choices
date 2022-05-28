@@ -1,4 +1,4 @@
-import { createStore } from 'redux';
+import { createStore } from 'pico-redux';
 import { expect } from 'chai';
 import rootReducer from '.';
 import groups from './groups';

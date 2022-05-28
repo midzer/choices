@@ -1,4 +1,4 @@
-/*! choices.js v10.1.0 | © 2022 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! @midzer/choices v1.0.0 | © 2022 midzer | https://github.com/midzer/choices */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -10,12 +10,12 @@
 		root["Choices"] = factory();
 })(window, function() {
 return /******/ (function() { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 282:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -25,7 +25,7 @@ exports.clearChoices = exports.activateChoices = exports.filterChoices = exports
 
 var constants_1 = __webpack_require__(883);
 
-var addChoice = function (_a) {
+var addChoice = function addChoice(_a) {
   var value = _a.value,
       label = _a.label,
       id = _a.id,
@@ -51,7 +51,7 @@ var addChoice = function (_a) {
 
 exports.addChoice = addChoice;
 
-var filterChoices = function (results) {
+var filterChoices = function filterChoices(results) {
   return {
     type: constants_1.ACTION_TYPES.FILTER_CHOICES,
     results: results
@@ -60,7 +60,7 @@ var filterChoices = function (results) {
 
 exports.filterChoices = filterChoices;
 
-var activateChoices = function (active) {
+var activateChoices = function activateChoices(active) {
   if (active === void 0) {
     active = true;
   }
@@ -73,7 +73,7 @@ var activateChoices = function (active) {
 
 exports.activateChoices = activateChoices;
 
-var clearChoices = function () {
+var clearChoices = function clearChoices() {
   return {
     type: constants_1.ACTION_TYPES.CLEAR_CHOICES
   };
@@ -86,6 +86,7 @@ exports.clearChoices = clearChoices;
 /***/ 783:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -95,7 +96,7 @@ exports.addGroup = void 0;
 
 var constants_1 = __webpack_require__(883);
 
-var addGroup = function (_a) {
+var addGroup = function addGroup(_a) {
   var value = _a.value,
       id = _a.id,
       active = _a.active,
@@ -116,6 +117,7 @@ exports.addGroup = addGroup;
 /***/ 464:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -125,7 +127,7 @@ exports.highlightItem = exports.removeItem = exports.addItem = void 0;
 
 var constants_1 = __webpack_require__(883);
 
-var addItem = function (_a) {
+var addItem = function addItem(_a) {
   var value = _a.value,
       label = _a.label,
       id = _a.id,
@@ -149,7 +151,7 @@ var addItem = function (_a) {
 
 exports.addItem = addItem;
 
-var removeItem = function (id, choiceId) {
+var removeItem = function removeItem(id, choiceId) {
   return {
     type: constants_1.ACTION_TYPES.REMOVE_ITEM,
     id: id,
@@ -159,7 +161,7 @@ var removeItem = function (id, choiceId) {
 
 exports.removeItem = removeItem;
 
-var highlightItem = function (id, highlighted) {
+var highlightItem = function highlightItem(id, highlighted) {
   return {
     type: constants_1.ACTION_TYPES.HIGHLIGHT_ITEM,
     id: id,
@@ -174,6 +176,7 @@ exports.highlightItem = highlightItem;
 /***/ 137:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -183,7 +186,7 @@ exports.setIsLoading = exports.resetTo = exports.clearAll = void 0;
 
 var constants_1 = __webpack_require__(883);
 
-var clearAll = function () {
+var clearAll = function clearAll() {
   return {
     type: constants_1.ACTION_TYPES.CLEAR_ALL
   };
@@ -191,7 +194,7 @@ var clearAll = function () {
 
 exports.clearAll = clearAll;
 
-var resetTo = function (state) {
+var resetTo = function resetTo(state) {
   return {
     type: constants_1.ACTION_TYPES.RESET_TO,
     state: state
@@ -200,7 +203,7 @@ var resetTo = function (state) {
 
 exports.resetTo = resetTo;
 
-var setIsLoading = function (isLoading) {
+var setIsLoading = function setIsLoading(isLoading) {
   return {
     type: constants_1.ACTION_TYPES.SET_IS_LOADING,
     isLoading: isLoading
@@ -214,6 +217,7 @@ exports.setIsLoading = setIsLoading;
 /***/ 373:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
@@ -236,12 +240,6 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 
-var deepmerge_1 = __importDefault(__webpack_require__(996));
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-
-var fuse_js_1 = __importDefault(__webpack_require__(221));
-
 var choices_1 = __webpack_require__(282);
 
 var groups_1 = __webpack_require__(783);
@@ -263,22 +261,17 @@ var reducers_1 = __webpack_require__(655);
 var store_1 = __importDefault(__webpack_require__(744));
 
 var templates_1 = __importDefault(__webpack_require__(686));
-/** @see {@link http://browserhacks.com/#hack-acea075d0ac6954f275a70023906050c} */
 
-
-var IS_IE11 = '-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style;
 var USER_DEFAULTS = {};
 /**
  * Choices
- * @author Josh Johnson<josh@joshuajohnson.co.uk>
+ * @author midzer<midzer.de>
  */
 
 var Choices =
 /** @class */
 function () {
   function Choices(element, userConfig) {
-    var _this = this;
-
     if (element === void 0) {
       element = '[data-choice]';
     }
@@ -287,17 +280,13 @@ function () {
       userConfig = {};
     }
 
+    var _this = this;
+
     if (userConfig.allowHTML === undefined) {
       console.warn('Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.');
     }
 
-    this.config = deepmerge_1.default.all([defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig], // When merging array configs, replace with a copy of the userConfig array,
-    // instead of concatenating with the default array
-    {
-      arrayMerge: function (_, sourceArray) {
-        return __spreadArray([], sourceArray, true);
-      }
-    });
+    this.config = (0, utils_1.extend)(true, defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig);
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
 
     if (invalidConfigOptions.length) {
@@ -335,7 +324,7 @@ function () {
       this.passedElement = new components_1.WrappedSelect({
         element: passedElement,
         classNames: this.config.classNames,
-        template: function (data) {
+        template: function template(data) {
           return _this._templates.option(data);
         }
       });
@@ -348,7 +337,6 @@ function () {
     this._prevState = reducers_1.defaultState;
     this._currentValue = '';
     this._canSearch = !!this.config.searchEnabled;
-    this._isScrollingOnIe = false;
     this._highlightPosition = 0;
     this._wasTap = true;
     this._placeholderValue = this._generatePlaceholderValue();
@@ -437,7 +425,7 @@ function () {
   }
 
   Object.defineProperty(Choices, "defaults", {
-    get: function () {
+    get: function get() {
       return Object.preventExtensions({
         get options() {
           return USER_DEFAULTS;
@@ -1047,7 +1035,7 @@ function () {
       fragment = document.createDocumentFragment();
     }
 
-    var getGroupChoices = function (group) {
+    var getGroupChoices = function getGroupChoices(group) {
       return choices.filter(function (choice) {
         if (_this._isSelectOneElement) {
           return choice.groupId === group.id;
@@ -1094,7 +1082,7 @@ function () {
         renderChoiceLimit = _a.renderChoiceLimit;
     var filter = this._isSearching ? utils_1.sortByScore : this.config.sorter;
 
-    var appendChoice = function (choice) {
+    var appendChoice = function appendChoice(choice) {
       var shouldRender = renderSelectedChoices === 'auto' ? _this._isSelectOneElement || !choice.selected : true;
 
       if (shouldRender) {
@@ -1181,7 +1169,7 @@ function () {
       this.passedElement.options = items;
     }
 
-    var addItemToFragment = function (item) {
+    var addItemToFragment = function addItemToFragment(item) {
       // Create new list element
       var listItem = _this._getTemplate('item', item, removeItemButton); // Append it to list
 
@@ -1451,20 +1439,98 @@ function () {
   Choices.prototype._searchChoices = function (value) {
     var newValue = typeof value === 'string' ? value.trim() : value;
     var currentValue = typeof this._currentValue === 'string' ? this._currentValue.trim() : this._currentValue;
+    var _a = this.config,
+        searchFloor = _a.searchFloor,
+        searchResultLimit = _a.searchResultLimit,
+        shouldSort = _a.shouldSort;
 
-    if (newValue.length < 1 && newValue === "".concat(currentValue, " ")) {
+    if (newValue.length < searchFloor || newValue === "".concat(currentValue, " ")) {
       return 0;
     } // If new value matches the desired length and is not the same as the current value with a space
 
 
     var haystack = this._store.searchableChoices;
-    var needle = newValue;
-    var options = Object.assign(this.config.fuseOptions, {
-      keys: __spreadArray([], this.config.searchFields, true),
-      includeMatches: true
-    });
-    var fuse = new fuse_js_1.default(haystack, options);
-    var results = fuse.search(needle); // see https://github.com/krisk/Fuse/issues/303
+    var needle = newValue.toLowerCase();
+
+    function kmpSearch(pattern, text) {
+      if (pattern.length == 0) return 0; // Immediate match
+      // Compute longest suffix-prefix table
+
+      var lsp = [0]; // Base case
+
+      for (var i = 1; i < pattern.length; i++) {
+        var j = lsp[i - 1]; // Start by assuming we're extending the previous LSP
+
+        while (j > 0 && pattern.charAt(i) != pattern.charAt(j)) {
+          j = lsp[j - 1];
+        }
+
+        if (pattern.charAt(i) == pattern.charAt(j)) j++;
+        lsp.push(j);
+      } // Walk through text string
+
+
+      var j = 0; // Number of chars matched in pattern
+
+      for (var i = 0; i < text.length; i++) {
+        while (j > 0 && text.charAt(i) != pattern.charAt(j)) {
+          j = lsp[j - 1];
+        } // Fall back in the pattern
+
+
+        if (text.charAt(i) == pattern.charAt(j)) {
+          j++; // Next char matched, increment position
+
+          if (j == pattern.length) return i - (j - 1);
+        }
+      }
+
+      return -1; // Not found
+    }
+
+    var results = []; //let results: Choice[];
+
+    var count = 0;
+
+    for (var i = 0, j = haystack.length; i < j; i++) {
+      var entry = haystack[i];
+
+      if (kmpSearch(needle, entry.value.toLowerCase()) != -1) {
+        //const choice: Choice = entry;
+        results.push({
+          item: entry
+        });
+
+        if (++count === searchResultLimit) {
+          break;
+        }
+      }
+    } // Sort
+
+
+    if (shouldSort) {
+      results.sort(function (a, b) {
+        var aIndex = a.item.value.toLowerCase().indexOf(needle);
+        var bIndex = b.item.value.toLowerCase().indexOf(needle);
+
+        if (aIndex < bIndex) {
+          return -1;
+        }
+
+        if (aIndex > bIndex) {
+          return 1;
+        }
+
+        return 0;
+      });
+    } // Give score
+
+
+    var score = 0;
+
+    for (var i = 0; i < results.length; i++) {
+      results[i].item.score = ++score;
+    }
 
     this._currentValue = newValue;
     this._highlightPosition = 0;
@@ -1805,14 +1871,6 @@ function () {
 
     if (!(target instanceof HTMLElement)) {
       return;
-    } // If we have our mouse down on the scrollbar and are on IE11...
-
-
-    if (IS_IE11 && this.choiceList.element.contains(target)) {
-      // check if click was on a scrollbar area
-      var firstChoice = this.choiceList.element.firstElementChild;
-      var isOnScrollbar = this._direction === 'ltr' ? event.offsetX >= firstChoice.offsetWidth : event.offsetX < firstChoice.offsetLeft;
-      this._isScrollingOnIe = isOnScrollbar;
     }
 
     if (target === this.input.element) {
@@ -1922,7 +1980,7 @@ function () {
     var target = _a.target;
     var blurWasWithinContainer = target && this.containerOuter.element.contains(target);
 
-    if (blurWasWithinContainer && !this._isScrollingOnIe) {
+    if (blurWasWithinContainer) {
       var activeItems = this._store.activeItems;
       var hasHighlightedItems_1 = activeItems.some(function (item) {
         return item.highlighted;
@@ -1955,12 +2013,6 @@ function () {
         }
       }, _b);
       blurActions[this.passedElement.element.type]();
-    } else {
-      // On IE11, clicking the scollbar blurs our input and thus
-      // closes the dropdown. To stop this, we refocus our input
-      // if we know we are on IE *and* are scrolling.
-      this._isScrollingOnIe = false;
-      this.input.element.focus();
     }
   };
 
@@ -2172,7 +2224,7 @@ function () {
         disabled: isDisabled
       }));
 
-      var addGroupChoices = function (choice) {
+      var addGroupChoices = function addGroupChoices(choice) {
         var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
 
         _this._addChoice({
@@ -2217,7 +2269,7 @@ function () {
       userTemplates = callbackOnCreateTemplates.call(this, utils_1.strToEl);
     }
 
-    this._templates = (0, deepmerge_1.default)(templates_1.default, userTemplates);
+    this._templates = (0, utils_1.extend)(true, templates_1.default, userTemplates);
   };
 
   Choices.prototype._createElements = function () {
@@ -2413,7 +2465,7 @@ function () {
 
     var itemType = (0, utils_1.getType)(item).toLowerCase();
     var handleType = {
-      object: function () {
+      object: function object() {
         if (!item.value) {
           return;
         } // If we are dealing with a select input, we need to create an option first
@@ -2439,7 +2491,7 @@ function () {
           });
         }
       },
-      string: function () {
+      string: function string() {
         if (!_this._isTextElement) {
           _this._addChoice({
             value: item,
@@ -2513,6 +2565,7 @@ exports["default"] = Choices;
 /***/ 613:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -2687,6 +2740,7 @@ exports["default"] = Container;
 /***/ 217:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -2710,7 +2764,7 @@ function () {
     /**
      * Bottom position of dropdown in viewport coordinates
      */
-    get: function () {
+    get: function get() {
       return this.element.getBoundingClientRect().bottom;
     },
     enumerable: false,
@@ -2753,6 +2807,7 @@ exports["default"] = Dropdown;
 /***/ 520:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -2795,6 +2850,7 @@ exports.WrappedSelect = wrapped_select_1.default;
 /***/ 11:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -2826,24 +2882,24 @@ function () {
   }
 
   Object.defineProperty(Input.prototype, "placeholder", {
-    set: function (placeholder) {
+    set: function set(placeholder) {
       this.element.placeholder = placeholder;
     },
     enumerable: false,
     configurable: true
   });
   Object.defineProperty(Input.prototype, "value", {
-    get: function () {
+    get: function get() {
       return (0, utils_1.sanitise)(this.element.value);
     },
-    set: function (value) {
+    set: function set(value) {
       this.element.value = value;
     },
     enumerable: false,
     configurable: true
   });
   Object.defineProperty(Input.prototype, "rawValue", {
-    get: function () {
+    get: function get() {
       return this.element.value;
     },
     enumerable: false,
@@ -2961,6 +3017,7 @@ exports["default"] = Input;
 /***/ 624:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3069,6 +3126,7 @@ exports["default"] = List;
 /***/ 730:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3094,24 +3152,24 @@ function () {
   }
 
   Object.defineProperty(WrappedElement.prototype, "isActive", {
-    get: function () {
+    get: function get() {
       return this.element.dataset.choice === 'active';
     },
     enumerable: false,
     configurable: true
   });
   Object.defineProperty(WrappedElement.prototype, "dir", {
-    get: function () {
+    get: function get() {
       return this.element.dir;
     },
     enumerable: false,
     configurable: true
   });
   Object.defineProperty(WrappedElement.prototype, "value", {
-    get: function () {
+    get: function get() {
       return this.element.value;
     },
-    set: function (value) {
+    set: function set(value) {
       // you must define setter here otherwise it will be readonly property
       this.element.value = value;
     },
@@ -3182,24 +3240,28 @@ exports["default"] = WrappedElement;
 /***/ 541:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __extends = this && this.__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
       __proto__: []
     } instanceof Array && function (d, b) {
       d.__proto__ = b;
     } || function (d, b) {
-      for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
     };
 
-    return extendStatics(d, b);
+    return _extendStatics(d, b);
   };
 
   return function (d, b) {
     if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
+
+    _extendStatics(d, b);
 
     function __() {
       this.constructor = d;
@@ -3241,10 +3303,10 @@ function (_super) {
   }
 
   Object.defineProperty(WrappedInput.prototype, "value", {
-    get: function () {
+    get: function get() {
       return this.element.value;
     },
-    set: function (value) {
+    set: function set(value) {
       this.element.setAttribute('value', value);
       this.element.value = value;
     },
@@ -3261,24 +3323,28 @@ exports["default"] = WrappedInput;
 /***/ 982:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __extends = this && this.__extends || function () {
-  var extendStatics = function (d, b) {
-    extendStatics = Object.setPrototypeOf || {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
       __proto__: []
     } instanceof Array && function (d, b) {
       d.__proto__ = b;
     } || function (d, b) {
-      for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
     };
 
-    return extendStatics(d, b);
+    return _extendStatics(d, b);
   };
 
   return function (d, b) {
     if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
+
+    _extendStatics(d, b);
 
     function __() {
       this.constructor = d;
@@ -3320,7 +3386,7 @@ function (_super) {
   }
 
   Object.defineProperty(WrappedSelect.prototype, "placeholderOption", {
-    get: function () {
+    get: function get() {
       return this.element.querySelector('option[value=""]') || // Backward compatibility layer for the non-standard placeholder attribute supported in older versions.
       this.element.querySelector('option[placeholder]');
     },
@@ -3328,22 +3394,22 @@ function (_super) {
     configurable: true
   });
   Object.defineProperty(WrappedSelect.prototype, "optionGroups", {
-    get: function () {
+    get: function get() {
       return Array.from(this.element.getElementsByTagName('OPTGROUP'));
     },
     enumerable: false,
     configurable: true
   });
   Object.defineProperty(WrappedSelect.prototype, "options", {
-    get: function () {
+    get: function get() {
       return Array.from(this.element.options);
     },
-    set: function (options) {
+    set: function set(options) {
       var _this = this;
 
       var fragment = document.createDocumentFragment();
 
-      var addOptionToFragment = function (data) {
+      var addOptionToFragment = function addOptionToFragment(data) {
         // Create a standard select option
         var option = _this.template(data); // Append it to fragment
 
@@ -3376,6 +3442,7 @@ exports["default"] = WrappedSelect;
 /***/ 883:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3428,6 +3495,7 @@ exports.SCROLLING_SPEED = 4;
 /***/ 789:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3502,17 +3570,14 @@ exports.DEFAULT_CONFIG = {
   itemSelectText: 'Press to select',
   uniqueItemText: 'Only unique values can be added',
   customAddItemText: 'Only values matching specific conditions can be added',
-  addItemText: function (value) {
+  addItemText: function addItemText(value) {
     return "Press Enter to add <b>\"".concat((0, utils_1.sanitise)(value), "\"</b>");
   },
-  maxItemText: function (maxItemCount) {
+  maxItemText: function maxItemText(maxItemCount) {
     return "Only ".concat(maxItemCount, " values can be added");
   },
-  valueComparer: function (value1, value2) {
+  valueComparer: function valueComparer(value1, value2) {
     return value1 === value2;
-  },
-  fuseOptions: {
-    includeScore: true
   },
   labelId: '',
   callbackOnInit: null,
@@ -3525,6 +3590,7 @@ exports.DEFAULT_CONFIG = {
 /***/ 18:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3536,6 +3602,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 978:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -3548,6 +3615,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 948:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3559,6 +3627,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 359:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3570,6 +3639,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 285:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3581,6 +3651,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 533:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -3593,23 +3664,32 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 187:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
-  Object.defineProperty(o, k2, {
-    enumerable: true,
-    get: function () {
-      return m[k];
-    }
-  });
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+    desc = {
+      enumerable: true,
+      get: function get() {
+        return m[k];
+      }
+    };
+  }
+
+  Object.defineProperty(o, k2, desc);
 } : function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
   o[k2] = m[k];
 });
 
 var __exportStar = this && this.__exportStar || function (m, exports) {
-  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+  for (var p in m) {
+    if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+  }
 };
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3651,6 +3731,7 @@ __exportStar(__webpack_require__(876), exports);
 /***/ 287:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3662,6 +3743,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 132:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3673,6 +3755,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 837:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3684,6 +3767,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 598:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3695,6 +3779,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 37:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3706,6 +3791,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 369:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3717,6 +3803,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 47:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3728,6 +3815,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 923:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3739,6 +3827,7 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 876:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -3750,21 +3839,22 @@ Object.defineProperty(exports, "__esModule", ({
 /***/ 799:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.diff = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+exports.extend = exports.diff = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
 
-var getRandomNumber = function (min, max) {
+var getRandomNumber = function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
 exports.getRandomNumber = getRandomNumber;
 
-var generateChars = function (length) {
+var generateChars = function generateChars(length) {
   return Array.from({
     length: length
   }, function () {
@@ -3774,7 +3864,7 @@ var generateChars = function (length) {
 
 exports.generateChars = generateChars;
 
-var generateId = function (element, prefix) {
+var generateId = function generateId(element, prefix) {
   var id = element.id || element.name && "".concat(element.name, "-").concat((0, exports.generateChars)(2)) || (0, exports.generateChars)(4);
   id = id.replace(/(:|\.|\[|\]|,)/g, '');
   id = "".concat(prefix, "-").concat(id);
@@ -3783,19 +3873,19 @@ var generateId = function (element, prefix) {
 
 exports.generateId = generateId;
 
-var getType = function (obj) {
+var getType = function getType(obj) {
   return Object.prototype.toString.call(obj).slice(8, -1);
 };
 
 exports.getType = getType;
 
-var isType = function (type, obj) {
+var isType = function isType(type, obj) {
   return obj !== undefined && obj !== null && (0, exports.getType)(obj) === type;
 };
 
 exports.isType = isType;
 
-var wrap = function (element, wrapper) {
+var wrap = function wrap(element, wrapper) {
   if (wrapper === void 0) {
     wrapper = document.createElement('div');
   }
@@ -3813,7 +3903,7 @@ var wrap = function (element, wrapper) {
 
 exports.wrap = wrap;
 
-var getAdjacentEl = function (startEl, selector, direction) {
+var getAdjacentEl = function getAdjacentEl(startEl, selector, direction) {
   if (direction === void 0) {
     direction = 1;
   }
@@ -3834,7 +3924,7 @@ var getAdjacentEl = function (startEl, selector, direction) {
 
 exports.getAdjacentEl = getAdjacentEl;
 
-var isScrolledIntoView = function (element, parent, direction) {
+var isScrolledIntoView = function isScrolledIntoView(element, parent, direction) {
   if (direction === void 0) {
     direction = 1;
   }
@@ -3858,7 +3948,7 @@ var isScrolledIntoView = function (element, parent, direction) {
 
 exports.isScrolledIntoView = isScrolledIntoView;
 
-var sanitise = function (value) {
+var sanitise = function sanitise(value) {
   if (typeof value !== 'string') {
     return value;
   }
@@ -3883,7 +3973,7 @@ exports.strToEl = function () {
   };
 }();
 
-var sortByAlpha = function (_a, _b) {
+var sortByAlpha = function sortByAlpha(_a, _b) {
   var value = _a.value,
       _c = _a.label,
       label = _c === void 0 ? value : _c;
@@ -3899,7 +3989,7 @@ var sortByAlpha = function (_a, _b) {
 
 exports.sortByAlpha = sortByAlpha;
 
-var sortByScore = function (a, b) {
+var sortByScore = function sortByScore(a, b) {
   var _a = a.score,
       scoreA = _a === void 0 ? 0 : _a;
   var _b = b.score,
@@ -3909,7 +3999,7 @@ var sortByScore = function (a, b) {
 
 exports.sortByScore = sortByScore;
 
-var dispatchEvent = function (element, type, customArgs) {
+var dispatchEvent = function dispatchEvent(element, type, customArgs) {
   if (customArgs === void 0) {
     customArgs = null;
   }
@@ -3924,7 +4014,7 @@ var dispatchEvent = function (element, type, customArgs) {
 
 exports.dispatchEvent = dispatchEvent;
 
-var existsInArray = function (array, value, key) {
+var existsInArray = function existsInArray(array, value, key) {
   if (key === void 0) {
     key = 'value';
   }
@@ -3940,7 +4030,7 @@ var existsInArray = function (array, value, key) {
 
 exports.existsInArray = existsInArray;
 
-var cloneObject = function (obj) {
+var cloneObject = function cloneObject(obj) {
   return JSON.parse(JSON.stringify(obj));
 };
 
@@ -3949,7 +4039,7 @@ exports.cloneObject = cloneObject;
  * Returns an array of keys present on the first but missing on the second object
  */
 
-var diff = function (a, b) {
+var diff = function diff(a, b) {
   var aKeys = Object.keys(a).sort();
   var bKeys = Object.keys(b).sort();
   return aKeys.filter(function (i) {
@@ -3958,12 +4048,55 @@ var diff = function (a, b) {
 };
 
 exports.diff = diff;
+/*!
+ * Merge two or more objects together.
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
+ * @param   {Boolean}  deep     If true, do a deep (or recursive) merge [optional]
+ * @param   {Object}   objects  The objects to merge together
+ * @returns {Object}            Merged values of defaults and options
+ */
+
+var extend = function extend(a, b, c, d) {
+  // Variables
+  var extended = {};
+  var deep = false;
+  var i = 0; // Check if a deep merge
+
+  if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
+    deep = arguments[0];
+    i++;
+  } // Merge the object into the extended object
+
+
+  var merge = function merge(obj) {
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        // If property is an object, merge properties
+        if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+          extended[prop] = (0, exports.extend)(extended[prop], obj[prop]);
+        } else {
+          extended[prop] = obj[prop];
+        }
+      }
+    }
+  }; // Loop through each object and conduct a merge
+
+
+  for (; i < arguments.length; i++) {
+    merge(arguments[i]);
+  }
+
+  return extended;
+};
+
+exports.extend = extend;
 
 /***/ }),
 
 /***/ 273:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
@@ -4065,11 +4198,12 @@ function choices(state, action) {
           // within filtered results
 
           choice.active = filterChoicesAction_1.results.some(function (_a) {
-            var item = _a.item,
-                score = _a.score;
+            var item = _a.item
+            /*, score*/
+            ;
 
             if (item.id === choice.id) {
-              choice.score = score;
+              //choice.score = score;
               return true;
             }
 
@@ -4108,6 +4242,7 @@ exports["default"] = choices;
 /***/ 871:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
@@ -4166,6 +4301,7 @@ exports["default"] = groups;
 /***/ 655:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -4179,7 +4315,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.defaultState = void 0;
 
-var redux_1 = __webpack_require__(857);
+var pico_redux_1 = __webpack_require__(390);
 
 var items_1 = __importDefault(__webpack_require__(52));
 
@@ -4197,14 +4333,14 @@ exports.defaultState = {
   choices: [],
   loading: false
 };
-var appReducer = (0, redux_1.combineReducers)({
+var appReducer = (0, pico_redux_1.combineReducers)({
   items: items_1.default,
   groups: groups_1.default,
   choices: choices_1.default,
   loading: loading_1.default
 });
 
-var rootReducer = function (passedState, action) {
+var rootReducer = function rootReducer(passedState, action) {
   var state = passedState; // If we are clearing all items, groups and options we reassign
   // state and then pass that state to our proper reducer. This isn't
   // mutating our actual state
@@ -4226,6 +4362,7 @@ exports["default"] = rootReducer;
 /***/ 52:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
@@ -4320,6 +4457,7 @@ exports["default"] = items;
 /***/ 502:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({
@@ -4328,7 +4466,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports.defaultState = void 0;
 exports.defaultState = false;
 
-var general = function (state, action) {
+var general = function general(state, action) {
   if (state === void 0) {
     state = exports.defaultState;
   }
@@ -4357,6 +4495,7 @@ exports["default"] = general;
 /***/ 744:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 
 var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
@@ -4380,7 +4519,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-var redux_1 = __webpack_require__(857);
+var pico_redux_1 = __webpack_require__(390);
 
 var index_1 = __importDefault(__webpack_require__(655));
 
@@ -4388,7 +4527,7 @@ var Store =
 /** @class */
 function () {
   function Store() {
-    this._store = (0, redux_1.createStore)(index_1.default, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+    this._store = (0, pico_redux_1.withSubscribe)(pico_redux_1.createStore)(index_1.default, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
   }
   /**
    * Subscribe store to function call (wrapped Redux method)
@@ -4411,7 +4550,7 @@ function () {
     /**
      * Get store object (wrapping Redux method)
      */
-    get: function () {
+    get: function get() {
       return this._store.getState();
     },
     enumerable: false,
@@ -4421,7 +4560,7 @@ function () {
     /**
      * Get items from store
      */
-    get: function () {
+    get: function get() {
       return this.state.items;
     },
     enumerable: false,
@@ -4431,7 +4570,7 @@ function () {
     /**
      * Get active items from store
      */
-    get: function () {
+    get: function get() {
       return this.items.filter(function (item) {
         return item.active === true;
       });
@@ -4443,7 +4582,7 @@ function () {
     /**
      * Get highlighted items from store
      */
-    get: function () {
+    get: function get() {
       return this.items.filter(function (item) {
         return item.active && item.highlighted;
       });
@@ -4455,7 +4594,7 @@ function () {
     /**
      * Get choices from store
      */
-    get: function () {
+    get: function get() {
       return this.state.choices;
     },
     enumerable: false,
@@ -4465,7 +4604,7 @@ function () {
     /**
      * Get active choices from store
      */
-    get: function () {
+    get: function get() {
       return this.choices.filter(function (choice) {
         return choice.active === true;
       });
@@ -4477,7 +4616,7 @@ function () {
     /**
      * Get selectable choices from store
      */
-    get: function () {
+    get: function get() {
       return this.choices.filter(function (choice) {
         return choice.disabled !== true;
       });
@@ -4489,7 +4628,7 @@ function () {
     /**
      * Get choices that can be searched (excluding placeholders)
      */
-    get: function () {
+    get: function get() {
       return this.selectableChoices.filter(function (choice) {
         return choice.placeholder !== true;
       });
@@ -4501,7 +4640,7 @@ function () {
     /**
      * Get placeholder choice from store
      */
-    get: function () {
+    get: function get() {
       return __spreadArray([], this.choices, true).reverse().find(function (choice) {
         return choice.placeholder === true;
       });
@@ -4513,7 +4652,7 @@ function () {
     /**
      * Get groups from store
      */
-    get: function () {
+    get: function get() {
       return this.state.groups;
     },
     enumerable: false,
@@ -4523,7 +4662,7 @@ function () {
     /**
      * Get active groups from store
      */
-    get: function () {
+    get: function get() {
       var _a = this,
           groups = _a.groups,
           choices = _a.choices;
@@ -4577,6 +4716,7 @@ exports["default"] = Store;
 /***/ 686:
 /***/ (function(__unused_webpack_module, exports) {
 
+"use strict";
 
 /**
  * Helpers to create HTML elements used by Choices
@@ -4587,7 +4727,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 var templates = {
-  containerOuter: function (_a, dir, isSelectElement, isSelectOneElement, searchEnabled, passedElementType, labelId) {
+  containerOuter: function containerOuter(_a, dir, isSelectElement, isSelectOneElement, searchEnabled, passedElementType, labelId) {
     var containerOuter = _a.classNames.containerOuter;
     var div = Object.assign(document.createElement('div'), {
       className: containerOuter
@@ -4614,18 +4754,18 @@ var templates = {
     div.setAttribute('aria-expanded', 'false');
 
     if (labelId) {
-      div.setAttribute('aria-labeledby', labelId);
+      div.setAttribute('aria-labelledby', labelId);
     }
 
     return div;
   },
-  containerInner: function (_a) {
+  containerInner: function containerInner(_a) {
     var containerInner = _a.classNames.containerInner;
     return Object.assign(document.createElement('div'), {
       className: containerInner
     });
   },
-  itemList: function (_a, isSelectOneElement) {
+  itemList: function itemList(_a, isSelectOneElement) {
     var _b = _a.classNames,
         list = _b.list,
         listSingle = _b.listSingle,
@@ -4634,7 +4774,7 @@ var templates = {
       className: "".concat(list, " ").concat(isSelectOneElement ? listSingle : listItems)
     });
   },
-  placeholder: function (_a, value) {
+  placeholder: function placeholder(_a, value) {
     var _b;
 
     var allowHTML = _a.allowHTML,
@@ -4643,7 +4783,7 @@ var templates = {
       className: placeholder
     }, _b[allowHTML ? 'innerHTML' : 'innerText'] = value, _b));
   },
-  item: function (_a, _b, removeItemButton) {
+  item: function item(_a, _b, removeItemButton) {
     var _c, _d;
 
     var allowHTML = _a.allowHTML,
@@ -4705,7 +4845,7 @@ var templates = {
 
     return div;
   },
-  choiceList: function (_a, isSelectOneElement) {
+  choiceList: function choiceList(_a, isSelectOneElement) {
     var list = _a.classNames.list;
     var div = Object.assign(document.createElement('div'), {
       className: list
@@ -4718,7 +4858,7 @@ var templates = {
     div.setAttribute('role', 'listbox');
     return div;
   },
-  choiceGroup: function (_a, _b) {
+  choiceGroup: function choiceGroup(_a, _b) {
     var _c;
 
     var allowHTML = _a.allowHTML,
@@ -4748,7 +4888,7 @@ var templates = {
     }, _c[allowHTML ? 'innerHTML' : 'innerText'] = value, _c)));
     return div;
   },
-  choice: function (_a, _b, selectText) {
+  choice: function choice(_a, _b, selectText) {
     var _c;
 
     var allowHTML = _a.allowHTML,
@@ -4798,7 +4938,7 @@ var templates = {
 
     return div;
   },
-  input: function (_a, placeholderValue) {
+  input: function input(_a, placeholderValue) {
     var _b = _a.classNames,
         input = _b.input,
         inputCloned = _b.inputCloned;
@@ -4815,7 +4955,7 @@ var templates = {
     inp.setAttribute('aria-label', placeholderValue);
     return inp;
   },
-  dropdown: function (_a) {
+  dropdown: function dropdown(_a) {
     var _b = _a.classNames,
         list = _b.list,
         listDropdown = _b.listDropdown;
@@ -4824,7 +4964,7 @@ var templates = {
     div.setAttribute('aria-expanded', 'false');
     return div;
   },
-  notice: function (_a, innerText, type) {
+  notice: function notice(_a, innerText, type) {
     var _b;
 
     var allowHTML = _a.allowHTML,
@@ -4848,7 +4988,7 @@ var templates = {
 
     return Object.assign(document.createElement('div'), (_b = {}, _b[allowHTML ? 'innerHTML' : 'innerText'] = innerText, _b.className = classes.join(' '), _b));
   },
-  option: function (_a) {
+  option: function option(_a) {
     var label = _a.label,
         value = _a.value,
         customProperties = _a.customProperties,
@@ -4868,2662 +5008,92 @@ exports["default"] = templates;
 
 /***/ }),
 
-/***/ 996:
+/***/ 258:
 /***/ (function(module) {
 
+module.exports = (...middlewares) => createStore => (...args) => {
+  const store = createStore(...args)
+  const reducer = (acc, middleware) => acc = middleware(store)(acc)
+  const dispatch = middlewares.reduceRight(reducer, store.dispatch)
 
-
-var isMergeableObject = function isMergeableObject(value) {
-	return isNonNullObject(value)
-		&& !isSpecial(value)
-};
-
-function isNonNullObject(value) {
-	return !!value && typeof value === 'object'
+  return Object.assign({}, store, { dispatch })
 }
-
-function isSpecial(value) {
-	var stringValue = Object.prototype.toString.call(value);
-
-	return stringValue === '[object RegExp]'
-		|| stringValue === '[object Date]'
-		|| isReactElement(value)
-}
-
-// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
-var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
-var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
-
-function isReactElement(value) {
-	return value.$$typeof === REACT_ELEMENT_TYPE
-}
-
-function emptyTarget(val) {
-	return Array.isArray(val) ? [] : {}
-}
-
-function cloneUnlessOtherwiseSpecified(value, options) {
-	return (options.clone !== false && options.isMergeableObject(value))
-		? deepmerge(emptyTarget(value), value, options)
-		: value
-}
-
-function defaultArrayMerge(target, source, options) {
-	return target.concat(source).map(function(element) {
-		return cloneUnlessOtherwiseSpecified(element, options)
-	})
-}
-
-function getMergeFunction(key, options) {
-	if (!options.customMerge) {
-		return deepmerge
-	}
-	var customMerge = options.customMerge(key);
-	return typeof customMerge === 'function' ? customMerge : deepmerge
-}
-
-function getEnumerableOwnPropertySymbols(target) {
-	return Object.getOwnPropertySymbols
-		? Object.getOwnPropertySymbols(target).filter(function(symbol) {
-			return target.propertyIsEnumerable(symbol)
-		})
-		: []
-}
-
-function getKeys(target) {
-	return Object.keys(target).concat(getEnumerableOwnPropertySymbols(target))
-}
-
-function propertyIsOnObject(object, property) {
-	try {
-		return property in object
-	} catch(_) {
-		return false
-	}
-}
-
-// Protects from prototype poisoning and unexpected merging up the prototype chain.
-function propertyIsUnsafe(target, key) {
-	return propertyIsOnObject(target, key) // Properties are safe to merge if they don't exist in the target yet,
-		&& !(Object.hasOwnProperty.call(target, key) // unsafe if they exist up the prototype chain,
-			&& Object.propertyIsEnumerable.call(target, key)) // and also unsafe if they're nonenumerable.
-}
-
-function mergeObject(target, source, options) {
-	var destination = {};
-	if (options.isMergeableObject(target)) {
-		getKeys(target).forEach(function(key) {
-			destination[key] = cloneUnlessOtherwiseSpecified(target[key], options);
-		});
-	}
-	getKeys(source).forEach(function(key) {
-		if (propertyIsUnsafe(target, key)) {
-			return
-		}
-
-		if (propertyIsOnObject(target, key) && options.isMergeableObject(source[key])) {
-			destination[key] = getMergeFunction(key, options)(target[key], source[key], options);
-		} else {
-			destination[key] = cloneUnlessOtherwiseSpecified(source[key], options);
-		}
-	});
-	return destination
-}
-
-function deepmerge(target, source, options) {
-	options = options || {};
-	options.arrayMerge = options.arrayMerge || defaultArrayMerge;
-	options.isMergeableObject = options.isMergeableObject || isMergeableObject;
-	// cloneUnlessOtherwiseSpecified is added to `options` so that custom arrayMerge()
-	// implementations can use it. The caller may not replace it.
-	options.cloneUnlessOtherwiseSpecified = cloneUnlessOtherwiseSpecified;
-
-	var sourceIsArray = Array.isArray(source);
-	var targetIsArray = Array.isArray(target);
-	var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
-
-	if (!sourceAndTargetTypesMatch) {
-		return cloneUnlessOtherwiseSpecified(source, options)
-	} else if (sourceIsArray) {
-		return options.arrayMerge(target, source, options)
-	} else {
-		return mergeObject(target, source, options)
-	}
-}
-
-deepmerge.all = function deepmergeAll(array, options) {
-	if (!Array.isArray(array)) {
-		throw new Error('first argument should be an array')
-	}
-
-	return array.reduce(function(prev, next) {
-		return deepmerge(prev, next, options)
-	}, {})
-};
-
-var deepmerge_1 = deepmerge;
-
-module.exports = deepmerge_1;
 
 
 /***/ }),
 
-/***/ 221:
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+/***/ 793:
+/***/ (function(module) {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": function() { return /* binding */ Fuse; }
-/* harmony export */ });
-/**
- * Fuse.js v6.5.3 - Lightweight fuzzy-search (http://fusejs.io)
- *
- * Copyright (c) 2021 Kiro Risk (http://kiro.me)
- * All Rights Reserved. Apache Software License 2.0
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- */
+module.exports = (reducers) => (state = {}, action) =>
+  Object.keys(reducers)
+    .reduce((acc, key) => Object.assign(acc, { [key]: reducers[key](state[key], action) }), {})
 
-function isArray(value) {
-  return !Array.isArray
-    ? getTag(value) === '[object Array]'
-    : Array.isArray(value)
+
+/***/ }),
+
+/***/ 571:
+/***/ (function(module) {
+
+module.exports = (reducer, state = reducer(void 0, { type: '@@init' })) => ({
+  dispatch: action => (state = reducer(state, action), action),
+  getState: () => state
+})
+
+
+/***/ }),
+
+/***/ 390:
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+const applyMiddleware = __webpack_require__(258)
+const combineReducers = __webpack_require__(793)
+const createStore = __webpack_require__(571)
+const withMiddleware = __webpack_require__(634)
+const withSubscribe = __webpack_require__(167)
+
+module.exports = {
+  applyMiddleware,
+  combineReducers,
+  createStore,
+  withMiddleware,
+  withSubscribe
 }
 
-// Adapted from: https://github.com/lodash/lodash/blob/master/.internal/baseToString.js
-const INFINITY = 1 / 0;
-function baseToString(value) {
-  // Exit early for strings to avoid a performance hit in some environments.
-  if (typeof value == 'string') {
-    return value
-  }
-  let result = value + '';
-  return result == '0' && 1 / value == -INFINITY ? '-0' : result
-}
 
-function toString(value) {
-  return value == null ? '' : baseToString(value)
-}
+/***/ }),
 
-function isString(value) {
-  return typeof value === 'string'
-}
+/***/ 634:
+/***/ (function(module) {
 
-function isNumber(value) {
-  return typeof value === 'number'
-}
+module.exports = createStore => (reducer, state, middleware) =>
+  middleware(createStore)(reducer, state)
 
-// Adapted from: https://github.com/lodash/lodash/blob/master/isBoolean.js
-function isBoolean(value) {
-  return (
-    value === true ||
-    value === false ||
-    (isObjectLike(value) && getTag(value) == '[object Boolean]')
+
+/***/ }),
+
+/***/ 167:
+/***/ (function(module) {
+
+module.exports = createStore => (reducer,...args) => {
+  const listeners = []
+  const wrapped = (state, action) => (
+    action && action.type != '@@init' && window.requestAnimationFrame(() => listeners.forEach(listener => listener())),
+    reducer(state, action)
+  )
+  const store = createStore(wrapped, ...args)
+
+  return Object.assign(
+    {},
+    store,
+    {
+      subscribe(listener) {
+        listeners.push(listener)
+        return () => listeners.splice(listeners.indexOf(listener))
+      },
+    }
   )
 }
-
-function isObject(value) {
-  return typeof value === 'object'
-}
-
-// Checks if `value` is object-like.
-function isObjectLike(value) {
-  return isObject(value) && value !== null
-}
-
-function isDefined(value) {
-  return value !== undefined && value !== null
-}
-
-function isBlank(value) {
-  return !value.trim().length
-}
-
-// Gets the `toStringTag` of `value`.
-// Adapted from: https://github.com/lodash/lodash/blob/master/.internal/getTag.js
-function getTag(value) {
-  return value == null
-    ? value === undefined
-      ? '[object Undefined]'
-      : '[object Null]'
-    : Object.prototype.toString.call(value)
-}
-
-const EXTENDED_SEARCH_UNAVAILABLE = 'Extended search is not available';
-
-const INCORRECT_INDEX_TYPE = "Incorrect 'index' type";
-
-const LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY = (key) =>
-  `Invalid value for key ${key}`;
-
-const PATTERN_LENGTH_TOO_LARGE = (max) =>
-  `Pattern length exceeds max of ${max}.`;
-
-const MISSING_KEY_PROPERTY = (name) => `Missing ${name} property in key`;
-
-const INVALID_KEY_WEIGHT_VALUE = (key) =>
-  `Property 'weight' in key '${key}' must be a positive integer`;
-
-const hasOwn = Object.prototype.hasOwnProperty;
-
-class KeyStore {
-  constructor(keys) {
-    this._keys = [];
-    this._keyMap = {};
-
-    let totalWeight = 0;
-
-    keys.forEach((key) => {
-      let obj = createKey(key);
-
-      totalWeight += obj.weight;
-
-      this._keys.push(obj);
-      this._keyMap[obj.id] = obj;
-
-      totalWeight += obj.weight;
-    });
-
-    // Normalize weights so that their sum is equal to 1
-    this._keys.forEach((key) => {
-      key.weight /= totalWeight;
-    });
-  }
-  get(keyId) {
-    return this._keyMap[keyId]
-  }
-  keys() {
-    return this._keys
-  }
-  toJSON() {
-    return JSON.stringify(this._keys)
-  }
-}
-
-function createKey(key) {
-  let path = null;
-  let id = null;
-  let src = null;
-  let weight = 1;
-
-  if (isString(key) || isArray(key)) {
-    src = key;
-    path = createKeyPath(key);
-    id = createKeyId(key);
-  } else {
-    if (!hasOwn.call(key, 'name')) {
-      throw new Error(MISSING_KEY_PROPERTY('name'))
-    }
-
-    const name = key.name;
-    src = name;
-
-    if (hasOwn.call(key, 'weight')) {
-      weight = key.weight;
-
-      if (weight <= 0) {
-        throw new Error(INVALID_KEY_WEIGHT_VALUE(name))
-      }
-    }
-
-    path = createKeyPath(name);
-    id = createKeyId(name);
-  }
-
-  return { path, id, weight, src }
-}
-
-function createKeyPath(key) {
-  return isArray(key) ? key : key.split('.')
-}
-
-function createKeyId(key) {
-  return isArray(key) ? key.join('.') : key
-}
-
-function get(obj, path) {
-  let list = [];
-  let arr = false;
-
-  const deepGet = (obj, path, index) => {
-    if (!isDefined(obj)) {
-      return
-    }
-    if (!path[index]) {
-      // If there's no path left, we've arrived at the object we care about.
-      list.push(obj);
-    } else {
-      let key = path[index];
-
-      const value = obj[key];
-
-      if (!isDefined(value)) {
-        return
-      }
-
-      // If we're at the last value in the path, and if it's a string/number/bool,
-      // add it to the list
-      if (
-        index === path.length - 1 &&
-        (isString(value) || isNumber(value) || isBoolean(value))
-      ) {
-        list.push(toString(value));
-      } else if (isArray(value)) {
-        arr = true;
-        // Search each item in the array.
-        for (let i = 0, len = value.length; i < len; i += 1) {
-          deepGet(value[i], path, index + 1);
-        }
-      } else if (path.length) {
-        // An object. Recurse further.
-        deepGet(value, path, index + 1);
-      }
-    }
-  };
-
-  // Backwards compatibility (since path used to be a string)
-  deepGet(obj, isString(path) ? path.split('.') : path, 0);
-
-  return arr ? list : list[0]
-}
-
-const MatchOptions = {
-  // Whether the matches should be included in the result set. When `true`, each record in the result
-  // set will include the indices of the matched characters.
-  // These can consequently be used for highlighting purposes.
-  includeMatches: false,
-  // When `true`, the matching function will continue to the end of a search pattern even if
-  // a perfect match has already been located in the string.
-  findAllMatches: false,
-  // Minimum number of characters that must be matched before a result is considered a match
-  minMatchCharLength: 1
-};
-
-const BasicOptions = {
-  // When `true`, the algorithm continues searching to the end of the input even if a perfect
-  // match is found before the end of the same input.
-  isCaseSensitive: false,
-  // When true, the matching function will continue to the end of a search pattern even if
-  includeScore: false,
-  // List of properties that will be searched. This also supports nested properties.
-  keys: [],
-  // Whether to sort the result list, by score
-  shouldSort: true,
-  // Default sort function: sort by ascending score, ascending index
-  sortFn: (a, b) =>
-    a.score === b.score ? (a.idx < b.idx ? -1 : 1) : a.score < b.score ? -1 : 1
-};
-
-const FuzzyOptions = {
-  // Approximately where in the text is the pattern expected to be found?
-  location: 0,
-  // At what point does the match algorithm give up. A threshold of '0.0' requires a perfect match
-  // (of both letters and location), a threshold of '1.0' would match anything.
-  threshold: 0.6,
-  // Determines how close the match must be to the fuzzy location (specified above).
-  // An exact letter match which is 'distance' characters away from the fuzzy location
-  // would score as a complete mismatch. A distance of '0' requires the match be at
-  // the exact location specified, a threshold of '1000' would require a perfect match
-  // to be within 800 characters of the fuzzy location to be found using a 0.8 threshold.
-  distance: 100
-};
-
-const AdvancedOptions = {
-  // When `true`, it enables the use of unix-like search commands
-  useExtendedSearch: false,
-  // The get function to use when fetching an object's properties.
-  // The default will search nested paths *ie foo.bar.baz*
-  getFn: get,
-  // When `true`, search will ignore `location` and `distance`, so it won't matter
-  // where in the string the pattern appears.
-  // More info: https://fusejs.io/concepts/scoring-theory.html#fuzziness-score
-  ignoreLocation: false,
-  // When `true`, the calculation for the relevance score (used for sorting) will
-  // ignore the field-length norm.
-  // More info: https://fusejs.io/concepts/scoring-theory.html#field-length-norm
-  ignoreFieldNorm: false,
-  // The weight to determine how much field length norm effects scoring.
-  fieldNormWeight: 1
-};
-
-var Config = {
-  ...BasicOptions,
-  ...MatchOptions,
-  ...FuzzyOptions,
-  ...AdvancedOptions
-};
-
-const SPACE = /[^ ]+/g;
-
-// Field-length norm: the shorter the field, the higher the weight.
-// Set to 3 decimals to reduce index size.
-function norm(weight = 1, mantissa = 3) {
-  const cache = new Map();
-  const m = Math.pow(10, mantissa);
-
-  return {
-    get(value) {
-      const numTokens = value.match(SPACE).length;
-
-      if (cache.has(numTokens)) {
-        return cache.get(numTokens)
-      }
-
-      // Default function is 1/sqrt(x), weight makes that variable
-      const norm = 1 / Math.pow(numTokens, 0.5 * weight);
-
-      // In place of `toFixed(mantissa)`, for faster computation
-      const n = parseFloat(Math.round(norm * m) / m);
-
-      cache.set(numTokens, n);
-
-      return n
-    },
-    clear() {
-      cache.clear();
-    }
-  }
-}
-
-class FuseIndex {
-  constructor({
-    getFn = Config.getFn,
-    fieldNormWeight = Config.fieldNormWeight
-  } = {}) {
-    this.norm = norm(fieldNormWeight, 3);
-    this.getFn = getFn;
-    this.isCreated = false;
-
-    this.setIndexRecords();
-  }
-  setSources(docs = []) {
-    this.docs = docs;
-  }
-  setIndexRecords(records = []) {
-    this.records = records;
-  }
-  setKeys(keys = []) {
-    this.keys = keys;
-    this._keysMap = {};
-    keys.forEach((key, idx) => {
-      this._keysMap[key.id] = idx;
-    });
-  }
-  create() {
-    if (this.isCreated || !this.docs.length) {
-      return
-    }
-
-    this.isCreated = true;
-
-    // List is Array<String>
-    if (isString(this.docs[0])) {
-      this.docs.forEach((doc, docIndex) => {
-        this._addString(doc, docIndex);
-      });
-    } else {
-      // List is Array<Object>
-      this.docs.forEach((doc, docIndex) => {
-        this._addObject(doc, docIndex);
-      });
-    }
-
-    this.norm.clear();
-  }
-  // Adds a doc to the end of the index
-  add(doc) {
-    const idx = this.size();
-
-    if (isString(doc)) {
-      this._addString(doc, idx);
-    } else {
-      this._addObject(doc, idx);
-    }
-  }
-  // Removes the doc at the specified index of the index
-  removeAt(idx) {
-    this.records.splice(idx, 1);
-
-    // Change ref index of every subsquent doc
-    for (let i = idx, len = this.size(); i < len; i += 1) {
-      this.records[i].i -= 1;
-    }
-  }
-  getValueForItemAtKeyId(item, keyId) {
-    return item[this._keysMap[keyId]]
-  }
-  size() {
-    return this.records.length
-  }
-  _addString(doc, docIndex) {
-    if (!isDefined(doc) || isBlank(doc)) {
-      return
-    }
-
-    let record = {
-      v: doc,
-      i: docIndex,
-      n: this.norm.get(doc)
-    };
-
-    this.records.push(record);
-  }
-  _addObject(doc, docIndex) {
-    let record = { i: docIndex, $: {} };
-
-    // Iterate over every key (i.e, path), and fetch the value at that key
-    this.keys.forEach((key, keyIndex) => {
-      // console.log(key)
-      let value = this.getFn(doc, key.path);
-
-      if (!isDefined(value)) {
-        return
-      }
-
-      if (isArray(value)) {
-        let subRecords = [];
-        const stack = [{ nestedArrIndex: -1, value }];
-
-        while (stack.length) {
-          const { nestedArrIndex, value } = stack.pop();
-
-          if (!isDefined(value)) {
-            continue
-          }
-
-          if (isString(value) && !isBlank(value)) {
-            let subRecord = {
-              v: value,
-              i: nestedArrIndex,
-              n: this.norm.get(value)
-            };
-
-            subRecords.push(subRecord);
-          } else if (isArray(value)) {
-            value.forEach((item, k) => {
-              stack.push({
-                nestedArrIndex: k,
-                value: item
-              });
-            });
-          } else ;
-        }
-        record.$[keyIndex] = subRecords;
-      } else if (!isBlank(value)) {
-        let subRecord = {
-          v: value,
-          n: this.norm.get(value)
-        };
-
-        record.$[keyIndex] = subRecord;
-      }
-    });
-
-    this.records.push(record);
-  }
-  toJSON() {
-    return {
-      keys: this.keys,
-      records: this.records
-    }
-  }
-}
-
-function createIndex(
-  keys,
-  docs,
-  { getFn = Config.getFn, fieldNormWeight = Config.fieldNormWeight } = {}
-) {
-  const myIndex = new FuseIndex({ getFn, fieldNormWeight });
-  myIndex.setKeys(keys.map(createKey));
-  myIndex.setSources(docs);
-  myIndex.create();
-  return myIndex
-}
-
-function parseIndex(
-  data,
-  { getFn = Config.getFn, fieldNormWeight = Config.fieldNormWeight } = {}
-) {
-  const { keys, records } = data;
-  const myIndex = new FuseIndex({ getFn, fieldNormWeight });
-  myIndex.setKeys(keys);
-  myIndex.setIndexRecords(records);
-  return myIndex
-}
-
-function computeScore$1(
-  pattern,
-  {
-    errors = 0,
-    currentLocation = 0,
-    expectedLocation = 0,
-    distance = Config.distance,
-    ignoreLocation = Config.ignoreLocation
-  } = {}
-) {
-  const accuracy = errors / pattern.length;
-
-  if (ignoreLocation) {
-    return accuracy
-  }
-
-  const proximity = Math.abs(expectedLocation - currentLocation);
-
-  if (!distance) {
-    // Dodge divide by zero error.
-    return proximity ? 1.0 : accuracy
-  }
-
-  return accuracy + proximity / distance
-}
-
-function convertMaskToIndices(
-  matchmask = [],
-  minMatchCharLength = Config.minMatchCharLength
-) {
-  let indices = [];
-  let start = -1;
-  let end = -1;
-  let i = 0;
-
-  for (let len = matchmask.length; i < len; i += 1) {
-    let match = matchmask[i];
-    if (match && start === -1) {
-      start = i;
-    } else if (!match && start !== -1) {
-      end = i - 1;
-      if (end - start + 1 >= minMatchCharLength) {
-        indices.push([start, end]);
-      }
-      start = -1;
-    }
-  }
-
-  // (i-1 - start) + 1 => i - start
-  if (matchmask[i - 1] && i - start >= minMatchCharLength) {
-    indices.push([start, i - 1]);
-  }
-
-  return indices
-}
-
-// Machine word size
-const MAX_BITS = 32;
-
-function search(
-  text,
-  pattern,
-  patternAlphabet,
-  {
-    location = Config.location,
-    distance = Config.distance,
-    threshold = Config.threshold,
-    findAllMatches = Config.findAllMatches,
-    minMatchCharLength = Config.minMatchCharLength,
-    includeMatches = Config.includeMatches,
-    ignoreLocation = Config.ignoreLocation
-  } = {}
-) {
-  if (pattern.length > MAX_BITS) {
-    throw new Error(PATTERN_LENGTH_TOO_LARGE(MAX_BITS))
-  }
-
-  const patternLen = pattern.length;
-  // Set starting location at beginning text and initialize the alphabet.
-  const textLen = text.length;
-  // Handle the case when location > text.length
-  const expectedLocation = Math.max(0, Math.min(location, textLen));
-  // Highest score beyond which we give up.
-  let currentThreshold = threshold;
-  // Is there a nearby exact match? (speedup)
-  let bestLocation = expectedLocation;
-
-  // Performance: only computer matches when the minMatchCharLength > 1
-  // OR if `includeMatches` is true.
-  const computeMatches = minMatchCharLength > 1 || includeMatches;
-  // A mask of the matches, used for building the indices
-  const matchMask = computeMatches ? Array(textLen) : [];
-
-  let index;
-
-  // Get all exact matches, here for speed up
-  while ((index = text.indexOf(pattern, bestLocation)) > -1) {
-    let score = computeScore$1(pattern, {
-      currentLocation: index,
-      expectedLocation,
-      distance,
-      ignoreLocation
-    });
-
-    currentThreshold = Math.min(score, currentThreshold);
-    bestLocation = index + patternLen;
-
-    if (computeMatches) {
-      let i = 0;
-      while (i < patternLen) {
-        matchMask[index + i] = 1;
-        i += 1;
-      }
-    }
-  }
-
-  // Reset the best location
-  bestLocation = -1;
-
-  let lastBitArr = [];
-  let finalScore = 1;
-  let binMax = patternLen + textLen;
-
-  const mask = 1 << (patternLen - 1);
-
-  for (let i = 0; i < patternLen; i += 1) {
-    // Scan for the best match; each iteration allows for one more error.
-    // Run a binary search to determine how far from the match location we can stray
-    // at this error level.
-    let binMin = 0;
-    let binMid = binMax;
-
-    while (binMin < binMid) {
-      const score = computeScore$1(pattern, {
-        errors: i,
-        currentLocation: expectedLocation + binMid,
-        expectedLocation,
-        distance,
-        ignoreLocation
-      });
-
-      if (score <= currentThreshold) {
-        binMin = binMid;
-      } else {
-        binMax = binMid;
-      }
-
-      binMid = Math.floor((binMax - binMin) / 2 + binMin);
-    }
-
-    // Use the result from this iteration as the maximum for the next.
-    binMax = binMid;
-
-    let start = Math.max(1, expectedLocation - binMid + 1);
-    let finish = findAllMatches
-      ? textLen
-      : Math.min(expectedLocation + binMid, textLen) + patternLen;
-
-    // Initialize the bit array
-    let bitArr = Array(finish + 2);
-
-    bitArr[finish + 1] = (1 << i) - 1;
-
-    for (let j = finish; j >= start; j -= 1) {
-      let currentLocation = j - 1;
-      let charMatch = patternAlphabet[text.charAt(currentLocation)];
-
-      if (computeMatches) {
-        // Speed up: quick bool to int conversion (i.e, `charMatch ? 1 : 0`)
-        matchMask[currentLocation] = +!!charMatch;
-      }
-
-      // First pass: exact match
-      bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch;
-
-      // Subsequent passes: fuzzy match
-      if (i) {
-        bitArr[j] |=
-          ((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1 | lastBitArr[j + 1];
-      }
-
-      if (bitArr[j] & mask) {
-        finalScore = computeScore$1(pattern, {
-          errors: i,
-          currentLocation,
-          expectedLocation,
-          distance,
-          ignoreLocation
-        });
-
-        // This match will almost certainly be better than any existing match.
-        // But check anyway.
-        if (finalScore <= currentThreshold) {
-          // Indeed it is
-          currentThreshold = finalScore;
-          bestLocation = currentLocation;
-
-          // Already passed `loc`, downhill from here on in.
-          if (bestLocation <= expectedLocation) {
-            break
-          }
-
-          // When passing `bestLocation`, don't exceed our current distance from `expectedLocation`.
-          start = Math.max(1, 2 * expectedLocation - bestLocation);
-        }
-      }
-    }
-
-    // No hope for a (better) match at greater error levels.
-    const score = computeScore$1(pattern, {
-      errors: i + 1,
-      currentLocation: expectedLocation,
-      expectedLocation,
-      distance,
-      ignoreLocation
-    });
-
-    if (score > currentThreshold) {
-      break
-    }
-
-    lastBitArr = bitArr;
-  }
-
-  const result = {
-    isMatch: bestLocation >= 0,
-    // Count exact matches (those with a score of 0) to be "almost" exact
-    score: Math.max(0.001, finalScore)
-  };
-
-  if (computeMatches) {
-    const indices = convertMaskToIndices(matchMask, minMatchCharLength);
-    if (!indices.length) {
-      result.isMatch = false;
-    } else if (includeMatches) {
-      result.indices = indices;
-    }
-  }
-
-  return result
-}
-
-function createPatternAlphabet(pattern) {
-  let mask = {};
-
-  for (let i = 0, len = pattern.length; i < len; i += 1) {
-    const char = pattern.charAt(i);
-    mask[char] = (mask[char] || 0) | (1 << (len - i - 1));
-  }
-
-  return mask
-}
-
-class BitapSearch {
-  constructor(
-    pattern,
-    {
-      location = Config.location,
-      threshold = Config.threshold,
-      distance = Config.distance,
-      includeMatches = Config.includeMatches,
-      findAllMatches = Config.findAllMatches,
-      minMatchCharLength = Config.minMatchCharLength,
-      isCaseSensitive = Config.isCaseSensitive,
-      ignoreLocation = Config.ignoreLocation
-    } = {}
-  ) {
-    this.options = {
-      location,
-      threshold,
-      distance,
-      includeMatches,
-      findAllMatches,
-      minMatchCharLength,
-      isCaseSensitive,
-      ignoreLocation
-    };
-
-    this.pattern = isCaseSensitive ? pattern : pattern.toLowerCase();
-
-    this.chunks = [];
-
-    if (!this.pattern.length) {
-      return
-    }
-
-    const addChunk = (pattern, startIndex) => {
-      this.chunks.push({
-        pattern,
-        alphabet: createPatternAlphabet(pattern),
-        startIndex
-      });
-    };
-
-    const len = this.pattern.length;
-
-    if (len > MAX_BITS) {
-      let i = 0;
-      const remainder = len % MAX_BITS;
-      const end = len - remainder;
-
-      while (i < end) {
-        addChunk(this.pattern.substr(i, MAX_BITS), i);
-        i += MAX_BITS;
-      }
-
-      if (remainder) {
-        const startIndex = len - MAX_BITS;
-        addChunk(this.pattern.substr(startIndex), startIndex);
-      }
-    } else {
-      addChunk(this.pattern, 0);
-    }
-  }
-
-  searchIn(text) {
-    const { isCaseSensitive, includeMatches } = this.options;
-
-    if (!isCaseSensitive) {
-      text = text.toLowerCase();
-    }
-
-    // Exact match
-    if (this.pattern === text) {
-      let result = {
-        isMatch: true,
-        score: 0
-      };
-
-      if (includeMatches) {
-        result.indices = [[0, text.length - 1]];
-      }
-
-      return result
-    }
-
-    // Otherwise, use Bitap algorithm
-    const {
-      location,
-      distance,
-      threshold,
-      findAllMatches,
-      minMatchCharLength,
-      ignoreLocation
-    } = this.options;
-
-    let allIndices = [];
-    let totalScore = 0;
-    let hasMatches = false;
-
-    this.chunks.forEach(({ pattern, alphabet, startIndex }) => {
-      const { isMatch, score, indices } = search(text, pattern, alphabet, {
-        location: location + startIndex,
-        distance,
-        threshold,
-        findAllMatches,
-        minMatchCharLength,
-        includeMatches,
-        ignoreLocation
-      });
-
-      if (isMatch) {
-        hasMatches = true;
-      }
-
-      totalScore += score;
-
-      if (isMatch && indices) {
-        allIndices = [...allIndices, ...indices];
-      }
-    });
-
-    let result = {
-      isMatch: hasMatches,
-      score: hasMatches ? totalScore / this.chunks.length : 1
-    };
-
-    if (hasMatches && includeMatches) {
-      result.indices = allIndices;
-    }
-
-    return result
-  }
-}
-
-class BaseMatch {
-  constructor(pattern) {
-    this.pattern = pattern;
-  }
-  static isMultiMatch(pattern) {
-    return getMatch(pattern, this.multiRegex)
-  }
-  static isSingleMatch(pattern) {
-    return getMatch(pattern, this.singleRegex)
-  }
-  search(/*text*/) {}
-}
-
-function getMatch(pattern, exp) {
-  const matches = pattern.match(exp);
-  return matches ? matches[1] : null
-}
-
-// Token: 'file
-
-class ExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'exact'
-  }
-  static get multiRegex() {
-    return /^="(.*)"$/
-  }
-  static get singleRegex() {
-    return /^=(.*)$/
-  }
-  search(text) {
-    const isMatch = text === this.pattern;
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [0, this.pattern.length - 1]
-    }
-  }
-}
-
-// Token: !fire
-
-class InverseExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'inverse-exact'
-  }
-  static get multiRegex() {
-    return /^!"(.*)"$/
-  }
-  static get singleRegex() {
-    return /^!(.*)$/
-  }
-  search(text) {
-    const index = text.indexOf(this.pattern);
-    const isMatch = index === -1;
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [0, text.length - 1]
-    }
-  }
-}
-
-// Token: ^file
-
-class PrefixExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'prefix-exact'
-  }
-  static get multiRegex() {
-    return /^\^"(.*)"$/
-  }
-  static get singleRegex() {
-    return /^\^(.*)$/
-  }
-  search(text) {
-    const isMatch = text.startsWith(this.pattern);
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [0, this.pattern.length - 1]
-    }
-  }
-}
-
-// Token: !^fire
-
-class InversePrefixExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'inverse-prefix-exact'
-  }
-  static get multiRegex() {
-    return /^!\^"(.*)"$/
-  }
-  static get singleRegex() {
-    return /^!\^(.*)$/
-  }
-  search(text) {
-    const isMatch = !text.startsWith(this.pattern);
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [0, text.length - 1]
-    }
-  }
-}
-
-// Token: .file$
-
-class SuffixExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'suffix-exact'
-  }
-  static get multiRegex() {
-    return /^"(.*)"\$$/
-  }
-  static get singleRegex() {
-    return /^(.*)\$$/
-  }
-  search(text) {
-    const isMatch = text.endsWith(this.pattern);
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [text.length - this.pattern.length, text.length - 1]
-    }
-  }
-}
-
-// Token: !.file$
-
-class InverseSuffixExactMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'inverse-suffix-exact'
-  }
-  static get multiRegex() {
-    return /^!"(.*)"\$$/
-  }
-  static get singleRegex() {
-    return /^!(.*)\$$/
-  }
-  search(text) {
-    const isMatch = !text.endsWith(this.pattern);
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices: [0, text.length - 1]
-    }
-  }
-}
-
-class FuzzyMatch extends BaseMatch {
-  constructor(
-    pattern,
-    {
-      location = Config.location,
-      threshold = Config.threshold,
-      distance = Config.distance,
-      includeMatches = Config.includeMatches,
-      findAllMatches = Config.findAllMatches,
-      minMatchCharLength = Config.minMatchCharLength,
-      isCaseSensitive = Config.isCaseSensitive,
-      ignoreLocation = Config.ignoreLocation
-    } = {}
-  ) {
-    super(pattern);
-    this._bitapSearch = new BitapSearch(pattern, {
-      location,
-      threshold,
-      distance,
-      includeMatches,
-      findAllMatches,
-      minMatchCharLength,
-      isCaseSensitive,
-      ignoreLocation
-    });
-  }
-  static get type() {
-    return 'fuzzy'
-  }
-  static get multiRegex() {
-    return /^"(.*)"$/
-  }
-  static get singleRegex() {
-    return /^(.*)$/
-  }
-  search(text) {
-    return this._bitapSearch.searchIn(text)
-  }
-}
-
-// Token: 'file
-
-class IncludeMatch extends BaseMatch {
-  constructor(pattern) {
-    super(pattern);
-  }
-  static get type() {
-    return 'include'
-  }
-  static get multiRegex() {
-    return /^'"(.*)"$/
-  }
-  static get singleRegex() {
-    return /^'(.*)$/
-  }
-  search(text) {
-    let location = 0;
-    let index;
-
-    const indices = [];
-    const patternLen = this.pattern.length;
-
-    // Get all exact matches
-    while ((index = text.indexOf(this.pattern, location)) > -1) {
-      location = index + patternLen;
-      indices.push([index, location - 1]);
-    }
-
-    const isMatch = !!indices.length;
-
-    return {
-      isMatch,
-      score: isMatch ? 0 : 1,
-      indices
-    }
-  }
-}
-
-// ❗Order is important. DO NOT CHANGE.
-const searchers = [
-  ExactMatch,
-  IncludeMatch,
-  PrefixExactMatch,
-  InversePrefixExactMatch,
-  InverseSuffixExactMatch,
-  SuffixExactMatch,
-  InverseExactMatch,
-  FuzzyMatch
-];
-
-const searchersLen = searchers.length;
-
-// Regex to split by spaces, but keep anything in quotes together
-const SPACE_RE = / +(?=([^\"]*\"[^\"]*\")*[^\"]*$)/;
-const OR_TOKEN = '|';
-
-// Return a 2D array representation of the query, for simpler parsing.
-// Example:
-// "^core go$ | rb$ | py$ xy$" => [["^core", "go$"], ["rb$"], ["py$", "xy$"]]
-function parseQuery(pattern, options = {}) {
-  return pattern.split(OR_TOKEN).map((item) => {
-    let query = item
-      .trim()
-      .split(SPACE_RE)
-      .filter((item) => item && !!item.trim());
-
-    let results = [];
-    for (let i = 0, len = query.length; i < len; i += 1) {
-      const queryItem = query[i];
-
-      // 1. Handle multiple query match (i.e, once that are quoted, like `"hello world"`)
-      let found = false;
-      let idx = -1;
-      while (!found && ++idx < searchersLen) {
-        const searcher = searchers[idx];
-        let token = searcher.isMultiMatch(queryItem);
-        if (token) {
-          results.push(new searcher(token, options));
-          found = true;
-        }
-      }
-
-      if (found) {
-        continue
-      }
-
-      // 2. Handle single query matches (i.e, once that are *not* quoted)
-      idx = -1;
-      while (++idx < searchersLen) {
-        const searcher = searchers[idx];
-        let token = searcher.isSingleMatch(queryItem);
-        if (token) {
-          results.push(new searcher(token, options));
-          break
-        }
-      }
-    }
-
-    return results
-  })
-}
-
-// These extended matchers can return an array of matches, as opposed
-// to a singl match
-const MultiMatchSet = new Set([FuzzyMatch.type, IncludeMatch.type]);
-
-/**
- * Command-like searching
- * ======================
- *
- * Given multiple search terms delimited by spaces.e.g. `^jscript .python$ ruby !java`,
- * search in a given text.
- *
- * Search syntax:
- *
- * | Token       | Match type                 | Description                            |
- * | ----------- | -------------------------- | -------------------------------------- |
- * | `jscript`   | fuzzy-match                | Items that fuzzy match `jscript`       |
- * | `=scheme`   | exact-match                | Items that are `scheme`                |
- * | `'python`   | include-match              | Items that include `python`            |
- * | `!ruby`     | inverse-exact-match        | Items that do not include `ruby`       |
- * | `^java`     | prefix-exact-match         | Items that start with `java`           |
- * | `!^earlang` | inverse-prefix-exact-match | Items that do not start with `earlang` |
- * | `.js$`      | suffix-exact-match         | Items that end with `.js`              |
- * | `!.go$`     | inverse-suffix-exact-match | Items that do not end with `.go`       |
- *
- * A single pipe character acts as an OR operator. For example, the following
- * query matches entries that start with `core` and end with either`go`, `rb`,
- * or`py`.
- *
- * ```
- * ^core go$ | rb$ | py$
- * ```
- */
-class ExtendedSearch {
-  constructor(
-    pattern,
-    {
-      isCaseSensitive = Config.isCaseSensitive,
-      includeMatches = Config.includeMatches,
-      minMatchCharLength = Config.minMatchCharLength,
-      ignoreLocation = Config.ignoreLocation,
-      findAllMatches = Config.findAllMatches,
-      location = Config.location,
-      threshold = Config.threshold,
-      distance = Config.distance
-    } = {}
-  ) {
-    this.query = null;
-    this.options = {
-      isCaseSensitive,
-      includeMatches,
-      minMatchCharLength,
-      findAllMatches,
-      ignoreLocation,
-      location,
-      threshold,
-      distance
-    };
-
-    this.pattern = isCaseSensitive ? pattern : pattern.toLowerCase();
-    this.query = parseQuery(this.pattern, this.options);
-  }
-
-  static condition(_, options) {
-    return options.useExtendedSearch
-  }
-
-  searchIn(text) {
-    const query = this.query;
-
-    if (!query) {
-      return {
-        isMatch: false,
-        score: 1
-      }
-    }
-
-    const { includeMatches, isCaseSensitive } = this.options;
-
-    text = isCaseSensitive ? text : text.toLowerCase();
-
-    let numMatches = 0;
-    let allIndices = [];
-    let totalScore = 0;
-
-    // ORs
-    for (let i = 0, qLen = query.length; i < qLen; i += 1) {
-      const searchers = query[i];
-
-      // Reset indices
-      allIndices.length = 0;
-      numMatches = 0;
-
-      // ANDs
-      for (let j = 0, pLen = searchers.length; j < pLen; j += 1) {
-        const searcher = searchers[j];
-        const { isMatch, indices, score } = searcher.search(text);
-
-        if (isMatch) {
-          numMatches += 1;
-          totalScore += score;
-          if (includeMatches) {
-            const type = searcher.constructor.type;
-            if (MultiMatchSet.has(type)) {
-              allIndices = [...allIndices, ...indices];
-            } else {
-              allIndices.push(indices);
-            }
-          }
-        } else {
-          totalScore = 0;
-          numMatches = 0;
-          allIndices.length = 0;
-          break
-        }
-      }
-
-      // OR condition, so if TRUE, return
-      if (numMatches) {
-        let result = {
-          isMatch: true,
-          score: totalScore / numMatches
-        };
-
-        if (includeMatches) {
-          result.indices = allIndices;
-        }
-
-        return result
-      }
-    }
-
-    // Nothing was matched
-    return {
-      isMatch: false,
-      score: 1
-    }
-  }
-}
-
-const registeredSearchers = [];
-
-function register(...args) {
-  registeredSearchers.push(...args);
-}
-
-function createSearcher(pattern, options) {
-  for (let i = 0, len = registeredSearchers.length; i < len; i += 1) {
-    let searcherClass = registeredSearchers[i];
-    if (searcherClass.condition(pattern, options)) {
-      return new searcherClass(pattern, options)
-    }
-  }
-
-  return new BitapSearch(pattern, options)
-}
-
-const LogicalOperator = {
-  AND: '$and',
-  OR: '$or'
-};
-
-const KeyType = {
-  PATH: '$path',
-  PATTERN: '$val'
-};
-
-const isExpression = (query) =>
-  !!(query[LogicalOperator.AND] || query[LogicalOperator.OR]);
-
-const isPath = (query) => !!query[KeyType.PATH];
-
-const isLeaf = (query) =>
-  !isArray(query) && isObject(query) && !isExpression(query);
-
-const convertToExplicit = (query) => ({
-  [LogicalOperator.AND]: Object.keys(query).map((key) => ({
-    [key]: query[key]
-  }))
-});
-
-// When `auto` is `true`, the parse function will infer and initialize and add
-// the appropriate `Searcher` instance
-function parse(query, options, { auto = true } = {}) {
-  const next = (query) => {
-    let keys = Object.keys(query);
-
-    const isQueryPath = isPath(query);
-
-    if (!isQueryPath && keys.length > 1 && !isExpression(query)) {
-      return next(convertToExplicit(query))
-    }
-
-    if (isLeaf(query)) {
-      const key = isQueryPath ? query[KeyType.PATH] : keys[0];
-
-      const pattern = isQueryPath ? query[KeyType.PATTERN] : query[key];
-
-      if (!isString(pattern)) {
-        throw new Error(LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY(key))
-      }
-
-      const obj = {
-        keyId: createKeyId(key),
-        pattern
-      };
-
-      if (auto) {
-        obj.searcher = createSearcher(pattern, options);
-      }
-
-      return obj
-    }
-
-    let node = {
-      children: [],
-      operator: keys[0]
-    };
-
-    keys.forEach((key) => {
-      const value = query[key];
-
-      if (isArray(value)) {
-        value.forEach((item) => {
-          node.children.push(next(item));
-        });
-      }
-    });
-
-    return node
-  };
-
-  if (!isExpression(query)) {
-    query = convertToExplicit(query);
-  }
-
-  return next(query)
-}
-
-// Practical scoring function
-function computeScore(
-  results,
-  { ignoreFieldNorm = Config.ignoreFieldNorm }
-) {
-  results.forEach((result) => {
-    let totalScore = 1;
-
-    result.matches.forEach(({ key, norm, score }) => {
-      const weight = key ? key.weight : null;
-
-      totalScore *= Math.pow(
-        score === 0 && weight ? Number.EPSILON : score,
-        (weight || 1) * (ignoreFieldNorm ? 1 : norm)
-      );
-    });
-
-    result.score = totalScore;
-  });
-}
-
-function transformMatches(result, data) {
-  const matches = result.matches;
-  data.matches = [];
-
-  if (!isDefined(matches)) {
-    return
-  }
-
-  matches.forEach((match) => {
-    if (!isDefined(match.indices) || !match.indices.length) {
-      return
-    }
-
-    const { indices, value } = match;
-
-    let obj = {
-      indices,
-      value
-    };
-
-    if (match.key) {
-      obj.key = match.key.src;
-    }
-
-    if (match.idx > -1) {
-      obj.refIndex = match.idx;
-    }
-
-    data.matches.push(obj);
-  });
-}
-
-function transformScore(result, data) {
-  data.score = result.score;
-}
-
-function format(
-  results,
-  docs,
-  {
-    includeMatches = Config.includeMatches,
-    includeScore = Config.includeScore
-  } = {}
-) {
-  const transformers = [];
-
-  if (includeMatches) transformers.push(transformMatches);
-  if (includeScore) transformers.push(transformScore);
-
-  return results.map((result) => {
-    const { idx } = result;
-
-    const data = {
-      item: docs[idx],
-      refIndex: idx
-    };
-
-    if (transformers.length) {
-      transformers.forEach((transformer) => {
-        transformer(result, data);
-      });
-    }
-
-    return data
-  })
-}
-
-class Fuse {
-  constructor(docs, options = {}, index) {
-    this.options = { ...Config, ...options };
-
-    if (
-      this.options.useExtendedSearch &&
-      !true
-    ) {}
-
-    this._keyStore = new KeyStore(this.options.keys);
-
-    this.setCollection(docs, index);
-  }
-
-  setCollection(docs, index) {
-    this._docs = docs;
-
-    if (index && !(index instanceof FuseIndex)) {
-      throw new Error(INCORRECT_INDEX_TYPE)
-    }
-
-    this._myIndex =
-      index ||
-      createIndex(this.options.keys, this._docs, {
-        getFn: this.options.getFn,
-        fieldNormWeight: this.options.fieldNormWeight
-      });
-  }
-
-  add(doc) {
-    if (!isDefined(doc)) {
-      return
-    }
-
-    this._docs.push(doc);
-    this._myIndex.add(doc);
-  }
-
-  remove(predicate = (/* doc, idx */) => false) {
-    const results = [];
-
-    for (let i = 0, len = this._docs.length; i < len; i += 1) {
-      const doc = this._docs[i];
-      if (predicate(doc, i)) {
-        this.removeAt(i);
-        i -= 1;
-        len -= 1;
-
-        results.push(doc);
-      }
-    }
-
-    return results
-  }
-
-  removeAt(idx) {
-    this._docs.splice(idx, 1);
-    this._myIndex.removeAt(idx);
-  }
-
-  getIndex() {
-    return this._myIndex
-  }
-
-  search(query, { limit = -1 } = {}) {
-    const {
-      includeMatches,
-      includeScore,
-      shouldSort,
-      sortFn,
-      ignoreFieldNorm
-    } = this.options;
-
-    let results = isString(query)
-      ? isString(this._docs[0])
-        ? this._searchStringList(query)
-        : this._searchObjectList(query)
-      : this._searchLogical(query);
-
-    computeScore(results, { ignoreFieldNorm });
-
-    if (shouldSort) {
-      results.sort(sortFn);
-    }
-
-    if (isNumber(limit) && limit > -1) {
-      results = results.slice(0, limit);
-    }
-
-    return format(results, this._docs, {
-      includeMatches,
-      includeScore
-    })
-  }
-
-  _searchStringList(query) {
-    const searcher = createSearcher(query, this.options);
-    const { records } = this._myIndex;
-    const results = [];
-
-    // Iterate over every string in the index
-    records.forEach(({ v: text, i: idx, n: norm }) => {
-      if (!isDefined(text)) {
-        return
-      }
-
-      const { isMatch, score, indices } = searcher.searchIn(text);
-
-      if (isMatch) {
-        results.push({
-          item: text,
-          idx,
-          matches: [{ score, value: text, norm, indices }]
-        });
-      }
-    });
-
-    return results
-  }
-
-  _searchLogical(query) {
-
-    const expression = parse(query, this.options);
-
-    const evaluate = (node, item, idx) => {
-      if (!node.children) {
-        const { keyId, searcher } = node;
-
-        const matches = this._findMatches({
-          key: this._keyStore.get(keyId),
-          value: this._myIndex.getValueForItemAtKeyId(item, keyId),
-          searcher
-        });
-
-        if (matches && matches.length) {
-          return [
-            {
-              idx,
-              item,
-              matches
-            }
-          ]
-        }
-
-        return []
-      }
-
-      const res = [];
-      for (let i = 0, len = node.children.length; i < len; i += 1) {
-        const child = node.children[i];
-        const result = evaluate(child, item, idx);
-        if (result.length) {
-          res.push(...result);
-        } else if (node.operator === LogicalOperator.AND) {
-          return []
-        }
-      }
-      return res
-    };
-
-    const records = this._myIndex.records;
-    const resultMap = {};
-    const results = [];
-
-    records.forEach(({ $: item, i: idx }) => {
-      if (isDefined(item)) {
-        let expResults = evaluate(expression, item, idx);
-
-        if (expResults.length) {
-          // Dedupe when adding
-          if (!resultMap[idx]) {
-            resultMap[idx] = { idx, item, matches: [] };
-            results.push(resultMap[idx]);
-          }
-          expResults.forEach(({ matches }) => {
-            resultMap[idx].matches.push(...matches);
-          });
-        }
-      }
-    });
-
-    return results
-  }
-
-  _searchObjectList(query) {
-    const searcher = createSearcher(query, this.options);
-    const { keys, records } = this._myIndex;
-    const results = [];
-
-    // List is Array<Object>
-    records.forEach(({ $: item, i: idx }) => {
-      if (!isDefined(item)) {
-        return
-      }
-
-      let matches = [];
-
-      // Iterate over every key (i.e, path), and fetch the value at that key
-      keys.forEach((key, keyIndex) => {
-        matches.push(
-          ...this._findMatches({
-            key,
-            value: item[keyIndex],
-            searcher
-          })
-        );
-      });
-
-      if (matches.length) {
-        results.push({
-          idx,
-          item,
-          matches
-        });
-      }
-    });
-
-    return results
-  }
-  _findMatches({ key, value, searcher }) {
-    if (!isDefined(value)) {
-      return []
-    }
-
-    let matches = [];
-
-    if (isArray(value)) {
-      value.forEach(({ v: text, i: idx, n: norm }) => {
-        if (!isDefined(text)) {
-          return
-        }
-
-        const { isMatch, score, indices } = searcher.searchIn(text);
-
-        if (isMatch) {
-          matches.push({
-            score,
-            key,
-            value: text,
-            idx,
-            norm,
-            indices
-          });
-        }
-      });
-    } else {
-      const { v: text, n: norm } = value;
-
-      const { isMatch, score, indices } = searcher.searchIn(text);
-
-      if (isMatch) {
-        matches.push({ score, key, value: text, norm, indices });
-      }
-    }
-
-    return matches
-  }
-}
-
-Fuse.version = '6.5.3';
-Fuse.createIndex = createIndex;
-Fuse.parseIndex = parseIndex;
-Fuse.config = Config;
-
-{
-  Fuse.parseQuery = parse;
-}
-
-{
-  register(ExtendedSearch);
-}
-
-
-
-
-/***/ }),
-
-/***/ 857:
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "__DO_NOT_USE__ActionTypes": function() { return /* binding */ ActionTypes; },
-  "applyMiddleware": function() { return /* binding */ applyMiddleware; },
-  "bindActionCreators": function() { return /* binding */ bindActionCreators; },
-  "combineReducers": function() { return /* binding */ combineReducers; },
-  "compose": function() { return /* binding */ compose; },
-  "createStore": function() { return /* binding */ createStore; }
-});
-
-;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/defineProperty.js
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/objectSpread2.js
-
-
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    enumerableOnly && (symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    })), keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = null != arguments[i] ? arguments[i] : {};
-    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
-      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-    });
-  }
-
-  return target;
-}
-;// CONCATENATED MODULE: ./node_modules/redux/es/redux.js
-
-
-/**
- * Adapted from React: https://github.com/facebook/react/blob/master/packages/shared/formatProdErrorMessage.js
- *
- * Do not require this module directly! Use normal throw error calls. These messages will be replaced with error codes
- * during build.
- * @param {number} code
- */
-function formatProdErrorMessage(code) {
-  return "Minified Redux error #" + code + "; visit https://redux.js.org/Errors?code=" + code + " for the full message or " + 'use the non-minified dev environment for full errors. ';
-}
-
-// Inlined version of the `symbol-observable` polyfill
-var $$observable = (function () {
-  return typeof Symbol === 'function' && Symbol.observable || '@@observable';
-})();
-
-/**
- * These are private action types reserved by Redux.
- * For any unknown actions, you must return the current state.
- * If the current state is undefined, you must return the initial state.
- * Do not reference these action types directly in your code.
- */
-var randomString = function randomString() {
-  return Math.random().toString(36).substring(7).split('').join('.');
-};
-
-var ActionTypes = {
-  INIT: "@@redux/INIT" + randomString(),
-  REPLACE: "@@redux/REPLACE" + randomString(),
-  PROBE_UNKNOWN_ACTION: function PROBE_UNKNOWN_ACTION() {
-    return "@@redux/PROBE_UNKNOWN_ACTION" + randomString();
-  }
-};
-
-/**
- * @param {any} obj The object to inspect.
- * @returns {boolean} True if the argument appears to be a plain object.
- */
-function isPlainObject(obj) {
-  if (typeof obj !== 'object' || obj === null) return false;
-  var proto = obj;
-
-  while (Object.getPrototypeOf(proto) !== null) {
-    proto = Object.getPrototypeOf(proto);
-  }
-
-  return Object.getPrototypeOf(obj) === proto;
-}
-
-// Inlined / shortened version of `kindOf` from https://github.com/jonschlinkert/kind-of
-function miniKindOf(val) {
-  if (val === void 0) return 'undefined';
-  if (val === null) return 'null';
-  var type = typeof val;
-
-  switch (type) {
-    case 'boolean':
-    case 'string':
-    case 'number':
-    case 'symbol':
-    case 'function':
-      {
-        return type;
-      }
-  }
-
-  if (Array.isArray(val)) return 'array';
-  if (isDate(val)) return 'date';
-  if (isError(val)) return 'error';
-  var constructorName = ctorName(val);
-
-  switch (constructorName) {
-    case 'Symbol':
-    case 'Promise':
-    case 'WeakMap':
-    case 'WeakSet':
-    case 'Map':
-    case 'Set':
-      return constructorName;
-  } // other
-
-
-  return type.slice(8, -1).toLowerCase().replace(/\s/g, '');
-}
-
-function ctorName(val) {
-  return typeof val.constructor === 'function' ? val.constructor.name : null;
-}
-
-function isError(val) {
-  return val instanceof Error || typeof val.message === 'string' && val.constructor && typeof val.constructor.stackTraceLimit === 'number';
-}
-
-function isDate(val) {
-  if (val instanceof Date) return true;
-  return typeof val.toDateString === 'function' && typeof val.getDate === 'function' && typeof val.setDate === 'function';
-}
-
-function kindOf(val) {
-  var typeOfVal = typeof val;
-
-  if (false) {}
-
-  return typeOfVal;
-}
-
-/**
- * Creates a Redux store that holds the state tree.
- * The only way to change the data in the store is to call `dispatch()` on it.
- *
- * There should only be a single store in your app. To specify how different
- * parts of the state tree respond to actions, you may combine several reducers
- * into a single reducer function by using `combineReducers`.
- *
- * @param {Function} reducer A function that returns the next state tree, given
- * the current state tree and the action to handle.
- *
- * @param {any} [preloadedState] The initial state. You may optionally specify it
- * to hydrate the state from the server in universal apps, or to restore a
- * previously serialized user session.
- * If you use `combineReducers` to produce the root reducer function, this must be
- * an object with the same shape as `combineReducers` keys.
- *
- * @param {Function} [enhancer] The store enhancer. You may optionally specify it
- * to enhance the store with third-party capabilities such as middleware,
- * time travel, persistence, etc. The only store enhancer that ships with Redux
- * is `applyMiddleware()`.
- *
- * @returns {Store} A Redux store that lets you read the state, dispatch actions
- * and subscribe to changes.
- */
-
-function createStore(reducer, preloadedState, enhancer) {
-  var _ref2;
-
-  if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
-    throw new Error( true ? formatProdErrorMessage(0) : 0);
-  }
-
-  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-    enhancer = preloadedState;
-    preloadedState = undefined;
-  }
-
-  if (typeof enhancer !== 'undefined') {
-    if (typeof enhancer !== 'function') {
-      throw new Error( true ? formatProdErrorMessage(1) : 0);
-    }
-
-    return enhancer(createStore)(reducer, preloadedState);
-  }
-
-  if (typeof reducer !== 'function') {
-    throw new Error( true ? formatProdErrorMessage(2) : 0);
-  }
-
-  var currentReducer = reducer;
-  var currentState = preloadedState;
-  var currentListeners = [];
-  var nextListeners = currentListeners;
-  var isDispatching = false;
-  /**
-   * This makes a shallow copy of currentListeners so we can use
-   * nextListeners as a temporary list while dispatching.
-   *
-   * This prevents any bugs around consumers calling
-   * subscribe/unsubscribe in the middle of a dispatch.
-   */
-
-  function ensureCanMutateNextListeners() {
-    if (nextListeners === currentListeners) {
-      nextListeners = currentListeners.slice();
-    }
-  }
-  /**
-   * Reads the state tree managed by the store.
-   *
-   * @returns {any} The current state tree of your application.
-   */
-
-
-  function getState() {
-    if (isDispatching) {
-      throw new Error( true ? formatProdErrorMessage(3) : 0);
-    }
-
-    return currentState;
-  }
-  /**
-   * Adds a change listener. It will be called any time an action is dispatched,
-   * and some part of the state tree may potentially have changed. You may then
-   * call `getState()` to read the current state tree inside the callback.
-   *
-   * You may call `dispatch()` from a change listener, with the following
-   * caveats:
-   *
-   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
-   * If you subscribe or unsubscribe while the listeners are being invoked, this
-   * will not have any effect on the `dispatch()` that is currently in progress.
-   * However, the next `dispatch()` call, whether nested or not, will use a more
-   * recent snapshot of the subscription list.
-   *
-   * 2. The listener should not expect to see all state changes, as the state
-   * might have been updated multiple times during a nested `dispatch()` before
-   * the listener is called. It is, however, guaranteed that all subscribers
-   * registered before the `dispatch()` started will be called with the latest
-   * state by the time it exits.
-   *
-   * @param {Function} listener A callback to be invoked on every dispatch.
-   * @returns {Function} A function to remove this change listener.
-   */
-
-
-  function subscribe(listener) {
-    if (typeof listener !== 'function') {
-      throw new Error( true ? formatProdErrorMessage(4) : 0);
-    }
-
-    if (isDispatching) {
-      throw new Error( true ? formatProdErrorMessage(5) : 0);
-    }
-
-    var isSubscribed = true;
-    ensureCanMutateNextListeners();
-    nextListeners.push(listener);
-    return function unsubscribe() {
-      if (!isSubscribed) {
-        return;
-      }
-
-      if (isDispatching) {
-        throw new Error( true ? formatProdErrorMessage(6) : 0);
-      }
-
-      isSubscribed = false;
-      ensureCanMutateNextListeners();
-      var index = nextListeners.indexOf(listener);
-      nextListeners.splice(index, 1);
-      currentListeners = null;
-    };
-  }
-  /**
-   * Dispatches an action. It is the only way to trigger a state change.
-   *
-   * The `reducer` function, used to create the store, will be called with the
-   * current state tree and the given `action`. Its return value will
-   * be considered the **next** state of the tree, and the change listeners
-   * will be notified.
-   *
-   * The base implementation only supports plain object actions. If you want to
-   * dispatch a Promise, an Observable, a thunk, or something else, you need to
-   * wrap your store creating function into the corresponding middleware. For
-   * example, see the documentation for the `redux-thunk` package. Even the
-   * middleware will eventually dispatch plain object actions using this method.
-   *
-   * @param {Object} action A plain object representing “what changed”. It is
-   * a good idea to keep actions serializable so you can record and replay user
-   * sessions, or use the time travelling `redux-devtools`. An action must have
-   * a `type` property which may not be `undefined`. It is a good idea to use
-   * string constants for action types.
-   *
-   * @returns {Object} For convenience, the same action object you dispatched.
-   *
-   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
-   * return something else (for example, a Promise you can await).
-   */
-
-
-  function dispatch(action) {
-    if (!isPlainObject(action)) {
-      throw new Error( true ? formatProdErrorMessage(7) : 0);
-    }
-
-    if (typeof action.type === 'undefined') {
-      throw new Error( true ? formatProdErrorMessage(8) : 0);
-    }
-
-    if (isDispatching) {
-      throw new Error( true ? formatProdErrorMessage(9) : 0);
-    }
-
-    try {
-      isDispatching = true;
-      currentState = currentReducer(currentState, action);
-    } finally {
-      isDispatching = false;
-    }
-
-    var listeners = currentListeners = nextListeners;
-
-    for (var i = 0; i < listeners.length; i++) {
-      var listener = listeners[i];
-      listener();
-    }
-
-    return action;
-  }
-  /**
-   * Replaces the reducer currently used by the store to calculate the state.
-   *
-   * You might need this if your app implements code splitting and you want to
-   * load some of the reducers dynamically. You might also need this if you
-   * implement a hot reloading mechanism for Redux.
-   *
-   * @param {Function} nextReducer The reducer for the store to use instead.
-   * @returns {void}
-   */
-
-
-  function replaceReducer(nextReducer) {
-    if (typeof nextReducer !== 'function') {
-      throw new Error( true ? formatProdErrorMessage(10) : 0);
-    }
-
-    currentReducer = nextReducer; // This action has a similiar effect to ActionTypes.INIT.
-    // Any reducers that existed in both the new and old rootReducer
-    // will receive the previous state. This effectively populates
-    // the new state tree with any relevant data from the old one.
-
-    dispatch({
-      type: ActionTypes.REPLACE
-    });
-  }
-  /**
-   * Interoperability point for observable/reactive libraries.
-   * @returns {observable} A minimal observable of state changes.
-   * For more information, see the observable proposal:
-   * https://github.com/tc39/proposal-observable
-   */
-
-
-  function observable() {
-    var _ref;
-
-    var outerSubscribe = subscribe;
-    return _ref = {
-      /**
-       * The minimal observable subscription method.
-       * @param {Object} observer Any object that can be used as an observer.
-       * The observer object should have a `next` method.
-       * @returns {subscription} An object with an `unsubscribe` method that can
-       * be used to unsubscribe the observable from the store, and prevent further
-       * emission of values from the observable.
-       */
-      subscribe: function subscribe(observer) {
-        if (typeof observer !== 'object' || observer === null) {
-          throw new Error( true ? formatProdErrorMessage(11) : 0);
-        }
-
-        function observeState() {
-          if (observer.next) {
-            observer.next(getState());
-          }
-        }
-
-        observeState();
-        var unsubscribe = outerSubscribe(observeState);
-        return {
-          unsubscribe: unsubscribe
-        };
-      }
-    }, _ref[$$observable] = function () {
-      return this;
-    }, _ref;
-  } // When a store is created, an "INIT" action is dispatched so that every
-  // reducer returns their initial state. This effectively populates
-  // the initial state tree.
-
-
-  dispatch({
-    type: ActionTypes.INIT
-  });
-  return _ref2 = {
-    dispatch: dispatch,
-    subscribe: subscribe,
-    getState: getState,
-    replaceReducer: replaceReducer
-  }, _ref2[$$observable] = observable, _ref2;
-}
-
-/**
- * Prints a warning in the console if it exists.
- *
- * @param {String} message The warning message.
- * @returns {void}
- */
-function warning(message) {
-  /* eslint-disable no-console */
-  if (typeof console !== 'undefined' && typeof console.error === 'function') {
-    console.error(message);
-  }
-  /* eslint-enable no-console */
-
-
-  try {
-    // This error was thrown as a convenience so that if you enable
-    // "break on all exceptions" in your console,
-    // it would pause the execution at this line.
-    throw new Error(message);
-  } catch (e) {} // eslint-disable-line no-empty
-
-}
-
-function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
-  var reducerKeys = Object.keys(reducers);
-  var argumentName = action && action.type === ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
-
-  if (reducerKeys.length === 0) {
-    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
-  }
-
-  if (!isPlainObject(inputState)) {
-    return "The " + argumentName + " has unexpected type of \"" + kindOf(inputState) + "\". Expected argument to be an object with the following " + ("keys: \"" + reducerKeys.join('", "') + "\"");
-  }
-
-  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
-    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
-  });
-  unexpectedKeys.forEach(function (key) {
-    unexpectedKeyCache[key] = true;
-  });
-  if (action && action.type === ActionTypes.REPLACE) return;
-
-  if (unexpectedKeys.length > 0) {
-    return "Unexpected " + (unexpectedKeys.length > 1 ? 'keys' : 'key') + " " + ("\"" + unexpectedKeys.join('", "') + "\" found in " + argumentName + ". ") + "Expected to find one of the known reducer keys instead: " + ("\"" + reducerKeys.join('", "') + "\". Unexpected keys will be ignored.");
-  }
-}
-
-function assertReducerShape(reducers) {
-  Object.keys(reducers).forEach(function (key) {
-    var reducer = reducers[key];
-    var initialState = reducer(undefined, {
-      type: ActionTypes.INIT
-    });
-
-    if (typeof initialState === 'undefined') {
-      throw new Error( true ? formatProdErrorMessage(12) : 0);
-    }
-
-    if (typeof reducer(undefined, {
-      type: ActionTypes.PROBE_UNKNOWN_ACTION()
-    }) === 'undefined') {
-      throw new Error( true ? formatProdErrorMessage(13) : 0);
-    }
-  });
-}
-/**
- * Turns an object whose values are different reducer functions, into a single
- * reducer function. It will call every child reducer, and gather their results
- * into a single state object, whose keys correspond to the keys of the passed
- * reducer functions.
- *
- * @param {Object} reducers An object whose values correspond to different
- * reducer functions that need to be combined into one. One handy way to obtain
- * it is to use ES6 `import * as reducers` syntax. The reducers may never return
- * undefined for any action. Instead, they should return their initial state
- * if the state passed to them was undefined, and the current state for any
- * unrecognized action.
- *
- * @returns {Function} A reducer function that invokes every reducer inside the
- * passed object, and builds a state object with the same shape.
- */
-
-
-function combineReducers(reducers) {
-  var reducerKeys = Object.keys(reducers);
-  var finalReducers = {};
-
-  for (var i = 0; i < reducerKeys.length; i++) {
-    var key = reducerKeys[i];
-
-    if (false) {}
-
-    if (typeof reducers[key] === 'function') {
-      finalReducers[key] = reducers[key];
-    }
-  }
-
-  var finalReducerKeys = Object.keys(finalReducers); // This is used to make sure we don't warn about the same
-  // keys multiple times.
-
-  var unexpectedKeyCache;
-
-  if (false) {}
-
-  var shapeAssertionError;
-
-  try {
-    assertReducerShape(finalReducers);
-  } catch (e) {
-    shapeAssertionError = e;
-  }
-
-  return function combination(state, action) {
-    if (state === void 0) {
-      state = {};
-    }
-
-    if (shapeAssertionError) {
-      throw shapeAssertionError;
-    }
-
-    if (false) { var warningMessage; }
-
-    var hasChanged = false;
-    var nextState = {};
-
-    for (var _i = 0; _i < finalReducerKeys.length; _i++) {
-      var _key = finalReducerKeys[_i];
-      var reducer = finalReducers[_key];
-      var previousStateForKey = state[_key];
-      var nextStateForKey = reducer(previousStateForKey, action);
-
-      if (typeof nextStateForKey === 'undefined') {
-        var actionType = action && action.type;
-        throw new Error( true ? formatProdErrorMessage(14) : 0);
-      }
-
-      nextState[_key] = nextStateForKey;
-      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
-    }
-
-    hasChanged = hasChanged || finalReducerKeys.length !== Object.keys(state).length;
-    return hasChanged ? nextState : state;
-  };
-}
-
-function bindActionCreator(actionCreator, dispatch) {
-  return function () {
-    return dispatch(actionCreator.apply(this, arguments));
-  };
-}
-/**
- * Turns an object whose values are action creators, into an object with the
- * same keys, but with every function wrapped into a `dispatch` call so they
- * may be invoked directly. This is just a convenience method, as you can call
- * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
- *
- * For convenience, you can also pass an action creator as the first argument,
- * and get a dispatch wrapped function in return.
- *
- * @param {Function|Object} actionCreators An object whose values are action
- * creator functions. One handy way to obtain it is to use ES6 `import * as`
- * syntax. You may also pass a single function.
- *
- * @param {Function} dispatch The `dispatch` function available on your Redux
- * store.
- *
- * @returns {Function|Object} The object mimicking the original object, but with
- * every action creator wrapped into the `dispatch` call. If you passed a
- * function as `actionCreators`, the return value will also be a single
- * function.
- */
-
-
-function bindActionCreators(actionCreators, dispatch) {
-  if (typeof actionCreators === 'function') {
-    return bindActionCreator(actionCreators, dispatch);
-  }
-
-  if (typeof actionCreators !== 'object' || actionCreators === null) {
-    throw new Error( true ? formatProdErrorMessage(16) : 0);
-  }
-
-  var boundActionCreators = {};
-
-  for (var key in actionCreators) {
-    var actionCreator = actionCreators[key];
-
-    if (typeof actionCreator === 'function') {
-      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
-    }
-  }
-
-  return boundActionCreators;
-}
-
-/**
- * Composes single-argument functions from right to left. The rightmost
- * function can take multiple arguments as it provides the signature for
- * the resulting composite function.
- *
- * @param {...Function} funcs The functions to compose.
- * @returns {Function} A function obtained by composing the argument functions
- * from right to left. For example, compose(f, g, h) is identical to doing
- * (...args) => f(g(h(...args))).
- */
-function compose() {
-  for (var _len = arguments.length, funcs = new Array(_len), _key = 0; _key < _len; _key++) {
-    funcs[_key] = arguments[_key];
-  }
-
-  if (funcs.length === 0) {
-    return function (arg) {
-      return arg;
-    };
-  }
-
-  if (funcs.length === 1) {
-    return funcs[0];
-  }
-
-  return funcs.reduce(function (a, b) {
-    return function () {
-      return a(b.apply(void 0, arguments));
-    };
-  });
-}
-
-/**
- * Creates a store enhancer that applies middleware to the dispatch method
- * of the Redux store. This is handy for a variety of tasks, such as expressing
- * asynchronous actions in a concise manner, or logging every action payload.
- *
- * See `redux-thunk` package as an example of the Redux middleware.
- *
- * Because middleware is potentially asynchronous, this should be the first
- * store enhancer in the composition chain.
- *
- * Note that each middleware will be given the `dispatch` and `getState` functions
- * as named arguments.
- *
- * @param {...Function} middlewares The middleware chain to be applied.
- * @returns {Function} A store enhancer applying the middleware.
- */
-
-function applyMiddleware() {
-  for (var _len = arguments.length, middlewares = new Array(_len), _key = 0; _key < _len; _key++) {
-    middlewares[_key] = arguments[_key];
-  }
-
-  return function (createStore) {
-    return function () {
-      var store = createStore.apply(void 0, arguments);
-
-      var _dispatch = function dispatch() {
-        throw new Error( true ? formatProdErrorMessage(15) : 0);
-      };
-
-      var middlewareAPI = {
-        getState: store.getState,
-        dispatch: function dispatch() {
-          return _dispatch.apply(void 0, arguments);
-        }
-      };
-      var chain = middlewares.map(function (middleware) {
-        return middleware(middlewareAPI);
-      });
-      _dispatch = compose.apply(void 0, chain)(store.dispatch);
-      return _objectSpread2(_objectSpread2({}, store), {}, {
-        dispatch: _dispatch
-      });
-    };
-  };
-}
-
-/*
- * This is a dummy function to check if the function name has been altered by minification.
- * If the function has been minified and NODE_ENV !== 'production', warn the user.
- */
-
-function isCrushed() {}
-
-if (false) {}
-
-
 
 
 /***/ })
@@ -7584,21 +5154,11 @@ if (false) {}
 /******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
 /******/ 	}();
 /******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 !function() {
+"use strict";
 /* harmony import */ var _scripts_choices__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(373);
 /* harmony import */ var _scripts_choices__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_scripts_choices__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _scripts_interfaces__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(187);

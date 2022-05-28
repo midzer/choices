@@ -1,8 +1,13 @@
-# Choices.js [![Actions Status](https://github.com/jshjohnson/Choices/workflows/Build%20and%20test/badge.svg)](https://github.com/jshjohnson/Choices/actions) [![Actions Status](https://github.com/jshjohnson/Choices/workflows/Bundle%20size%20checks/badge.svg)](https://github.com/jshjohnson/Choices/actions) [![npm](https://img.shields.io/npm/v/choices.js.svg)](https://www.npmjs.com/package/choices.js)
+# choices
 
-A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
+[![Version](https://badgen.net/npm/v/@midzer/choices)](https://github.com/midzer/choices/releases)
+[![License](https://badgen.net/npm/license/@midzer/choices)](https://github.com/midzer/choices/blob/master/LICENSE.md)
+![Dependencies](https://badgen.net/npm/dependents/@midzer/choices)
+![npm bundle size](https://badgen.net/bundlephobia/minzip/@midzer/choices)
 
-[Demo](https://choices-js.github.io/Choices/)
+A vanilla, lightweight (~16kb gzipped 🎉), configurable select plugin. Similar to Select2 and Selectize but without the jQuery dependency. Forked from [Choices.js v10.1.0](https://github.com/Choices-js/Choices).
+
+[Demo](https://midzer.github.io/choices/)
 
 ## TL;DR
 
@@ -10,21 +15,17 @@ A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input 
 - No jQuery dependency
 - Configurable sorting
 - Flexible styling
-- Fast search/filtering
+- Ultra-Fast search/filtering
 - Clean API
 - Right-to-left support
 - Custom templates
 
----
+## Differences to original Choices.js
 
-### Interested in writing your own ES6 JavaScript plugins? Check out [ES6.io](https://ES6.io/friend/JOHNSON) for great tutorials! 💪🏼
-
-### Sponsored by:
-<p align="center">
-  <a href="https://wanderermaps.com/" target="_blank" rel="noopener noreferrer">
-    <img src="https://cdn.shopify.com/s/files/1/0614/3357/7715/files/Logo_BlackWithBackground_200x.png?v=1644802773" alt="Wanderer Maps logo">
-  </a>
-</p>
+- replaced fuse.js by kmp search
+- dropped IE11 support
+- `deepmerge` dependency replaced by smaller vanilla utility
+- `redux` dependency replaced by smaller `pico-redux`
 
 ---
 
@@ -43,52 +44,19 @@ A vanilla, lightweight (~19kb gzipped 🎉), configurable select box/text input 
 
 ## Installation
 
-With [NPM](https://www.npmjs.com/package/choices.js):
+With [NPM](https://www.npmjs.com/package/@midzer/choices):
 
 ```zsh
-npm install choices.js
+npm install @midzer/choices
 ```
 
 With [Yarn](https://yarnpkg.com/):
 
 ```zsh
-yarn add choices.js
+yarn add @midzer/choices
 ```
 
-From a [CDN](https://www.jsdelivr.com/package/npm/choices.js):
-
-**Note:** There is sometimes a delay before the latest version of Choices is reflected on the CDN.
-
-```html
-<!-- Include base CSS (optional) -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/base.min.css"
-/>
-<!-- Or versioned -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/base.min.css"
-/>
-
-<!-- Include Choices CSS -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
-/>
-<!-- Or versioned -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
-/>
-
-<!-- Include Choices JavaScript (latest) -->
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<!-- Or versioned -->
-<script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
-```
-
-Or include Choices directly:
+Or include choices directly:
 
 ```html
 <!-- Include base CSS (optional) -->
@@ -187,11 +155,6 @@ Or include Choices directly:
       loadingState: 'is-loading',
       noResults: 'has-no-results',
       noChoices: 'has-no-choices'
-    },
-    // Choices uses the great Fuse library for searching. You
-    // can find more options here: https://fusejs.io/api/options.html
-    fuseOptions: {
-      includeScore: true
     },
     labelId: '',
     callbackOnInit: null,
@@ -583,7 +546,7 @@ For backward compatibility, `<option placeholder>This is a placeholder</option>`
 
 **Input types affected:** `text`
 
-**Usage:** The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example), otherwise pass a string.
+**Usage:** The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the [default config](https://github.com/midzer/choices#setup) for an example), otherwise pass a string.
 
 ### maxItemText
 
@@ -591,7 +554,7 @@ For backward compatibility, `<option placeholder>This is a placeholder</option>`
 
 **Input types affected:** `text`
 
-**Usage:** The text that is shown when a user has focus on the input but has already reached the [max item count](https://github.com/jshjohnson/Choices#maxitemcount). To access the max item count, pass a function with a `maxItemCount` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example), otherwise pass a string.
+**Usage:** The text that is shown when a user has focus on the input but has already reached the [max item count](https://github.com/midzer/choices#maxitemcount). To access the max item count, pass a function with a `maxItemCount` argument (see the [default config](https://github.com/midzer/choices#setup) for an example), otherwise pass a string.
 
 ### valueComparer
 
@@ -1102,16 +1065,7 @@ example.setChoiceByValue('Two'); // Choice with value of 'Two' has now been sele
 
 ## Browser compatibility
 
-Choices is compiled using [Babel](https://babeljs.io/) targeting browsers [with more than 1% of global usage](https://github.com/jshjohnson/Choices/blob/master/.browserslistrc) and expecting that features [listed below](https://github.com/jshjohnson/Choices/blob/master/.eslintrc.json#L62) are available or polyfilled in browser.
-You may see exact list of target browsers by running `npx browserslist` within this repository folder.
-If you need to support a browser that does not have one of the features listed below,
-I suggest including a polyfill from the very good [polyfill.io](https://polyfill.io/v3/):
-
-**Polyfill example used for the demo:**
-
-```html
-<script src="https://cdn.polyfill.io/v3/polyfill.min.js?features=Array.from%2Ces5%2Ces6%2CSymbol%2CSymbol.iterator%2CDOMTokenList%2CObject.assign%2CCustomEvent%2CElement.prototype.classList%2CElement.prototype.closest%2CElement.prototype.dataset%2CArray.prototype.find%2CArray.prototype.includes"></script>
-```
+All modern browsers, except IE11.
 
 **Features used in Choices:**
 
@@ -1152,16 +1106,8 @@ To setup a local environment: clone this repo, navigate into its directory in a 
 
 ### Interested in contributing?
 
-We're always interested in having more active maintainers.  Please get in touch if you're interested 👍
+We're always interested in having more active maintainers. Please get in touch if you're interested 👍
 
 ## License
 
 MIT License
-
-## Web component
-
-Want to use Choices as a web component? You're in luck. Adidas have built one for their design system which can be found [here](https://github.com/adidas/choicesjs-stencil).
-
-## Misc
-
-Thanks to [@mikefrancis](https://github.com/mikefrancis/) for [sending me on a hunt](https://twitter.com/_mikefrancis/status/701797835826667520) for a non-jQuery solution for select boxes that eventually led to this being built!

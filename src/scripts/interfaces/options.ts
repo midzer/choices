@@ -1,4 +1,3 @@
-import Fuse from 'fuse.js';
 import { Choices } from './choices';
 import { Choice } from './choice';
 import { ClassNames } from './class-names';
@@ -121,7 +120,7 @@ export interface Options {
   addItemFilter: string | RegExp | Types.FilterFunction | null;
 
   /**
-   * The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the **default config** [https://github.com/jshjohnson/Choices#setup] for an example), otherwise pass a string.
+   * The text that is shown when a user has inputted a new item but has not pressed the enter key. To access the current input value, pass a function with a `value` argument (see the **default config** [https://github.com/midzer/choices#setup] for an example), otherwise pass a string.
    *
    * **Input types affected:** text
    *
@@ -170,7 +169,7 @@ export interface Options {
    *
    * @default true
    */
-  allowHTML: boolean;
+   allowHTML: boolean;
 
   /**
    * Whether each inputted/chosen item should be unique.
@@ -402,7 +401,7 @@ export interface Options {
   itemSelectText: string;
 
   /**
-   * The text that is shown when a user has focus on the input but has already reached the **max item count** [https://github.com/jshjohnson/Choices#maxitemcount]. To access the max item count, pass a function with a `maxItemCount` argument (see the **default config** [https://github.com/jshjohnson/Choices#setup] for an example), otherwise pass a string.
+   * The text that is shown when a user has focus on the input but has already reached the **max item count** [https://github.com/midzer/choices#maxitemcount]. To access the max item count, pass a function with a `maxItemCount` argument (see the **default config** [https://github.com/midzer/choices#setup] for an example), otherwise pass a string.
    *
    * **Input types affected:** text
    *
@@ -430,7 +429,7 @@ export interface Options {
   customAddItemText: string | Types.NoticeStringFunction;
 
   /**
-   * Compare choice and value in appropriate way (e.g. deep equality for objects). To compare choice and value, pass a function with a `valueComparer` argument (see the [default config](https://github.com/jshjohnson/Choices#setup) for an example).
+   * Compare choice and value in appropriate way (e.g. deep equality for objects). To compare choice and value, pass a function with a `valueComparer` argument (see the [default config](https://github.com/midzer/choices#setup) for an example).
    *
    * **Input types affected:** select-one, select-multiple
    *
@@ -449,15 +448,10 @@ export interface Options {
   classNames: ClassNames;
 
   /**
-   * Choices uses the great Fuse library for searching. You can find more options here: https://fusejs.io/api/options.html
-   */
-  fuseOptions: Fuse.IFuseOptions<Choices>;
-
-  /**
    * ID of the connected label to improve a11y. If set, aria-labelledby will be added.
    */
-  labelId: string;
-
+   labelId: string;
+   
   /**
    * Function to run once Choices initialises.
    *
@@ -470,7 +464,7 @@ export interface Options {
   callbackOnInit: ((this: Choices) => void) | null;
 
   /**
-   * Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various data attributes defined here [https://github.com/jshjohnson/Choices/blob/67f29c286aa21d88847adfcd6304dc7d068dc01f/assets/scripts/src/choices.js#L1993-L2067].
+   * Function to run on template creation. Through this callback it is possible to provide custom templates for the various components of Choices (see terminology). For Choices to work with custom templates, it is important you maintain the various data attributes defined here [https://github.com/midzer/choices/blob/67f29c286aa21d88847adfcd6304dc7d068dc01f/assets/scripts/src/choices.js#L1993-L2067].
    *
    * **Input types affected:** text, select-one, select-multiple
    *

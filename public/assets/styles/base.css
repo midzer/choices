@@ -9,7 +9,8 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 html,
@@ -79,6 +80,7 @@ a:focus {
   border-radius: 2.5px;
   font-size: 14px;
   -webkit-appearance: none;
+     -moz-appearance: none;
           appearance: none;
   margin-bottom: 24px;
 }

@@ -80,7 +80,6 @@ describe('constants', () => {
         expect(DEFAULT_CONFIG.customAddItemText).to.be.a('string');
         expect(DEFAULT_CONFIG.addItemText).to.be.a('function');
         expect(DEFAULT_CONFIG.maxItemText).to.be.a('function');
-        expect(DEFAULT_CONFIG.fuseOptions).to.be.an('object');
         expect(DEFAULT_CONFIG.callbackOnInit).to.equal(null);
         expect(DEFAULT_CONFIG.callbackOnCreateTemplates).to.equal(null);
       });

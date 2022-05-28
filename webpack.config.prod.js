@@ -1,13 +1,11 @@
 const path = require('path');
-const deepMerge = require('deepmerge');
 const { BannerPlugin } = require('webpack');
+const { merge } = require('webpack-merge');
 
 const baseConfig = require('./webpack.config.base');
 const { name, version, author, homepage } = require('./package.json');
 
-const arrayMerge = (target, source) => [...source, ...target];
-
-const prodConfig = deepMerge(
+const prodConfig = merge(
   baseConfig,
   {
     mode: 'production',
@@ -20,28 +18,19 @@ const prodConfig = deepMerge(
         `${name} v${version} | © ${new Date().getFullYear()} ${author} | ${homepage}`,
       ),
     ],
-  },
-  {
-    arrayMerge,
-  },
+  }
 );
 
 module.exports = [
-  deepMerge(
+  merge(
     prodConfig,
     {
       output: { filename: 'choices.js', libraryTarget: 'umd' },
       optimization: { minimize: false },
-    },
-    {
-      arrayMerge,
-    },
+    }
   ),
-  deepMerge(
+  merge(
     prodConfig,
     { output: { filename: 'choices.min.js' } },
-    {
-      arrayMerge,
-    },
-  ),
+  )
 ];

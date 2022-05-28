@@ -1,5 +1,3 @@
-import { Options } from 'deepmerge';
-import { Store } from 'redux';
 import {
   WrappedInput,
   WrappedSelect,
@@ -13,6 +11,8 @@ import { Group } from './group';
 import { Item } from './item';
 import { State } from './state';
 import templates from '../templates';
+import { Options } from '../interfaces/options';
+import Store from '../store/store';
 
 export interface Choices {
   initialised: boolean;
@@ -53,8 +53,6 @@ export interface Choices {
   _currentValue: string;
 
   _canSearch: boolean;
-
-  _isScrollingOnIe: boolean;
 
   _highlightPosition: number;
 

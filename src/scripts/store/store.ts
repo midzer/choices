@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createStore, Store as IStore, AnyAction } from 'redux';
+import { createStore, withSubscribe } from 'pico-redux';
 import { Choice } from '../interfaces/choice';
 import { Group } from '../interfaces/group';
 import { Item } from '../interfaces/item';
@@ -7,10 +7,10 @@ import { State } from '../interfaces/state';
 import rootReducer from '../reducers/index';
 
 export default class Store {
-  _store: IStore;
+  _store: any;
 
   constructor() {
-    this._store = createStore(
+    this._store = withSubscribe(createStore)(
       rootReducer,
       (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
         (window as any).__REDUX_DEVTOOLS_EXTENSION__(),
@@ -27,7 +27,7 @@ export default class Store {
   /**
    * Dispatch event to store (wrapped Redux method)
    */
-  dispatch(action: AnyAction): void {
+  dispatch(action: any): void {
     this._store.dispatch(action);
   }
 

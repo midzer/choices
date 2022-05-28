@@ -9,7 +9,7 @@ import Store from './store/store';
 import templates from './templates';
 /**
  * Choices
- * @author Josh Johnson<josh@joshuajohnson.co.uk>
+ * @author midzer<midzer.de>
  */
 declare class Choices implements Choices {
     static get defaults(): {
@@ -36,7 +36,6 @@ declare class Choices implements Choices {
     _prevState: State;
     _currentValue: string;
     _canSearch: boolean;
-    _isScrollingOnIe: boolean;
     _highlightPosition: number;
     _wasTap: boolean;
     _isSearching: boolean;

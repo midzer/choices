@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from 'pico-redux';
 import items from './items';
 import groups from './groups';
 import choices from './choices';

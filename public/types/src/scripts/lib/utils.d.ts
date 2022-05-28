@@ -23,5 +23,13 @@ export declare const cloneObject: (obj: object) => object;
  * Returns an array of keys present on the first but missing on the second object
  */
 export declare const diff: (a: Record<string, any>, b: Record<string, any>) => string[];
+/*!
+ * Merge two or more objects together.
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
+ * @param   {Boolean}  deep     If true, do a deep (or recursive) merge [optional]
+ * @param   {Object}   objects  The objects to merge together
+ * @returns {Object}            Merged values of defaults and options
+ */
+export declare const extend: (a?: Boolean, b?: Object, c?: Object, d?: Object) => {};
 export {};
 //# sourceMappingURL=utils.d.ts.map
