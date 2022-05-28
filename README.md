@@ -22,10 +22,10 @@ A fast, vanilla, lightweight (~16kb gzipped 🎉), configurable select plugin fo
 
 ## Differences to original Choices.js
 
-- replaced fuse.js by [KMP algorithm](https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm)
+- replaced `fuse.js` by [KMP algorithm](https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm)
+- replaced `deepmerge` a small utility
+- replaced `redux` by `pico-redux`
 - dropped IE11 support
-- `deepmerge` dependency replaced by vanilla utility
-- `redux` dependency replaced by smaller `pico-redux`
 
 ---
 
